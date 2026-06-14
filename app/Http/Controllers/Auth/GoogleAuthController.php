@@ -65,7 +65,7 @@ class GoogleAuthController extends Controller
 
         if ($user && $user->canAccessAdminPortal()) {
             return redirect()->route('admin.login')->withErrors([
-                'email' => 'Staff and developer accounts must login through the protected portal.',
+                'email' => 'Wrong portal for this account. Staff, admin-client, and developer accounts must sign in through the protected staff portal.',
             ]);
         }
 
@@ -101,15 +101,8 @@ class GoogleAuthController extends Controller
             'password_reset_token',
             'is_forgot_password',
             'otp_passed',
+            'customer_otp_passed',
         ]);
-
-        if (!is_null($user->email_verified_at)) {
-            request()->session()->put('customer_otp_passed', true);
-            request()->session()->forget(['otp_email', 'auth_type']);
-
-            return redirect()->route('dashboard')
-                ->with('status', 'Signed in with Google.');
-        }
 
         $otp = sprintf('%06d', mt_rand(0, 999999));
         $user->forceFill([
@@ -141,7 +134,6 @@ class GoogleAuthController extends Controller
 
         request()->session()->put('otp_email', $user->email);
         request()->session()->put('auth_type', 'account_verification');
-        request()->session()->forget('customer_otp_passed');
 
         return redirect()->route('otp.verify', [
             'email' => $user->email,

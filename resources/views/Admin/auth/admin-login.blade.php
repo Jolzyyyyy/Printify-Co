@@ -432,7 +432,7 @@
 
         .auth-options {
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
             width: 100%;
             margin: 0 0 10px !important;
@@ -452,6 +452,15 @@
             height: 15px !important;
             accent-color: var(--primary-blue) !important;
         }
+
+        .forgot-link {
+            color: var(--primary-blue) !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            text-decoration: none !important;
+        }
+
+        .forgot-link:hover { color: var(--dark-blue) !important; }
 
         .auth-btn {
             height: 41px !important;
@@ -530,6 +539,32 @@
             margin-top: 2px;
         }
 
+        .auth-feedback {
+            width: 100%;
+            border: 1px solid #fecaca;
+            background: #fff1f2;
+            color: #991b1b;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 0 0 12px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+        }
+
+        .auth-feedback strong {
+            display: block;
+            color: #7f1d1d;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .cooldown-timer {
+            font-variant-numeric: tabular-nums;
+        }
+
         @media (max-width: 860px) {
             .auth-container {
                 width: min(835px, calc(100vw - 28px)) !important;
@@ -554,6 +589,23 @@
             <div class="form-content">
                 <h1 class="auth-title">Create Account</h1>
                 <p class="auth-subtitle">Create staff access for the admin portal</p>
+
+                @if ($errors->any())
+                    <div class="auth-feedback" role="alert">
+                        <strong>Sign-in notice</strong>
+                        {{ $errors->first() }}
+                    </div>
+                @elseif (($loginCooldownSeconds ?? 0) > 0)
+                    <div class="auth-feedback" role="alert">
+                        <strong>Login cooldown active</strong>
+                        Please wait <span class="cooldown-timer" data-cooldown="{{ $loginCooldownSeconds }}">{{ $loginCooldownSeconds }}</span> seconds before trying again.
+                    </div>
+                @elseif (session('status'))
+                    <div class="auth-feedback" role="status">
+                        <strong>Notice</strong>
+                        {{ session('status') }}
+                    </div>
+                @endif
 
                 <form method="POST" action="{{ route('admin.register.submit') }}" class="w-full">
                     @csrf
@@ -596,8 +648,8 @@
                                 </svg>
                             </span>
                             <select name="role" class="custom-input" required>
-                                <option value="{{ \App\Models\User::ROLE_ADMIN }}" @selected(old('role') === \App\Models\User::ROLE_ADMIN)>Administrator</option>
-                                <option value="{{ \App\Models\User::ROLE_DEVELOPER }}" @selected(old('role') === \App\Models\User::ROLE_DEVELOPER)>System Developer</option>
+                                <option value="{{ \App\Models\User::ROLE_ADMIN_CLIENT }}" @selected(old('role') === \App\Models\User::ROLE_ADMIN_CLIENT)>Admin Client</option>
+                                <option value="{{ \App\Models\User::ROLE_DEVELOPER }}" @selected(old('role') === \App\Models\User::ROLE_DEVELOPER)>Developer</option>
                             </select>
                         </div>
                         @error('role') <p class="error-text">{{ $message }}</p> @enderror
@@ -635,6 +687,23 @@
             <div class="form-content">
                 <h1 class="auth-title">Sign In</h1>
                 <p class="auth-subtitle">Welcome back! Please sign in</p>
+
+                @if ($errors->any())
+                    <div class="auth-feedback" role="alert">
+                        <strong>Sign-in notice</strong>
+                        {{ $errors->first() }}
+                    </div>
+                @elseif (($loginCooldownSeconds ?? 0) > 0)
+                    <div class="auth-feedback" role="alert">
+                        <strong>Login cooldown active</strong>
+                        Please wait <span class="cooldown-timer" data-cooldown="{{ $loginCooldownSeconds }}">{{ $loginCooldownSeconds }}</span> seconds before trying again.
+                    </div>
+                @elseif (session('status'))
+                    <div class="auth-feedback" role="status">
+                        <strong>Notice</strong>
+                        {{ session('status') }}
+                    </div>
+                @endif
 
                 <form method="POST" action="{{ route('admin.login.submit') }}" class="w-full">
                     @csrf
@@ -678,6 +747,7 @@
                             <input id="remember_me" type="checkbox" name="remember">
                             <span>Remember me</span>
                         </label>
+                        <a href="{{ route('admin.password.request') }}" class="forgot-link">Forgot Password?</a>
                     </div>
 
                     <button type="submit" class="auth-btn">Sign In</button>
@@ -692,13 +762,13 @@
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
                     <h1>Staff Portal</h1>
-                    <p>Already have an admin or developer account? Sign in to manage the system.</p>
+                    <p>Already have an admin client or developer account? Sign in to manage the system.</p>
                     <button class="ghost-btn" id="signIn">Sign In</button>
                 </div>
 
                 <div class="overlay-panel overlay-right">
                     <h1>New Staff?</h1>
-                    <p>Create an admin or developer account to access the correct dashboard.</p>
+                    <p>Create an admin client or developer account to access the correct dashboard.</p>
                     <button class="ghost-btn" id="signUp">Sign Up</button>
                 </div>
             </div>
@@ -766,6 +836,26 @@
             } else {
                 container.classList.remove('right-panel-active');
             }
+        });
+
+        document.querySelectorAll('[data-cooldown]').forEach((timer) => {
+            let remaining = Number(timer.dataset.cooldown || 0);
+            const render = () => {
+                timer.textContent = Math.max(0, remaining).toString();
+            };
+
+            render();
+
+            const interval = window.setInterval(() => {
+                remaining -= 1;
+                render();
+
+                if (remaining <= 0) {
+                    window.clearInterval(interval);
+                    const notice = timer.closest('.auth-feedback');
+                    if (notice) notice.remove();
+                }
+            }, 1000);
         });
 
         function togglePassword(inputId, svgId) {

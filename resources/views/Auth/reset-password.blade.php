@@ -1034,7 +1034,7 @@
                 </button>
 
                 <div class="back-wrapper">
-                    <a class="back-link" href="{{ route('login') }}">
+                    <a class="back-link" href="{{ (session('password_reset_portal') ?? 'customer') === 'staff' ? route('admin.login') : route('login') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
                         </svg>
@@ -1097,9 +1097,10 @@
                                 @click="submitResetForm('auto_login')"
                                 class="modal-btn modal-btn-dark"
                             >
-                                {{ __('Dashboard') }}
+                                {{ (session('password_reset_portal') ?? 'customer') === 'staff' ? __('Staff Dashboard') : __('Dashboard') }}
                             </button>
 
+                            @if ((session('password_reset_portal') ?? 'customer') !== 'staff')
                             <button
                                 type="button"
                                 @click="submitResetForm('manual_login')"
@@ -1107,6 +1108,7 @@
                             >
                                 {{ __('Back to Login') }}
                             </button>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 // --- CUSTOMER CONTROLLERS ---
@@ -16,13 +15,10 @@ use App\Http\Controllers\SupportTicketController;
 
 // --- CUSTOMER AUTH CONTROLLERS ---
 use App\Http\Controllers\Auth\AuthenticatedSessionController; 
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyOtpController; 
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\NewPasswordController;
 
 // --- ADMIN CONTROLLERS ---
 use App\Http\Controllers\Admin\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\Auth\AdminPasswordResetLinkController;
 use App\Http\Controllers\Admin\AdminClientInvitationController;
 use App\Http\Controllers\Admin\AdminClientProfileController;
 use App\Http\Controllers\Admin\DeveloperAdminClientController;
@@ -33,7 +29,6 @@ use App\Http\Controllers\Admin\SectionController as AdminSectionController;
 
 // --- THIRD PARTY AUTH CONTROLLERS ---
 use App\Http\Controllers\GoogleController;
-use App\Http\Controllers\Auth\FacebookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,43 +70,13 @@ Route::get('/checkout.php', fn () => redirect('/checkout'));
 
 /*
 |--------------------------------------------------------------------------
-| 2. OTP & PASSWORD SETUP (STAY)
+| 2. PASSWORD SETUP (STAY)
 |--------------------------------------------------------------------------
 */
-Route::get('/verify-account', [VerifyOtpController::class, 'showVerifyForm'])
-    ->name('customer.otp.verify');
-
-Route::get('/verify-account/otp', [VerifyOtpController::class, 'showVerifyForm'])
-    ->name('otp.verify');
-
-Route::get('/verify-otp-page', [VerifyOtpController::class, 'showVerifyForm'])
-    ->name('verify-account');
-
-Route::post('/verify-otp-submit', [VerifyOtpController::class, 'verify'])
-    ->name('customer.otp.submit');
-
-Route::post('/resend-otp', [VerifyOtpController::class, 'resend'])
-    ->name('customer.otp.resend');
-
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/setup-password', [GoogleController::class, 'showSetupPassword'])->name('setup-password');
     Route::post('/setup-password-submit', [GoogleController::class, 'updateSetupPassword'])->name('password.setup.submit');
-
-    Route::get('/dashboard-redirect', function () {
-        $user = Auth::user();
-        if (!$user) return redirect()->route('login');
-
-        if ($user->canAccessAdminPortal()) {
-            return redirect()->route('admin.otp.verify');
-        }
-        
-        if (session('customer_otp_passed') === true) {
-            return redirect()->route('dashboard');
-        }
-
-        return redirect()->route('customer.otp.verify');
-    })->name('dashboard.redirect');
 });
 
 /*
@@ -189,23 +154,6 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
 
 /*
 |--------------------------------------------------------------------------
-| 4. GUEST ROUTES (STAY)
-|--------------------------------------------------------------------------
-*/
-Route::middleware('guest')->group(function () {
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login.post');
-    Route::post('register', [RegisteredUserController::class, 'store'])->name('register.post');
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
-    Route::post('reset-password/store', [NewPasswordController::class, 'store'])->name('password.store');
-});
-
-/*
-|--------------------------------------------------------------------------
 | 5. ADMIN SECTION (STAY)
 |--------------------------------------------------------------------------
 */
@@ -216,27 +164,29 @@ Route::middleware('guest')->prefix('p-co-2026')->group(function () {
     Route::get('/register-7b5e93-adm-key', [AdminAuthController::class, 'showRegisterForm'])->name('admin.register');
     Route::post('/login-7b5e93-adm-key', [AdminAuthController::class, 'login'])->name('admin.login.submit');
     Route::post('/register-7b5e93-adm-key', [AdminAuthController::class, 'register'])->name('admin.register.submit');
+    Route::get('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'create'])->name('admin.password.request');
+    Route::post('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'store'])->name('admin.password.email');
     Route::get('/admin-client-invite/{token}', [AdminClientInvitationController::class, 'show'])->name('admin-client-invitations.show');
     Route::post('/admin-client-invite/{token}', [AdminClientInvitationController::class, 'store'])->name('admin-client-invitations.store');
 });
 
 // Admin Authenticated Routes
-Route::middleware(['auth', 'admin'])->prefix('p-co-2026/admin')->group(function () {
+Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
     
     // Phase 1: Email OTP
     Route::get('/verify-access', [AdminAuthController::class, 'showOtpForm'])->name('admin.otp.verify');
     Route::post('/verify-otp-submit', [AdminAuthController::class, 'verifyOtp'])->name('admin.otp.submit');
     Route::post('/resend-otp', [AdminAuthController::class, 'resendOtp'])->name('admin.otp.resend');
     
-    // Phase 2: 2FA Security
-    Route::get('/security-2fa', [SecurityController::class, 'show2faForm'])->name('admin.security.2fa');
-    Route::post('/security-2fa-verify', [SecurityController::class, 'verify2fa'])->name('admin.security.2fa.activate');
-
     // Admin Dashboard & Resources
-    Route::middleware(['role:admin,developer,admin_client'])->group(function () {
+    Route::middleware(['role:admin_client,developer', 'staff.portal', 'admin.client.profile'])->group(function () {
         
         // 1. DASHBOARD
         Route::get('/dashboard', AdminDashboardController::class)->name('admin.dashboard');
+
+        // Phase 2: 2FA Security
+        Route::get('/security-2fa', [SecurityController::class, 'show2faForm'])->name('admin.security.2fa');
+        Route::post('/security-2fa-verify', [SecurityController::class, 'verify2fa'])->name('admin.security.2fa.activate');
 
         // 2. CUSTOMER/USER
         Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers');
@@ -245,7 +195,7 @@ Route::middleware(['auth', 'admin'])->prefix('p-co-2026/admin')->group(function 
         Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
         Route::get('/orders-database', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/orders-database/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
-        Route::middleware('role:developer,admin')->group(function () {
+        Route::middleware('role:developer')->group(function () {
             Route::get('/orders-database/{order}/edit', [OrderController::class, 'edit'])->name('admin.orders.edit');
             Route::put('/orders-database/{order}', [OrderController::class, 'update'])->name('admin.orders.update');
             Route::delete('/orders-database/{order}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
@@ -254,10 +204,13 @@ Route::middleware(['auth', 'admin'])->prefix('p-co-2026/admin')->group(function 
         // 4. PRODUCTS
         Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
         Route::get('/services', [ServiceController::class, 'adminIndex'])->name('admin.services.index');
-        Route::get('/services/create', [ServiceController::class, 'create'])->name('admin.services.create');
-        Route::patch('/services/{service}/toggle', [ServiceController::class, 'toggleActive'])->name('admin.services.toggle');
-        Route::middleware('role:developer,admin')->group(function () {
+        Route::middleware('role:developer')->group(function () {
+            Route::get('/services/create', [ServiceController::class, 'create'])->name('admin.services.create');
+            Route::post('/services', [ServiceController::class, 'store'])->name('admin.services.store');
             Route::get('/services/{service}/edit', [ServiceController::class, 'edit'])->name('admin.services.edit');
+            Route::put('/services/{service}', [ServiceController::class, 'update'])->name('admin.services.update');
+            Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('admin.services.destroy');
+            Route::patch('/services/{service}/toggle', [ServiceController::class, 'toggleActive'])->name('admin.services.toggle');
         });
         
         // 5. RATES
@@ -285,12 +238,11 @@ Route::middleware(['auth', 'admin'])->prefix('p-co-2026/admin')->group(function 
         Route::patch('/profile', [ProfileController::class, 'adminUpdate'])->name('admin.profile.update');
         Route::get('/reference-profile', [AdminClientProfileController::class, 'edit'])->name('admin.admin-client-profile.edit');
         Route::put('/reference-profile', [AdminClientProfileController::class, 'update'])->name('admin.admin-client-profile.update');
-        Route::resource('services-admin', ServiceController::class)->except(['index', 'show']);
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
     });
 });
 
-Route::middleware(['auth', 'admin', 'role:developer'])->prefix('p-co-2026/developer')->name('developer.')->group(function () {
+Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026/developer')->name('developer.')->group(function () {
     Route::get('/orders', [AdminSectionController::class, 'orders'])->name('orders.index');
     Route::get('/services', [AdminSectionController::class, 'services'])->name('services.index');
     Route::get('/customers', [AdminSectionController::class, 'customers'])->name('customers.index');
@@ -304,20 +256,12 @@ Route::middleware(['auth', 'admin', 'role:developer'])->prefix('p-co-2026/develo
     Route::patch('/admin-clients/{user}/assign-customer', [DeveloperAdminClientController::class, 'assignCustomer'])->name('admin-clients.assign-customer');
 });
 
-/*
-|--------------------------------------------------------------------------
-| 6. THIRD PARTY AUTH ROUTES (STAY)
-|--------------------------------------------------------------------------
-*/
-Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
-Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
-Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook'])->name('facebook.login');
-Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
-
 if (file_exists(__DIR__ . '/auth.php')) {
     require __DIR__ . '/auth.php';
 }
 
 // Routes para sa CRUD operations ng Customers
-Route::post('/admin/customers/save', [AdminController::class, 'saveCustomer'])->name('admin.customers.save');
-Route::delete('/admin/customers/delete/{id}', [AdminController::class, 'deleteCustomer'])->name('admin.customers.delete');
+Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('admin/customers')->group(function () {
+    Route::post('/save', [AdminController::class, 'saveCustomer'])->name('admin.customers.save');
+    Route::delete('/delete/{id}', [AdminController::class, 'deleteCustomer'])->name('admin.customers.delete');
+});

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Password::defaults(fn () => Password::min(8)->numbers()->symbols());
+
         /**
          * 🛡️ REDIRECT IF AUTHENTICATED (Guest Middleware Override)
          * Kapag ang isang user ay naka-login na at sinubukan niyang i-access ang 
@@ -31,8 +34,8 @@ class AppServiceProvider extends ServiceProvider
 
             if ($user) {
                 /**
-                 * 1. ADMIN FLOW (UNTOUCHED)
-                 * Nanatiling original ang logic para sa Admin ayon sa iyong request.
+                 * 1. STAFF PORTAL FLOW
+                 * Para sa admin_client at developer accounts.
                  */
                 if (method_exists($user, 'canAccessAdminPortal') && $user->canAccessAdminPortal()) {
                     return route('admin.otp.verify');

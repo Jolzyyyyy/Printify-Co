@@ -84,8 +84,8 @@ class PasswordResetTest extends TestCase
             ->post(route('password.store', absolute: false), [
                 'token' => $token,
                 'email' => $user->email,
-                'password' => 'new-secure-password',
-                'password_confirmation' => 'new-secure-password',
+                'password' => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
                 'action_type' => 'manual_login',
             ]);
 
@@ -93,7 +93,7 @@ class PasswordResetTest extends TestCase
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('login', absolute: false));
 
-        $this->assertTrue(Hash::check('new-secure-password', $user->fresh()->password));
+        $this->assertTrue(Hash::check('NewPassword1!', $user->fresh()->password));
     }
 
     public function test_forgot_password_otp_reset_flow_can_auto_login_user(): void
@@ -125,12 +125,42 @@ class PasswordResetTest extends TestCase
         $this->post(route('password.store', absolute: false), [
             'token' => session('password_reset_token'),
             'email' => $user->email,
-            'password' => 'new-secure-password',
-            'password_confirmation' => 'new-secure-password',
+            'password' => 'NewPassword1!',
+            'password_confirmation' => 'NewPassword1!',
             'action_type' => 'auto_login',
         ])->assertRedirect(route('dashboard', absolute: false));
 
         $this->assertAuthenticatedAs($user);
-        $this->assertTrue(Hash::check('new-secure-password', $user->fresh()->password));
+        $this->assertTrue(Hash::check('NewPassword1!', $user->fresh()->password));
+    }
+
+    public function test_password_reset_requires_shared_password_policy(): void
+    {
+        $user = User::factory()->create();
+        $token = 'test-reset-token';
+
+        $response = $this
+            ->withSession([
+                'password_reset_token' => $token,
+                'password_reset_email' => $user->email,
+            ])
+            ->from(route('password.reset', [
+                'token' => $token,
+                'email' => $user->email,
+            ], false))
+            ->post(route('password.store', absolute: false), [
+                'token' => $token,
+                'email' => $user->email,
+                'password' => 'weakpass',
+                'password_confirmation' => 'weakpass',
+                'action_type' => 'manual_login',
+            ]);
+
+        $response
+            ->assertRedirect(route('password.reset', [
+                'token' => $token,
+                'email' => $user->email,
+            ], false))
+            ->assertSessionHasErrors('password');
     }
 }

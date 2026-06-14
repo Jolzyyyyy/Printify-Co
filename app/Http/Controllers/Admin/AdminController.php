@@ -20,14 +20,78 @@ class AdminController extends Controller
         ]);
     }
 
-    public function customers() 
+    public function customers(Request $request) 
 {
-    // Simple filter: Lahat ng may role na Customer, kunin mo.
-    $users = \App\Models\User::where('role', 'Customer')->get(); 
+    $portalUser = $request->user();
+
+    $usersQuery = User::query()
+        ->when($portalUser->isDeveloper(), fn ($query) => $query
+            ->where('role', User::ROLE_ADMIN_CLIENT)
+            ->where('email', 'enchantingasha@gmail.com'))
+        ->when($portalUser->isAdminClient(), fn ($query) => $query
+            ->where('role', User::ROLE_CUSTOMER)
+            ->where('email', 'julieannecalusa@gmail.com')
+            ->where('admin_client_id', $portalUser->id))
+        ->when(!$portalUser->isDeveloper() && !$portalUser->isAdminClient(), fn ($query) => $query
+            ->where('role', User::ROLE_CUSTOMER));
+
+    $scopedUsers = (clone $usersQuery)->latest()->get();
+    $activeUsers = (clone $usersQuery)
+        ->whereNotNull('email_verified_at')
+        ->when($portalUser->isDeveloper(), fn ($query) => $query->whereNotNull('approved_at'))
+        ->count();
+
+    $pendingUsers = (clone $usersQuery)
+        ->where(function ($query) use ($portalUser) {
+            $query->whereNull('email_verified_at');
+
+            if ($portalUser->isDeveloper()) {
+                $query->orWhereNull('approved_at');
+            }
+        })
+        ->count();
+
+    $customerMetrics = [
+        'totalLabel' => $portalUser->isDeveloper() ? 'Total Admin Clients' : 'Total Customers',
+        'activeLabel' => $portalUser->isDeveloper() ? 'Active Admin Clients' : 'Active Customers',
+        'pendingLabel' => $portalUser->isDeveloper() ? 'Pending Admin Clients' : 'Pending Customers',
+        'total' => $scopedUsers->count(),
+        'active' => $activeUsers,
+        'pending' => $pendingUsers,
+        'suspended' => 0,
+    ];
+
+    $customerUsers = $scopedUsers->map(function (User $user) use ($portalUser) {
+        $status = $user->email_verified_at && (!$portalUser->isDeveloper() || $user->approved_at)
+            ? 'ACTIVE'
+            : 'INVITED';
+
+        $roleLabel = $user->isAdminClient() ? 'Admin Client' : 'Customer User';
+
+        return [
+            'id' => ($user->isAdminClient() ? 'ADM-' : 'CUST-') . str_pad((string) $user->id, 4, '0', STR_PAD_LEFT),
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone ?? 'N/A',
+            'company' => $user->company ?? ($user->adminClientProfile?->business_name ?? 'N/A'),
+            'status' => $status,
+            'role' => $roleLabel,
+            'roleShort' => $user->isAdminClient() ? 'Admin Client' : 'Customer',
+            'scope' => $user->isAdminClient() ? 'Admin Client Account' : 'Linked to ' . ($user->assignedAdminClient?->name ?? 'admin client'),
+            'permissions' => $user->isAdminClient() ? 'Approved portal access' : 'Customer account access',
+            'joined' => optional($user->created_at)->format('M d, Y') ?? 'N/A',
+            'since' => optional($user->created_at)->format('M d, Y h:i A') ?? 'N/A',
+            'lastLogin' => $user->email_verified_at ? 'Verified ' . $user->email_verified_at->format('M d, Y h:i A') : 'Not verified yet',
+            'photo' => $user->profile_photo ?? '',
+            'orders' => [],
+        ];
+    })->values();
 
     return view('Admin.dashboard', [
         'section' => 'customers',
-        'users'   => $users 
+        'users' => $scopedUsers,
+        'customerMetrics' => $customerMetrics,
+        'customerUsersJson' => $customerUsers,
     ]); 
 }
 

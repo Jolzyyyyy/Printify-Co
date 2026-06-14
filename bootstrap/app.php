@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         /**
          * 1. GUEST REDIRECT:
          * Kapag HINDI logged in ang user, dito sila ibabato.
-         * Naka-isolate ang Admin route (p-co-2026) para sa security.
+         * Naka-isolate ang staff portal route (p-co-2026) para sa security.
          */
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->is('p-co-2026/*') || $request->is('p-co-2026')) {
@@ -41,7 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->alias([
             'role'         => \App\Http\Middleware\RoleMiddleware::class,
-            'admin'        => \App\Http\Middleware\AdminMiddleware::class,
+            'staff.portal' => \App\Http\Middleware\AdminMiddleware::class,
             'admin.client.profile' => \App\Http\Middleware\EnsureAdminClientProfileIsComplete::class,
             
             // Ang 'customer_otp' alias na ngayon ang hahawak sa OTP Verification Logic
@@ -52,4 +52,3 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
-

@@ -122,19 +122,19 @@
                                             </button>
                                         </form>
                                         @unless($readyForApproval)
-                                            <p class="text-xs font-semibold leading-5 text-slate-500">The admin must finish the invite setup before this button unlocks.</p>
+                                            <p class="text-xs font-semibold leading-5 text-slate-500">The admin client must finish the invite setup before this button unlocks.</p>
                                         @endunless
                                     </div>
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-slate-500">No pending admin accounts.</p>
+                            <p class="text-sm text-slate-500">No pending admin client accounts.</p>
                         @endforelse
                     </div>
                 </div>
 
                 <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h2 class="text-lg font-black text-slate-900">Approved Admin Accounts</h2>
+                    <h2 class="text-lg font-black text-slate-900">Approved Admin Client Accounts</h2>
                     <div class="mt-4 space-y-4">
                         @forelse ($approvedAdminClients as $approvedUser)
                             <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
@@ -177,7 +177,7 @@
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-slate-500">No approved admin accounts yet.</p>
+                            <p class="text-sm text-slate-500">No approved admin client accounts yet.</p>
                         @endforelse
                     </div>
                 </div>

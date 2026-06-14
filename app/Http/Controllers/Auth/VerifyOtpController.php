@@ -18,7 +18,9 @@ use Illuminate\Validation\ValidationException;
 class VerifyOtpController extends Controller
 {
     private const CUSTOMER_OTP_MAX_ATTEMPTS = 3;
+    private const STAFF_OTP_MAX_ATTEMPTS = 5;
     private const CUSTOMER_OTP_RESEND_MAX_ATTEMPTS = 1;
+    private const STAFF_OTP_RESEND_MAX_ATTEMPTS = 1;
 
     public function showVerifyForm(Request $request)
     {
@@ -44,12 +46,36 @@ class VerifyOtpController extends Controller
             ]);
         }
 
-        // Siguraduhin na ang view file ay resources/views/auth/verify-otp.blade.php
+        $portal = $this->verificationPortal($request);
+        $otpThrottleKey = $this->otpThrottleKeyFromContext($portal, $email, $request->ip());
+        $resendThrottleKey = $this->otpResendThrottleKeyFromContext($portal, $email, $request->ip());
+        $maxAttempts = $this->otpMaxAttempts($portal);
+        $maxResends = $this->otpResendMaxAttempts($portal);
+        $isStaffReset = $portal === 'staff';
+
         return view('auth.verify-otp', [
             'email' => $email,
             'verificationEmail' => session('is_forgot_password') === true
                 ? session('password_reset_email')
                 : $email,
+            'otpTitle' => $isStaffReset ? 'Verify Staff Reset Code' : 'Verify Account',
+            'otpInstruction' => $isStaffReset
+                ? 'Enter the 6-digit staff reset code sent to your email address.'
+                : 'Please enter the 6-digit security code sent to your email address to continue.',
+            'otpStatusMessage' => $isStaffReset
+                ? 'A 6-digit staff password reset code has been sent to your email.'
+                : 'A 6-digit verification code has been sent to your email.',
+            'otpSubmitAction' => $isStaffReset ? route('otp.submit') : route('customer.otp.submit'),
+            'otpResendAction' => $isStaffReset ? route('otp.resend') : route('customer.otp.resend'),
+            'otpBackRoute' => $isStaffReset ? route('admin.login') : route('login'),
+            'otpBackLabel' => $isStaffReset ? 'Back to Staff Login' : 'Back to Login',
+            'verificationFlow' => session('is_forgot_password') === true ? 'forgot_password' : null,
+            'otpLockoutSeconds' => RateLimiter::tooManyAttempts($otpThrottleKey, $maxAttempts)
+                ? RateLimiter::availableIn($otpThrottleKey)
+                : 0,
+            'resendCooldownSeconds' => RateLimiter::tooManyAttempts($resendThrottleKey, $maxResends)
+                ? RateLimiter::availableIn($resendThrottleKey)
+                : 0,
         ]);
     }
 
@@ -65,24 +91,36 @@ class VerifyOtpController extends Controller
             'verification_flow' => ['nullable', 'string'],
         ]);
 
-        $otpThrottleKey = $this->customerOtpThrottleKey($request);
+        $lookupEmail = $this->verificationEmail($request);
+
+        if (!$lookupEmail) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Verification session expired. Please sign in again.',
+            ]);
+        }
+
+        if (Str::lower(trim((string) $request->email)) !== Str::lower(trim((string) $lookupEmail))) {
+            return back()->withErrors([
+                'email' => 'Verification session mismatch. Please restart the verification process.',
+            ]);
+        }
+
+        $portal = $this->verificationPortal($request);
+        $maxAttempts = $this->otpMaxAttempts($portal);
+        $otpThrottleKey = $this->otpThrottleKey($request, $lookupEmail);
 
         $this->ensureRateLimit(
             $otpThrottleKey,
-            self::CUSTOMER_OTP_MAX_ATTEMPTS,
+            $maxAttempts,
             'otp'
         );
-
-        $lookupEmail = session('is_forgot_password') === true
-            ? session('password_reset_email')
-            : $request->email;
 
         $user = User::where('email', trim((string) $lookupEmail))->first();
 
         if (!$user) {
             $attempts = RateLimiter::hit($otpThrottleKey, User::EMAIL_OTP_LOCKOUT_SECONDS);
 
-            if ($attempts >= self::CUSTOMER_OTP_MAX_ATTEMPTS) {
+            if ($attempts >= $maxAttempts) {
                 $this->throwOtpLockout($otpThrottleKey, 'otp');
             }
 
@@ -93,21 +131,21 @@ class VerifyOtpController extends Controller
         if (trim((string)$user->otp_code) !== trim((string)$request->otp)) {
             $attempts = RateLimiter::hit($otpThrottleKey, User::EMAIL_OTP_LOCKOUT_SECONDS);
 
-            if ($attempts >= self::CUSTOMER_OTP_MAX_ATTEMPTS) {
+            if ($attempts >= $maxAttempts) {
                 $this->throwOtpLockout($otpThrottleKey, 'otp');
             }
 
             return back()
                 ->withInput()
                 ->withErrors(['otp' => 'The security code you entered is incorrect.'])
-                ->with('otp_attempt_count', min($attempts, self::CUSTOMER_OTP_MAX_ATTEMPTS));
+                ->with('otp_attempt_count', min($attempts, $maxAttempts));
         }
 
-        // 2. Security Check: Expired na ba ang code?
-        if ($user->otp_expires_at && Carbon::parse($user->otp_expires_at)->isPast()) {
+        // 2. Security Check: may valid expiry ba ang code?
+        if (!$user->otp_expires_at || Carbon::parse($user->otp_expires_at)->isPast()) {
             $attempts = RateLimiter::hit($otpThrottleKey, User::EMAIL_OTP_LOCKOUT_SECONDS);
 
-            if ($attempts >= self::CUSTOMER_OTP_MAX_ATTEMPTS) {
+            if ($attempts >= $maxAttempts) {
                 $this->throwOtpLockout($otpThrottleKey, 'otp');
             }
 
@@ -129,8 +167,11 @@ class VerifyOtpController extends Controller
         if (session('is_forgot_password') === true) {
             $token = session('password_reset_token');
             $emailForReset = session('password_reset_email', $user->email);
+            $resetPortal = session('password_reset_portal', 'customer');
 
-            $request->session()->put('customer_otp_passed', true);
+            if ($resetPortal === 'customer') {
+                $request->session()->put('customer_otp_passed', true);
+            }
             $request->session()->forget(['is_forgot_password', 'otp_email']);
             
             return redirect()->route('password.reset', [
@@ -161,27 +202,26 @@ class VerifyOtpController extends Controller
      */
     public function resend(Request $request)
     {
-        $otpThrottleKey = $this->customerOtpThrottleKey($request);
-
-        $this->ensureRateLimit(
-            $otpThrottleKey,
-            self::CUSTOMER_OTP_MAX_ATTEMPTS,
-            'otp'
-        );
-
-        $this->ensureRateLimit(
-            $this->customerOtpResendThrottleKey($request),
-            self::CUSTOMER_OTP_RESEND_MAX_ATTEMPTS,
-            'otp'
-        );
-
-        $lookupEmail = session('is_forgot_password') === true
-            ? session('password_reset_email')
-            : ($request->email ?? session('otp_email') ?? session('password_reset_email'));
+        $lookupEmail = $this->verificationEmail($request);
 
         if (!$lookupEmail) {
             return back()->withErrors(['otp' => 'Email session expired. Please restart the process.']);
         }
+
+        $portal = $this->verificationPortal($request);
+        $otpThrottleKey = $this->otpThrottleKey($request, $lookupEmail);
+
+        $this->ensureRateLimit(
+            $otpThrottleKey,
+            $this->otpMaxAttempts($portal),
+            'otp'
+        );
+
+        $this->ensureRateLimit(
+            $this->otpResendThrottleKey($request, $lookupEmail),
+            $this->otpResendMaxAttempts($portal),
+            'otp'
+        );
 
         $user = User::where('email', $lookupEmail)->first();
         if (!$user) return back()->withErrors(['otp' => 'User not found.']);
@@ -200,6 +240,10 @@ class VerifyOtpController extends Controller
                 : $user->email;
 
             Mail::to($deliveryEmail)->send(new OTPVerificationMail($otp));
+            RateLimiter::hit(
+                $this->otpResendThrottleKey($request, $lookupEmail),
+                User::EMAIL_OTP_RESEND_COOLDOWN_SECONDS
+            );
             return back()->with('status', 'A new 6-digit verification code has been sent to your email.');
         } catch (\Exception $e) {
             Log::error("OTP Resend failed for {$user->email}: " . $e->getMessage());
@@ -229,9 +273,13 @@ class VerifyOtpController extends Controller
         ]);
     }
 
-    private function customerOtpThrottleKey(Request $request): string
+    private function otpThrottleKey(Request $request, ?string $email = null): string
     {
-        return $this->customerOtpThrottleKeyFromContext($request->input('email', ''), $request->ip());
+        return $this->otpThrottleKeyFromContext(
+            $this->verificationPortal($request),
+            $email ?? $this->verificationEmail($request),
+            $request->ip()
+        );
     }
 
     private function isForgotPasswordFlow(Request $request): bool
@@ -249,20 +297,65 @@ class VerifyOtpController extends Controller
             || $request->input('verification_flow') === 'forgot_password';
     }
 
-    private function customerOtpResendThrottleKey(Request $request): string
+    private function otpResendThrottleKey(Request $request, ?string $email = null): string
     {
-        $email = $request->input('email') ?? session('otp_email') ?? session('password_reset_email') ?? '';
-
-        return $this->customerOtpResendThrottleKeyFromContext((string) $email, $request->ip());
+        return $this->otpResendThrottleKeyFromContext(
+            $this->verificationPortal($request),
+            $email ?? $this->verificationEmail($request),
+            $request->ip()
+        );
     }
 
-    private function customerOtpThrottleKeyFromContext(?string $email, string $ip): string
+    private function verificationEmail(Request $request): ?string
     {
-        return 'customer-otp:' . Str::transliterate(Str::lower((string) $email) . '|' . $ip);
+        if (session('is_forgot_password') === true) {
+            return session('password_reset_email');
+        }
+
+        if (Auth::check()) {
+            return Auth::user()->email;
+        }
+
+        return session('otp_email')
+            ?? session('password_reset_email')
+            ?? $request->input('email')
+            ?? $request->query('email');
     }
 
-    private function customerOtpResendThrottleKeyFromContext(?string $email, string $ip): string
+    private function verificationPortal(Request $request): string
     {
-        return 'customer-otp-resend:' . Str::transliterate(Str::lower((string) $email) . '|' . $ip);
+        if (session('password_reset_portal') === 'staff') {
+            return 'staff';
+        }
+
+        return 'customer';
+    }
+
+    private function otpMaxAttempts(string $portal): int
+    {
+        return $portal === 'staff'
+            ? self::STAFF_OTP_MAX_ATTEMPTS
+            : self::CUSTOMER_OTP_MAX_ATTEMPTS;
+    }
+
+    private function otpResendMaxAttempts(string $portal): int
+    {
+        return $portal === 'staff'
+            ? self::STAFF_OTP_RESEND_MAX_ATTEMPTS
+            : self::CUSTOMER_OTP_RESEND_MAX_ATTEMPTS;
+    }
+
+    private function otpThrottleKeyFromContext(string $portal, ?string $email, string $ip): string
+    {
+        $prefix = $portal === 'staff' ? 'staff-otp:' : 'customer-otp:';
+
+        return $prefix . Str::transliterate(Str::lower((string) $email) . '|' . $ip);
+    }
+
+    private function otpResendThrottleKeyFromContext(string $portal, ?string $email, string $ip): string
+    {
+        $prefix = $portal === 'staff' ? 'staff-otp-resend:' : 'customer-otp-resend:';
+
+        return $prefix . Str::transliterate(Str::lower((string) $email) . '|' . $ip);
     }
 }

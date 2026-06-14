@@ -531,6 +531,40 @@
             margin-top: 2px;
         }
 
+        .auth-feedback {
+            width: 100%;
+            border: 1px solid #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 0 0 12px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+        }
+
+        .auth-feedback strong {
+            display: block;
+            color: #7c2d12;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .cooldown-timer {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .helper-text {
+            color: #64748b;
+            font-size: 10px;
+            width: 100%;
+            text-align: left;
+            margin-top: 3px;
+        }
+
         /* Final orange split-card auth UI */
         .min-h-screen{
             background:
@@ -881,6 +915,23 @@
                 <h1 class="auth-title">Create Account</h1>
                 <p class="auth-subtitle">Join us today and get started</p>
 
+                @if ($errors->any())
+                    <div class="auth-feedback" role="alert">
+                        <strong>Sign-in notice</strong>
+                        {{ $errors->first() }}
+                    </div>
+                @elseif (($loginCooldownSeconds ?? 0) > 0)
+                    <div class="auth-feedback" role="alert">
+                        <strong>Login cooldown active</strong>
+                        Please wait <span class="cooldown-timer" data-cooldown="{{ $loginCooldownSeconds }}">{{ $loginCooldownSeconds }}</span> seconds before trying again.
+                    </div>
+                @elseif (session('status'))
+                    <div class="auth-feedback" role="status">
+                        <strong>Notice</strong>
+                        {{ session('status') }}
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('register') }}" class="w-full">
                     @csrf
 
@@ -929,6 +980,7 @@
                                 </svg>
                             </button>
                         </div>
+                        <p class="helper-text">Use at least 8 characters with a number and special symbol.</p>
                         @error('password') <p class="error-text">{{ $message }}</p> @enderror
                     </div>
 
@@ -955,6 +1007,23 @@
             <div class="form-content">
                 <h1 class="auth-title">Sign In</h1>
                 <p class="auth-subtitle">Welcome back! Please sign in</p>
+
+                @if ($errors->any())
+                    <div class="auth-feedback" role="alert">
+                        <strong>Sign-in notice</strong>
+                        {{ $errors->first() }}
+                    </div>
+                @elseif (($loginCooldownSeconds ?? 0) > 0)
+                    <div class="auth-feedback" role="alert">
+                        <strong>Login cooldown active</strong>
+                        Please wait <span class="cooldown-timer" data-cooldown="{{ $loginCooldownSeconds }}">{{ $loginCooldownSeconds }}</span> seconds before trying again.
+                    </div>
+                @elseif (session('status'))
+                    <div class="auth-feedback" role="status">
+                        <strong>Notice</strong>
+                        {{ session('status') }}
+                    </div>
+                @endif
 
                 <form method="POST" action="{{ route('login') }}" class="w-full">
                     @csrf
@@ -1083,6 +1152,26 @@
             if (hasRegErrors || isRegisterPath) {
                 container.classList.add('right-panel-active');
             }
+        });
+
+        document.querySelectorAll('[data-cooldown]').forEach((timer) => {
+            let remaining = Number(timer.dataset.cooldown || 0);
+            const render = () => {
+                timer.textContent = Math.max(0, remaining).toString();
+            };
+
+            render();
+
+            const interval = window.setInterval(() => {
+                remaining -= 1;
+                render();
+
+                if (remaining <= 0) {
+                    window.clearInterval(interval);
+                    const notice = timer.closest('.auth-feedback');
+                    if (notice) notice.remove();
+                }
+            }, 1000);
         });
 
         function togglePassword(inputId, svgId) {

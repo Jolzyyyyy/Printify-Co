@@ -129,6 +129,27 @@
             margin-top: 12px !important;
             margin-bottom: 5px !important;
         }
+
+        .lockout-info {
+            border: 1px solid #fecaca;
+            background: #fff1f2;
+            color: #991b1b;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+        }
+
+        .lockout-info strong {
+            display: block;
+            color: #7f1d1d;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
     </style>
 
     <div class="auth-container"
@@ -136,10 +157,22 @@
             otp: '',
             timer: {{ max((int) $resendCooldownSeconds, 0) }},
             canResend: {{ (int) $resendCooldownSeconds <= 0 ? 'true' : 'false' }},
+            lockoutTimer: {{ max((int) $otpLockoutSeconds, 0) }},
+            get otpLocked() {
+                return this.lockoutTimer > 0;
+            },
             init() {
-                if (this.canResend) {
-                    return;
+                if (this.lockoutTimer > 0) {
+                    let lockoutInterval = setInterval(() => {
+                        if (this.lockoutTimer > 0) {
+                            this.lockoutTimer--;
+                        } else {
+                            clearInterval(lockoutInterval);
+                        }
+                    }, 1000);
                 }
+
+                if (this.canResend) return;
 
                 let interval = setInterval(() => {
                     if (this.timer > 0) {
@@ -157,6 +190,12 @@
         <p class="instruction-text">
             Please enter the 6-digit security code sent to your email address to continue.
         </p>
+
+        <div x-show="otpLocked" class="lockout-info" role="alert">
+            <strong>Verification cooldown active</strong>
+            Too many incorrect codes. Please wait <span x-text="Math.ceil(lockoutTimer / 60)"></span> minute<span x-show="Math.ceil(lockoutTimer / 60) !== 1">s</span>
+            (<span x-text="lockoutTimer"></span>s) before trying again.
+        </div>
 
         @if (session('status'))
             <div style="color: #16a34a; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
@@ -177,6 +216,7 @@
                 maxlength="6"
                 placeholder="000000"
                 class="otp-input"
+                x-bind:disabled="otpLocked"
                 required
                 autofocus
             />
@@ -185,7 +225,7 @@
                 <div style="color: #dc2626; font-size: 11px; font-weight: 700; margin-top: 5px;">{{ $message }}</div>
             @enderror
 
-            <button type="submit" class="auth-btn" x-bind:disabled="otp.length !== 6">
+            <button type="submit" class="auth-btn" x-bind:disabled="otpLocked || otp.length !== 6">
                 Verify My Account
             </button>
         </form>
@@ -197,11 +237,11 @@
                     @csrf
                     <input type="hidden" name="email" value="{{ session('admin_email') }}">
                     
-                    <button type="submit" x-show="canResend" class="nav-link resend-link">
+                    <button type="submit" x-show="canResend && !otpLocked" class="nav-link resend-link">
                         Resend Code
                     </button>
 
-                    <div x-show="!canResend" class="timer-info">
+                    <div x-show="!otpLocked && !canResend" class="timer-info">
                         Resend available in <span x-text="timer" style="color:#4f46e5; font-weight: bold;"></span>s
                     </div>
                 </form>

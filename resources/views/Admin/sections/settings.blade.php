@@ -121,7 +121,7 @@
                 <label class="form-control"><span>Language</span><select x-model="profile.language"><option>English (US)</option><option>Tagalog</option></select></label>
                 <label class="form-control"><span>Phone Number</span><input x-model="profile.phone" type="text"></label>
                 <label class="form-control tall"><span>Business Address</span><textarea x-model="profile.address"></textarea></label>
-                <label class="form-control"><span>Role</span><select x-model="profile.role"><option>Super Administrator</option><option>Manager</option><option>Support</option></select></label>
+                <label class="form-control"><span>Role</span><select x-model="profile.role"><option>Admin Client</option><option>Developer</option><option>Customer</option></select></label>
                 <label class="form-control"><span>Company / Business Name</span><input x-model="business.name" type="text"></label>
             </div>
             <button class="admin-btn admin-btn-primary card-save-btn" @click="saveProfile()"><i data-lucide="lock-keyhole"></i><span>Save Changes</span></button>
@@ -181,6 +181,43 @@
         </article>
     </section>
 
+    <section class="admin-main-box auth-policy-section">
+        <div class="team-head">
+            <div class="card-title-row">
+                <i data-lucide="shield-check"></i>
+                <div>
+                    <h2>Authentication Policy</h2>
+                    <p>Current login, OTP, cooldown, and password reset rules for customer, admin client, and developer access.</p>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="team-table auth-policy-table">
+                <thead>
+                    <tr>
+                        <th>Area</th>
+                        <th>Attempts Allowed</th>
+                        <th>Cooling / Lockout Period</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Developer login</td><td>5 failed attempts</td><td>5 minutes</td><td>Persists after reload and uses the protected staff portal.</td></tr>
+                    <tr><td>Admin-client login</td><td>5 failed attempts</td><td>5 minutes</td><td>Persists after reload; account must be developer-approved.</td></tr>
+                    <tr><td>Customer login</td><td>3 failed attempts</td><td>5 minutes</td><td>Uses the customer email/password throttle.</td></tr>
+                    <tr><td>Staff OTP verification</td><td>5 wrong OTP attempts</td><td>15 minutes</td><td>Applies to developer and admin-client portal access.</td></tr>
+                    <tr><td>Customer OTP verification</td><td>3 wrong OTP attempts</td><td>15 minutes</td><td>Input and verify button lock during cooldown.</td></tr>
+                    <tr><td>Staff OTP resend</td><td>1 resend</td><td>60 seconds</td><td>Countdown persists after reload.</td></tr>
+                    <tr><td>Customer OTP resend</td><td>1 resend</td><td>60 seconds</td><td>Countdown persists after reload.</td></tr>
+                    <tr><td>OTP code validity</td><td>N/A</td><td>Expires after 5 minutes</td><td>User must request a new OTP after expiry.</td></tr>
+                    <tr><td>Customer password reset request</td><td>1 request</td><td>60 seconds</td><td>Prevents repeated reset-code requests.</td></tr>
+                    <tr><td>Staff password reset request</td><td>1 request</td><td>60 seconds</td><td>Available only for developer and approved admin-client accounts.</td></tr>
+                    <tr><td>Wrong-role sign-in</td><td>Counts as failed login attempt</td><td>Uses login cooldown</td><td>Shows a clear portal mismatch message and redirects to the correct login.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <section class="settings-bottom-grid">
         <article class="admin-main-box settings-card integrations-card">
             <div class="card-title-row"><i data-lucide="puzzle"></i><h2>Integrations</h2></div>
@@ -238,7 +275,7 @@
 function adminSettingsFinal(){return{
     toast:{show:false,message:''},
     calendar:{open:false,label:'May 14, 2026 - Present',monthCursor:null,monthTitle:'',selectedDate:'',days:[],editingId:null,form:{title:'',time:'09:00',note:''},events:[{id:1,date:new Date().toISOString().slice(0,10),title:'Review settings',time:'09:00',note:'Check profile, security, and system preferences.'}]},
-    profile:{fullName:'Admin User',email:'admin@example.com',phone:'+1 (555) 123-4567',timezone:'(UTC-08:00) Pacific Time (US & Canada)',language:'English (US)',role:'Super Administrator',address:'123 Commerce St, Suite 500\nLos Angeles, CA 90013, USA',photo:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=240&h=240&fit=crop&crop=face'},
+    profile:{fullName:'Admin Client User',email:'adminclient@example.com',phone:'+1 (555) 123-4567',timezone:'(UTC-08:00) Pacific Time (US & Canada)',language:'English (US)',role:'Admin Client',address:'123 Commerce St, Suite 500\nLos Angeles, CA 90013, USA',photo:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=240&h=240&fit=crop&crop=face'},
     business:{name:'JTC ECOM (Print-On-Demand)',type:'E-commerce',supportEmail:'support@jtcecom.com',billingAddress:'123 Commerce St, Suite 500\nLos Angeles, CA 90013, USA',website:'https://jtcecom.com',currency:'USD - US Dollar ($)',taxId:'US123456789',region:'United States'},
     security:{tfa:true,sessions:3,recovery:2},
     notifications:[
@@ -259,7 +296,7 @@ function adminSettingsFinal(){return{
         {name:'Zapier',icon:'asterisk',color:'logo-orange',connected:false}
     ],
     team:[
-        {name:'Admin User',email:'admin@example.com',role:'Super Admin',permissions:'All Permissions',lastActive:'May 12, 2025 9:41 AM',status:'Active',avatar:'https://i.pravatar.cc/80?img=12'},
+        {name:'Admin Client User',email:'adminclient@example.com',role:'Admin Client',permissions:'Scoped Permissions',lastActive:'May 12, 2025 9:41 AM',status:'Active',avatar:'https://i.pravatar.cc/80?img=12'},
         {name:'Jane Manager',email:'jane.manager@example.com',role:'Manager',permissions:'Orders, Products, Reports',lastActive:'May 11, 2025 4:22 PM',status:'Active',avatar:'https://i.pravatar.cc/80?img=47'},
         {name:'Mike Customer',email:'mike.customer@example.com',role:'Support',permissions:'Support, Products',lastActive:'May 9, 2025 11:08 AM',status:'Invited',avatar:'https://i.pravatar.cc/80?img=32'}
     ],
@@ -300,6 +337,50 @@ function adminSettingsFinal(){return{
     removeMember(member){if(confirm('Remove '+member.name+' from team?')){this.team=this.team.filter(m=>m.email!==member.email);this.showToast(member.name+' removed');}}
 }}
 </script>
+
+<style id="settings-auth-policy-table">
+    .settings-admin-shell .auth-policy-section{
+        margin:0 0 16px!important;
+        padding:0!important;
+        overflow:hidden!important;
+        background:#fff!important;
+    }
+    .settings-admin-shell .auth-policy-table{
+        min-width:860px!important;
+    }
+    .settings-admin-shell .auth-policy-table th{
+        color:#0f172a!important;
+        font-family:'Poppins',system-ui,sans-serif!important;
+        font-size:12px!important;
+        font-weight:800!important;
+        vertical-align:top!important;
+    }
+    .settings-admin-shell .auth-policy-table td{
+        height:auto!important;
+        min-height:52px!important;
+        padding-top:14px!important;
+        padding-bottom:14px!important;
+        vertical-align:top!important;
+        line-height:1.55!important;
+        color:#1f2937!important;
+    }
+    .settings-admin-shell .auth-policy-table td:first-child{
+        color:#050816!important;
+        font-weight:700!important;
+        white-space:nowrap!important;
+    }
+    .settings-admin-shell .auth-policy-table td:nth-child(2),
+    .settings-admin-shell .auth-policy-table td:nth-child(3){
+        font-weight:600!important;
+    }
+    .settings-admin-shell .auth-policy-table tbody tr:hover{
+        background:#f8fbff!important;
+    }
+    @media(max-width:820px){
+        .settings-admin-shell .auth-policy-table{min-width:760px!important;}
+        .settings-admin-shell .auth-policy-table td:first-child{white-space:normal!important;}
+    }
+</style>
 
 <style>
 :root{--admin-blue:#0b63f6;--admin-black:#050816;--admin-orange:#f59e0b;--admin-border:#050816;--admin-muted:#667085;--admin-line:#e8edf5;--admin-bg:#fff;--admin-green:#0f9f63;--admin-red:#ef2f2f;--admin-purple:#7c3aed;--admin-radius:13px;--admin-shadow:0 5px 18px rgba(5,8,22,.06);--hover-blur:rgba(22,24,29,.72)}

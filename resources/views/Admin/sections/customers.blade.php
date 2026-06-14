@@ -4,6 +4,19 @@
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 
+@php
+    $customerMetrics = $customerMetrics ?? [
+        'totalLabel' => 'Total Users',
+        'activeLabel' => 'Active Users',
+        'pendingLabel' => 'Pending Invites',
+        'total' => 0,
+        'active' => 0,
+        'pending' => 0,
+        'suspended' => 0,
+    ];
+    $customerUsersJson = $customerUsersJson ?? collect();
+@endphp
+
 <style>
 :root{
     --admin-blue:#0b63f6;
@@ -932,19 +945,19 @@
     <section class="customer-metrics">
         <button type="button" class="customer-metric-card blue" @click="setFilter('')">
             <span class="metric-icon-box"><i data-lucide="users-round"></i></span>
-            <span class="metric-info"><h3>Total Users</h3><strong>1,452</strong><p><span class="trend-up">↑ 12.4%</span><span>vs last 30 days</span></p></span>
+            <span class="metric-info"><h3>{{ $customerMetrics['totalLabel'] }}</h3><strong>{{ number_format($customerMetrics['total']) }}</strong><p><span class="trend-up">Current</span><span>role scope</span></p></span>
         </button>
         <button type="button" class="customer-metric-card green" @click="setFilter('ACTIVE')">
             <span class="metric-icon-box"><i data-lucide="user-round-check"></i></span>
-            <span class="metric-info"><h3>Active Users</h3><strong>1,156</strong><p><span class="trend-up">↑ 9.8%</span><span>vs last 30 days</span></p></span>
+            <span class="metric-info"><h3>{{ $customerMetrics['activeLabel'] }}</h3><strong>{{ number_format($customerMetrics['active']) }}</strong><p><span class="trend-up">Current</span><span>role scope</span></p></span>
         </button>
         <button type="button" class="customer-metric-card orange" @click="setFilter('INVITED')">
             <span class="metric-icon-box"><i data-lucide="mail"></i></span>
-            <span class="metric-info"><h3>Pending Invites</h3><strong>246</strong><p><span class="trend-up">↑ 18.6%</span><span>vs last 30 days</span></p></span>
+            <span class="metric-info"><h3>{{ $customerMetrics['pendingLabel'] }}</h3><strong>{{ number_format($customerMetrics['pending']) }}</strong><p><span class="trend-up">Current</span><span>role scope</span></p></span>
         </button>
         <button type="button" class="customer-metric-card red" @click="setFilter('SUSPENDED')">
             <span class="metric-icon-box"><i data-lucide="shield-alert"></i></span>
-            <span class="metric-info"><h3>Suspended Accounts</h3><strong>50</strong><p><span class="trend-down">↓ 2.3%</span><span>vs last 30 days</span></p></span>
+            <span class="metric-info"><h3>Suspended Accounts</h3><strong>{{ number_format($customerMetrics['suspended']) }}</strong><p><span class="trend-down">Current</span><span>role scope</span></p></span>
         </button>
     </section>
 
@@ -1272,7 +1285,8 @@ function customerManagementExactApp(){
         filterOrder:['','ACTIVE','INVITED','SUSPENDED','INACTIVE'],
         userModal:{open:false,mode:'add',form:{id:null,name:'',email:'',phone:'',company:'',role:'Product Admin',status:'ACTIVE'}},
         orderModal:{open:false,orderId:'ORD-1024'},
-        users:[
+        users:@json($customerUsersJson),
+        sampleUsers:[
             {id:'CUST-1024',name:'Ethan Carter',email:'ethan.carter@example.com',phone:'+1 (555) 123-4567',company:'Carter Designs',status:'ACTIVE',role:'Product Admin',roleShort:'Admin',scope:'All Access',permissions:'23 of 23',joined:'Apr 15, 2024 (1 year ago)',since:'Apr 15, 2024 02:15 PM',lastLogin:'May 18, 2025 10:30 AM',photo:'https://i.pravatar.cc/120?img=12',orders:[{id:'ORD-1024',item:'Document Printing',date:'Jun 6, 2026',status:'Completed',total:'PHP 350.00'},{id:'ORD-1029',item:'Document Scanning',date:'Jun 4, 2026',status:'Shipped',total:'PHP 650.00'}]},
             {id:'CUST-1025',name:'Sophia Lee',email:'sophia.lee@example.com',phone:'+1 (555) 234-5678',company:'Lee Studio',status:'ACTIVE',role:'Customer Support',roleShort:'Support',scope:'Customer Access',permissions:'16 of 23',joined:'Mar 10, 2024',since:'Mar 10, 2024 08:40 AM',lastLogin:'Jun 5, 2026 09:11 AM',photo:'https://i.pravatar.cc/120?img=47',orders:[{id:'ORD-1030',item:'2x2 ID Photo Package',date:'Jun 4, 2026',status:'Ready',total:'PHP 180.00'}]},
             {id:'CUST-1026',name:'Liam Johnson',email:'liam.johnson@example.com',phone:'+1 (555) 345-6789',company:'Johnson Prints',status:'ACTIVE',role:'Manager',roleShort:'Manager',scope:'Branch Access',permissions:'20 of 23',joined:'Feb 2, 2024',since:'Feb 2, 2024 11:25 AM',lastLogin:'Jun 6, 2026 01:45 PM',photo:'https://i.pravatar.cc/120?img=33',orders:[{id:'ORD-1026',item:'Tarpaulin Print',date:'Jun 5, 2026',status:'Pending',total:'PHP 1,800.00'}]},
@@ -1288,8 +1302,8 @@ function customerManagementExactApp(){
         ],
         init(){
             this.users = this.users.map(u => ({...u, activities:this.baseActivities(), fullActivity:this.fullActivities()}));
-            this.selectedUser = this.users[0];
-            this.roleDraft = this.selectedUser.role;
+            this.selectedUser = this.users[0] || null;
+            this.roleDraft = this.selectedUser ? this.selectedUser.role : 'Customer User';
             this.refreshIcons();
         },
 
