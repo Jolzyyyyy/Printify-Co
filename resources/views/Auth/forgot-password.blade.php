@@ -489,6 +489,32 @@
             color: #16a34a;
         }
 
+        .cooldown-notice {
+            width: 100%;
+            margin-bottom: 12px;
+            border: 1px solid #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+        }
+
+        .cooldown-notice strong {
+            display: block;
+            color: #7c2d12;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .cooldown-timer {
+            font-variant-numeric: tabular-nums;
+        }
+
         @media (max-width: 560px) {
             .forgot-container {
                 width: 92vw;
@@ -532,15 +558,22 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 14.25h5.5v4.5h-5.5v-4.5z" />
             </svg>
 
-            <h1 class="auth-title">Forgot Password</h1>
+            <h1 class="auth-title">{{ $passwordResetTitle ?? 'Forgot Password' }}</h1>
 
             <p class="instruction-text">
-                {{ __('Enter your email address and we will send you a code to reset your password.') }}
+                {{ __($passwordResetCopy ?? 'Enter your email address and we will send you a code to reset your password.') }}
             </p>
 
             <x-auth-session-status class="status-text" :status="session('status')" />
 
-            <form method="POST" action="{{ route('password.email') }}">
+            @if (($resetCooldownSeconds ?? 0) > 0)
+                <div class="cooldown-notice" role="alert">
+                    <strong>Password reset cooldown active</strong>
+                    Please wait <span class="cooldown-timer" data-cooldown="{{ $resetCooldownSeconds }}">{{ $resetCooldownSeconds }}</span> seconds before requesting another code.
+                </div>
+            @endif
+
+            <form method="POST" action="{{ $passwordResetAction ?? route('password.email') }}">
                 @csrf
 
                 <div class="form-group">
@@ -575,9 +608,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 16h.01" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>{{ __('We’ll send a secure code to your email.') }}</span>
+                    <span>{{ __($passwordResetInfo ?? 'We will send a secure code to your email.') }}</span>
                 </div>
 
+                @if ($showRecoveryEmailOption ?? true)
                 <div class="backup-row">
                     <input
                         id="use_backup"
@@ -591,13 +625,14 @@
                         {{ __('Use recovery email') }}
                     </label>
                 </div>
+                @endif
 
                 <button type="submit" class="auth-btn">
                     {{ __('Send Reset Code') }}
                 </button>
 
                 <div class="back-wrapper">
-                    <a class="back-link" href="{{ route('login') }}">
+                    <a class="back-link" href="{{ $passwordResetBackRoute ?? route('login') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
                         </svg>
@@ -622,5 +657,25 @@
                 input.placeholder = "name@example.com";
             }
         }
+
+        document.querySelectorAll('[data-cooldown]').forEach((timer) => {
+            let remaining = Number(timer.dataset.cooldown || 0);
+            const render = () => {
+                timer.textContent = Math.max(0, remaining).toString();
+            };
+
+            render();
+
+            const interval = window.setInterval(() => {
+                remaining -= 1;
+                render();
+
+                if (remaining <= 0) {
+                    window.clearInterval(interval);
+                    const notice = timer.closest('.cooldown-notice');
+                    if (notice) notice.remove();
+                }
+            }, 1000);
+        });
     </script>
 </x-guest-layout>

@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
 class AdminClientAccessTest extends TestCase
@@ -38,7 +39,7 @@ class AdminClientAccessTest extends TestCase
             ->assertRedirect(route('developer.admin-clients.index', absolute: false))
             ->assertSessionHas('invite_url');
 
-        $this->assertSame(User::ROLE_ADMIN, $adminClient->role);
+        $this->assertSame(User::ROLE_ADMIN_CLIENT, $adminClient->role);
         $this->assertSame($developer->id, $adminClient->preregistered_by);
         $this->assertNull($adminClient->approved_at);
         $this->assertNotNull($adminClient->invite_token);
@@ -91,6 +92,41 @@ class AdminClientAccessTest extends TestCase
         ]);
     }
 
+    public function test_admin_client_invite_password_uses_shared_password_policy(): void
+    {
+        $token = 'plain-admin-client-token';
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'email' => 'weak-password-client@example.com',
+            'password' => Hash::make('temporary-password'),
+            'email_verified_at' => now(),
+            'invite_token' => hash('sha256', $token),
+            'invite_expires_at' => now()->addDay(),
+            'approved_at' => null,
+        ]);
+
+        $response = $this
+            ->from(route('admin-client-invitations.show', $token, false))
+            ->post(route('admin-client-invitations.store', [
+                'token' => $token,
+            ], false), [
+                'password' => 'weakpass',
+                'business_name' => 'Client Studio',
+                'contact_person' => 'Client Owner',
+                'contact_number' => '09170000000',
+                'business_address' => '123 Client Street',
+                'reference_notes' => 'Primary branch',
+            ]);
+
+        $response
+            ->assertRedirect(route('admin-client-invitations.show', $token, false))
+            ->assertSessionHasErrors('password');
+
+        $adminClient->refresh();
+        $this->assertNotNull($adminClient->invite_token);
+        $this->assertNull($adminClient->invitation_accepted_at);
+    }
+
     public function test_approved_admin_client_login_requires_email_otp_before_dashboard(): void
     {
         Mail::fake();
@@ -129,17 +165,197 @@ class AdminClientAccessTest extends TestCase
         Mail::assertSent(OTPVerificationMail::class);
     }
 
-    public function test_staff_registration_form_uses_single_password_field(): void
+    public function test_staff_forgot_password_sends_otp_for_developer_and_resets_to_staff_dashboard(): void
     {
-        $response = $this->get(route('admin.register', absolute: false));
+        Mail::fake();
+
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email' => 'reset-developer@example.com',
+            'password' => Hash::make('OldPassword1!'),
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->post(route('admin.password.email', absolute: false), [
+            'email' => $developer->email,
+        ]);
+
+        $response
+            ->assertRedirect(route('otp.verify', [
+                'email' => $developer->email,
+                'flow' => 'forgot_password',
+            ], false))
+            ->assertSessionHas('password_reset_portal', 'staff')
+            ->assertSessionHas('password_reset_email', $developer->email);
+        Mail::assertSent(OTPVerificationMail::class);
+
+        $developer->refresh();
+
+        $this
+            ->post(route('otp.submit', absolute: false), [
+                'email' => $developer->email,
+                'otp' => $developer->otp_code,
+                'verification_flow' => 'forgot_password',
+            ])
+            ->assertRedirect(route('password.reset', [
+                'token' => session('password_reset_token'),
+                'email' => $developer->email,
+            ], false));
+
+        $this
+            ->post(route('password.store', absolute: false), [
+                'token' => session('password_reset_token'),
+                'email' => $developer->email,
+                'password' => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
+                'action_type' => 'manual_login',
+            ])
+            ->assertRedirect(route('admin.dashboard', absolute: false))
+            ->assertSessionHas('staff_otp_passed', true)
+            ->assertSessionHas('status', 'Success! Your password has been updated and you are now logged in.');
+
+        $this->assertTrue(Hash::check('NewPassword1!', $developer->fresh()->password));
+        $this->assertAuthenticatedAs($developer);
+    }
+
+    public function test_staff_forgot_password_otp_screen_uses_staff_routes_and_limits(): void
+    {
+        Mail::fake();
+
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email' => 'staff-otp-screen@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->post(route('admin.password.email', absolute: false), [
+            'email' => $developer->email,
+        ])->assertRedirect(route('otp.verify', [
+            'email' => $developer->email,
+            'flow' => 'forgot_password',
+        ], false));
+
+        $response = $this->get(route('otp.verify', [
+            'email' => $developer->email,
+            'flow' => 'forgot_password',
+        ], false));
 
         $response
             ->assertOk()
-            ->assertSee('name="password"', false)
-            ->assertDontSee('name="password_confirmation"', false);
+            ->assertSee('Verify Staff Reset Code')
+            ->assertSee('Back to Staff Login')
+            ->assertSee('action="' . route('otp.submit') . '"', false)
+            ->assertSee('action="' . route('otp.resend') . '"', false)
+            ->assertDontSee('action="' . route('customer.otp.submit') . '"', false)
+            ->assertDontSee('action="' . route('customer.otp.resend') . '"', false);
+
+        for ($attempt = 1; $attempt <= 4; $attempt++) {
+            $this->post(route('otp.submit', absolute: false), [
+                'email' => $developer->email,
+                'otp' => '000000',
+                'verification_flow' => 'forgot_password',
+            ])->assertSessionHasErrors('otp');
+
+            $this->assertFalse(RateLimiter::tooManyAttempts(
+                'staff-otp:' . strtolower($developer->email) . '|127.0.0.1',
+                5
+            ));
+        }
+
+        $this->post(route('otp.submit', absolute: false), [
+            'email' => $developer->email,
+            'otp' => '000000',
+            'verification_flow' => 'forgot_password',
+        ])->assertSessionHasErrors('otp');
+
+        $this->assertTrue(RateLimiter::tooManyAttempts(
+            'staff-otp:' . strtolower($developer->email) . '|127.0.0.1',
+            5
+        ));
     }
 
-    public function test_staff_registration_redirects_to_email_otp_verification(): void
+    public function test_staff_forgot_password_resets_approved_admin_client_to_staff_dashboard(): void
+    {
+        Mail::fake();
+
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'email' => 'reset-admin-client@example.com',
+            'password' => Hash::make('OldPassword1!'),
+            'email_verified_at' => now(),
+            'approved_at' => now(),
+            'approved_by' => $developer->id,
+        ]);
+
+        $this->post(route('admin.password.email', absolute: false), [
+            'email' => $adminClient->email,
+        ])->assertRedirect(route('otp.verify', [
+            'email' => $adminClient->email,
+            'flow' => 'forgot_password',
+        ], false));
+
+        $adminClient->refresh();
+
+        $this
+            ->post(route('otp.submit', absolute: false), [
+                'email' => $adminClient->email,
+                'otp' => $adminClient->otp_code,
+                'verification_flow' => 'forgot_password',
+            ])
+            ->assertRedirect(route('password.reset', [
+                'token' => session('password_reset_token'),
+                'email' => $adminClient->email,
+            ], false));
+
+        $this
+            ->post(route('password.store', absolute: false), [
+                'token' => session('password_reset_token'),
+                'email' => $adminClient->email,
+                'password' => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
+                'action_type' => 'manual_login',
+            ])
+            ->assertRedirect(route('admin.dashboard', absolute: false))
+            ->assertSessionHas('staff_otp_passed', true);
+
+        $this->assertAuthenticatedAs($adminClient);
+        $this->assertTrue(Hash::check('NewPassword1!', $adminClient->fresh()->password));
+    }
+
+    public function test_staff_forgot_password_rejects_customer_email_without_sending_code(): void
+    {
+        Mail::fake();
+
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'email' => 'customer-reset@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->post(route('admin.password.email', absolute: false), [
+            'email' => $customer->email,
+        ]);
+
+        $response
+            ->assertRedirect()
+            ->assertSessionHas('status', 'If that email belongs to an approved staff account, a verification code has been sent.')
+            ->assertSessionMissing('password_reset_portal');
+        Mail::assertNothingSent();
+    }
+
+    public function test_public_staff_registration_form_is_not_available(): void
+    {
+        $response = $this->get(route('admin.register', absolute: false));
+
+        $response->assertNotFound();
+    }
+
+    public function test_public_staff_registration_submission_is_not_available(): void
     {
         Mail::fake();
 
@@ -150,22 +366,13 @@ class AdminClientAccessTest extends TestCase
             'password' => 'Password1!',
         ]);
 
-        $user = User::where('email', 'portal-developer@example.com')->firstOrFail();
-
-        $response
-            ->assertRedirect(route('admin.otp.verify', absolute: false))
-            ->assertSessionHas('admin_auth_passed', true)
-            ->assertSessionHas('admin_email', 'portal-developer@example.com')
-            ->assertSessionHas('needs_email_otp', true)
-            ->assertSessionMissing('staff_otp_passed');
-
-        $this->assertAuthenticatedAs($user);
-        $this->assertSame(User::ROLE_DEVELOPER, $user->role);
-        $this->assertNotNull($user->fresh()->otp_code);
-        Mail::assertSent(OTPVerificationMail::class);
+        $response->assertNotFound();
+        $this->assertDatabaseMissing('users', ['email' => 'portal-developer@example.com']);
+        $this->assertGuest();
+        Mail::assertNothingSent();
     }
 
-    public function test_developer_approval_converts_legacy_admin_client_invite_to_admin_account(): void
+    public function test_developer_approval_keeps_invited_account_as_admin_client(): void
     {
         $developer = User::factory()->create([
             'role' => User::ROLE_DEVELOPER,
@@ -198,7 +405,7 @@ class AdminClientAccessTest extends TestCase
         $pendingAdmin->refresh();
 
         $response->assertRedirect(route('developer.admin-clients.index', absolute: false));
-        $this->assertSame(User::ROLE_ADMIN, $pendingAdmin->role);
+        $this->assertSame(User::ROLE_ADMIN_CLIENT, $pendingAdmin->role);
         $this->assertNotNull($pendingAdmin->approved_at);
         $this->assertSame($developer->id, $pendingAdmin->approved_by);
     }
@@ -325,7 +532,7 @@ class AdminClientAccessTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_customer_cannot_access_staff_developer_dashboard(): void
+    public function test_customer_is_redirected_from_staff_developer_dashboard_with_feedback(): void
     {
         $customer = User::factory()->create([
             'role' => User::ROLE_CUSTOMER,
@@ -337,7 +544,11 @@ class AdminClientAccessTest extends TestCase
             ->withSession(['customer_otp_passed' => true])
             ->get(route('admin.dashboard', absolute: false));
 
-        $response->assertForbidden();
+        $response
+            ->assertRedirect(route('admin.login', absolute: false))
+            ->assertSessionHasErrors('email');
+
+        $this->assertGuest();
     }
 
     public function test_customer_cannot_submit_staff_portal_otp(): void

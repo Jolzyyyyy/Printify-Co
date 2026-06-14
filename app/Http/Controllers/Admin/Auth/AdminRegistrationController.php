@@ -29,26 +29,19 @@ class AdminRegistrationController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // FIXED: Strict Password Validation (8+ chars, Letters, Numbers, Symbols)
+        // Keep staff password rules aligned with customer password rules.
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => [
-                'required', 
-                Password::min(8)     // Minimum 8 characters
-                    ->letters()      // Dapat may letters
-                    ->mixedCase()    // Dapat may Uppercase at Lowercase
-                    ->numbers()      // Dapat may numbers
-                    ->symbols()      // Dapat may special symbols (@$!%*#?&)
-            ],
+            'password' => ['required', Password::defaults()],
         ]);
 
-        // 1. Create Admin User (Hardcoded 'admin' role para safe)
+        // 1. Create Admin Client User
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'admin', 
+            'role' => User::ROLE_ADMIN_CLIENT,
         ]);
 
         // 2. Generate OTP Code (6 Digits)
@@ -66,7 +59,7 @@ class AdminRegistrationController extends Controller
         session([
             'admin_auth_passed' => true,
             'admin_email' => $user->email,
-            'user_role' => 'admin', // Marker na admin ang pumasok
+            'user_role' => User::ROLE_ADMIN_CLIENT,
         ]);
 
         // Siguraduhing malinis ang verification flags bago mag-OTP
@@ -79,6 +72,6 @@ class AdminRegistrationController extends Controller
         // 5. REDIRECT sa Admin-specific OTP route
         // Ito ay dapat mag-match sa route name sa web.php mo
         return redirect()->route('admin.otp.verify')
-                         ->with('status', 'Admin account created! Please check your email for the verification code.');
+                         ->with('status', 'Admin client account created! Please check your email for the verification code.');
     }
 }

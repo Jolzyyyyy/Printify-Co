@@ -43,6 +43,7 @@
         <div>
             <x-input-label for="password" :value="__('Password')" />
             <x-text-input id="password" class="mt-1 block w-full" type="password" name="password" required autocomplete="new-password" />
+            <p class="mt-2 text-xs text-slate-500">Use at least 8 characters with a number and special symbol.</p>
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 

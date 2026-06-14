@@ -12,16 +12,24 @@ use Carbon\Carbon;
 use App\Notifications\SendOTP;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class PasswordResetLinkController extends Controller
 {
+    private const PASSWORD_RESET_REQUEST_MAX_ATTEMPTS = 1;
+    private const PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS = 60;
+
     /**
      * Display the forgot password view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
         // Tumuturo sa resources/views/auth/forgot-password.blade.php
-        return view('auth.forgot-password');
+        return view('auth.forgot-password', [
+            'resetCooldownSeconds' => $this->passwordResetCooldownSeconds($request),
+        ]);
     }
 
     /**
@@ -33,6 +41,13 @@ class PasswordResetLinkController extends Controller
         $request->validate([
             'email' => ['required', 'email'],
         ]);
+
+        $this->ensureResetRequestIsNotRateLimited($request);
+        $request->session()->put('password_reset_throttle_email', Str::lower((string) $request->input('email', '')));
+        RateLimiter::hit(
+            $this->passwordResetThrottleKey($request),
+            self::PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS
+        );
 
         // --- SECURITY UPDATE: CHECK IF USING BACKUP EMAIL ---
         $isBackup = $request->has('use_backup');
@@ -107,5 +122,40 @@ class PasswordResetLinkController extends Controller
     private function customerOtpResendThrottleKey(string $email, string $ip): string
     {
         return 'customer-otp-resend:' . Str::transliterate(Str::lower($email) . '|' . $ip);
+    }
+
+    private function ensureResetRequestIsNotRateLimited(Request $request): void
+    {
+        $key = $this->passwordResetThrottleKey($request);
+
+        if (!RateLimiter::tooManyAttempts($key, self::PASSWORD_RESET_REQUEST_MAX_ATTEMPTS)) {
+            return;
+        }
+
+        $seconds = RateLimiter::availableIn($key);
+
+        throw ValidationException::withMessages([
+            'email' => "Please wait {$seconds} second" . ($seconds === 1 ? '' : 's') . ' before requesting another password reset code.',
+        ]);
+    }
+
+    private function passwordResetThrottleKey(Request $request): string
+    {
+        return 'password-reset-request:' . Str::transliterate(Str::lower((string) $request->input('email', '')) . '|' . $request->ip());
+    }
+
+    private function passwordResetCooldownSeconds(Request $request): int
+    {
+        $email = session('password_reset_throttle_email');
+
+        if (!$email) {
+            return 0;
+        }
+
+        $key = 'password-reset-request:' . Str::transliterate(Str::lower((string) $email) . '|' . $request->ip());
+
+        return RateLimiter::tooManyAttempts($key, self::PASSWORD_RESET_REQUEST_MAX_ATTEMPTS)
+            ? RateLimiter::availableIn($key)
+            : 0;
     }
 }

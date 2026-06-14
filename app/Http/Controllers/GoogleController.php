@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules\Password;
 
 class GoogleController extends Controller
 {
@@ -107,7 +108,7 @@ class GoogleController extends Controller
     public function updateSetupPassword(Request $request)
     {
         $request->validate([
-            'password' => ['required', 'min:8'],
+            'password' => ['required', Password::defaults()],
         ]);
 
         Auth::user()->update([

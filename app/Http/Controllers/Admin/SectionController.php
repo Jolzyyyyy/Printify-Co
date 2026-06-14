@@ -142,7 +142,7 @@ class SectionController extends Controller
             'description' => 'Role scope, account status, and security controls for the staff workspace.',
             'cards' => $this->summaryCards($user),
             'rows' => collect([
-                ['title' => 'Portal role', 'meta' => str_replace('_', ' ', $user->role), 'note' => $user->isDeveloper() ? 'Developer oversight enabled' : ($user->isAdmin() ? 'Admin operations enabled' : 'Admin-client scoped access')],
+                ['title' => 'Portal role', 'meta' => str_replace('_', ' ', $user->role), 'note' => $user->isDeveloper() ? 'Developer oversight enabled' : 'Admin-client scoped access'],
                 ['title' => 'Email OTP', 'meta' => session('staff_otp_passed') ? 'Verified for this session' : 'Required', 'note' => 'Portal sessions require email verification.'],
                 ['title' => 'Reference profile', 'meta' => $user->isAdminClient() ? ($user->hasCompletedAdminClientProfile() ? 'Complete' : 'Incomplete') : ucfirst($user->role) . ' account', 'note' => $user->isAdminClient() ? 'Used for future system reference.' : 'Staff account managed separately from customer accounts.'],
             ]),
@@ -193,9 +193,9 @@ class SectionController extends Controller
 
         if ($user->isDeveloper()) {
             $cards[] = [
-                'label' => 'Admin Accounts',
-                'value' => User::where('role', User::ROLE_ADMIN)->whereNotNull('preregistered_by')->whereNotNull('approved_at')->count(),
-                'note' => User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_ADMIN_CLIENT])
+                'label' => 'Active Admin Clients',
+                'value' => User::where('role', User::ROLE_ADMIN_CLIENT)->whereNotNull('approved_at')->count(),
+                'note' => User::where('role', User::ROLE_ADMIN_CLIENT)
                     ->whereNotNull('preregistered_by')
                     ->whereNull('approved_at')
                     ->count() . ' pending approval',

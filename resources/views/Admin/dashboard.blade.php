@@ -2,6 +2,8 @@
 
     @php
         $portalUser = $portalUser ?? auth()->user();
+        $isDeveloperPortal = isset($portalUser) && $portalUser->isDeveloper();
+        $isAdminClientPortal = isset($portalUser) && $portalUser->isAdminClient();
         $headerAuditLogs = isset($recentAuditLogs)
             ? $recentAuditLogs
             : \App\Models\AuditLog::with(['actor', 'targetUser'])->latest()->limit(8)->get();
@@ -17,20 +19,36 @@
             ]);
         }
         $dashboardOrders = \App\Models\Order::query();
-        $dashboardCustomers = \App\Models\User::where('role', \App\Models\User::ROLE_CUSTOMER);
+        $dashboardActiveUsers = \App\Models\User::query()
+            ->whereNotNull('email_verified_at')
+            ->when($isDeveloperPortal, fn ($query) => $query
+                ->where('role', \App\Models\User::ROLE_ADMIN_CLIENT)
+                ->where('email', 'enchantingasha@gmail.com')
+                ->whereNotNull('approved_at'))
+            ->when($isAdminClientPortal, fn ($query) => $query
+                ->where('role', \App\Models\User::ROLE_CUSTOMER)
+                ->where('email', 'julieannecalusa@gmail.com')
+                ->where('admin_client_id', $portalUser->id))
+            ->when(!$isDeveloperPortal && !$isAdminClientPortal, fn ($query) => $query
+                ->where('role', \App\Models\User::ROLE_CUSTOMER));
         $dashboardServices = \App\Models\Service::query();
         $dashboardStats = [
             'revenue' => (float) (clone $dashboardOrders)->sum('total_price'),
             'orders' => (clone $dashboardOrders)->count(),
-            'customers' => (clone $dashboardCustomers)->count(),
+            'customers' => (clone $dashboardActiveUsers)->count(),
             'services' => (clone $dashboardServices)->count(),
             'pending' => (clone $dashboardOrders)->whereIn('status', ['Pending', 'For Verification'])->count(),
             'ready' => (clone $dashboardOrders)->whereIn('status', ['Ready', 'Ready / Delivery'])->count(),
             'completed' => (clone $dashboardOrders)->where('status', 'Completed')->count(),
             'cancelled' => (clone $dashboardOrders)->where('status', 'Cancelled')->count(),
         ];
+        $dashboardActiveUsersLabel = $isDeveloperPortal
+            ? 'Active Admin Clients'
+            : ($isAdminClientPortal ? 'Active Customers' : 'Active Users');
+        $dashboardActiveUsersRoute = $isDeveloperPortal
+            ? route('developer.admin-clients.index')
+            : route('admin.customers');
         $dashboardRecentOrders = \App\Models\Order::with('user')->latest()->limit(5)->get();
-        $isDeveloperPortal = isset($portalUser) && $portalUser->isDeveloper();
         $portalRoleLabel = $isDeveloperPortal ? 'Developer' : 'Admin';
         $portalRoleUpper = strtoupper($portalRoleLabel);
         $portalTitle = $portalRoleUpper . ' DASHBOARD';
@@ -2721,8 +2739,8 @@
                         <button type="button" class="dash-metric orange" @click="window.location.href='{{ route('admin.orders') }}'">
                             <span class="dash-icon dash-orange-soft"><i data-lucide="shopping-bag"></i></span><span><small>Total Orders</small><strong>{{ number_format($dashboardStats['orders']) }}</strong><span>↗ 18.3% vs last 7 days</span></span>
                         </button>
-                        <button type="button" class="dash-metric green" @click="window.location.href='{{ route('admin.customers') }}'">
-                            <span class="dash-icon dash-green-soft"><i data-lucide="users-round"></i></span><span><small>Active Users</small><strong>{{ number_format($dashboardStats['customers']) }}</strong><span>↗ 9.4% vs last 7 days</span></span>
+                        <button type="button" class="dash-metric green" @click="window.location.href='{{ $dashboardActiveUsersRoute }}'">
+                            <span class="dash-icon dash-green-soft"><i data-lucide="users-round"></i></span><span><small>{{ $dashboardActiveUsersLabel }}</small><strong>{{ number_format($dashboardStats['customers']) }}</strong><span>↗ 9.4% vs last 7 days</span></span>
                         </button>
                         <button type="button" class="dash-metric red" @click="openInfo('Pending Approvals','Pending review count: {{ number_format($dashboardStats['pending']) }}. Review order and customer requests that need action.')">
                             <span class="dash-icon dash-red-soft"><i data-lucide="clipboard-check"></i></span><span><small>Pending Approvals</small><strong>{{ number_format($dashboardStats['pending']) }}</strong><span class="red-trend">↘ 5.1% vs last 7 days</span></span>
@@ -2986,7 +3004,7 @@
                                 openReal(url,message){this.showToast(message||'Opening...');window.dispatchEvent(new CustomEvent('printify-admin-feedback',{detail:{message:message||'Opening section...'}}));setTimeout(()=>{window.location.href=url},350);},
                                 refreshDashboard(){this.showToast('Dashboard refreshed');this.refreshIcons();setTimeout(()=>window.location.reload(),450);},
                                 exportDashboard(){
-                                    const rows=[['Metric','Value'],['Revenue','PHP {{ number_format($dashboardStats['revenue'], 2) }}'],['Orders','{{ number_format($dashboardStats['orders']) }}'],['Active Users','{{ number_format($dashboardStats['customers']) }}'],['Pending Approvals','{{ number_format($dashboardStats['pending']) }}'],['Services','{{ number_format($dashboardStats['services']) }}']];
+                                    const rows=[['Metric','Value'],['Revenue','PHP {{ number_format($dashboardStats['revenue'], 2) }}'],['Orders','{{ number_format($dashboardStats['orders']) }}'],['{{ $dashboardActiveUsersLabel }}','{{ number_format($dashboardStats['customers']) }}'],['Pending Approvals','{{ number_format($dashboardStats['pending']) }}'],['Services','{{ number_format($dashboardStats['services']) }}']];
                                     const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');
                                     const a=document.createElement('a');
                                     a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));

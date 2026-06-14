@@ -31,6 +31,39 @@ class DashboardAccessTest extends TestCase
             ->assertSee('Customer');
     }
 
+    public function test_verified_customer_without_session_otp_is_redirected_to_otp(): void
+    {
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this
+            ->actingAs($customer)
+            ->get(route('dashboard', absolute: false));
+
+        $response
+            ->assertRedirect(route('customer.otp.verify', absolute: false))
+            ->assertSessionHasErrors('otp');
+    }
+
+    public function test_developer_on_customer_dashboard_is_redirected_to_staff_dashboard(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('dashboard', absolute: false));
+
+        $response
+            ->assertRedirect(route('admin.dashboard', absolute: false))
+            ->assertSessionHas('status', 'This account belongs to the staff portal. Redirecting you to the correct dashboard.');
+    }
+
     public function test_developer_dashboard_renders_developer_controls(): void
     {
         $developer = User::factory()->create([
@@ -52,35 +85,44 @@ class DashboardAccessTest extends TestCase
             ->assertSee('Recent Audit Activity');
     }
 
-    public function test_admin_dashboard_does_not_render_developer_controls(): void
+    public function test_admin_client_dashboard_does_not_render_developer_controls(): void
     {
-        $admin = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
             'email_verified_at' => now(),
+            'approved_at' => now(),
+        ]);
+        $adminClient->adminClientProfile()->create([
+            'business_name' => 'Admin Client Studio',
+            'contact_person' => 'Admin Client User',
+            'contact_number' => '09170000000',
+            'business_address' => '123 Admin Client Street',
+            'profile_completed_at' => now(),
         ]);
 
         $response = $this
-            ->actingAs($admin)
+            ->actingAs($adminClient)
             ->withSession(['staff_otp_passed' => true])
             ->get(route('admin.dashboard', absolute: false));
 
         $response
             ->assertOk()
-            ->assertSee('Dashboard Overview')
-            ->assertSee('Admin Portal')
+            ->assertSee('Admin Management Portal')
+            ->assertSee('ADMIN DASHBOARD')
             ->assertDontSee('Developer Dashboard')
             ->assertDontSee('Manage Admin Clients');
     }
 
-    public function test_admin_cannot_access_developer_admin_client_management(): void
+    public function test_admin_client_cannot_access_developer_admin_client_management(): void
     {
-        $admin = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
             'email_verified_at' => now(),
+            'approved_at' => now(),
         ]);
 
         $response = $this
-            ->actingAs($admin)
+            ->actingAs($adminClient)
             ->withSession(['staff_otp_passed' => true])
             ->get(route('developer.admin-clients.index', absolute: false));
 
@@ -336,5 +378,43 @@ class DashboardAccessTest extends TestCase
             ->withSession(['staff_otp_passed' => true])
             ->get(route('admin.services.edit', $service, false))
             ->assertForbidden();
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('admin.services.create', absolute: false))
+            ->assertForbidden();
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->patch(route('admin.services.toggle', $service, false))
+            ->assertForbidden();
+    }
+
+    public function test_guest_cannot_submit_admin_customer_crud_routes(): void
+    {
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'email' => 'protected-customer@example.com',
+        ]);
+
+        $this
+            ->post(route('admin.customers.save', absolute: false), [
+                'id' => $customer->id,
+                'name' => 'Changed Name',
+                'email' => 'changed@example.com',
+                'role' => User::ROLE_CUSTOMER,
+            ])
+            ->assertRedirect(route('login', absolute: false));
+
+        $this
+            ->delete(route('admin.customers.delete', $customer, false))
+            ->assertRedirect(route('login', absolute: false));
+
+        $this->assertDatabaseHas('users', [
+            'id' => $customer->id,
+            'email' => 'protected-customer@example.com',
+        ]);
     }
 }

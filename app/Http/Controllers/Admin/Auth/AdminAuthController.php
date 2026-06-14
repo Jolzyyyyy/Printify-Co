@@ -8,27 +8,28 @@ use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 
 class AdminAuthController extends Controller
 {
     private const STAFF_LOGIN_MAX_ATTEMPTS = 5;
+    private const STAFF_LOGIN_LOCKOUT_SECONDS = 300;
     private const STAFF_OTP_MAX_ATTEMPTS = 5;
     private const STAFF_OTP_RESEND_MAX_ATTEMPTS = 1;
 
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
         if (Auth::check() && Auth::user()->canAccessAdminPortal() && session('staff_otp_passed')) {
             return redirect()->route('admin.dashboard');
         }
 
-        return view('Admin.auth.admin-login');
+        return view('Admin.auth.admin-login', [
+            'loginCooldownSeconds' => $this->staffLoginCooldownSeconds($request),
+        ]);
     }
 
     public function login(Request $request)
@@ -46,24 +47,32 @@ class AdminAuthController extends Controller
 
         $user = User::where('email', trim((string) $request->email))->first();
 
-        if (!$user || !$user->canAccessAdminPortal()) {
-            RateLimiter::hit($this->staffLoginThrottleKey($request));
+        if ($user && !$user->canAccessAdminPortal()) {
+            $this->hitStaffLoginThrottle($request);
 
             return back()->withErrors([
-                'email' => 'Access denied. This portal is for approved staff and developers only.',
+                'email' => 'Wrong portal for this account. Customer accounts must sign in from the customer login page.',
+            ])->onlyInput('email');
+        }
+
+        if (!$user) {
+            $this->hitStaffLoginThrottle($request);
+
+            return back()->withErrors([
+                'email' => 'No staff, admin-client, or developer account was found for this email.',
             ])->onlyInput('email');
         }
 
         if (($user->isAdminClient() && !$user->isApprovedAdminClient()) || $user->isInvitedAdminPendingApproval()) {
-            RateLimiter::hit($this->staffLoginThrottleKey($request));
+            $this->hitStaffLoginThrottle($request);
 
             return back()->withErrors([
-                'email' => 'This admin account is still awaiting developer approval.',
+                'email' => 'This admin client account is still awaiting developer approval.',
             ])->onlyInput('email');
         }
 
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            RateLimiter::hit($this->staffLoginThrottleKey($request));
+            $this->hitStaffLoginThrottle($request);
 
             return back()->withErrors([
                 'email' => 'These credentials do not match our records.',
@@ -72,6 +81,7 @@ class AdminAuthController extends Controller
 
         $request->session()->regenerate();
         RateLimiter::clear($this->staffLoginThrottleKey($request));
+        $request->session()->forget('staff_login_throttle_email');
 
         $request->session()->forget([
             'admin_auth_passed',
@@ -93,48 +103,12 @@ class AdminAuthController extends Controller
 
     public function showRegisterForm()
     {
-        if (Auth::check() && Auth::user()->canAccessAdminPortal() && session('staff_otp_passed')) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        return view('Admin.auth.admin-login');
+        abort(404);
     }
 
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'role' => ['required', 'in:' . User::ROLE_ADMIN . ',' . User::ROLE_DEVELOPER],
-            'password' => [
-                'required',
-                Password::min(8)->letters()->mixedCase()->numbers()->symbols(),
-            ],
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
-
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        $request->session()->forget([
-            'admin_verified',
-            '2fa_passed',
-            'staff_otp_passed',
-        ]);
-
-        session([
-            'admin_auth_passed' => true,
-            'admin_email' => $user->email,
-            'needs_email_otp' => true,
-        ]);
-
-        return $this->sendStaffOtp($request, $user, 'Admin account created. Please verify your email to continue.');
+        abort(404);
     }
 
     public function showOtpForm()
@@ -195,7 +169,7 @@ class AdminAuthController extends Controller
             ]);
         }
 
-        if ($user->otp_expires_at && now()->gt($user->otp_expires_at)) {
+        if (!$user->otp_expires_at || now()->gt($user->otp_expires_at)) {
             RateLimiter::hit($otpThrottleKey, User::EMAIL_OTP_LOCKOUT_SECONDS);
 
             return back()->withErrors([
@@ -317,6 +291,27 @@ class AdminAuthController extends Controller
     private function staffLoginThrottleKey(Request $request): string
     {
         return 'staff-login:' . Str::transliterate(Str::lower($request->input('email', '')) . '|' . $request->ip());
+    }
+
+    private function hitStaffLoginThrottle(Request $request): void
+    {
+        $request->session()->put('staff_login_throttle_email', Str::lower((string) $request->input('email', '')));
+        RateLimiter::hit($this->staffLoginThrottleKey($request), self::STAFF_LOGIN_LOCKOUT_SECONDS);
+    }
+
+    private function staffLoginCooldownSeconds(Request $request): int
+    {
+        $email = session('staff_login_throttle_email');
+
+        if (!$email) {
+            return 0;
+        }
+
+        $key = 'staff-login:' . Str::transliterate(Str::lower((string) $email) . '|' . $request->ip());
+
+        return RateLimiter::tooManyAttempts($key, self::STAFF_LOGIN_MAX_ATTEMPTS)
+            ? RateLimiter::availableIn($key)
+            : 0;
     }
 
     private function staffOtpThrottleKey(Request $request): string

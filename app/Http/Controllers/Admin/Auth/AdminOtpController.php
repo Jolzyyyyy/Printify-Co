@@ -27,10 +27,10 @@ class AdminOtpController extends Controller
     {
         // --- 🛡️ SECURITY SHIELD ---
         // 1. Dapat logged in.
-        // 2. Dapat ang role ay 'admin'. Kapag customer, BLOCK at pabalikin sa login.
-        if (!Auth::check() || !Auth::user()->isAdmin()) {
+        // 2. Dapat admin_client o developer ang role. Kapag customer, BLOCK at pabalikin sa login.
+        if (!Auth::check() || !Auth::user()->canAccessAdminPortal()) {
             Auth::logout();
-            return redirect()->route('admin.login')->withErrors(['email' => 'Unauthorized access. Admins only.']);
+            return redirect()->route('admin.login')->withErrors(['email' => 'Unauthorized access. Admin clients and developers only.']);
         }
 
         // Kung verified na ang Email OTP ni Admin, huwag na pabalikin dito.
@@ -53,8 +53,8 @@ class AdminOtpController extends Controller
 
         $user = Auth::user();
 
-        // Double check if admin (Safety first)
-        if (!$user || !$user->isAdmin()) {
+        // Double check portal access (Safety first)
+        if (!$user || !$user->canAccessAdminPortal()) {
             Auth::logout();
             return redirect()->route('admin.login')->withErrors(['email' => 'Invalid session.']);
         }
@@ -89,7 +89,7 @@ class AdminOtpController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (!$user || !$user->canAccessAdminPortal()) {
             return redirect()->route('admin.login');
         }
 
@@ -99,7 +99,7 @@ class AdminOtpController extends Controller
         $user->otp_expires_at = now()->addMinutes(User::EMAIL_OTP_TTL_MINUTES);
         $user->save();
 
-        // Send Email specifically for Admin
+        // Send Email specifically for portal users
         Mail::to($user->email)->send(new OTPVerificationMail($otp));
 
         return back()->with('status', 'A new verification code has been sent to your admin email.');

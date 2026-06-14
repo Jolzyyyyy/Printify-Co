@@ -36,8 +36,9 @@
                                     <input type="password" name="password" id="password"
                                            class="form-control @error('password') is-invalid @enderror" 
                                            style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 0.75rem; border-radius: 10px;" 
-                                           placeholder="Minimum 8 characters" required autofocus>
+                                           placeholder="At least 8 characters, number, and symbol" required autofocus>
                                 </div>
+                                <p class="text-muted small mt-2 mb-0">Use at least 8 characters with a number and special symbol.</p>
                                 @error('password')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror

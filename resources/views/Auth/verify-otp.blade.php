@@ -477,6 +477,30 @@
             font-weight: 700;
         }
 
+        .lockout-info {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            border: 1px solid #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.35;
+            text-align: left;
+        }
+
+        .lockout-info strong {
+            display: block;
+            color: #7c2d12;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
         .nav-link {
             font-size: 13px;
             color: #7b8796;
@@ -582,10 +606,28 @@
     <div class="auth-container"
         x-data="{
             otp: '',
-            timer: 60,
-            canResend: false,
+            timer: {{ max((int) ($resendCooldownSeconds ?? 0), 0) }},
+            canResend: {{ (int) ($resendCooldownSeconds ?? 0) <= 0 ? 'true' : 'false' }},
+            lockoutTimer: {{ max((int) ($otpLockoutSeconds ?? 0), 0) }},
+            get otpLocked() {
+                return this.lockoutTimer > 0;
+            },
 
             init() {
+                if (this.lockoutTimer > 0) {
+                    let lockoutInterval = setInterval(() => {
+                        if (this.lockoutTimer > 0) {
+                            this.lockoutTimer--;
+                        } else {
+                            clearInterval(lockoutInterval);
+                        }
+                    }, 1000);
+                }
+
+                if (this.canResend) {
+                    return;
+                }
+
                 let interval = setInterval(() => {
                     if (this.timer > 0) {
                         this.timer--;
@@ -611,10 +653,10 @@
             </svg>
         </div>
 
-        <h1 class="auth-title">Verify Account</h1>
+        <h1 class="auth-title">{{ $otpTitle ?? 'Verify Account' }}</h1>
 
         <p class="instruction-text">
-            Please enter the 6-digit security code sent to your email address to continue.
+            {{ $otpInstruction ?? 'Please enter the 6-digit security code sent to your email address to continue.' }}
         </p>
 
         <div class="status-message">
@@ -622,7 +664,7 @@
                 <circle cx="12" cy="12" r="9"></circle>
                 <path d="M8.8 12.2l2 2 4.5-4.6"></path>
             </svg>
-            <span>A 6-digit verification code has been sent to your email.</span>
+            <span>{{ $otpStatusMessage ?? 'A 6-digit verification code has been sent to your email.' }}</span>
         </div>
 
         @if (session('status'))
@@ -631,11 +673,20 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('customer.otp.submit') }}">
+        <div x-show="otpLocked" class="lockout-info" role="alert">
+            <strong>Verification cooldown active</strong>
+            Too many incorrect codes. Please wait <span x-text="Math.ceil(lockoutTimer / 60)"></span> minute<span x-show="Math.ceil(lockoutTimer / 60) !== 1">s</span>
+            (<span x-text="lockoutTimer"></span>s) before trying again.
+        </div>
+
+        <form method="POST" action="{{ $otpSubmitAction ?? route('customer.otp.submit') }}">
             @csrf
 
             <input type="hidden" name="email" value="{{ $verificationEmail ?? $email ?? (Auth::user()->email ?? (session('otp_email') ?? request()->email)) }}">
             <input type="hidden" name="otp" :value="otp">
+            @if (!empty($verificationFlow))
+                <input type="hidden" name="verification_flow" value="{{ $verificationFlow }}">
+            @endif
 
             <div class="otp-wrapper">
                 <input
@@ -645,6 +696,7 @@
                     @input="cleanOtp()"
                     @paste="$nextTick(() => cleanOtp())"
                     class="otp-real-input"
+                    x-bind:disabled="otpLocked"
                     required
                     autofocus
                 >
@@ -664,22 +716,22 @@
                 <div class="error-text">{{ $message }}</div>
             @enderror
 
-            <button type="submit" class="auth-btn" x-bind:disabled="otp.length !== 6">
+            <button type="submit" class="auth-btn" x-bind:disabled="otpLocked || otp.length !== 6">
                 Verify Account
             </button>
         </form>
 
         <div class="footer-nav">
-            <form method="POST" action="{{ route('customer.otp.resend') }}">
+            <form method="POST" action="{{ $otpResendAction ?? route('customer.otp.resend') }}">
                 @csrf
 
                 <input type="hidden" name="email" value="{{ $verificationEmail ?? $email ?? (Auth::user()->email ?? (session('otp_email') ?? request()->email)) }}">
 
-                <button type="submit" x-show="canResend" class="nav-link resend-link">
+                <button type="submit" x-show="canResend && !otpLocked" class="nav-link resend-link">
                     Resend Code
                 </button>
 
-                <div x-show="!canResend" class="timer-info">
+                <div x-show="!otpLocked && !canResend" class="timer-info">
                     Resend available in <span x-text="'00:' + String(timer).padStart(2, '0')"></span>
                 </div>
             </form>
@@ -695,11 +747,11 @@
                     </button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="nav-link back-link">
+                <a href="{{ $otpBackRoute ?? route('login') }}" class="nav-link back-link">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
                     </svg>
-                    Back to Login
+                    {{ $otpBackLabel ?? 'Back to Login' }}
                 </a>
             @endauth
         </div>

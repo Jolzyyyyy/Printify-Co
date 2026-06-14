@@ -29,7 +29,9 @@ class NewPasswordController extends Controller
          * Kung walang token o email, ibig sabihin hindi dumaan ang user sa tamang flow.
          */
         if (!$token || !$email) {
-            return redirect()->route('login')->withErrors([
+            $loginRoute = session('password_reset_portal') === 'staff' ? 'admin.login' : 'login';
+
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Session expired or invalid access. Please restart the password reset process.',
             ]);
         }
@@ -57,9 +59,24 @@ class NewPasswordController extends Controller
          * 2. SECURITY CHECK
          * Sinisiguro natin na dumaan ang user sa OTP verification bago payagang palitan ang password.
          */
-        if (!session()->has('password_reset_token')) {
-            return redirect()->route('login')->withErrors([
+        $sessionToken = session('password_reset_token');
+        $sessionEmail = session('password_reset_email');
+        $resetPortal = session('password_reset_portal', 'customer');
+
+        if (!$sessionToken || !$sessionEmail) {
+            $loginRoute = session('password_reset_portal') === 'staff' ? 'admin.login' : 'login';
+
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Security check failed. Please verify your identity via OTP again.',
+            ]);
+        }
+
+        if (!hash_equals((string) $sessionToken, (string) $request->token)
+            || Str::lower(trim((string) $sessionEmail)) !== Str::lower(trim((string) $request->email))) {
+            $loginRoute = $resetPortal === 'staff' ? 'admin.login' : 'login';
+
+            return redirect()->route($loginRoute)->withErrors([
+                'email' => 'Password reset session mismatch. Please request a new reset code.',
             ]);
         }
 
@@ -69,6 +86,12 @@ class NewPasswordController extends Controller
         if (!$user) {
             return back()->withErrors([
                 'email' => 'User account not found.',
+            ]);
+        }
+
+        if ($resetPortal === 'staff' && !$user->canAccessAdminPortal()) {
+            return redirect()->route('admin.login')->withErrors([
+                'email' => 'This password reset link is only for admin-client and developer accounts.',
             ]);
         }
 
@@ -89,6 +112,7 @@ class NewPasswordController extends Controller
         $request->session()->forget([
             'password_reset_token',
             'password_reset_email',
+            'password_reset_portal',
             'otp_email',
             'is_forgot_password',
             'auth_type',
@@ -99,11 +123,21 @@ class NewPasswordController extends Controller
          * 6. SMART REDIRECTION LOGIC
          * Base sa 'action_type' na ipinasa mula sa Blade form.
          */
-        $action = $request->action_type ?? 'auto_login'; // Default to auto_login for better UX
+        $action = $resetPortal === 'staff'
+            ? 'auto_login'
+            : ($request->action_type ?? 'auto_login');
 
         if ($action === 'auto_login') {
             // Flow: Dashboard Entry
             Auth::login($user);
+            if ($resetPortal === 'staff' && $user->canAccessAdminPortal()) {
+                $request->session()->put('staff_otp_passed', true);
+
+                return redirect()->route('admin.dashboard')->with('status',
+                    'Success! Your password has been updated and you are now logged in.'
+                );
+            }
+
             $request->session()->put('customer_otp_passed', true);
 
             return redirect()->route('dashboard')->with('status', 
@@ -115,7 +149,7 @@ class NewPasswordController extends Controller
         Auth::guard('web')->logout();
         $request->session()->forget('customer_otp_passed');
 
-        return redirect()->route('login')->with('status', 
+        return redirect()->route($resetPortal === 'staff' ? 'admin.login' : 'login')->with('status', 
             'Your password has been updated! Please login with your new credentials.'
         );
     }

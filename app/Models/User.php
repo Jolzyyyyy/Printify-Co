@@ -17,7 +17,6 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
-    const ROLE_ADMIN = 'admin';
     const ROLE_ADMIN_CLIENT = 'admin_client';
     const ROLE_CUSTOMER = 'customer';
     const ROLE_DEVELOPER = 'developer';
@@ -49,7 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo',
         'preferences',
         'password',
-        'role',               // 'admin' o 'customer'
+        'role',               // customer, admin_client, or developer
         'admin_client_id',
         'otp_code',           // 6-digit code
         'otp_expires_at',     // Expiration timestamp
@@ -116,11 +115,6 @@ class User extends Authenticatable implements MustVerifyEmail
     |--------------------------------------------------------------------------
     */
 
-    public function isAdmin(): bool
-    {
-        return $this->role === self::ROLE_ADMIN;
-    }
-
     public function isAdminClient(): bool
     {
         return $this->role === self::ROLE_ADMIN_CLIENT;
@@ -148,19 +142,19 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function canAccessAdminPortal(): bool
     {
-        return $this->isAdmin() || $this->isAdminClient() || $this->isDeveloper();
+        return $this->isAdminClient() || $this->isDeveloper();
     }
 
     public function isInvitedAdminPendingApproval(): bool
     {
-        return $this->isAdmin()
+        return $this->isAdminClient()
             && $this->preregistered_by !== null
             && $this->approved_at === null;
     }
 
     public function canViewAllPortalRecords(): bool
     {
-        return $this->isAdmin() || $this->isDeveloper();
+        return $this->isDeveloper();
     }
 
     public function isApprovedAdminClient(): bool
