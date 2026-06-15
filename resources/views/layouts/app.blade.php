@@ -1585,6 +1585,63 @@
             </div>
         </header>
         <main class="page-content-wrapper">{{ $slot }}</main>
+        <div class="portal-calendar-overlay" id="portalCalendarOverlay" aria-hidden="true">
+            <section class="portal-calendar-modal" role="dialog" aria-modal="true" aria-labelledby="portalCalendarTitle">
+                <div class="portal-calendar-main">
+                    <div class="portal-calendar-head">
+                        <div>
+                            <h3 class="portal-calendar-title" id="portalCalendarTitle">Customer Calendar</h3>
+                            <p class="portal-calendar-subtitle">Select dates and manage your customer reminders.</p>
+                        </div>
+                        <div class="portal-calendar-nav">
+                            <button type="button" class="portal-calendar-icon-btn" id="portalCalendarPrev" aria-label="Previous month"><i data-lucide="chevron-left"></i></button>
+                            <button type="button" class="portal-calendar-action-btn" id="portalCalendarToday">Today</button>
+                            <button type="button" class="portal-calendar-icon-btn" id="portalCalendarNext" aria-label="Next month"><i data-lucide="chevron-right"></i></button>
+                            <button type="button" class="portal-calendar-icon-btn" id="portalCalendarClose" aria-label="Close calendar"><i data-lucide="x"></i></button>
+                        </div>
+                    </div>
+                    <div class="portal-calendar-month-row">
+                        <h4 class="portal-calendar-month-title" id="portalCalendarMonth"></h4>
+                        <button type="button" class="portal-calendar-use-btn" id="portalCalendarUse"><i data-lucide="check"></i> Use Date</button>
+                    </div>
+                    <div class="portal-calendar-weekdays" aria-hidden="true">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+                    <div class="portal-calendar-grid" id="portalCalendarGrid"></div>
+                </div>
+                <aside class="portal-calendar-side">
+                    <div class="portal-calendar-side-title">Selected Date</div>
+                    <div class="portal-selected-date-card">
+                        <div class="portal-selected-date-icon"><i data-lucide="calendar-days"></i></div>
+                        <div>
+                            <h4 class="portal-calendar-selected-date" id="portalCalendarSelected"></h4>
+                            <p>Add details for your reminder or event on this date.</p>
+                        </div>
+                    </div>
+                    <form class="portal-calendar-form" id="portalCalendarForm">
+                        <input type="hidden" id="portalCalendarEventId">
+                        <div class="portal-calendar-field">
+                            <label for="portalCalendarEventTitle">Event / Reminder</label>
+                            <input type="text" id="portalCalendarEventTitle" maxlength="80" placeholder="Example: Follow up call with customer" required>
+                        </div>
+                        <div class="portal-calendar-field">
+                            <label for="portalCalendarEventTime">Time</label>
+                            <input type="time" id="portalCalendarEventTime">
+                        </div>
+                        <div class="portal-calendar-field">
+                            <label for="portalCalendarEventNote">Note (Optional)</label>
+                            <textarea id="portalCalendarEventNote" maxlength="180" placeholder="Add any notes or details about this reminder..."></textarea>
+                        </div>
+                        <div class="portal-calendar-info"><i data-lucide="info"></i><span>Your reminder will be saved and visible in your calendar and customer timeline.</span></div>
+                        <div class="portal-calendar-event-list" id="portalCalendarEventList"></div>
+                        <div class="portal-calendar-actions">
+                            <button type="button" class="portal-calendar-clear-btn" id="portalCalendarClear">Cancel</button>
+                            <button type="submit" class="portal-calendar-save-btn" id="portalCalendarSave">Save Changes</button>
+                        </div>
+                    </form>
+                </aside>
+            </section>
+        </div>
     </div>
 
     <script>
@@ -1621,6 +1678,1032 @@
         window.addEventListener('printify-profile-updated',e=>syncCustomerHeaderProfile(e.detail||{},true));
         document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>document.body.classList.add('loaded'),80);syncCustomerHeaderProfile({},false);if(window.lucide)lucide.createIcons()});
     </script>
+    <style id="portal-shell-final-cleanup">
+        body{background:#fff!important}
+        .quick-actions-container{display:none!important}
+        .page-content-wrapper,
+        .customer-dashboard-v2,
+        .profile-page,
+        .settings-page,
+        .st-page,
+        .co-page,
+        .orders-page,
+        .security-page,
+        .sp-page,
+        .notifications-page,
+        .nf-page,
+        .customer-section-page{
+            background:#fff!important;
+            background-image:none!important;
+            box-shadow:none!important;
+        }
+        .page-content-wrapper:before,
+        .page-content-wrapper:after,
+        .customer-dashboard-v2:before,
+        .customer-dashboard-v2:after,
+        .profile-page:before,
+        .profile-page:after,
+        .st-page:before,
+        .st-page:after,
+        .co-page:before,
+        .co-page:after,
+        .security-page:before,
+        .security-page:after,
+        .nf-page:before,
+        .nf-page:after{
+            display:none!important;
+            content:none!important;
+        }
+        .st-date,
+        .profile-date,
+        .security-date,
+        .co-calendar-toggle,
+        .nf-calendar-trigger,
+        .dash-date-control,
+        .admin-date-control,
+        .settings-date-control,
+        .settings-calendar-trigger{
+            cursor:pointer!important;
+        }
+        .portal-calendar-overlay{
+            position:fixed;
+            inset:0;
+            z-index:2147482500;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:18px;
+            background:rgba(17,24,39,.36);
+            backdrop-filter:blur(9px);
+            opacity:0;
+            visibility:hidden;
+            pointer-events:none;
+            transition:opacity .2s ease,visibility .2s ease;
+        }
+        .portal-calendar-overlay.is-open{opacity:1;visibility:visible;pointer-events:auto}
+        .portal-calendar-modal{
+            width:min(850px,calc(100vw - 40px));
+            min-height:540px;
+            max-height:calc(100vh - 44px);
+            display:grid;
+            grid-template-columns:minmax(0,1fr) 320px;
+            background:#fff;
+            border-radius:15px;
+            box-shadow:0 24px 70px rgba(15,23,42,.25);
+            overflow:hidden;
+            font-family:var(--customer-font,'Inter',system-ui,sans-serif);
+            color:#111827;
+        }
+        .portal-calendar-main{padding:26px 24px 24px;border-right:1px solid #e5e7eb;min-width:0}
+        .portal-calendar-side{padding:26px 22px 20px;min-width:0}
+        .portal-calendar-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;margin-bottom:28px}
+        .portal-calendar-title{margin:0 0 9px;font-family:var(--customer-title,'Poppins',system-ui,sans-serif);font-size:21px;font-weight:700;letter-spacing:0;color:#111827}
+        .portal-calendar-subtitle{margin:0;max-width:260px;color:#64748b;font-size:12px;font-weight:500;line-height:1.6}
+        .portal-calendar-nav{display:flex;align-items:center;gap:12px}
+        .portal-calendar-icon-btn,
+        .portal-calendar-action-btn,
+        .portal-calendar-use-btn,
+        .portal-calendar-clear-btn,
+        .portal-calendar-save-btn,
+        .portal-calendar-mini-btn{
+            border:1px solid #e5e7eb;
+            background:#fff;
+            color:#111827;
+            box-shadow:none;
+            cursor:pointer;
+            font-family:var(--customer-title,'Poppins',system-ui,sans-serif);
+            font-weight:600;
+        }
+        .portal-calendar-icon-btn{width:38px;height:38px;min-width:38px;border-radius:999px;display:grid;place-items:center}
+        .portal-calendar-icon-btn i,.portal-calendar-icon-btn svg{width:18px;height:18px}
+        .portal-calendar-action-btn{height:38px;min-width:68px;padding:0 16px;border-radius:999px}
+        .portal-calendar-month-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+        .portal-calendar-month-title{margin:0;font-family:var(--customer-title,'Poppins',system-ui,sans-serif);font-size:19px;font-weight:700;color:#111827}
+        .portal-calendar-use-btn{height:38px;min-width:124px;border-color:#ff7a00;color:#ff5f00;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+        .portal-calendar-weekdays,.portal-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+        .portal-calendar-weekdays{margin-bottom:8px}
+        .portal-calendar-weekdays span{text-align:center;font-size:9px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
+        .portal-calendar-day{
+            min-height:58px;
+            border:1px solid #e5e7eb;
+            border-radius:9px;
+            background:#fff;
+            color:#111827;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:7px;
+            cursor:pointer;
+            font-size:14px;
+            font-weight:500;
+        }
+        .portal-calendar-day:hover,.portal-calendar-day:focus{border-color:#ff7a00;outline:0}
+        .portal-calendar-day.is-muted{background:#fafafa;color:#cbd5e1;cursor:default}
+        .portal-calendar-day.is-today,.portal-calendar-day.is-selected{border-color:#ff7a00;background:#fff7ed;color:#ff5f00;box-shadow:inset 0 0 0 1px #ff7a00}
+        .portal-calendar-day-events{display:flex;gap:3px;min-height:5px}
+        .portal-calendar-dot{width:5px;height:5px;border-radius:999px;background:#ff7a00}
+        .portal-calendar-side-title{font-size:12px;font-weight:800;color:#111827;margin-bottom:14px}
+        .portal-selected-date-card{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;padding:14px 15px;border:1px solid #fdba74;border-radius:10px;background:#fff7ed;margin-bottom:20px}
+        .portal-selected-date-icon{width:30px;height:30px;display:grid;place-items:center;color:#ff6b00}
+        .portal-selected-date-icon svg{width:21px;height:21px}
+        .portal-calendar-selected-date{margin:0 0 6px;font-family:var(--customer-title,'Poppins',system-ui,sans-serif);font-size:13px;font-weight:700;color:#111827}
+        .portal-selected-date-card p{margin:0;color:#64748b;font-size:10.5px;font-weight:500;line-height:1.45}
+        .portal-calendar-form{display:grid;gap:12px}
+        .portal-calendar-field{display:grid;gap:7px}
+        .portal-calendar-field label{font-size:10px;font-weight:800;color:#111827}
+        .portal-calendar-field input,.portal-calendar-field textarea{
+            width:100%;
+            border:1px solid #e5e7eb;
+            border-radius:10px;
+            background:#fff;
+            color:#111827;
+            font-size:12px;
+            font-weight:500;
+            padding:0 14px;
+            outline:none;
+            box-shadow:none;
+        }
+        .portal-calendar-field input{height:43px}
+        .portal-calendar-field textarea{height:90px;resize:none;padding-top:13px}
+        .portal-calendar-field input:focus,.portal-calendar-field textarea:focus{border-color:#ff7a00;box-shadow:0 0 0 3px rgba(255,122,0,.10)}
+        .portal-calendar-info{display:grid;grid-template-columns:22px minmax(0,1fr);gap:9px;align-items:center;border:1px solid #fdba74;border-radius:10px;background:#fff7ed;color:#64748b;padding:12px;font-size:10.5px;font-weight:500;line-height:1.35}
+        .portal-calendar-info svg{width:18px;height:18px;color:#ff6b00}
+        .portal-calendar-event-list{display:grid;gap:8px;max-height:108px;overflow:auto;padding-right:2px}
+        .portal-calendar-empty{border:1px dashed #d8dee8;border-radius:10px;padding:11px;text-align:center;color:#64748b;font-size:10.5px;background:#fff}
+        .portal-calendar-event-item{border:1px solid #e5e7eb;border-radius:10px;background:#fff;padding:10px;display:grid;gap:5px}
+        .portal-calendar-event-title{font-size:12px;font-weight:800;color:#111827}
+        .portal-calendar-event-meta{font-size:10px;font-weight:700;color:#ff6b00}
+        .portal-calendar-event-note{font-size:10.5px;color:#64748b;line-height:1.35}
+        .portal-calendar-event-actions{display:flex;justify-content:flex-end;gap:6px}
+        .portal-calendar-mini-btn{height:26px;border-radius:8px;padding:0 10px;font-size:9.5px}
+        .portal-calendar-mini-btn.danger{background:#ef4444;color:#fff;border-color:#ef4444}
+        .portal-calendar-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:2px}
+        .portal-calendar-clear-btn,.portal-calendar-save-btn{height:42px;border-radius:999px;padding:0 26px;font-size:12px}
+        .portal-calendar-save-btn{min-width:150px;background:#16a34a;color:#fff;border-color:#16a34a}
+        .portal-calendar-clear-btn{min-width:120px}
+        .portal-calendar-icon-btn:hover,
+        .portal-calendar-action-btn:hover,
+        .portal-calendar-use-btn:hover,
+        .portal-calendar-clear-btn:hover,
+        .portal-calendar-mini-btn:hover{background:#f8fafc;color:#111827}
+        .portal-calendar-save-btn:hover{background:#15803d;border-color:#15803d;color:#fff}
+        @media(max-width:900px){
+            .portal-calendar-modal{grid-template-columns:1fr;overflow:auto;min-height:auto}
+            .portal-calendar-main{border-right:0;border-bottom:1px solid #e5e7eb}
+        }
+        @media(max-width:640px){
+            .portal-calendar-overlay{align-items:flex-start;overflow:auto;padding:12px}
+            .portal-calendar-modal{width:100%;max-height:none}
+            .portal-calendar-head{grid-template-columns:1fr}
+            .portal-calendar-nav{justify-content:flex-start;flex-wrap:wrap}
+            .portal-calendar-day{min-height:48px}
+            .portal-calendar-actions{display:grid;grid-template-columns:1fr 1fr}
+            .portal-calendar-clear-btn,.portal-calendar-save-btn{width:100%;min-width:0}
+        }
+    </style>
+    <style id="portal-calendar-single-source-final">
+        .date-pill,
+        .st-date,
+        .profile-date,
+        .security-date,
+        .co-date,
+        .co-calendar-toggle,
+        .nf-date,
+        .nf-calendar-trigger,
+        .dash-date-control,
+        .admin-date-control,
+        .settings-date-control,
+        .settings-calendar-trigger{
+            height:42px!important;
+            min-height:42px!important;
+            min-width:216px!important;
+            width:auto!important;
+            padding:0 18px!important;
+            display:inline-flex!important;
+            align-items:center!important;
+            justify-content:center!important;
+            gap:10px!important;
+            border:1px solid #111827!important;
+            border-radius:10px!important;
+            background:#fff!important;
+            color:#111827!important;
+            box-shadow:none!important;
+            font-family:var(--customer-font,'Inter',system-ui,sans-serif)!important;
+            font-size:12px!important;
+            font-weight:700!important;
+            line-height:1!important;
+            white-space:nowrap!important;
+            letter-spacing:0!important;
+            cursor:pointer!important;
+            transition:background .18s ease,color .18s ease,border-color .18s ease!important;
+        }
+        .date-pill svg,.date-pill i,
+        .st-date svg,.st-date i,
+        .profile-date svg,.profile-date i,
+        .security-date svg,.security-date i,
+        .co-date svg,.co-date i,
+        .co-calendar-toggle svg,.co-calendar-toggle i,
+        .nf-date svg,.nf-date i,
+        .nf-calendar-trigger svg,.nf-calendar-trigger i,
+        .dash-date-control svg,.dash-date-control i,
+        .admin-date-control svg,.admin-date-control i,
+        .settings-date-control svg,.settings-date-control i,
+        .settings-calendar-trigger svg,.settings-calendar-trigger i{
+            width:18px!important;
+            height:18px!important;
+            color:#111827!important;
+            stroke:#111827!important;
+            flex:0 0 auto!important;
+        }
+        .date-pill:hover,.date-pill:focus-visible,
+        .st-date:hover,.st-date:focus-visible,
+        .profile-date:hover,.profile-date:focus-visible,
+        .security-date:hover,.security-date:focus-visible,
+        .co-date:hover,.co-date:focus-visible,
+        .co-calendar-toggle:hover,.co-calendar-toggle:focus-visible,
+        .nf-date:hover,.nf-date:focus-visible,
+        .nf-calendar-trigger:hover,.nf-calendar-trigger:focus-visible,
+        .dash-date-control:hover,.dash-date-control:focus-visible,
+        .admin-date-control:hover,.admin-date-control:focus-visible,
+        .settings-date-control:hover,.settings-date-control:focus-visible,
+        .settings-calendar-trigger:hover,.settings-calendar-trigger:focus-visible{
+            background:#111827!important;
+            color:#fff!important;
+            border-color:#111827!important;
+            outline:0!important;
+            transform:none!important;
+        }
+        .date-pill:hover svg,.date-pill:focus-visible svg,.date-pill:hover i,.date-pill:focus-visible i,
+        .st-date:hover svg,.st-date:focus-visible svg,.st-date:hover i,.st-date:focus-visible i,
+        .profile-date:hover svg,.profile-date:focus-visible svg,.profile-date:hover i,.profile-date:focus-visible i,
+        .security-date:hover svg,.security-date:focus-visible svg,.security-date:hover i,.security-date:focus-visible i,
+        .co-date:hover svg,.co-date:focus-visible svg,.co-date:hover i,.co-date:focus-visible i,
+        .co-calendar-toggle:hover svg,.co-calendar-toggle:focus-visible svg,.co-calendar-toggle:hover i,.co-calendar-toggle:focus-visible i,
+        .nf-date:hover svg,.nf-date:focus-visible svg,.nf-date:hover i,.nf-date:focus-visible i,
+        .nf-calendar-trigger:hover svg,.nf-calendar-trigger:focus-visible svg,.nf-calendar-trigger:hover i,.nf-calendar-trigger:focus-visible i,
+        .dash-date-control:hover svg,.dash-date-control:focus-visible svg,.dash-date-control:hover i,.dash-date-control:focus-visible i,
+        .admin-date-control:hover svg,.admin-date-control:focus-visible svg,.admin-date-control:hover i,.admin-date-control:focus-visible i,
+        .settings-date-control:hover svg,.settings-date-control:focus-visible svg,.settings-date-control:hover i,.settings-date-control:focus-visible i{
+            color:#fff!important;
+            stroke:#fff!important;
+        }
+        .dashboard-calendar-overlay,
+        .portal-calendar-overlay{
+            position:fixed!important;
+            inset:0!important;
+            z-index:2147482500!important;
+            display:flex!important;
+            align-items:center!important;
+            justify-content:center!important;
+            padding:18px!important;
+            background:rgba(17,24,39,.36)!important;
+            backdrop-filter:blur(9px)!important;
+            transition:opacity .2s ease,visibility .2s ease!important;
+        }
+        .dashboard-calendar-modal,
+        .portal-calendar-modal{
+            width:min(920px,calc(100vw - 40px))!important;
+            min-height:0!important;
+            max-height:calc(100vh - 36px)!important;
+            display:grid!important;
+            grid-template-columns:minmax(0,1.1fr) 310px!important;
+            background:#fff!important;
+            border:1px solid #E2E8F0!important;
+            border-radius:18px!important;
+            box-shadow:0 26px 80px rgba(15,23,42,.22)!important;
+            overflow:hidden!important;
+            color:#111827!important;
+            font-family:var(--customer-font,'Inter',system-ui,sans-serif)!important;
+        }
+        .calendar-main,
+        .portal-calendar-main{
+            padding:18px!important;
+            border-right:1px solid #E2E8F0!important;
+            min-width:0!important;
+            background:#fff!important;
+        }
+        .calendar-side,
+        .portal-calendar-side{
+            padding:18px!important;
+            background:#fbfbfb!important;
+            min-width:0!important;
+        }
+        .calendar-side-inner{
+            padding:0!important;
+        }
+        .calendar-modal-head,
+        .portal-calendar-head{
+            display:grid!important;
+            grid-template-columns:minmax(0,1fr) auto!important;
+            gap:16px!important;
+            align-items:start!important;
+            margin-bottom:26px!important;
+        }
+        .calendar-title,
+        .portal-calendar-title{
+            margin:0 0 9px!important;
+            font-family:var(--customer-title,'Poppins',system-ui,sans-serif)!important;
+            font-size:21px!important;
+            font-weight:700!important;
+            line-height:1.2!important;
+            color:#111827!important;
+            letter-spacing:0!important;
+        }
+        .calendar-subtitle,
+        .portal-calendar-subtitle{
+            margin:0!important;
+            max-width:270px!important;
+            color:#64748b!important;
+            font-size:12px!important;
+            font-weight:500!important;
+            line-height:1.55!important;
+        }
+        .calendar-nav,
+        .portal-calendar-nav{
+            display:flex!important;
+            align-items:center!important;
+            justify-content:flex-end!important;
+            gap:12px!important;
+        }
+        .calendar-icon-btn,
+        .calendar-action-btn,
+        .calendar-use-date-btn,
+        .calendar-clear-btn,
+        .calendar-save-btn,
+        .calendar-mini-btn,
+        .portal-calendar-icon-btn,
+        .portal-calendar-action-btn,
+        .portal-calendar-use-btn,
+        .portal-calendar-clear-btn,
+        .portal-calendar-save-btn,
+        .portal-calendar-mini-btn{
+            box-shadow:none!important;
+            font-family:var(--customer-title,'Poppins',system-ui,sans-serif)!important;
+            font-weight:600!important;
+            letter-spacing:0!important;
+        }
+        .calendar-icon-btn,
+        .portal-calendar-icon-btn{
+            width:38px!important;
+            height:38px!important;
+            min-width:38px!important;
+            border:1px solid #E2E8F0!important;
+            border-radius:999px!important;
+            background:#fff!important;
+            color:#111827!important;
+            display:grid!important;
+            place-items:center!important;
+            padding:0!important;
+        }
+        .calendar-action-btn,
+        .portal-calendar-action-btn{
+            height:38px!important;
+            min-width:74px!important;
+            padding:0 17px!important;
+            border:1px solid #E2E8F0!important;
+            border-radius:999px!important;
+            background:#fff!important;
+            color:#111827!important;
+        }
+        .calendar-month-row,
+        .portal-calendar-month-row{
+            display:flex!important;
+            align-items:center!important;
+            justify-content:space-between!important;
+            gap:16px!important;
+            margin-bottom:24px!important;
+        }
+        .calendar-month-title,
+        .portal-calendar-month-title{
+            margin:0!important;
+            font-family:var(--customer-title,'Poppins',system-ui,sans-serif)!important;
+            font-size:19px!important;
+            font-weight:700!important;
+            line-height:1.2!important;
+            color:#111827!important;
+            letter-spacing:0!important;
+        }
+        .calendar-use-date-btn,
+        .portal-calendar-use-btn{
+            height:38px!important;
+            min-width:126px!important;
+            padding:0 16px!important;
+            border:1px solid #ff7a00!important;
+            border-radius:10px!important;
+            background:#fff!important;
+            color:#ff5f00!important;
+            display:inline-flex!important;
+            align-items:center!important;
+            justify-content:center!important;
+            gap:8px!important;
+        }
+        .calendar-weekdays,
+        .calendar-grid,
+        .portal-calendar-weekdays,
+        .portal-calendar-grid{
+            display:grid!important;
+            grid-template-columns:repeat(7,minmax(0,1fr))!important;
+            gap:8px!important;
+        }
+        .calendar-weekdays,
+        .portal-calendar-weekdays{
+            margin-bottom:8px!important;
+        }
+        .calendar-weekdays span,
+        .portal-calendar-weekdays span{
+            text-align:center!important;
+            font-size:9px!important;
+            font-weight:800!important;
+            color:#64748b!important;
+            text-transform:uppercase!important;
+            letter-spacing:.08em!important;
+        }
+        .calendar-day,
+        .portal-calendar-day{
+            position:relative!important;
+            min-height:78px!important;
+            height:auto!important;
+            border:1px solid #E2E8F0!important;
+            border-radius:12px!important;
+            background:#fff!important;
+            padding:8px!important;
+            text-align:left!important;
+            color:#111827!important;
+            display:block!important;
+            cursor:pointer!important;
+            overflow:hidden!important;
+            box-shadow:none!important;
+        }
+        .calendar-day:hover,
+        .calendar-day:focus,
+        .portal-calendar-day:hover,
+        .portal-calendar-day:focus{
+            border-color:#ff7a00!important;
+            box-shadow:0 10px 24px rgba(255,122,0,.10)!important;
+            outline:0!important;
+        }
+        .calendar-day.is-muted,
+        .portal-calendar-day.is-muted{
+            background:#fafafa!important;
+            color:#a1a1aa!important;
+            cursor:default!important;
+        }
+        .calendar-day.is-today,
+        .portal-calendar-day.is-today{
+            border-color:#ff7a00!important;
+            background:#fff7ed!important;
+            color:#ff5f00!important;
+        }
+        .calendar-day.is-selected,
+        .portal-calendar-day.is-selected{
+            border-color:#111827!important;
+            background:rgba(17,24,39,.08)!important;
+            color:#111827!important;
+            box-shadow:inset 0 0 0 1px #111827!important;
+        }
+        .calendar-day-number,
+        .portal-calendar-day-number{
+            display:block!important;
+            font-size:12px!important;
+            font-weight:800!important;
+            line-height:1!important;
+        }
+        .calendar-day-events,
+        .portal-calendar-day-events{
+            display:flex!important;
+            flex-wrap:wrap!important;
+            gap:4px!important;
+            margin-top:17px!important;
+            min-height:7px!important;
+        }
+        .calendar-event-dot,
+        .portal-calendar-dot{
+            width:7px!important;
+            height:7px!important;
+            border-radius:999px!important;
+            background:#ff7a00!important;
+            box-shadow:0 0 0 3px rgba(255,122,0,.10)!important;
+        }
+        .calendar-side-title,
+        .portal-calendar-side-title{
+            margin:0 0 14px!important;
+            font-size:12px!important;
+            font-weight:800!important;
+            color:#111827!important;
+        }
+        .selected-date-card,
+        .portal-selected-date-card{
+            display:grid!important;
+            grid-template-columns:34px minmax(0,1fr)!important;
+            gap:12px!important;
+            align-items:start!important;
+            padding:14px 15px!important;
+            border:1px solid #fdba74!important;
+            border-radius:10px!important;
+            background:#fff7ed!important;
+            margin-bottom:20px!important;
+        }
+        .selected-date-icon,
+        .portal-selected-date-icon{
+            width:30px!important;
+            height:30px!important;
+            display:grid!important;
+            place-items:center!important;
+            color:#ff6b00!important;
+        }
+        .calendar-selected-date,
+        .portal-calendar-selected-date{
+            margin:0 0 6px!important;
+            font-family:var(--customer-title,'Poppins',system-ui,sans-serif)!important;
+            font-size:13px!important;
+            font-weight:700!important;
+            color:#111827!important;
+        }
+        .selected-date-card p,
+        .portal-selected-date-card p{
+            margin:0!important;
+            color:#64748b!important;
+            font-size:10.5px!important;
+            font-weight:500!important;
+            line-height:1.45!important;
+        }
+        .calendar-form,
+        .portal-calendar-form{
+            display:grid!important;
+            gap:12px!important;
+        }
+        .calendar-field,
+        .portal-calendar-field{
+            display:grid!important;
+            gap:7px!important;
+        }
+        .calendar-field label,
+        .portal-calendar-field label{
+            font-size:10px!important;
+            font-weight:800!important;
+            color:#111827!important;
+        }
+        .calendar-field input,
+        .calendar-field textarea,
+        .portal-calendar-field input,
+        .portal-calendar-field textarea{
+            width:100%!important;
+            border:1px solid #E2E8F0!important;
+            border-radius:10px!important;
+            background:#fff!important;
+            color:#111827!important;
+            font-size:12px!important;
+            font-weight:500!important;
+            padding:0 14px!important;
+            outline:none!important;
+            box-shadow:none!important;
+        }
+        .calendar-field input,
+        .portal-calendar-field input{
+            height:43px!important;
+        }
+        .calendar-field textarea,
+        .portal-calendar-field textarea{
+            height:90px!important;
+            min-height:90px!important;
+            resize:none!important;
+            padding-top:13px!important;
+        }
+        .calendar-info-box,
+        .portal-calendar-info{
+            display:grid!important;
+            grid-template-columns:22px minmax(0,1fr)!important;
+            gap:9px!important;
+            align-items:center!important;
+            border:1px solid #fdba74!important;
+            border-radius:10px!important;
+            background:#fff7ed!important;
+            color:#64748b!important;
+            padding:12px!important;
+            font-size:10.5px!important;
+            font-weight:500!important;
+            line-height:1.35!important;
+        }
+        .calendar-event-list,
+        .portal-calendar-event-list{
+            display:grid!important;
+            gap:8px!important;
+            max-height:108px!important;
+            overflow:auto!important;
+            padding-right:2px!important;
+        }
+        .calendar-empty,
+        .portal-calendar-empty{
+            min-height:auto!important;
+            border:1px dashed #d8dee8!important;
+            border-radius:10px!important;
+            padding:11px!important;
+            text-align:center!important;
+            color:#64748b!important;
+            font-size:10.5px!important;
+            background:#fff!important;
+        }
+        .calendar-form-actions,
+        .portal-calendar-actions{
+            display:flex!important;
+            align-items:center!important;
+            justify-content:flex-end!important;
+            gap:10px!important;
+            margin-top:2px!important;
+        }
+        .calendar-clear-btn,
+        .portal-calendar-clear-btn{
+            height:42px!important;
+            min-width:120px!important;
+            border:1px solid #E2E8F0!important;
+            border-radius:999px!important;
+            background:#fff!important;
+            color:#111827!important;
+            padding:0 26px!important;
+            font-size:12px!important;
+        }
+        .calendar-save-btn,
+        .portal-calendar-save-btn{
+            height:42px!important;
+            min-width:150px!important;
+            border:1px solid #16a34a!important;
+            border-radius:999px!important;
+            background:#16a34a!important;
+            color:#fff!important;
+            padding:0 26px!important;
+            font-size:12px!important;
+        }
+        @media(max-width:900px){
+            .dashboard-calendar-modal,
+            .portal-calendar-modal{grid-template-columns:1fr!important;overflow:auto!important}
+            .calendar-main,
+            .portal-calendar-main{border-right:0!important;border-bottom:1px solid #E2E8F0!important}
+            .calendar-side,
+            .portal-calendar-side{background:#fff!important}
+        }
+        @media(max-width:640px){
+            .dashboard-calendar-overlay,
+            .portal-calendar-overlay{align-items:flex-start!important;overflow:auto!important;padding:12px!important}
+            .dashboard-calendar-modal,
+            .portal-calendar-modal{width:100%!important;max-height:none!important}
+            .calendar-modal-head,
+            .portal-calendar-head{grid-template-columns:1fr!important}
+            .calendar-nav,
+            .portal-calendar-nav{justify-content:flex-start!important;flex-wrap:wrap!important}
+            .calendar-day,
+            .portal-calendar-day{min-height:62px!important}
+            .calendar-form-actions,
+            .portal-calendar-actions{display:grid!important;grid-template-columns:1fr 1fr!important}
+            .calendar-clear-btn,
+            .calendar-save-btn,
+            .portal-calendar-clear-btn,
+            .portal-calendar-save-btn{width:100%!important;min-width:0!important}
+        }
+    </style>
+    <script id="portal-calendar-final-js">
+        (function(){
+            const overlay=document.getElementById('portalCalendarOverlay');
+            if(!overlay)return;
+            const $=id=>document.getElementById(id);
+            const grid=$('portalCalendarGrid');
+            const monthLabel=$('portalCalendarMonth');
+            const selectedLabel=$('portalCalendarSelected');
+            const eventList=$('portalCalendarEventList');
+            const eventForm=$('portalCalendarForm');
+            const eventId=$('portalCalendarEventId');
+            const eventTitle=$('portalCalendarEventTitle');
+            const eventTime=$('portalCalendarEventTime');
+            const eventNote=$('portalCalendarEventNote');
+            const saveBtn=$('portalCalendarSave');
+            const storageKey='printify_portal_calendar_events_{{ md5($displayEmail) }}';
+            let activeTrigger=null;
+            let events=[];
+            let today=new Date();
+            let selected=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+            let view=new Date(selected.getFullYear(),selected.getMonth(),1);
+            const pad=n=>String(n).padStart(2,'0');
+            const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+            const same=(a,b)=>key(a)===key(b);
+            const fmt=(d,o)=>d.toLocaleDateString('en-US',o);
+            const fmtLong=d=>fmt(d,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+            const fmtShort=d=>fmt(d,{month:'short',day:'numeric',year:'numeric'});
+            const fmtMonth=d=>fmt(d,{month:'long',year:'numeric'});
+            function load(){try{events=JSON.parse(localStorage.getItem(storageKey)||'[]').filter(x=>x&&x.date&&x.title)}catch(e){events=[]}}
+            function save(){localStorage.setItem(storageKey,JSON.stringify(events))}
+            function clear(){eventId.value='';eventTitle.value='';eventTime.value='';eventNote.value='';saveBtn.textContent='Save Changes'}
+            function dayEvents(k){return events.filter(x=>x.date===k).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')))}
+            function renderList(){
+                selectedLabel.textContent=fmtLong(selected);
+                eventList.innerHTML='';
+                const rows=dayEvents(key(selected));
+                if(!rows.length){
+                    const empty=document.createElement('div');
+                    empty.className='portal-calendar-empty';
+                    empty.textContent='No reminders yet for this date.';
+                    eventList.appendChild(empty);
+                    return;
+                }
+                rows.forEach(item=>{
+                    const card=document.createElement('div');
+                    card.className='portal-calendar-event-item';
+                    const title=document.createElement('div');
+                    title.className='portal-calendar-event-title';
+                    title.textContent=item.title;
+                    const meta=document.createElement('div');
+                    meta.className='portal-calendar-event-meta';
+                    meta.textContent=item.time?`Time: ${item.time}`:'No time set';
+                    const note=document.createElement('div');
+                    note.className='portal-calendar-event-note';
+                    note.textContent=item.note||'No note added.';
+                    const actions=document.createElement('div');
+                    actions.className='portal-calendar-event-actions';
+                    const edit=document.createElement('button');
+                    edit.type='button';
+                    edit.className='portal-calendar-mini-btn';
+                    edit.textContent='Edit';
+                    edit.addEventListener('click',()=>{eventId.value=item.id;eventTitle.value=item.title;eventTime.value=item.time||'';eventNote.value=item.note||'';saveBtn.textContent='Update';eventTitle.focus()});
+                    const del=document.createElement('button');
+                    del.type='button';
+                    del.className='portal-calendar-mini-btn danger';
+                    del.textContent='Delete';
+                    del.addEventListener('click',()=>{events=events.filter(x=>x.id!==item.id);save();clear();render()});
+                    actions.append(edit,del);
+                    card.append(title,meta,note,actions);
+                    eventList.appendChild(card);
+                });
+            }
+            function render(){
+                const y=view.getFullYear();
+                const m=view.getMonth();
+                const first=new Date(y,m,1);
+                const last=new Date(y,m+1,0);
+                const offset=first.getDay();
+                monthLabel.textContent=fmtMonth(view);
+                grid.innerHTML='';
+                for(let i=0;i<35;i++){
+                    const n=i-offset+1;
+                    const cell=document.createElement('button');
+                    cell.type='button';
+                    cell.className='portal-calendar-day';
+                    if(n<1||n>last.getDate()){
+                        cell.classList.add('is-muted');
+                        cell.disabled=true;
+                        grid.appendChild(cell);
+                        continue;
+                    }
+                    const d=new Date(y,m,n);
+                    const rows=dayEvents(key(d));
+                    cell.classList.toggle('is-today',same(d,today));
+                    cell.classList.toggle('is-selected',same(d,selected));
+                    const num=document.createElement('span');
+                    num.className='portal-calendar-day-number';
+                    num.textContent=n;
+                    const dots=document.createElement('span');
+                    dots.className='portal-calendar-day-events';
+                    rows.slice(0,3).forEach(()=>{const dot=document.createElement('span');dot.className='portal-calendar-dot';dots.appendChild(dot)});
+                    cell.append(num,dots);
+                    cell.addEventListener('click',()=>{selected=d;clear();render()});
+                    grid.appendChild(cell);
+                }
+                renderList();
+                if(window.lucide)window.lucide.createIcons();
+            }
+            function open(trigger){
+                activeTrigger=trigger||null;
+                overlay.classList.add('is-open');
+                overlay.setAttribute('aria-hidden','false');
+                render();
+                setTimeout(()=>grid.querySelector('.portal-calendar-day.is-selected')?.focus(),40);
+            }
+            function close(){
+                overlay.classList.remove('is-open');
+                overlay.setAttribute('aria-hidden','true');
+                activeTrigger?.focus?.();
+            }
+            document.addEventListener('click',function(e){
+                const trigger=e.target.closest('.st-date,.profile-date,.security-date,.co-calendar-toggle,.nf-calendar-trigger,.date-pill.calendar-toggle,.dash-date-control,.admin-date-control,.settings-date-control,.settings-calendar-trigger');
+                if(!trigger || trigger.id==='customerCalendarToggle')return;
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                open(trigger);
+            },true);
+            $('portalCalendarClose')?.addEventListener('click',close);
+            overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+            $('portalCalendarPrev')?.addEventListener('click',()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()});
+            $('portalCalendarNext')?.addEventListener('click',()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()});
+            $('portalCalendarToday')?.addEventListener('click',()=>{today=new Date();selected=new Date(today.getFullYear(),today.getMonth(),today.getDate());view=new Date(selected.getFullYear(),selected.getMonth(),1);clear();render()});
+            $('portalCalendarUse')?.addEventListener('click',()=>{
+                const target=activeTrigger?.querySelector('span')||activeTrigger;
+                if(target)target.textContent=(activeTrigger?.classList.contains('co-filter-date')?'': 'Today is ')+fmtShort(selected);
+                close();
+            });
+            $('portalCalendarClear')?.addEventListener('click',clear);
+            eventForm?.addEventListener('submit',e=>{
+                e.preventDefault();
+                const title=eventTitle.value.trim();
+                if(!title){eventTitle.focus();return}
+                const id=eventId.value.trim();
+                const payload={id:id||`evt-${Date.now()}-${Math.random().toString(16).slice(2)}`,date:key(selected),title,time:eventTime.value.trim(),note:eventNote.value.trim(),updated_at:new Date().toISOString()};
+                events=id?events.map(x=>x.id===id?{...x,...payload}:x):events.concat(payload);
+                save();
+                clear();
+                render();
+            });
+            document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('is-open'))close()});
+            document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.st-date,.profile-date,.security-date,.co-calendar-toggle,.nf-calendar-trigger,.dash-date-control,.admin-date-control,.settings-date-control,.settings-calendar-trigger').forEach(el=>{if(!el.hasAttribute('tabindex'))el.setAttribute('tabindex','0')})});
+            load();
+        })();
+    </script>
     @endif
+<style id="portal-2fa-and-customer-button-final-cleanup">
+    @font-face{font-family:'PortalLeague0615';src:url('/Fonts/LeagueSpartan-SemiBold.otf') format('opentype');font-weight:600;font-style:normal;font-display:swap}
+    @font-face{font-family:'PortalInter0615';src:url('/Fonts/Inter.ttc') format('truetype-collection'),url('/Fonts/Inter.ttc') format('truetype');font-weight:400 800;font-style:normal;font-display:swap}
+    @font-face{font-family:'PortalBoxing0615';src:url('/Fonts/Boxing-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
+
+    [data-tab="twofa"],
+    [data-tab-panel="twofa"],
+    [data-tab-jump="twofa"],
+    [href*="twofa" i],
+    [href*="2fa" i] {
+        display: none !important;
+    }
+
+    body.customer-portal-scope {
+        --customer-portal-orange: #ff7a00;
+    }
+
+    body.customer-portal-scope :where(.page-content-wrapper, .search-popover, .notification-panel, .messenger-panel) :where(p,span,a,li,small,td,th,input,textarea,select,option,button,label) {
+        font-family: 'PortalInter0615', 'Inter', system-ui, sans-serif !important;
+        letter-spacing: 0 !important;
+    }
+
+    body.customer-portal-scope :where(.page-content-wrapper, .search-popover, .notification-panel, .messenger-panel) :where(h1,h2,h3,h4,h5,h6,strong,b,.hero-kicker,.hero-main-title,.hero-subline,.dashboard-main-title,.profile-title,.page-title,.section-title,.section-subtitle,.card-title,.panel-title,.prof-card-title,.prof-widget-title,.sidebar-link,.search-mini-title,.notif-title,.topic-title) {
+        font-family: 'PortalLeague0615', 'League Spartan', system-ui, sans-serif !important;
+        letter-spacing: 0 !important;
+    }
+
+    body.customer-portal-scope :where(.brand-name, .printify-logo, .printify-brand, .brand-main-text, .printify-wordmark) {
+        font-family: 'PortalBoxing0615', 'Boxing', serif !important;
+        font-weight: 400 !important;
+    }
+
+    body.customer-portal-scope .page-content-wrapper :is(
+        .primary-button,
+        .tiny-button.primary,
+        .view-button,
+        .clear-filter-btn,
+        .edit-profile-button,
+        .new-order-btn,
+        .export-btn,
+        .manage-preferences-btn,
+        .prof-btn,
+        .prof-mini,
+        .prof-link,
+        .st-btn,
+        .st-outline-btn,
+        .co-btn,
+        .nf-btn,
+        .sp-btn,
+        button[class*="btn"],
+        a[class*="btn"],
+        button[class*="button"],
+        a[class*="button"]
+    ):not(.calendar-day):not(.portal-calendar-day):not(.sidebar-link):not(.header-icon-no-box):not(.menu-toggle):not(.toggle):not(.switch):not(.prof-camera-btn):not(.portal-calendar-close):not(.dashboard-calendar-close):not(.calendar-close):not(.icon-only) {
+        min-height: 42px !important;
+        border-radius: 999px !important;
+        padding: 0 22px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        letter-spacing: 0 !important;
+        box-shadow: none !important;
+        white-space: nowrap !important;
+    }
+
+    body.customer-portal-scope .page-content-wrapper :is(
+        .primary-button,
+        .tiny-button.primary,
+        .view-button,
+        .clear-filter-btn,
+        .edit-profile-button,
+        .new-order-btn,
+        .export-btn,
+        .manage-preferences-btn,
+        .co-primary,
+        .nf-primary,
+        .sp-primary,
+        .st-primary,
+        button.orange,
+        a.orange,
+        button[class*="orange"],
+        a[class*="orange"]
+    ):not(.calendar-day):not(.portal-calendar-day):not(.sidebar-link):not(.header-icon-no-box):not(.menu-toggle):not(.toggle):not(.switch):not(.prof-camera-btn):not(.portal-calendar-close):not(.dashboard-calendar-close):not(.calendar-close):not(.icon-only) {
+        background: var(--customer-portal-orange) !important;
+        border-color: var(--customer-portal-orange) !important;
+        color: #111827 !important;
+    }
+
+    body.customer-portal-scope .page-content-wrapper :is(
+        .primary-button,
+        .tiny-button.primary,
+        .view-button,
+        .clear-filter-btn,
+        .edit-profile-button,
+        .new-order-btn,
+        .export-btn,
+        .manage-preferences-btn,
+        .co-primary,
+        .nf-primary,
+        .sp-primary,
+        .st-primary,
+        button.orange,
+        a.orange,
+        button[class*="orange"],
+        a[class*="orange"]
+    ):not(.calendar-day):not(.portal-calendar-day):not(.sidebar-link):not(.header-icon-no-box):not(.menu-toggle):not(.toggle):not(.switch):not(.prof-camera-btn):not(.portal-calendar-close):not(.dashboard-calendar-close):not(.calendar-close):not(.icon-only):hover {
+        background: #111827 !important;
+        border-color: #111827 !important;
+        color: #ffffff !important;
+    }
+</style>
+
+<script id="portal-2fa-and-customer-button-final-js">
+    document.addEventListener('DOMContentLoaded', () => {
+        const path = window.location.pathname.toLowerCase();
+        const customerPaths = [
+            '/dashboard',
+            '/profile',
+            '/my-orders',
+            '/security',
+            '/notifications',
+            '/settings',
+        ];
+        const isAdminOrDeveloper = path.includes('/admin') || path.includes('/developer');
+        const isCustomerPortal = !isAdminOrDeveloper && customerPaths.some((item) => path === item || path.startsWith(`${item}/`));
+
+        if (isCustomerPortal) {
+            document.body.classList.add('customer-portal-scope');
+        }
+
+        const portalRoot = document.querySelector('.page-content-wrapper, main, body');
+        if (!portalRoot) {
+            return;
+        }
+
+        const twoFactorTerms = [
+            '2fa',
+            'two-factor',
+            'two factor',
+            'authenticator app',
+            'backup codes',
+            'trusted devices',
+            'skip 2fa',
+            'manage 2fa',
+            'enable two-factor',
+            'two-factor authentication',
+            'two-factor auth',
+        ];
+
+        const shouldRemoveText = (text) => {
+            const normalized = (text || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            return normalized && twoFactorTerms.some((term) => normalized.includes(term));
+        };
+
+        const removeVisibleTwoFactorElement = (element) => {
+            if (!element || element.closest('script, style, noscript')) {
+                return;
+            }
+
+            const compactTarget = element.closest(
+                '[data-tab="twofa"], [data-tab-panel="twofa"], [data-tab-jump="twofa"], .security-tab, .settings-line, .toggle-line, .info-row, .sp-chip, .st-quick-card, .st-row, .st-option, .st-setting-row, .prof-row, .prof-stat, .prof-security-item, .security-summary-card, .security-card, .sp-info-card, .sp-status-card, .list-group-item, li, button, a'
+            );
+
+            if (compactTarget) {
+                compactTarget.remove();
+                return;
+            }
+
+            if (element.children.length === 0) {
+                element.remove();
+            }
+        };
+
+        portalRoot.querySelectorAll('[data-tab="twofa"], [data-tab-panel="twofa"], [data-tab-jump="twofa"], [href*="twofa" i], [href*="2fa" i]').forEach((element) => {
+            removeVisibleTwoFactorElement(element);
+        });
+
+        portalRoot.querySelectorAll('button, a, label, p, h1, h2, h3, h4, h5, span, small, strong, b').forEach((element) => {
+            if (shouldRemoveText(element.textContent)) {
+                removeVisibleTwoFactorElement(element);
+            }
+        });
+    });
+</script>
+
 </body>
 </html>

@@ -147,7 +147,6 @@
             <div class="card-title-row"><i data-lucide="shield-check"></i><h2>Security</h2></div>
             <div class="settings-list">
                 <div class="settings-line"><span>Password</span><b>••••••••••</b><button class="mini-btn" @click="changePassword()">Change</button></div>
-                <div class="settings-line"><span>Two-Factor Authentication</span><strong class="green-text" x-text="security.tfa ? 'Enabled' : 'Disabled'"></strong><button class="mini-btn" @click="toggleTfa()" x-text="security.tfa ? 'Manage' : 'Enable'"></button></div>
                 <div class="settings-line"><span>Active Sessions</span><b x-text="security.sessions + ' active sessions'"></b><button class="mini-btn" @click="viewSessions()">View</button></div>
                 <div class="settings-line"><span>Recovery Methods</span><b x-text="security.recovery + ' methods set'"></b><button class="mini-btn" @click="showToast('Recovery methods opened')">Manage</button></div>
                 <div class="settings-line"><span>Login Alerts</span><strong class="green-text">Enabled</strong><button class="mini-btn" @click="showToast('Login alerts updated')">Manage</button></div>

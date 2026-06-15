@@ -676,10 +676,6 @@
 </span>
 </div>
 <div class="prof-field">
-<span class="prof-label">Two-Factor Auth</span>
-<span class="prof-badge">Enabled</span>
-</div>
-<div class="prof-field">
 <span class="prof-label">Account Type</span>
 <span class="prof-value">Customer</span>
 </div>

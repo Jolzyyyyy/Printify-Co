@@ -1191,7 +1191,7 @@
 
                     <div class="hero-title-area">
                         <p class="hero-kicker">{{ $portalKicker }}</p>
-                        <h1 class="hero-main-title">{{ $portalTitle }}</h1>
+                        <h1 class="hero-main-title"><span>{{ $portalRoleUpper }}</span> <span class="portal-dashboard-word">DASHBOARD</span></h1>
                         <p class="hero-subline">{{ $portalTagline }}</p>
                     </div>
 
@@ -3952,4 +3952,163 @@
         }
     </style>
 
+<style id="admin-developer-portal-final-cleanup">
+    .admin-main-shell{
+        --portal-accent: {{ $isDeveloperPortal ? '#10B981' : '#2563EB' }};
+        --portal-accent-soft: {{ $isDeveloperPortal ? '#ECFDF5' : '#EFF6FF' }};
+        --portal-accent-shadow: {{ $isDeveloperPortal ? 'rgba(16,185,129,.28)' : 'rgba(37,99,235,.28)' }};
+    }
+    body{background:#fff!important}
+    .admin-main-shell,
+    .content-container,
+    .admin-section-content,
+    .admin-dashboard-final,
+    .admin-section-content > .main-wrapper,
+    .admin-section-content > .analytics-section,
+    .admin-section-content > .settings-section,
+    .admin-section-content .main-wrapper,
+    .admin-section-content .analytics-section,
+    .admin-section-content .settings-section,
+    .settings-admin-shell{
+        background:#fff!important;
+        background-image:none!important;
+        box-shadow:none!important;
+    }
+    .admin-main-shell:before,
+    .admin-main-shell:after,
+    .content-container:before,
+    .content-container:after,
+    .admin-section-content:before,
+    .admin-section-content:after,
+    .admin-dashboard-final:before,
+    .admin-dashboard-final:after,
+    .settings-admin-shell:before,
+    .settings-admin-shell:after{
+        display:none!important;
+        content:none!important;
+    }
+    .admin-main-shell .quick-actions-container,
+    .admin-main-shell .action-circle-group{
+        display:none!important;
+    }
+    .admin-main-shell .sidebar{
+        width:260px!important;
+        background:#fff!important;
+        border-right:1px solid #E2E8F0!important;
+        box-shadow:4px 0 24px rgba(0,0,0,.025)!important;
+    }
+    .admin-main-shell.expanded{margin-left:85px!important}
+    .admin-main-shell:not(.expanded){margin-left:260px!important}
+    .admin-main-shell .sidebar.closed{width:85px!important}
+    .admin-main-shell .sidebar-header{
+        min-height:96px!important;
+        padding:1.5rem!important;
+        border-bottom:1px solid #F1F5F9!important;
+    }
+    .admin-main-shell .sidebar-link{
+        min-height:46px!important;
+        margin-bottom:5px!important;
+        padding:11px 16px!important;
+        border-radius:12px!important;
+        color:#64748B!important;
+        background:transparent!important;
+        border:0!important;
+        box-shadow:none!important;
+        font-size:10px!important;
+        font-weight:800!important;
+        text-transform:uppercase!important;
+        transition:background .18s ease,color .18s ease,border-color .18s ease!important;
+    }
+    .admin-main-shell .sidebar-link:not(.active):hover,
+    .admin-main-shell .sidebar-link:not(.active):focus-visible{
+        background:rgba(17,24,39,.10)!important;
+        color:#334155!important;
+        border:0!important;
+        box-shadow:none!important;
+        transform:none!important;
+        outline:0!important;
+    }
+    .admin-main-shell .sidebar-link.active{
+        background:var(--portal-accent-soft)!important;
+        color:var(--portal-accent)!important;
+        box-shadow:none!important;
+    }
+    .admin-main-shell .sidebar-link.active::before{
+        background:var(--portal-accent)!important;
+    }
+    .admin-main-shell .sidebar-link.active::after{
+        color:var(--portal-accent)!important;
+        background:transparent!important;
+    }
+    .admin-main-shell .menu-toggle:hover{
+        background:#F1F5F9!important;
+        color:var(--portal-accent)!important;
+    }
+    .admin-main-shell .hero-banner{
+        height:210px!important;
+        padding:5px 60px!important;
+        border-radius:0!important;
+        box-shadow:none!important;
+    }
+    .admin-main-shell .hero-title-area{
+        margin-top:0!important;
+        max-width:720px!important;
+    }
+    .admin-main-shell .hero-title-area::before{
+        width:74px!important;
+        height:4px!important;
+        margin-bottom:10px!important;
+        background:linear-gradient(90deg,var(--portal-accent),#60A5FA)!important;
+        box-shadow:0 8px 20px var(--portal-accent-shadow)!important;
+    }
+    .admin-main-shell .hero-kicker::before{
+        background:var(--portal-accent)!important;
+        box-shadow:0 0 12px var(--portal-accent)!important;
+    }
+    .admin-main-shell .hero-main-title{
+        font-size:clamp(2.1rem,4.4vw,3.35rem)!important;
+        line-height:1!important;
+        color:#fff!important;
+        white-space:nowrap!important;
+    }
+    .admin-main-shell .hero-main-title span:first-child{
+        color:#fff!important;
+    }
+    .admin-main-shell .hero-main-title .portal-dashboard-word{
+        color:var(--portal-accent)!important;
+    }
+    .admin-main-shell .dot.active{
+        background:var(--portal-accent)!important;
+    }
+    .admin-main-shell .content-container,
+    .admin-main-shell .admin-section-content{
+        padding:32px 70px 70px!important;
+    }
+    .admin-main-shell .date-pill,
+    .admin-main-shell .dash-date-control,
+    .admin-main-shell .admin-date-control,
+    .admin-main-shell .settings-date-control,
+    .admin-main-shell .settings-calendar-trigger{
+        cursor:pointer!important;
+    }
+    @media(max-width:1024px){
+        .admin-main-shell:not(.expanded),
+        .admin-main-shell.expanded{margin-left:85px!important}
+        .admin-main-shell .sidebar{width:85px!important}
+        .admin-main-shell .brand-name,
+        .admin-main-shell .sidebar-link span,
+        .admin-main-shell .sidebar-link.active::after{display:none!important}
+        .admin-main-shell .sidebar-link{justify-content:center!important;padding-left:0!important;padding-right:0!important}
+        .admin-main-shell .hero-banner{padding:5px 28px!important}
+        .admin-main-shell .content-container,
+        .admin-main-shell .admin-section-content{padding:32px 40px 60px!important}
+    }
+    @media(max-width:760px){
+        .admin-main-shell:not(.expanded),
+        .admin-main-shell.expanded{margin-left:0!important}
+        .admin-main-shell .hero-banner{height:390px!important;padding:16px!important}
+        .admin-main-shell .content-container,
+        .admin-main-shell .admin-section-content{padding:20px 16px!important}
+    }
+</style>
 </x-app-layout>
