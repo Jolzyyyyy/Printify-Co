@@ -36,9 +36,22 @@ class NewPasswordController extends Controller
             ]);
         }
 
+        $resetPortal = session('password_reset_portal', 'customer');
+        $resetUser = User::where('email', trim((string) $email))->first();
+        $dashboardLabel = 'Dashboard';
+        $loginLabel = 'Login';
+
+        if ($resetPortal === 'staff') {
+            $dashboardLabel = 'Dashboard';
+            $loginLabel = 'Login';
+        }
+
         return view('auth.reset-password', [
             'token' => $token,
             'email' => $email,
+            'resetPortal' => $resetPortal,
+            'resetDashboardLabel' => $dashboardLabel,
+            'resetLoginLabel' => $loginLabel,
         ]);
     }
 
@@ -123,9 +136,7 @@ class NewPasswordController extends Controller
          * 6. SMART REDIRECTION LOGIC
          * Base sa 'action_type' na ipinasa mula sa Blade form.
          */
-        $action = $resetPortal === 'staff'
-            ? 'auto_login'
-            : ($request->action_type ?? 'auto_login');
+        $action = $request->action_type ?? 'auto_login';
 
         if ($action === 'auto_login') {
             // Flow: Dashboard Entry

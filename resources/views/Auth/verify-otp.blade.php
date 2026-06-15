@@ -603,45 +603,15 @@
         </svg>
     </div>
 
-    <div class="auth-container"
-        x-data="{
-            otp: '',
-            timer: {{ max((int) ($resendCooldownSeconds ?? 0), 0) }},
-            canResend: {{ (int) ($resendCooldownSeconds ?? 0) <= 0 ? 'true' : 'false' }},
-            lockoutTimer: {{ max((int) ($otpLockoutSeconds ?? 0), 0) }},
-            get otpLocked() {
-                return this.lockoutTimer > 0;
-            },
+    @php
+        $currentOtpLockoutSeconds = max((int) ($otpLockoutSeconds ?? 0), 0);
+        $currentResendCooldownSeconds = max((int) ($resendCooldownSeconds ?? 0), 0);
+    @endphp
 
-            init() {
-                if (this.lockoutTimer > 0) {
-                    let lockoutInterval = setInterval(() => {
-                        if (this.lockoutTimer > 0) {
-                            this.lockoutTimer--;
-                        } else {
-                            clearInterval(lockoutInterval);
-                        }
-                    }, 1000);
-                }
-
-                if (this.canResend) {
-                    return;
-                }
-
-                let interval = setInterval(() => {
-                    if (this.timer > 0) {
-                        this.timer--;
-                    } else {
-                        this.canResend = true;
-                        clearInterval(interval);
-                    }
-                }, 1000);
-            },
-
-            cleanOtp() {
-                this.otp = this.otp.replace(/[^0-9]/g, '').slice(0, 6);
-            }
-        }"
+    <div
+        class="auth-container"
+        data-otp-lockout-seconds="{{ $currentOtpLockoutSeconds }}"
+        data-resend-cooldown-seconds="{{ $currentResendCooldownSeconds }}"
     >
 
         <div class="orange-header"></div>
@@ -673,17 +643,21 @@
             </div>
         @endif
 
-        <div x-show="otpLocked" class="lockout-info" role="alert">
+        @if ($currentOtpLockoutSeconds > 0)
+        <div class="lockout-info" role="alert" data-lockout-box>
             <strong>Verification cooldown active</strong>
-            Too many incorrect codes. Please wait <span x-text="Math.ceil(lockoutTimer / 60)"></span> minute<span x-show="Math.ceil(lockoutTimer / 60) !== 1">s</span>
-            (<span x-text="lockoutTimer"></span>s) before trying again.
+            Too many incorrect codes. Please wait
+            <span data-lockout-minutes>{{ (int) ceil($currentOtpLockoutSeconds / 60) }}</span>
+            <span data-lockout-minute-label>{{ (int) ceil($currentOtpLockoutSeconds / 60) === 1 ? 'minute' : 'minutes' }}</span>
+            (<span data-lockout-seconds>{{ $currentOtpLockoutSeconds }}</span>s) before trying again.
         </div>
+        @endif
 
         <form method="POST" action="{{ $otpSubmitAction ?? route('customer.otp.submit') }}">
             @csrf
 
             <input type="hidden" name="email" value="{{ $verificationEmail ?? $email ?? (Auth::user()->email ?? (session('otp_email') ?? request()->email)) }}">
-            <input type="hidden" name="otp" :value="otp">
+            <input type="hidden" name="otp" value="" data-otp-hidden>
             @if (!empty($verificationFlow))
                 <input type="hidden" name="verification_flow" value="{{ $verificationFlow }}">
             @endif
@@ -692,23 +666,20 @@
                 <input
                     type="text"
                     maxlength="6"
-                    x-model="otp"
-                    @input="cleanOtp()"
-                    @paste="$nextTick(() => cleanOtp())"
                     class="otp-real-input"
-                    x-bind:disabled="otpLocked"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    autocomplete="one-time-code"
+                    data-otp-input
+                    @if ($currentOtpLockoutSeconds > 0) disabled @endif
                     required
                     autofocus
                 >
 
-                <div class="otp-group">
-                    <template x-for="i in 6" :key="i">
-                        <div
-                            class="otp-box"
-                            :class="{ 'active': otp.length === i-1 }"
-                            x-text="otp[i-1] || ''"
-                        ></div>
-                    </template>
+                <div class="otp-group" aria-hidden="true">
+                    @for ($index = 0; $index < 6; $index++)
+                        <div class="otp-box{{ $index === 0 ? ' active' : '' }}" data-otp-box></div>
+                    @endfor
                 </div>
             </div>
 
@@ -716,7 +687,7 @@
                 <div class="error-text">{{ $message }}</div>
             @enderror
 
-            <button type="submit" class="auth-btn" x-bind:disabled="otpLocked || otp.length !== 6">
+            <button type="submit" class="auth-btn" data-otp-submit disabled>
                 Verify Account
             </button>
         </form>
@@ -727,12 +698,21 @@
 
                 <input type="hidden" name="email" value="{{ $verificationEmail ?? $email ?? (Auth::user()->email ?? (session('otp_email') ?? request()->email)) }}">
 
-                <button type="submit" x-show="canResend && !otpLocked" class="nav-link resend-link">
+                <button
+                    type="submit"
+                    class="nav-link resend-link"
+                    data-resend-button
+                    @if ($currentOtpLockoutSeconds > 0 || $currentResendCooldownSeconds > 0) style="display: none;" @endif
+                >
                     Resend Code
                 </button>
 
-                <div x-show="!otpLocked && !canResend" class="timer-info">
-                    Resend available in <span x-text="'00:' + String(timer).padStart(2, '0')"></span>
+                <div
+                    class="timer-info"
+                    data-resend-timer
+                    @if ($currentOtpLockoutSeconds > 0 || $currentResendCooldownSeconds <= 0) style="display: none;" @endif
+                >
+                    Resend available in <span data-resend-seconds>{{ gmdate('i:s', $currentResendCooldownSeconds) }}</span>
                 </div>
             </form>
 
@@ -756,4 +736,101 @@
             @endauth
         </div>
     </div>
+
+    <script>
+        (() => {
+            const container = document.querySelector('.auth-container[data-otp-lockout-seconds]');
+            if (!container) return;
+
+            const input = container.querySelector('[data-otp-input]');
+            const hidden = container.querySelector('[data-otp-hidden]');
+            const boxes = Array.from(container.querySelectorAll('[data-otp-box]'));
+            const submit = container.querySelector('[data-otp-submit]');
+            const lockoutBox = container.querySelector('[data-lockout-box]');
+            const lockoutSecondsEl = container.querySelector('[data-lockout-seconds]');
+            const lockoutMinutesEl = container.querySelector('[data-lockout-minutes]');
+            const lockoutMinuteLabelEl = container.querySelector('[data-lockout-minute-label]');
+            const resendButton = container.querySelector('[data-resend-button]');
+            const resendTimer = container.querySelector('[data-resend-timer]');
+            const resendSecondsEl = container.querySelector('[data-resend-seconds]');
+
+            let lockoutSeconds = Number(container.dataset.otpLockoutSeconds || 0);
+            let resendSeconds = Number(container.dataset.resendCooldownSeconds || 0);
+
+            const renderOtp = () => {
+                const value = (input?.value || '').replace(/\D/g, '').slice(0, 6);
+                if (input && input.value !== value) input.value = value;
+                if (hidden) hidden.value = value;
+
+                boxes.forEach((box, index) => {
+                    box.textContent = value[index] || '';
+                    box.classList.toggle('active', !lockoutSeconds && value.length === index);
+                });
+
+                if (submit) submit.disabled = lockoutSeconds > 0 || value.length !== 6;
+            };
+
+            const renderLockout = () => {
+                if (!lockoutBox) {
+                    renderOtp();
+                    return;
+                }
+
+                if (lockoutSeconds <= 0) {
+                    lockoutBox.remove();
+                    if (input) input.disabled = false;
+                    renderOtp();
+                    renderResend();
+                    return;
+                }
+
+                const minutes = Math.ceil(lockoutSeconds / 60);
+                if (lockoutSecondsEl) lockoutSecondsEl.textContent = String(lockoutSeconds);
+                if (lockoutMinutesEl) lockoutMinutesEl.textContent = String(minutes);
+                if (lockoutMinuteLabelEl) lockoutMinuteLabelEl.textContent = minutes === 1 ? 'minute' : 'minutes';
+                if (input) input.disabled = true;
+                renderOtp();
+            };
+
+            const renderResend = () => {
+                if (lockoutSeconds > 0) {
+                    if (resendButton) resendButton.style.display = 'none';
+                    if (resendTimer) resendTimer.style.display = 'none';
+                    return;
+                }
+
+                if (resendSeconds > 0) {
+                    if (resendButton) resendButton.style.display = 'none';
+                    if (resendTimer) resendTimer.style.display = '';
+                    if (resendSecondsEl) {
+                        const minutes = String(Math.floor(resendSeconds / 60)).padStart(2, '0');
+                        const seconds = String(resendSeconds % 60).padStart(2, '0');
+                        resendSecondsEl.textContent = `${minutes}:${seconds}`;
+                    }
+                    return;
+                }
+
+                if (resendButton) resendButton.style.display = '';
+                if (resendTimer) resendTimer.style.display = 'none';
+            };
+
+            input?.addEventListener('input', renderOtp);
+            input?.addEventListener('paste', () => window.setTimeout(renderOtp, 0));
+
+            renderLockout();
+            renderResend();
+
+            window.setInterval(() => {
+                if (lockoutSeconds > 0) {
+                    lockoutSeconds -= 1;
+                    renderLockout();
+                }
+
+                if (resendSeconds > 0 && lockoutSeconds <= 0) {
+                    resendSeconds -= 1;
+                    renderResend();
+                }
+            }, 1000);
+        })();
+    </script>
 </x-guest-layout>

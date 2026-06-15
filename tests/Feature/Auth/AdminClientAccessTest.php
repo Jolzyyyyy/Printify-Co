@@ -158,11 +158,74 @@ class AdminClientAccessTest extends TestCase
         $response
             ->assertRedirect(route('admin.otp.verify', absolute: false))
             ->assertSessionHas('needs_email_otp', true)
-            ->assertSessionHas('admin_email', 'approved-client@example.com');
+            ->assertSessionHas('admin_email', 'approved-client@example.com')
+            ->assertSessionHas('admin_role', User::ROLE_ADMIN_CLIENT)
+            ->assertSessionHas('admin_role_label', 'Admin Client')
+            ->assertSessionHas('admin_dashboard_label', 'Admin Client Dashboard');
 
         $this->assertAuthenticatedAs($adminClient);
         $this->assertNotNull($adminClient->fresh()->otp_code);
         Mail::assertSent(OTPVerificationMail::class);
+    }
+
+    public function test_developer_login_identifies_developer_role_before_otp(): void
+    {
+        Mail::fake();
+
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email' => 'identified-developer@example.com',
+            'password' => Hash::make('Password1!'),
+            'email_verified_at' => now(),
+        ]);
+
+        $this
+            ->post(route('admin.login.submit', absolute: false), [
+                'email' => $developer->email,
+                'password' => 'Password1!',
+            ])
+            ->assertRedirect(route('admin.otp.verify', absolute: false))
+            ->assertSessionHas('admin_role', User::ROLE_DEVELOPER)
+            ->assertSessionHas('admin_role_label', 'Developer')
+            ->assertSessionHas('admin_dashboard_label', 'Developer Dashboard')
+            ->assertSessionHas('status', 'Developer account identified. A verification code has been sent to your email before portal access can continue.');
+
+        $this
+            ->actingAs($developer)
+            ->withSession([
+                'admin_email' => $developer->email,
+                'admin_role' => User::ROLE_DEVELOPER,
+                'admin_role_label' => 'Developer',
+                'admin_dashboard_label' => 'Developer Dashboard',
+                'needs_email_otp' => true,
+            ])
+            ->get(route('admin.otp.verify', absolute: false))
+            ->assertOk()
+            ->assertSee('Verify Developer Account')
+            ->assertSee('Developer Dashboard');
+    }
+
+    public function test_staff_portal_base_url_redirects_to_correct_entry_point(): void
+    {
+        $this
+            ->get('/p-co-2026')
+            ->assertRedirect(route('admin.login', absolute: false));
+
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+
+        $this
+            ->actingAs($developer)
+            ->get('/p-co-2026')
+            ->assertRedirect(route('admin.otp.verify', absolute: false));
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get('/p-co-2026')
+            ->assertRedirect(route('admin.dashboard', absolute: false));
     }
 
     public function test_staff_forgot_password_sends_otp_for_developer_and_resets_to_staff_dashboard(): void
@@ -208,7 +271,7 @@ class AdminClientAccessTest extends TestCase
                 'email' => $developer->email,
                 'password' => 'NewPassword1!',
                 'password_confirmation' => 'NewPassword1!',
-                'action_type' => 'manual_login',
+                'action_type' => 'auto_login',
             ])
             ->assertRedirect(route('admin.dashboard', absolute: false))
             ->assertSessionHas('staff_otp_passed', true)
@@ -216,6 +279,52 @@ class AdminClientAccessTest extends TestCase
 
         $this->assertTrue(Hash::check('NewPassword1!', $developer->fresh()->password));
         $this->assertAuthenticatedAs($developer);
+    }
+
+    public function test_staff_forgot_password_manual_login_option_returns_to_staff_login(): void
+    {
+        Mail::fake();
+
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email' => 'manual-reset-developer@example.com',
+            'password' => Hash::make('OldPassword1!'),
+            'email_verified_at' => now(),
+        ]);
+
+        $this->post(route('admin.password.email', absolute: false), [
+            'email' => $developer->email,
+        ])->assertRedirect(route('otp.verify', [
+            'email' => $developer->email,
+            'flow' => 'forgot_password',
+        ], false));
+
+        $developer->refresh();
+
+        $this
+            ->post(route('otp.submit', absolute: false), [
+                'email' => $developer->email,
+                'otp' => $developer->otp_code,
+                'verification_flow' => 'forgot_password',
+            ])
+            ->assertRedirect(route('password.reset', [
+                'token' => session('password_reset_token'),
+                'email' => $developer->email,
+            ], false));
+
+        $this
+            ->post(route('password.store', absolute: false), [
+                'token' => session('password_reset_token'),
+                'email' => $developer->email,
+                'password' => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
+                'action_type' => 'manual_login',
+            ])
+            ->assertRedirect(route('admin.login', absolute: false))
+            ->assertSessionHas('status', 'Your password has been updated! Please login with your new credentials.');
+
+        $this->assertGuest();
+        $this->assertTrue(Hash::check('NewPassword1!', $developer->fresh()->password));
     }
 
     public function test_staff_forgot_password_otp_screen_uses_staff_routes_and_limits(): void
@@ -244,6 +353,9 @@ class AdminClientAccessTest extends TestCase
             ->assertOk()
             ->assertSee('Verify Staff Reset Code')
             ->assertSee('Back to Staff Login')
+            ->assertSee('data-otp-box', false)
+            ->assertSee('data-otp-input', false)
+            ->assertDontSee('Verification cooldown active')
             ->assertSee('action="' . route('otp.submit') . '"', false)
             ->assertSee('action="' . route('otp.resend') . '"', false)
             ->assertDontSee('action="' . route('customer.otp.submit') . '"', false)
@@ -313,12 +425,23 @@ class AdminClientAccessTest extends TestCase
             ], false));
 
         $this
+            ->get(route('password.reset', [
+                'token' => session('password_reset_token'),
+                'email' => $adminClient->email,
+            ], false))
+            ->assertOk()
+            ->assertSee('Dashboard')
+            ->assertSee('Login')
+            ->assertDontSee('Admin Client Dashboard')
+            ->assertDontSee('Staff Login');
+
+        $this
             ->post(route('password.store', absolute: false), [
                 'token' => session('password_reset_token'),
                 'email' => $adminClient->email,
                 'password' => 'NewPassword1!',
                 'password_confirmation' => 'NewPassword1!',
-                'action_type' => 'manual_login',
+                'action_type' => 'auto_login',
             ])
             ->assertRedirect(route('admin.dashboard', absolute: false))
             ->assertSessionHas('staff_otp_passed', true);

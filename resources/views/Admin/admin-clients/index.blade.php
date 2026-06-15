@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="max-w-6xl mx-auto py-10 px-6 space-y-8">
         <div>
-            <p class="text-xs font-bold uppercase tracking-[0.25em] text-blue-600">Developer Access</p>
+            <p class="text-xs font-bold uppercase tracking-[0.25em] text-blue-600">Developer Portal</p>
             <h1 class="text-3xl font-black text-slate-900 tracking-tight">Manage Admin Clients</h1>
             <p class="mt-2 text-sm text-slate-600">Invite admins, review their reference profile, approve access, and keep an audit trail.</p>
         </div>
