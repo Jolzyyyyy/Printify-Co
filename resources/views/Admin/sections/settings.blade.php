@@ -202,17 +202,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>Developer login</td><td>5 failed attempts</td><td>5 minutes</td><td>Persists after reload and uses the protected staff portal.</td></tr>
-                    <tr><td>Admin-client login</td><td>5 failed attempts</td><td>5 minutes</td><td>Persists after reload; account must be developer-approved.</td></tr>
-                    <tr><td>Customer login</td><td>3 failed attempts</td><td>5 minutes</td><td>Uses the customer email/password throttle.</td></tr>
-                    <tr><td>Staff OTP verification</td><td>5 wrong OTP attempts</td><td>15 minutes</td><td>Applies to developer and admin-client portal access.</td></tr>
-                    <tr><td>Customer OTP verification</td><td>3 wrong OTP attempts</td><td>15 minutes</td><td>Input and verify button lock during cooldown.</td></tr>
+                    <tr><td>Developer login</td><td>5 failed attempts</td><td>5 minutes</td><td>Uses the protected staff portal and persists after reload.</td></tr>
+                    <tr><td>Admin-client login</td><td>5 failed attempts</td><td>5 minutes</td><td>Uses the protected staff portal; account must be developer-approved.</td></tr>
+                    <tr><td>Legacy admin role</td><td>N/A</td><td>N/A</td><td>Legacy admin accounts are migrated to admin-client; there is no separate admin role in the current setup.</td></tr>
+                    <tr><td>Customer login</td><td>3 failed attempts</td><td>5 minutes</td><td>Uses a separate customer email/password throttle.</td></tr>
+                    <tr><td>Staff OTP verification</td><td>5 wrong OTP attempts</td><td>15 minutes</td><td>Applies to developer, approved admin-client, and staff password reset OTP flows.</td></tr>
+                    <tr><td>Customer OTP verification</td><td>3 wrong OTP attempts</td><td>15 minutes</td><td>Applies to customer login, registration, social login, and customer password reset OTP flows.</td></tr>
                     <tr><td>Staff OTP resend</td><td>1 resend</td><td>60 seconds</td><td>Countdown persists after reload.</td></tr>
                     <tr><td>Customer OTP resend</td><td>1 resend</td><td>60 seconds</td><td>Countdown persists after reload.</td></tr>
                     <tr><td>OTP code validity</td><td>N/A</td><td>Expires after 5 minutes</td><td>User must request a new OTP after expiry.</td></tr>
-                    <tr><td>Customer password reset request</td><td>1 request</td><td>60 seconds</td><td>Prevents repeated reset-code requests.</td></tr>
-                    <tr><td>Staff password reset request</td><td>1 request</td><td>60 seconds</td><td>Available only for developer and approved admin-client accounts.</td></tr>
-                    <tr><td>Wrong-role sign-in</td><td>Counts as failed login attempt</td><td>Uses login cooldown</td><td>Shows a clear portal mismatch message and redirects to the correct login.</td></tr>
+                    <tr><td>Customer password reset request</td><td>1 request</td><td>60 seconds</td><td>Redirects to the existing OTP verification screen while a reset OTP is pending.</td></tr>
+                    <tr><td>Staff password reset request</td><td>1 request</td><td>60 seconds</td><td>Available only for developer and approved admin-client accounts; redirects to pending OTP when applicable.</td></tr>
+                    <tr><td>Wrong-role sign-in</td><td>Counts as failed login attempt</td><td>Uses that portal's login cooldown</td><td>Customer and staff portals reject the wrong role with a clear mismatch message.</td></tr>
                 </tbody>
             </table>
         </div>

@@ -86,6 +86,9 @@ class AdminAuthController extends Controller
         $request->session()->forget([
             'admin_auth_passed',
             'admin_email',
+            'admin_role',
+            'admin_role_label',
+            'admin_dashboard_label',
             'needs_email_otp',
             'admin_verified',
             '2fa_passed',
@@ -95,10 +98,17 @@ class AdminAuthController extends Controller
         session([
             'admin_auth_passed' => true,
             'admin_email' => $user->email,
+            'admin_role' => $user->role,
+            'admin_role_label' => $user->portalRoleLabel(),
+            'admin_dashboard_label' => $user->portalDashboardLabel(),
             'needs_email_otp' => true,
         ]);
 
-        return $this->sendStaffOtp($request, $user, 'A verification code has been sent to your email before portal access can continue.');
+        return $this->sendStaffOtp(
+            $request,
+            $user,
+            $user->portalRoleLabel() . ' account identified. A verification code has been sent to your email before portal access can continue.'
+        );
     }
 
     public function showRegisterForm()
@@ -126,6 +136,8 @@ class AdminAuthController extends Controller
         $resendThrottleKey = $this->staffOtpResendThrottleKeyFromContext($email, request()->ip());
 
         return view('Admin.auth.admin-otp-verify', [
+            'portalRoleLabel' => Auth::user()->portalRoleLabel(),
+            'portalDashboardLabel' => Auth::user()->portalDashboardLabel(),
             'otpLockoutSeconds' => RateLimiter::tooManyAttempts($otpThrottleKey, self::STAFF_OTP_MAX_ATTEMPTS)
                 ? RateLimiter::availableIn($otpThrottleKey)
                 : 0,
@@ -194,7 +206,7 @@ class AdminAuthController extends Controller
         RateLimiter::clear($otpThrottleKey);
 
         return redirect()->route('admin.dashboard')
-            ->with('success', 'Email verification complete. Welcome to the staff portal.');
+            ->with('success', 'Email verification complete. Welcome to your ' . $user->portalDashboardLabel() . '.');
     }
 
     public function resendOtp(Request $request)
@@ -225,6 +237,9 @@ class AdminAuthController extends Controller
         $request->session()->forget([
             'admin_auth_passed',
             'admin_email',
+            'admin_role',
+            'admin_role_label',
+            'admin_dashboard_label',
             'needs_email_otp',
             'admin_verified',
             '2fa_passed',

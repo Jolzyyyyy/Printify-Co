@@ -49,13 +49,17 @@
             ? route('developer.admin-clients.index')
             : route('admin.customers');
         $dashboardRecentOrders = \App\Models\Order::with('user')->latest()->limit(5)->get();
-        $portalRoleLabel = $isDeveloperPortal ? 'Developer' : 'Admin';
+        $portalRoleLabel = $isDeveloperPortal
+            ? 'Developer'
+            : ($isAdminClientPortal ? 'Admin Client' : 'Admin');
         $portalRoleUpper = strtoupper($portalRoleLabel);
-        $portalTitle = $portalRoleUpper . ' DASHBOARD';
+        $portalTitle = $isDeveloperPortal ? 'Developer Dashboard' : 'ADMIN DASHBOARD';
         $portalKicker = $isDeveloperPortal ? 'Developer Management Portal' : 'Admin Management Portal';
         $portalTagline = $isDeveloperPortal
             ? 'Manage admin clients, services, analytics, and platform controls from one developer workspace.'
-            : 'Manage customers, orders, products, reports, and system activity from one admin workspace.';
+            : ($isAdminClientPortal
+                ? 'Manage assigned customers, orders, reports, and reference profile activity from one admin-client workspace.'
+                : 'Manage customers, orders, products, reports, and system activity from one admin workspace.');
         $portalDisplayName = $portalUser->name ?? $portalRoleLabel;
         $portalInitial = strtoupper(substr($portalDisplayName, 0, 1));
         $headerSearchItems = $isDeveloperPortal
@@ -165,7 +169,7 @@
             width: 4px; background: var(--staff-blue); border-radius: 0 4px 4px 0;
         }
         .sidebar-link.active::after {
-            content: '›';
+            content: '\203A';
             margin-left: auto;
             color: var(--staff-blue);
             font-size: 16px;
@@ -1192,6 +1196,9 @@
                     <div class="hero-title-area">
                         <p class="hero-kicker">{{ $portalKicker }}</p>
                         <h1 class="hero-main-title">{{ $portalTitle }}</h1>
+                        @if($isAdminClientPortal)
+                            <p class="hero-subline" style="margin-top:6px;font-weight:800;">Admin Client Dashboard</p>
+                        @endif
                         <p class="hero-subline">{{ $portalTagline }}</p>
                     </div>
 
@@ -1240,6 +1247,17 @@
                     ])->values();
                 @endphp
                 <main class="content-container admin-dashboard-final" x-data="adminDashboardFinal()" x-init="init()">
+                    @if($isAdminClientPortal)
+                        <section class="dash-main-box" style="margin-bottom:14px;">
+                            <h2 class="dash-card-title">Access Checklist</h2>
+                            <div class="dash-mini-row">
+                                <div class="dash-mini"><i data-lucide="badge-check" style="width:13px"></i>Approved<strong>Yes</strong></div>
+                                <div class="dash-mini"><i data-lucide="user-check" style="width:13px"></i>Reference Profile<strong>Ready</strong></div>
+                                <div class="dash-mini"><i data-lucide="users-round" style="width:13px"></i>Assigned Customers<strong>{{ number_format($dashboardStats['customers']) }}</strong></div>
+                                <div class="dash-mini"><i data-lucide="clipboard-list" style="width:13px"></i>Managed Orders<strong>{{ number_format($dashboardStats['orders']) }}</strong></div>
+                            </div>
+                        </section>
+                    @endif
                     <style>
                         .admin-dashboard-final{--dash-blue:#0b63f6;--dash-blue-dark:#084ac2;--dash-black:#050816;--dash-orange:#ff7a00;--dash-green:#10b981;--dash-red:#ef4444;--dash-yellow:#f59e0b;--dash-purple:#8b5cf6;--dash-line:#e8edf5;--dash-soft:#f8fafc;max-width:1360px!important;margin:0 auto!important;padding:18px 22px 26px!important;color:var(--dash-black);font-family:'Inter',system-ui,sans-serif;letter-spacing:.005em!important}.admin-dashboard-final *{box-sizing:border-box}.admin-dashboard-final button,.admin-dashboard-final input,.admin-dashboard-final select{font-family:'Inter',system-ui,sans-serif}.dash-feedback-toast{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:7000;background:linear-gradient(135deg,var(--dash-blue),var(--dash-blue-dark));color:#fff;border-radius:999px;padding:12px 22px;font-size:13px;font-weight:700;box-shadow:0 14px 32px rgba(11,99,246,.28);text-align:center}.dash-page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:15px}.dash-title-wrap{position:relative;padding-left:12px}.dash-title-wrap:before{content:"";position:absolute;left:0;top:2px;width:4px;height:46px;background:var(--dash-blue);border-radius:999px}.dash-title-wrap h1{font-family:'Playfair Display',Georgia,serif!important;font-size:38px!important;font-weight:700!important;line-height:1.05!important;letter-spacing:0!important;margin:0 0 7px!important;color:var(--dash-black)!important}.dash-title-wrap p{font-size:14px!important;font-weight:400!important;color:#344054!important;margin:0!important}.dash-head-actions{display:grid;grid-template-columns:128px 128px;grid-template-areas:"date date" "export refresh";gap:9px;align-items:stretch;justify-content:end;min-width:270px}.dash-date-control{grid-area:date;justify-content:space-between;width:100%;min-width:0}.dash-export-btn{grid-area:export}.dash-refresh-btn{grid-area:refresh}.dash-btn,.dash-date-control{height:40px;min-height:40px;border:0!important;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:none!important;transition:background-color .18s ease,color .18s ease}.dash-btn svg,.dash-date-control svg{width:17px;height:17px;stroke-width:2.1}.dash-primary{background:linear-gradient(135deg,#1274ff 0%,#0b63f6 54%,#084ac2 100%)!important;color:#fff!important}.dash-outline,.dash-date-control{background:#f8fafc!important;color:var(--dash-black)!important}.dash-btn:hover,.dash-date-control:hover{background:var(--dash-black)!important;color:#fff!important}.dash-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:15px}.dash-metric{min-height:82px;background:#fff;border:1.4px solid #d8dee8;border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:13px;text-align:left;cursor:pointer;box-shadow:0 5px 18px rgba(5,8,22,.04);transition:background-color .18s ease,border-color .18s ease}.dash-metric:hover,.dash-main-box.clickable:hover{background:rgba(33,37,41,.08)!important}.dash-metric.blue{border-color:#0b63f6}.dash-metric.orange{border-color:#ff7a00}.dash-metric.green{border-color:#10b981}.dash-metric.red{border-color:#ef4444}.dash-metric.cyan{border-color:#0ea5e9}.dash-icon{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto}.dash-icon svg{width:26px;height:26px}.dash-blue-soft{background:#eaf1ff;color:#0b63f6}.dash-orange-soft{background:#fff3e6;color:#ff7a00}.dash-green-soft{background:#e4f8ee;color:#10b981}.dash-red-soft{background:#ffe9e9;color:#ef4444}.dash-cyan-soft{background:#e8f8ff;color:#0ea5e9}.dash-metric small{display:block;font-family:'Poppins',system-ui,sans-serif;font-size:10px;font-weight:600;color:#344054;text-transform:uppercase;margin-bottom:5px}.dash-metric strong{display:block;font-size:22px;line-height:1;font-weight:800;color:var(--dash-black);margin-bottom:7px}.dash-metric span{display:flex;align-items:center;gap:5px;color:#10b981;font-size:11px;font-weight:700}.dash-metric span.red-trend{color:#ef4444}.dash-grid-three{display:grid;grid-template-columns:1.05fr 1.35fr .95fr;gap:14px;margin-bottom:14px}.dash-grid-three.equal{grid-template-columns:1fr 1.35fr .95fr}.dash-main-box{background:#fff;border:1.4px solid #d8dee8;border-radius:12px;box-shadow:0 5px 18px rgba(5,8,22,.04);padding:15px;min-height:188px}.dash-main-box:hover{border-color:#c5ccd8}.dash-card-title{font-family:'Poppins',system-ui,sans-serif;font-size:15px;font-weight:600;color:var(--dash-black);margin:0 0 14px;position:relative;padding-left:14px}.dash-card-title:before{content:"";position:absolute;left:0;top:9px;width:8px;height:2px;border-radius:99px;background:var(--dash-orange)}.dash-live-row{display:grid;grid-template-columns:92px 62px 1fr 40px 50px;gap:8px;align-items:center;margin-bottom:9px;font-size:11px;color:#344054;font-weight:600}.dash-bar{height:7px;border-radius:999px;background:#e2e8f0;overflow:hidden}.dash-bar span{display:block;height:100%;border-radius:999px}.dash-ontime{display:flex;align-items:center;gap:5px;color:#10b981!important;font-size:10px!important;font-weight:700!important}.dash-dot{width:7px;height:7px;border-radius:999px;display:inline-block}.dash-dot.blue{background:#0b63f6}.dash-dot.orange{background:#ff7a00}.dash-dot.green{background:#10b981}.dash-dot.red{background:#ef4444}.dash-dot.purple{background:#8b5cf6}.dash-mini-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.dash-mini{border:1px solid #eef2f7;border-radius:9px;background:#fbfcfe;min-height:50px;padding:8px 10px;font-size:10px;color:#475467;font-weight:600}.dash-mini i{color:#64748b;margin-right:4px}.dash-mini strong{display:block;margin-top:6px;color:var(--dash-black);font-size:18px;font-weight:800}.dash-donut-wrap{display:grid;grid-template-columns:170px 1fr;gap:22px;align-items:center}.dash-donut-svg{width:165px;height:165px}.dash-donut-number{font-size:28px;font-weight:800;fill:var(--dash-black)}.dash-donut-label{font-size:12px;font-weight:600;fill:#64748b}.dash-legend{display:flex;flex-direction:column;gap:12px}.dash-legend-line{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;color:#344054}.dash-legend-line span{display:flex;align-items:center;gap:8px}.dash-legend-line strong{font-weight:700}.dash-action-line,.dash-alert-line,.dash-task-line,.dash-activity-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #edf2f7;color:#344054;text-decoration:none;font-size:12px;background:transparent}.dash-action-line:last-child,.dash-alert-line:last-child,.dash-task-line:last-child,.dash-activity-line:last-child{border-bottom:0}.dash-action-line:hover{color:var(--dash-blue)}.dash-action-icon{width:30px;height:30px;border-radius:9px;background:#eaf1ff;color:var(--dash-blue);display:grid;place-items:center;flex:0 0 auto}.dash-action-icon svg{width:17px;height:17px}.dash-action-line strong{display:block;font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:600;color:var(--dash-black);line-height:1.2}.dash-action-line small{display:block;color:#64748b;font-size:10px;margin-top:2px}.dash-action-line>svg{width:17px;color:var(--dash-black);margin-left:auto}.dash-alert-copy{display:flex;align-items:center;gap:10px}.dash-alert-icon{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:#fff7ed;color:#ff7a00;flex:0 0 auto}.dash-count-pill{min-width:28px;min-height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;padding:0 9px;background:#fff1d6;color:#c26c00;font-size:12px;font-weight:800}.dash-count-pill.blue{background:#eaf1ff;color:#0b63f6}.dash-count-pill.red{background:#ffe9e9;color:#ef4444}.dash-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;color:var(--dash-blue);text-decoration:none;font-size:12px;font-weight:700}.dash-link:hover{color:var(--dash-black)}.dash-table{width:100%;border-collapse:collapse}.dash-table th{height:36px;text-align:left;background:#fbfcfe;border-bottom:1px solid #e8edf5;color:#344054;text-transform:uppercase;font-size:10px;font-weight:800;padding:0 12px}.dash-table td{height:40px;border-bottom:1px solid #e8edf5;color:var(--dash-black);font-size:12px;font-weight:500;padding:0 12px}.dash-table tbody tr:hover{background:#f8fafc}.dash-order-link{border:0;background:transparent;padding:0;color:var(--dash-blue);font-weight:800;cursor:pointer}.dash-order-link:hover{color:var(--dash-black);text-decoration:underline}.dash-product-cell{display:flex;align-items:center;gap:8px}.dash-product-img{width:24px;height:24px;border-radius:6px;background:#e8edf5;display:grid;place-items:center;color:#64748b}.dash-pill{display:inline-flex;align-items:center;gap:5px;min-height:24px;border-radius:999px;padding:0 10px;font-size:11px;font-weight:800}.dash-pill.low{background:#fff0d4;color:#c26c00}.dash-pill.completed{background:#dff8ec;color:#0f7a4f}.dash-pill.processing{background:#fff0d4;color:#c26c00}.dash-pill.new{background:#dbeafe;color:#0b63f6}.dash-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:#667085;font-size:11px}.dash-modal-overlay{position:fixed;inset:0;background:rgba(5,8,22,.36);backdrop-filter:blur(3px);z-index:6500;display:flex;align-items:center;justify-content:center;padding:24px}.dash-order-modal{width:min(790px,96vw);max-height:92vh;overflow:auto;background:#fff;border:1.5px solid #d8dee8;border-radius:13px;box-shadow:0 28px 70px rgba(5,8,22,.25)}.dash-modal-head{height:56px;border-bottom:1px solid #e8edf5;padding:0 22px;display:flex;align-items:center;justify-content:space-between}.dash-modal-heading{display:flex;align-items:center;gap:10px}.dash-modal-heading h2{font-family:'Poppins',system-ui,sans-serif;font-size:17px;font-weight:600;margin:0}.dash-modal-heading span{width:5px;height:5px;background:#667085;border-radius:50%}.dash-modal-heading b{font-size:14px;color:#475467}.dash-icon-btn{width:32px;height:32px;border:0;background:transparent;border-radius:8px;display:grid;place-items:center;cursor:pointer;color:#050816}.dash-icon-btn:hover{background:transparent!important;color:var(--dash-blue)!important}.dash-modal-grid{display:grid;grid-template-columns:1fr 1fr .95fr;gap:10px;padding:16px 20px 10px}.dash-modal-card,.dash-items-card{background:#fbfcfe;border:0;border-radius:10px;padding:13px}.dash-modal-card h3,.dash-items-card h3{font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:600;margin:0 0 12px}.dash-customer-flex{display:flex;gap:12px;align-items:center}.dash-avatar{width:42px;height:42px;border-radius:50%;background:#eaf1ff;color:var(--dash-blue);display:grid;place-items:center}.dash-customer-flex strong,.dash-customer-flex small{display:block}.dash-customer-flex small{color:#64748b;font-size:11px;margin-top:3px}.dash-address{display:flex;gap:9px;font-size:12px;line-height:1.55;margin:0}.dash-address svg{width:16px;color:var(--dash-blue);flex:0 0 auto}.dash-status-strip{display:grid;grid-template-columns:1fr 1.2fr 1fr 1.1fr 1fr;margin:0 20px 10px;background:#fbfcfe;border-radius:10px;overflow:hidden}.dash-status-strip>div{padding:13px;border-right:1px solid #e8edf5}.dash-status-strip>div:last-child{border-right:0}.dash-status-strip span{display:block;font-size:10px;color:#64748b;font-weight:800;margin-bottom:6px}.dash-status-strip b{display:flex;align-items:center;gap:6px;font-size:12px}.dash-items-card{margin:0 20px 12px}.dash-items-card table{width:100%;border-collapse:collapse;font-size:12px}.dash-items-card th{height:34px;text-align:left;border-bottom:1px solid #e8edf5;text-transform:uppercase;font-size:10px;color:#475467;padding:0 9px}.dash-items-card td{border-bottom:1px solid #eef2f7;padding:9px;color:#050816;font-weight:600}.dash-modal-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 20px 20px}.dash-modal-actions{display:flex;flex-direction:column;gap:8px}.dash-modal-actions .dash-btn{width:100%}@media(max-width:1200px){.dash-metrics{grid-template-columns:repeat(2,1fr)}.dash-grid-three,.dash-grid-three.equal{grid-template-columns:1fr}.dash-head-actions{min-width:260px}}@media(max-width:760px){.admin-dashboard-final{padding:16px!important}.dash-page-head{flex-direction:column}.dash-head-actions{width:100%;grid-template-columns:1fr 1fr}.dash-metrics,.dash-modal-grid,.dash-status-strip,.dash-modal-bottom{grid-template-columns:1fr}.dash-donut-wrap{grid-template-columns:1fr}.dash-status-strip>div{border-right:0;border-bottom:1px solid #e8edf5}.dash-status-strip>div:last-child{border-bottom:0}}
                     
@@ -2734,19 +2752,19 @@
 
                     <section class="dash-metrics">
                         <button type="button" class="dash-metric blue" @click="openInfo('Revenue Details','Total recorded revenue: PHP {{ number_format($dashboardStats['revenue'], 2) }}. This is calculated from order totals.')">
-                            <span class="dash-icon dash-blue-soft"><i data-lucide="circle-dollar-sign"></i></span><span><small>Revenue</small><strong>PHP {{ number_format($dashboardStats['revenue'], 2) }}</strong><span>↗ 12.6% vs last 7 days</span></span>
+                            <span class="dash-icon dash-blue-soft"><i data-lucide="circle-dollar-sign"></i></span><span><small>Revenue</small><strong>PHP {{ number_format($dashboardStats['revenue'], 2) }}</strong><span>&uarr; 12.6% vs last 7 days</span></span>
                         </button>
                         <button type="button" class="dash-metric orange" @click="window.location.href='{{ route('admin.orders') }}'">
-                            <span class="dash-icon dash-orange-soft"><i data-lucide="shopping-bag"></i></span><span><small>Total Orders</small><strong>{{ number_format($dashboardStats['orders']) }}</strong><span>↗ 18.3% vs last 7 days</span></span>
+                            <span class="dash-icon dash-orange-soft"><i data-lucide="shopping-bag"></i></span><span><small>Total Orders</small><strong>{{ number_format($dashboardStats['orders']) }}</strong><span>&uarr; 18.3% vs last 7 days</span></span>
                         </button>
                         <button type="button" class="dash-metric green" @click="window.location.href='{{ $dashboardActiveUsersRoute }}'">
-                            <span class="dash-icon dash-green-soft"><i data-lucide="users-round"></i></span><span><small>{{ $dashboardActiveUsersLabel }}</small><strong>{{ number_format($dashboardStats['customers']) }}</strong><span>↗ 9.4% vs last 7 days</span></span>
+                            <span class="dash-icon dash-green-soft"><i data-lucide="users-round"></i></span><span><small>{{ $dashboardActiveUsersLabel }}</small><strong>{{ number_format($dashboardStats['customers']) }}</strong><span>&uarr; 9.4% vs last 7 days</span></span>
                         </button>
                         <button type="button" class="dash-metric red" @click="openInfo('Pending Approvals','Pending review count: {{ number_format($dashboardStats['pending']) }}. Review order and customer requests that need action.')">
-                            <span class="dash-icon dash-red-soft"><i data-lucide="clipboard-check"></i></span><span><small>Pending Approvals</small><strong>{{ number_format($dashboardStats['pending']) }}</strong><span class="red-trend">↘ 5.1% vs last 7 days</span></span>
+                            <span class="dash-icon dash-red-soft"><i data-lucide="clipboard-check"></i></span><span><small>Pending Approvals</small><strong>{{ number_format($dashboardStats['pending']) }}</strong><span class="red-trend">&darr; 5.1% vs last 7 days</span></span>
                         </button>
                         <button type="button" class="dash-metric cyan" @click="window.location.href='{{ route('admin.products') }}'">
-                            <span class="dash-icon dash-cyan-soft"><i data-lucide="package-check"></i></span><span><small>Services / Products</small><strong>{{ number_format($dashboardStats['services']) }}</strong><span>↗ 7.2% vs last 7 days</span></span>
+                            <span class="dash-icon dash-cyan-soft"><i data-lucide="package-check"></i></span><span><small>{{ $isDeveloperPortal ? 'Services' : 'Services / Products' }}</small><strong>{{ number_format($dashboardStats['services']) }}</strong><span>&uarr; 7.2% vs last 7 days</span></span>
                         </button>
                     </section>
 
@@ -2799,9 +2817,9 @@
                             <h2 class="dash-card-title">Quick Admin Actions</h2>
                             <a class="dash-action-line" href="{{ route('admin.orders') }}"><span class="dash-action-icon"><i data-lucide="clipboard-list"></i></span><span><strong>View Production Queue</strong><small>See current print jobs</small></span><i data-lucide="chevron-right"></i></a>
                             <a class="dash-action-line" href="{{ route('admin.customers') }}"><span class="dash-action-icon"><i data-lucide="users-round"></i></span><span><strong>Review Customer Records</strong><small>Manage customer profiles</small></span><i data-lucide="chevron-right"></i></a>
-                            <a class="dash-action-line" href="{{ route('admin.products') }}"><span class="dash-action-icon"><i data-lucide="package-pen"></i></span><span><strong>Product Edits</strong><small>Add or update products</small></span><i data-lucide="chevron-right"></i></a>
+                            <a class="dash-action-line" href="{{ route('admin.products') }}"><span class="dash-action-icon"><i data-lucide="package-pen"></i></span><span><strong>{{ $isDeveloperPortal ? 'Service Catalog' : 'Product Edits' }}</strong><small>{{ $isDeveloperPortal ? 'Review service availability' : 'Add or update products' }}</small></span><i data-lucide="chevron-right"></i></a>
                             <a class="dash-action-line" href="{{ route('admin.orders') }}"><span class="dash-action-icon"><i data-lucide="rotate-ccw"></i></span><span><strong>Return Requests</strong><small>Manage return and refund</small></span><i data-lucide="chevron-right"></i></a>
-                            <a class="dash-action-line" href="{{ route('admin.products') }}"><span class="dash-action-icon"><i data-lucide="boxes"></i></span><span><strong>Catalog Items</strong><small>Manage catalog and services</small></span><i data-lucide="chevron-right"></i></a>
+                            <a class="dash-action-line" href="{{ route('admin.products') }}"><span class="dash-action-icon"><i data-lucide="boxes"></i></span><span><strong>{{ $isDeveloperPortal ? 'Service Items' : 'Catalog Items' }}</strong><small>Manage catalog and services</small></span><i data-lucide="chevron-right"></i></a>
                         </article>
                     </section>
 
@@ -2816,13 +2834,13 @@
                                     <a class="dash-link" href="{{ route('admin.orders') }}">View all alerts <i data-lucide="arrow-right" style="width:14px"></i></a>
                                 </div>
                                 <div class="dash-stock-area dash-low-stock-panel">
-                                    <h2 class="dash-card-title">Low Stock Alerts</h2>
+                                    <h2 class="dash-card-title">{{ $isDeveloperPortal ? 'Service Alerts' : 'Low Stock Alerts' }}</h2>
                                     <table class="dash-table dash-stock-table">
-                                        <thead><tr><th>Product</th><th>Stock Left</th><th>Status</th></tr></thead>
+                                        <thead><tr><th>{{ $isDeveloperPortal ? 'Service' : 'Product' }}</th><th>Stock Left</th><th>Status</th></tr></thead>
                                         <tbody>
-                                            <tr @click="openInfo('Matte Black Mug','Stock left: 12. Product record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="cup-soda" style="width:14px"></i></span>Matte Black Mug</span></td><td>12</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
-                                            <tr @click="openInfo('Premium White Tee','Stock left: 18. Product record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="shirt" style="width:14px"></i></span>Premium White Tee</span></td><td>18</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
-                                            <tr @click="openInfo('Glossy Photo Paper','Stock left: 25. Product record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="image" style="width:14px"></i></span>Glossy Photo Paper</span></td><td>25</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
+                                            <tr @click="openInfo('Matte Black Mug','Stock left: 12. {{ $isDeveloperPortal ? 'Service' : 'Product' }} record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="cup-soda" style="width:14px"></i></span>Matte Black Mug</span></td><td>12</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
+                                            <tr @click="openInfo('Premium White Tee','Stock left: 18. {{ $isDeveloperPortal ? 'Service' : 'Product' }} record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="shirt" style="width:14px"></i></span>Premium White Tee</span></td><td>18</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
+                                            <tr @click="openInfo('Glossy Photo Paper','Stock left: 25. {{ $isDeveloperPortal ? 'Service' : 'Product' }} record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="image" style="width:14px"></i></span>Glossy Photo Paper</span></td><td>25</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
                                         </tbody>
                                     </table>
                                     <a class="dash-link" href="{{ route('admin.products') }}">View all low stock items <i data-lucide="arrow-right" style="width:14px"></i></a>
@@ -2834,7 +2852,7 @@
                             <h2 class="dash-card-title">Pending Approvals</h2>
                             <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.customers') }}','Opening user registrations...')"><span>User registrations</span><strong>{{ number_format($dashboardStats['pending']) }}</strong></button>
                             <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening return requests...')"><span>Return requests</span><strong>{{ number_format(max(0, $dashboardStats['cancelled'])) }}</strong></button>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.products') }}','Opening product edits...')"><span>Product edits</span><strong>{{ number_format(max(0, $dashboardStats['services'])) }}</strong></button>
+                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.products') }}','Opening {{ $isDeveloperPortal ? 'service' : 'product' }} edits...')"><span>{{ $isDeveloperPortal ? 'Service edits' : 'Product edits' }}</span><strong>{{ number_format(max(0, $dashboardStats['services'])) }}</strong></button>
                             <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.products') }}','Opening catalog submissions...')"><span>Catalog item submissions</span><strong>1</strong></button>
                             <a class="dash-link" href="{{ route('admin.orders') }}">Review all approvals <i data-lucide="arrow-right" style="width:14px"></i></a>
                         </article>
@@ -2842,7 +2860,7 @@
 
                     <section class="dash-grid-three equal">
                         <article class="dash-main-box dash-activity-panel">
-                            <h2 class="dash-card-title">Recent Admin Activity</h2>
+                            <h2 class="dash-card-title">{{ $isDeveloperPortal ? 'Recent Audit Activity' : 'Recent Admin Activity' }}</h2>
                             @foreach($headerNotifications->take(4) as $note)
                                 <div class="dash-activity-line"><span>{{ $note['title'] }}</span><strong>{{ $note['time'] }}</strong></div>
                             @endforeach
@@ -2883,13 +2901,13 @@
                     <div x-show="orderModal" x-transition.opacity class="dash-modal-overlay" style="display:none" @click.self="orderModal=false">
                         <div class="dash-order-modal" x-transition.scale.origin.center>
                             <header class="dash-modal-head">
-                                <div class="dash-modal-heading"><h2>Order Details</h2><span></span><b x-text="selectedOrder?.id || '—'"></b></div>
+                                <div class="dash-modal-heading"><h2>Order Details</h2><span></span><b x-text="selectedOrder?.id || '-'"></b></div>
                                 <button type="button" class="dash-icon-btn" @click="orderModal=false"><i data-lucide="x"></i></button>
                             </header>
                             <div class="dash-modal-grid">
                                 <article class="dash-modal-card"><h3>Customer</h3><div class="dash-customer-flex"><div class="dash-avatar"><i data-lucide="user"></i></div><div><strong x-text="selectedOrder?.customer || 'Customer'"></strong><small x-text="selectedOrder?.email || 'customer@example.com'"></small><small x-text="selectedOrder?.phone || '+63 900 000 0000'"></small></div></div><small style="display:inline-block;margin-top:10px;color:#64748b">Customer ID: Auto-generated</small></article>
                                 <article class="dash-modal-card"><h3>Shipping Address</h3><p class="dash-address"><i data-lucide="map-pin"></i><span x-text="selectedOrder?.address || 'Customer address not provided'"></span></p></article>
-                                <article class="dash-modal-card"><h3>Payment Method</h3><p style="margin:0 0 8px;font-weight:800"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ef4444"></span><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#f59e0b;margin-left:-7px"></span> VISA •••• 4242</p><span class="dash-pill completed">Paid</span></article>
+                                <article class="dash-modal-card"><h3>Payment Method</h3><p style="margin:0 0 8px;font-weight:800"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ef4444"></span><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#f59e0b;margin-left:-7px"></span> VISA &bull;&bull;&bull;&bull; 4242</p><span class="dash-pill completed">Paid</span></article>
                             </div>
                             <section class="dash-status-strip">
                                 <div><span>Order Status</span><b x-text="selectedOrder?.status || 'Recorded'"></b></div>
@@ -3442,7 +3460,7 @@
 
     <!-- =========================================================
          FINAL REQUEST PATCH - dashboard box borders
-         - Recent Admin Activity and Latest Transactions: black border
+         - {{ $isDeveloperPortal ? 'Recent Audit Activity' : 'Recent Admin Activity' }} and Latest Transactions: black border
          - System Alerts and Low Stock Alerts: black border each
          - Print Production Live Status and Order Pipeline Snapshot: box exists but border is hidden
     ========================================================== -->
@@ -3571,7 +3589,7 @@
             border-color:#111827!important;
         }
 
-        /* Recent Admin Activity + Latest Transactions: black border remains only on their own cards */
+        /* {{ $isDeveloperPortal ? 'Recent Audit Activity' : 'Recent Admin Activity' }} + Latest Transactions: black border remains only on their own cards */
         .admin-dashboard-final .dash-grid-three.equal > article.dash-main-box:nth-child(1),
         .admin-dashboard-final .dash-grid-three.equal > article.dash-main-box:nth-child(2){
             border:1px solid #111827!important;
@@ -3731,9 +3749,9 @@
 
     <!-- =========================================================
          FINAL USER PATCH V4
-         - Apply Help Center / Knowledge Base Management box style
+         - Apply Support Center / Knowledge Base Management box style
            to Print Production Live Status and Order Pipeline Snapshot
-         - Apply Help Center top + left spacing to Dashboard wrapper
+         - Apply support center top + left spacing to Dashboard wrapper
          - Keep System Alerts + Low Stock Alerts in one shared box
          - Keep calendar compact
     ========================================================== -->

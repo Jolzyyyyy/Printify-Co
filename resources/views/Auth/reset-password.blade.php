@@ -417,6 +417,19 @@
 
         .validation-success {
             color: var(--success);
+            font-weight: 700;
+        }
+
+        .validation-success svg {
+            stroke: var(--success);
+        }
+
+        .validation-error svg {
+            stroke: var(--danger);
+        }
+
+        .validation-neutral svg {
+            stroke: #98a1af;
         }
 
         .auth-btn {
@@ -567,14 +580,18 @@
             background: rgba(0, 0, 0, 0.50);
         }
 
+        .modal-overlay[hidden] {
+            display: none !important;
+        }
+
         .modal-box {
             width: 100%;
             max-width: 435px;
-            height: 56px;
+            height: auto;
             min-height: 56px;
             background: rgba(255, 255, 255, 0.88);
             border-radius: 9px;
-            padding: 0 22px;
+            padding: 14px 22px;
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
             text-align: left;
             display: flex;
@@ -592,8 +609,15 @@
             color: #111111;
             text-transform: none;
             letter-spacing: 0;
-            line-height: 1;
-            white-space: nowrap;
+            line-height: 1.25;
+            white-space: normal;
+        }
+
+        .modal-copy {
+            margin: 5px 0 0;
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.35;
         }
 
         .modal-success {
@@ -653,10 +677,10 @@
 
         .success-modal-box {
             width: 100%;
-            max-width: 435px;
-            height: 56px;
+            max-width: 545px;
+            height: auto;
             min-height: 56px;
-            padding: 0 22px;
+            padding: 16px 22px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -666,17 +690,18 @@
 
         .success-modal-box .modal-title {
             margin: 0;
-            line-height: 1;
+            line-height: 1.2;
         }
 
         .success-modal-box .modal-actions {
             gap: 10px;
-            height: 100%;
+            height: auto;
+            flex-wrap: wrap;
         }
 
         .success-modal-box .modal-btn {
             height: 30px;
-            min-width: 82px;
+            min-width: 122px;
             padding: 0 18px;
             border-radius: 999px;
             font-size: 12px;
@@ -715,6 +740,21 @@
             border-color: #000000;
         }
 
+        .success-modal-box .modal-btn-cancel {
+            min-width: 76px;
+            background: transparent;
+            color: #6b7280;
+            border-color: transparent;
+        }
+
+        .success-modal-box .modal-btn-cancel:hover,
+        .success-modal-box .modal-btn-cancel:focus,
+        .success-modal-box .modal-btn-cancel:active {
+            background: #f3f4f6;
+            color: #111827;
+            border-color: #e5e7eb;
+        }
+
         [x-cloak] {
             display: none !important;
         }
@@ -746,7 +786,7 @@
 
             .modal-box {
                 max-width: 90vw;
-                height: 54px;
+                height: auto;
                 min-height: 54px;
                 padding: 0 18px;
             }
@@ -766,18 +806,23 @@
 
             .success-modal-box {
                 max-width: 90vw;
-                height: 54px;
+                height: auto;
                 min-height: 54px;
-                padding: 0 18px;
+                padding: 14px 18px;
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
             }
 
             .success-modal-box .modal-actions {
+                width: 100%;
                 gap: 8px;
             }
 
             .success-modal-box .modal-btn {
                 height: 28px;
-                min-width: 74px;
+                min-width: 0;
+                flex: 1 1 auto;
                 padding: 0 12px;
                 font-size: 11px;
             }
@@ -807,60 +852,7 @@
     </div>
 
     {{-- RESET PASSWORD CARD --}}
-    <div
-        class="reset-container"
-        x-data="{
-            password: '',
-            password_confirmation: '',
-            showModal: false,
-            showConfirmReset: false,
-            showFeedback: false,
-            actionType: 'auto_login',
-            isPassDirty: false,
-            isConfirmDirty: false,
-
-            get rules() {
-                return {
-                    length: this.password.length >= 8,
-                    number: /[0-9]/.test(this.password),
-                    symbol: /[!@#$%^&*(),.?':{}|<>]/.test(this.password),
-                    match: (this.password === this.password_confirmation) && this.password !== ''
-                }
-            },
-
-            submitResetForm(type) {
-                this.actionType = type;
-
-                this.$nextTick(() => {
-                    document.getElementById('resetForm').submit();
-                });
-            },
-
-            openConfirm() {
-                this.isPassDirty = true;
-                this.isConfirmDirty = true;
-
-                if (this.rules.length && this.rules.number && this.rules.symbol && this.rules.match) {
-                    this.showConfirmReset = true;
-                }
-            },
-
-            confirmYes() {
-                this.showConfirmReset = false;
-
-                this.showFeedback = false;
-
-                this.$nextTick(() => {
-                    this.showFeedback = true;
-                    this.showModal = true;
-                });
-
-                setTimeout(() => {
-                    this.showFeedback = false;
-                }, 5000);
-            }
-        }"
-    >
+    <div class="reset-container">
         <div class="card-content">
             <h1 class="auth-title">Reset Password</h1>
 
@@ -870,19 +862,13 @@
 
             <x-auth-session-status class="status-text" :status="session('status')" />
 
-            <form method="POST" action="{{ route('password.store') }}" id="resetForm">
+            <form method="POST" action="{{ route('password.store') }}" id="resetForm" novalidate>
                 @csrf
 
                 <input
                     type="hidden"
                     name="token"
                     value="{{ $token ?? (request()->route('token') ?? session('password_reset_token')) }}"
-                >
-
-                <input
-                    type="hidden"
-                    name="action_type"
-                    :value="actionType"
                 >
 
                 {{-- EMAIL --}}
@@ -929,8 +915,6 @@
                             class="custom-input password-input"
                             type="password"
                             name="password"
-                            x-model="password"
-                            @input="isPassDirty = true"
                             placeholder="New Password"
                             required
                             autocomplete="new-password"
@@ -964,8 +948,6 @@
                             class="custom-input password-input"
                             type="password"
                             name="password_confirmation"
-                            x-model="password_confirmation"
-                            @input="isConfirmDirty = true"
                             placeholder="Confirm New Password"
                             required
                             autocomplete="new-password"
@@ -984,10 +966,7 @@
 
                 {{-- VALIDATION RULES --}}
                 <div class="validation-grid">
-                    <div
-                        class="validation-item"
-                        :class="!isPassDirty ? 'validation-neutral' : (rules.length ? 'validation-success' : 'validation-error')"
-                    >
+                    <div class="validation-item validation-neutral" data-rule="length">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -995,10 +974,7 @@
                         <span>{{ __('At least 8 characters') }}</span>
                     </div>
 
-                    <div
-                        class="validation-item"
-                        :class="!isPassDirty ? 'validation-neutral' : (rules.symbol ? 'validation-success' : 'validation-error')"
-                    >
+                    <div class="validation-item validation-neutral" data-rule="symbol">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1006,10 +982,7 @@
                         <span>{{ __('Contains special symbol') }}</span>
                     </div>
 
-                    <div
-                        class="validation-item"
-                        :class="!isPassDirty ? 'validation-neutral' : (rules.number ? 'validation-success' : 'validation-error')"
-                    >
+                    <div class="validation-item validation-neutral" data-rule="number">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1017,10 +990,7 @@
                         <span>{{ __('Must include a number') }}</span>
                     </div>
 
-                    <div
-                        class="validation-item"
-                        :class="!isConfirmDirty ? 'validation-neutral' : (rules.match ? 'validation-success' : 'validation-error')"
-                    >
+                    <div class="validation-item validation-neutral" data-rule="match">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1029,86 +999,74 @@
                     </div>
                 </div>
 
-                <button type="button" class="auth-btn" @click="openConfirm()">
+                <button type="button" class="auth-btn" data-open-reset-confirm>
                     {{ __('Reset Password') }}
                 </button>
 
                 <div class="back-wrapper">
-                    <a class="back-link" href="{{ (session('password_reset_portal') ?? 'customer') === 'staff' ? route('admin.login') : route('login') }}">
+                    <a class="back-link" href="{{ ($resetPortal ?? session('password_reset_portal') ?? 'customer') === 'staff' ? route('admin.login') : route('login') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
                         </svg>
-                        {{ __('Back to Login') }}
+                        {{ __($resetLoginLabel ?? 'Back to Login') }}
                     </a>
                 </div>
 
-                {{-- SUCCESS FEEDBACK MESSAGE - SMOOTH POPUP SA GREEN LINE AREA --}}
-                <div
-                    x-show="showFeedback"
-                    x-cloak
-                    x-transition:leave="transition ease-in duration-300"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    class="success-comment-wrap"
-                >
-                    <div class="success-comment">
-                        <strong>{{ __('Success!') }}</strong>
-                        {{ __('Your password has been reset successfully.') }}
-                    </div>
-                </div>
-
                 {{-- CONFIRM RESET MODAL --}}
-                <div x-show="showConfirmReset" x-cloak class="modal-overlay">
+                <div class="modal-overlay" data-requirements-modal hidden>
                     <div class="modal-box">
                         <h3 class="modal-title">
-                            {{ __('Confirm reset?') }}
+                            {{ __('Please complete all password requirements.') }}
                         </h3>
 
                         <div class="modal-actions">
                             <button
                                 type="button"
-                                @click="confirmYes()"
                                 class="modal-btn modal-btn-dark"
+                                data-close-requirements
                             >
-                                {{ __('Yes') }}
-                            </button>
-
-                            <button
-                                type="button"
-                                @click="showConfirmReset = false"
-                                class="modal-btn modal-btn-light"
-                            >
-                                {{ __('No') }}
+                                {{ __('OK') }}
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {{-- SUCCESS ACTION MODAL --}}
-                <div x-show="showModal" x-cloak class="modal-overlay">
+                {{-- CONFIRM RESET MODAL --}}
+                <div class="modal-overlay" data-confirm-reset-modal hidden>
                     <div class="modal-box success-modal-box">
-                        <h3 class="modal-title modal-success">
-                            {{ __('Success!') }}
-                        </h3>
+                        <div>
+                            <h3 class="modal-title">
+                                {{ __('Confirm password reset') }}
+                            </h3>
+                            <p class="modal-copy">
+                                {{ __('Choose where to continue after your password is updated.') }}
+                            </p>
+                        </div>
 
                         <div class="modal-actions">
                             <button
                                 type="button"
-                                @click="submitResetForm('auto_login')"
                                 class="modal-btn modal-btn-dark"
+                                data-submit-reset="auto_login"
                             >
-                                {{ (session('password_reset_portal') ?? 'customer') === 'staff' ? __('Staff Dashboard') : __('Dashboard') }}
+                                {{ __('Go to ') . __($resetDashboardLabel ?? 'Dashboard') }}
                             </button>
 
-                            @if ((session('password_reset_portal') ?? 'customer') !== 'staff')
                             <button
                                 type="button"
-                                @click="submitResetForm('manual_login')"
                                 class="modal-btn modal-btn-light"
+                                data-submit-reset="manual_login"
                             >
-                                {{ __('Back to Login') }}
+                                {{ __('Go to ') . __($resetLoginLabel ?? 'Login') }}
                             </button>
-                            @endif
+
+                            <button
+                                type="button"
+                                class="modal-btn modal-btn-cancel"
+                                data-close-confirm
+                            >
+                                {{ __('Cancel') }}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1117,6 +1075,130 @@
     </div>
 
     <script>
+        (() => {
+            const form = document.getElementById('resetForm');
+            if (!form) return;
+
+            const password = document.getElementById('password');
+            const confirmation = document.getElementById('password_confirmation');
+            const confirmModal = form.querySelector('[data-confirm-reset-modal]');
+            const requirementsModal = form.querySelector('[data-requirements-modal]');
+            const openConfirmButton = form.querySelector('[data-open-reset-confirm]');
+            const closeRequirements = form.querySelector('[data-close-requirements]');
+            const closeConfirm = form.querySelector('[data-close-confirm]');
+            const submitButtons = Array.from(form.querySelectorAll('[data-submit-reset]'));
+            const ruleItems = {
+                length: form.querySelector('[data-rule="length"]'),
+                symbol: form.querySelector('[data-rule="symbol"]'),
+                number: form.querySelector('[data-rule="number"]'),
+                match: form.querySelector('[data-rule="match"]'),
+            };
+
+            let passwordTouched = false;
+            let confirmationTouched = false;
+
+            const rules = () => {
+                const value = password?.value || '';
+                const confirmValue = confirmation?.value || '';
+
+                return {
+                    length: value.length >= 8,
+                    symbol: /[!@#$%^&*(),.?':{}|<>]/.test(value),
+                    number: /[0-9]/.test(value),
+                    match: value !== '' && value === confirmValue,
+                };
+            };
+
+            const setRuleState = (item, state) => {
+                if (!item) return;
+
+                item.classList.remove('validation-neutral', 'validation-success', 'validation-error');
+                item.classList.add(state);
+            };
+
+            const renderRules = (forceDirty = false) => {
+                const current = rules();
+                const passDirty = forceDirty || passwordTouched;
+                const confirmDirty = forceDirty || confirmationTouched;
+
+                setRuleState(ruleItems.length, !passDirty ? 'validation-neutral' : (current.length ? 'validation-success' : 'validation-error'));
+                setRuleState(ruleItems.symbol, !passDirty ? 'validation-neutral' : (current.symbol ? 'validation-success' : 'validation-error'));
+                setRuleState(ruleItems.number, !passDirty ? 'validation-neutral' : (current.number ? 'validation-success' : 'validation-error'));
+                setRuleState(ruleItems.match, !confirmDirty ? 'validation-neutral' : (current.match ? 'validation-success' : 'validation-error'));
+
+                return Object.values(current).every(Boolean);
+            };
+
+            const show = (element) => {
+                if (element) element.hidden = false;
+            };
+
+            const hide = (element) => {
+                if (element) element.hidden = true;
+            };
+
+            password?.addEventListener('input', () => {
+                passwordTouched = true;
+                renderRules();
+            });
+
+            confirmation?.addEventListener('input', () => {
+                confirmationTouched = true;
+                renderRules();
+            });
+
+            openConfirmButton?.addEventListener('click', () => {
+                passwordTouched = true;
+                confirmationTouched = true;
+
+                if (renderRules(true)) {
+                    show(confirmModal);
+                    return;
+                }
+
+                show(requirementsModal);
+            });
+
+            closeRequirements?.addEventListener('click', () => hide(requirementsModal));
+            closeConfirm?.addEventListener('click', () => hide(confirmModal));
+            confirmModal?.addEventListener('click', (event) => {
+                if (event.target === confirmModal) {
+                    hide(confirmModal);
+                }
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    hide(confirmModal);
+                    hide(requirementsModal);
+                }
+            });
+
+            submitButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    passwordTouched = true;
+                    confirmationTouched = true;
+
+                    if (!renderRules(true)) {
+                        hide(confirmModal);
+                        show(requirementsModal);
+                        return;
+                    }
+
+                    form.querySelectorAll('input[name="action_type"]').forEach((input) => input.remove());
+
+                    const actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'action_type';
+                    actionInput.value = button.dataset.submitReset || 'auto_login';
+                    form.appendChild(actionInput);
+
+                    HTMLFormElement.prototype.submit.call(form);
+                });
+            });
+
+            renderRules();
+        })();
+
         function togglePasswordVisibility(inputId, svgId) {
             const input = document.getElementById(inputId);
             const svg = document.getElementById(svgId);
