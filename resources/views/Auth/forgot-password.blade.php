@@ -642,6 +642,74 @@
             </form>
         </div>
     </div>
+    <style id="customer-auth-shared-bg-final-0615">
+        .min-h-screen {
+            background:
+                linear-gradient(152deg, rgba(255,247,237,.88) 0 28%, rgba(255,255,255,.98) 28.2% 64%, rgba(255,247,237,.82) 64.2% 100%)!important;
+            overflow:hidden!important;
+        }
+        .min-h-screen::before {
+            content:""!important;
+            position:absolute!important;
+            inset:0!important;
+            opacity:1!important;
+            pointer-events:none!important;
+            background-image:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='930' height='300' viewBox='0 0 930 300'%3E%3Cg fill='none' stroke='rgba(255,122,0,.22)' stroke-width='1'%3E%3Cpath d='M-60 122 C86 38 185 230 335 132 S570 36 760 118 S950 220 1010 128'/%3E%3Cpath d='M-60 134 C86 50 185 242 335 144 S570 48 760 130 S950 232 1010 140'/%3E%3Cpath d='M-60 146 C86 62 185 254 335 156 S570 60 760 142 S950 244 1010 152'/%3E%3Cpath d='M-60 158 C86 74 185 266 335 168 S570 72 760 154 S950 256 1010 164'/%3E%3Cpath d='M-60 170 C86 86 185 278 335 180 S570 84 760 166 S950 268 1010 176'/%3E%3Cpath d='M-60 182 C86 98 185 290 335 192 S570 96 760 178 S950 280 1010 188'/%3E%3C/g%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='300' viewBox='0 0 900 300'%3E%3Cg fill='none' stroke='rgba(255,122,0,.20)' stroke-width='1'%3E%3Cpath d='M-30 170 C95 255 220 70 370 175 S610 262 930 118'/%3E%3Cpath d='M-30 182 C95 267 220 82 370 187 S610 274 930 130'/%3E%3Cpath d='M-30 194 C95 279 220 94 370 199 S610 286 930 142'/%3E%3Cpath d='M-30 206 C95 291 220 106 370 211 S610 298 930 154'/%3E%3Cpath d='M-30 218 C95 303 220 118 370 223 S610 310 930 166'/%3E%3C/g%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='rgba(255,122,0,.62)'%3E%3Ccircle cx='10' cy='10' r='1.4'/%3E%3Ccircle cx='26' cy='10' r='1.4'/%3E%3Ccircle cx='42' cy='10' r='1.4'/%3E%3Ccircle cx='58' cy='10' r='1.4'/%3E%3Ccircle cx='74' cy='10' r='1.4'/%3E%3Ccircle cx='10' cy='26' r='1.4'/%3E%3Ccircle cx='26' cy='26' r='1.4'/%3E%3Ccircle cx='42' cy='26' r='1.4'/%3E%3Ccircle cx='58' cy='26' r='1.4'/%3E%3Ccircle cx='74' cy='26' r='1.4'/%3E%3Ccircle cx='10' cy='42' r='1.4'/%3E%3Ccircle cx='26' cy='42' r='1.4'/%3E%3Ccircle cx='42' cy='42' r='1.4'/%3E%3Ccircle cx='58' cy='42' r='1.4'/%3E%3Ccircle cx='74' cy='42' r='1.4'/%3E%3Ccircle cx='10' cy='58' r='1.4'/%3E%3Ccircle cx='26' cy='58' r='1.4'/%3E%3Ccircle cx='42' cy='58' r='1.4'/%3E%3Ccircle cx='58' cy='58' r='1.4'/%3E%3Ccircle cx='74' cy='58' r='1.4'/%3E%3C/g%3E%3C/svg%3E")!important;
+            background-size:930px 300px,900px 300px,120px 120px!important;
+            background-position:left -150px top 82px,right -110px bottom 46px,right 70px center!important;
+            background-repeat:no-repeat!important;
+            animation:none!important;
+        }
+        .min-h-screen::after {
+            content:""!important;
+            position:absolute!important;
+            inset:0!important;
+            pointer-events:none!important;
+            background-image:
+                linear-gradient(152deg, transparent 0 28%, rgba(255,255,255,.70) 28.2% 57%, transparent 57.2% 100%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='180' viewBox='0 0 220 180'%3E%3Cg fill='none' stroke='rgba(255,122,0,.48)' stroke-width='1.6'%3E%3Cpath d='M42 25 C50 45 58 53 78 61 C58 69 50 77 42 97 C34 77 26 69 6 61 C26 53 34 45 42 25Z'/%3E%3Cpath d='M168 118 C174 132 180 138 194 144 C180 150 174 156 168 170 C162 156 156 150 142 144 C156 138 162 132 168 118Z'/%3E%3C/g%3E%3C/svg%3E")!important;
+            background-size:100% 100%,220px 180px!important;
+            background-position:center,left 80px top 270px!important;
+            background-repeat:no-repeat!important;
+        }
+        .bg-scene,
+        .forgot-bg-scene,
+        .blob-tl,.blob-rb,.orb-tr,.orb-bl,.lines-top-left,.lines-left-mid,.lines-bottom,.soft-center,.dots-left,.dots-right,.spark {
+            display:none!important;
+        }
+        .forgot-container {
+            position:relative!important;
+            z-index:3!important;
+        }
+        .back-link {
+            position:relative!important;
+            display:inline-flex!important;
+            align-items:center!important;
+            padding-bottom:2px!important;
+            text-decoration:none!important;
+        }
+        .back-link::after {
+            content:"";
+            position:absolute;
+            left:0;
+            right:0;
+            bottom:-1px;
+            height:1.5px;
+            border-radius:999px;
+            background:#ff7a00;
+            opacity:0;
+            transform:scaleX(0);
+            transition:opacity .18s ease,transform .18s ease;
+        }
+        .back-link:hover::after,
+        .back-link:focus-visible::after {
+            opacity:1;
+            transform:scaleX(1);
+        }
+    </style>
 
     <script>
         function toggleEmailLabel() {
@@ -678,4 +746,17 @@
             }, 1000);
         });
     </script>
+    <style id="auth-recovery-input-icon-field-consistency-0615">
+        .auth-shell .input-icon,
+        .auth-shell .input-wrapper svg {
+            color:#1f2937!important;
+            stroke:#1f2937!important;
+            width:18px!important;
+            height:18px!important;
+        }
+        .auth-shell .input-wrapper input,
+        .auth-shell .otp-box {
+            border-color:#6b7280!important;
+        }
+    </style>
 </x-guest-layout>

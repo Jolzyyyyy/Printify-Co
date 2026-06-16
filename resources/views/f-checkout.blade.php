@@ -142,6 +142,457 @@ html{scroll-behavior:smooth}
 @media(max-width:760px){#checkout{padding-top:20px}.pfy-page{width:calc(100% - 22px)}.pfy-page-head h1{font-size:31px}.pfy-stepper{grid-template-columns:1fr 1fr}.pfy-field-grid,.pfy-field-grid.two,.pfy-field-grid.four,.pfy-payment-grid{grid-template-columns:1fr}.pfy-card-head{flex-direction:column}.pfy-order-item{grid-template-columns:64px 1fr}.pfy-order-price{grid-column:2;text-align:left;padding-top:0}.pfy-order-img,.pfy-order-placeholder{width:64px;height:64px}.pfy-promo{grid-template-columns:1fr}.pfy-promo button{width:100%}.pfy-place-order{width:100%}}
 </style>
 
+<style id="checkout-section-spacing-compact-final">
+#checkout{
+  padding-top:26px!important;
+  padding-bottom:48px!important;
+}
+#checkout .pfy-page{
+  width:min(1520px,calc(100% - 112px))!important;
+  max-width:1520px!important;
+  margin:0 auto!important;
+}
+#checkout .pfy-page-head{
+  margin-bottom:18px!important;
+}
+@media(max-width:1260px){
+  #checkout{
+    padding-top:24px!important;
+    padding-bottom:44px!important;
+  }
+  #checkout .pfy-page{
+    width:calc(100% - 44px)!important;
+  }
+}
+@media(max-width:760px){
+  #checkout{
+    padding-top:22px!important;
+    padding-bottom:38px!important;
+  }
+  #checkout .pfy-page{
+    width:calc(100% - 28px)!important;
+  }
+}
+</style>
+
+<style id="checkout-reference-layout-last-lock">
+#checkout .pfy-main-grid{
+  grid-template-columns:minmax(420px,1.05fr) minmax(430px,1fr) minmax(380px,.98fr)!important;
+  grid-template-areas:"steps steps steps" "customer summary delivery"!important;
+  gap:22px 24px!important;
+}
+#checkout .pfy-sidebar{grid-area:summary!important;display:flex!important;flex-direction:column!important;gap:14px!important;position:static!important}
+#checkout .pfy-delivery-payment{grid-area:delivery!important}
+#checkout .pfy-customer-shipping{grid-area:customer!important}
+#checkout .pfy-stepper{grid-area:steps!important;width:min(640px,100%)!important;margin:-70px auto 4px!important}
+#checkout .pfy-delivery-payment .pfy-card-notes,
+#checkout .pfy-delivery-payment .pfy-card-payment{display:none!important}
+#checkout .pfy-sidebar>.pfy-card-payment{display:block!important;border:1px solid #e4e8ef!important;border-radius:12px!important;background:#fff!important;box-shadow:0 10px 28px rgba(17,24,39,.035)!important}
+#checkout .pfy-secure-card{display:none!important}
+#checkout .pfy-delivery-option{min-height:78px!important;padding:16px!important;border-radius:8px!important}
+#checkout .pfy-delivery-option.is-selected{border-color:#ff4f16!important;background:#fff9f5!important}
+#checkout .pfy-summary .pfy-card-notes{display:block!important;margin:0 0 10px!important;border:0!important;background:transparent!important}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-head{padding:0 0 7px!important}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-body{padding:0!important}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-title p{display:none!important}
+#checkout .pfy-receipt-row{display:flex!important}
+@media(max-width:1260px){
+  #checkout .pfy-main-grid{grid-template-columns:1fr!important;grid-template-areas:"steps" "customer" "summary" "delivery"!important}
+  #checkout .pfy-stepper{margin:0 auto!important}
+}
+@media(max-width:720px){
+  #checkout .pfy-main-grid{grid-template-areas:"steps" "customer" "summary" "delivery"!important}
+}
+</style>
+
+<script id="checkout-reference-layout-script">
+(function(){
+  function arrangeCheckoutReference(){
+    var sidebar=document.querySelector('#checkout .pfy-sidebar');
+    var summary=document.querySelector('#checkout .pfy-summary');
+    var notes=document.querySelector('#checkout .pfy-card-notes');
+    var payment=document.querySelector('#checkout .pfy-card-payment');
+    var promo=document.querySelector('#checkout .pfy-promo');
+    if(summary&&notes&&promo&&!summary.contains(notes)){
+      promo.insertAdjacentElement('afterend',notes);
+    }
+    if(sidebar&&summary&&payment&&payment.parentElement!==sidebar){
+      summary.insertAdjacentElement('afterend',payment);
+    }
+    var receipt=document.getElementById('pfyReceiptRow');
+    if(summary&&!receipt){
+      receipt=document.createElement('button');
+      receipt.type='button';
+      receipt.id='pfyReceiptRow';
+      receipt.className='pfy-receipt-row';
+      receipt.innerHTML='<span><i class="fa-regular fa-file-lines"></i><b>E-Receipt</b><small>Get e-receipt via email after order completion.</small></span><i class="fa-solid fa-chevron-right"></i>';
+      var notesCard=summary.querySelector('.pfy-card-notes');
+      if(notesCard) notesCard.insertAdjacentElement('afterend',receipt);
+      receipt.addEventListener('click',function(){
+        if(typeof window.dispatchEvent==='function'){
+          window.dispatchEvent(new CustomEvent('printify-front-feedback',{detail:{message:'E-receipt will be sent after order completion.'}}));
+        }
+      });
+    }
+  }
+  document.addEventListener('DOMContentLoaded',arrangeCheckoutReference);
+  document.addEventListener('printify:checkout-opened',arrangeCheckoutReference);
+  window.addEventListener('load',arrangeCheckoutReference);
+  arrangeCheckoutReference();
+})();
+</script>
+
+<style id="checkout-reference-layout-final">
+#checkout{
+  padding:28px 0 46px!important;
+  background:#fff!important;
+}
+#checkout .pfy-page{
+  width:min(1520px,calc(100% - 108px))!important;
+  max-width:1520px!important;
+  padding:0 0 30px!important;
+}
+#checkout .pfy-breadcrumb{
+  margin:0 0 18px!important;
+  gap:10px!important;
+  color:#536070!important;
+  font-size:12px!important;
+  font-weight:600!important;
+}
+#checkout .pfy-page-head{
+  margin:0 0 22px!important;
+}
+#checkout .pfy-page-head h1{
+  font-family:var(--pf-body)!important;
+  font-size:28px!important;
+  line-height:1.05!important;
+  font-weight:900!important;
+  letter-spacing:0!important;
+}
+#checkout .pfy-page-head p{
+  margin-top:8px!important;
+  font-size:14px!important;
+  color:#485366!important;
+}
+#checkout .pfy-main-grid{
+  display:grid!important;
+  grid-template-columns:minmax(420px,1.05fr) minmax(430px,1fr) minmax(380px,.98fr)!important;
+  grid-template-areas:
+    "steps steps steps"
+    "customer summary delivery"!important;
+  gap:22px 24px!important;
+  align-items:start!important;
+  justify-content:center!important;
+}
+#checkout .pfy-left{display:contents!important}
+#checkout .pfy-customer-shipping{grid-area:customer!important;width:100%!important}
+#checkout .pfy-sidebar{grid-area:summary!important;width:100%!important;display:flex!important;flex-direction:column!important;gap:14px!important}
+#checkout .pfy-delivery-payment{grid-area:delivery!important;width:100%!important}
+#checkout .pfy-delivery-payment .pfy-card-notes,
+#checkout .pfy-delivery-payment .pfy-card-payment{display:none!important}
+#checkout .pfy-secure-card{display:none!important}
+#checkout .pfy-stepper{
+  grid-area:steps!important;
+  width:min(640px,100%)!important;
+  grid-template-columns:repeat(4,minmax(80px,1fr))!important;
+  justify-self:center!important;
+  gap:28px!important;
+  margin:-70px auto 4px!important;
+}
+#checkout .pfy-step{gap:8px!important}
+#checkout .pfy-step:after{
+  top:18px!important;
+  left:calc(50% + 44px)!important;
+  width:84px!important;
+  border-top:2px solid #d7dde7!important;
+}
+#checkout .pfy-step-no{
+  width:36px!important;
+  height:36px!important;
+  border-radius:50%!important;
+  font-size:13px!important;
+  font-weight:900!important;
+}
+#checkout .pfy-step-copy strong{
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:900!important;
+}
+#checkout .pfy-form-group,
+#checkout .pfy-summary,
+#checkout .pfy-sidebar>.pfy-card-payment{
+  border:1px solid #e4e8ef!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(17,24,39,.035)!important;
+  overflow:hidden!important;
+}
+#checkout .pfy-form-group .pfy-card,
+#checkout .pfy-sidebar>.pfy-card-payment{
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+#checkout .pfy-form-group .pfy-card + .pfy-card{
+  border-top:1px solid #edf0f4!important;
+}
+#checkout .pfy-card-head{
+  padding:24px 20px 10px!important;
+}
+#checkout .pfy-card-body{
+  padding:14px 20px 24px!important;
+}
+#checkout .pfy-card-title{
+  gap:12px!important;
+}
+#checkout .pfy-card-icon,
+#checkout .pfy-summary-title i{
+  width:26px!important;
+  height:26px!important;
+  min-width:26px!important;
+  color:#ff4f16!important;
+  font-size:21px!important;
+}
+#checkout .pfy-card-title h2,
+#checkout .pfy-summary h3{
+  font-size:16px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+}
+#checkout .pfy-card-title p{
+  margin-top:6px!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+  color:#4b5563!important;
+}
+#checkout .pfy-customer-shipping .pfy-field-grid,
+#checkout .pfy-customer-shipping .pfy-field-grid.two,
+#checkout .pfy-customer-shipping .pfy-field-grid.four{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:16px!important;
+}
+#checkout .pfy-customer-shipping .pfy-field:has(#street){grid-column:1/-1!important}
+#checkout .pfy-customer-shipping .pfy-field:has(#apartment){grid-column:auto!important}
+#checkout .pfy-field input,
+#checkout .pfy-field select{
+  height:48px!important;
+  border:1px solid #dfe4ec!important;
+  border-radius:8px!important;
+  padding:0 14px!important;
+  font-size:12.5px!important;
+  font-weight:600!important;
+}
+#checkout .pfy-field label{display:none!important}
+#checkout .pfy-section-control{
+  align-self:center!important;
+  margin:0!important;
+  font-size:12px!important;
+}
+#checkout .pfy-summary{
+  padding:16px 16px 15px!important;
+}
+#checkout .pfy-summary-head{
+  margin-bottom:14px!important;
+}
+#checkout .pfy-order-item{
+  grid-template-columns:58px minmax(0,1fr) auto!important;
+  gap:13px!important;
+  align-items:start!important;
+}
+#checkout .pfy-order-img,
+#checkout .pfy-order-placeholder{
+  width:58px!important;
+  height:58px!important;
+  border-radius:8px!important;
+}
+#checkout .pfy-order-placeholder{font-size:28px!important}
+#checkout .pfy-order-info h4{
+  margin:0 0 4px!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+}
+#checkout .pfy-order-info p{
+  margin:1px 0!important;
+  font-size:11px!important;
+  line-height:1.25!important;
+}
+#checkout .pfy-order-price{
+  padding-top:2px!important;
+  font-size:12px!important;
+}
+#checkout .pfy-summary-line{
+  margin:13px 0 11px!important;
+}
+#checkout .pfy-promo{
+  grid-template-columns:minmax(0,1fr) 80px!important;
+  gap:10px!important;
+  margin-bottom:12px!important;
+}
+#checkout .pfy-promo input{
+  height:36px!important;
+  border-radius:9px!important;
+  font-size:11.5px!important;
+}
+#checkout .pfy-promo button{
+  height:36px!important;
+  border-radius:999px!important;
+}
+#checkout .pfy-summary .pfy-card-notes{
+  margin:0 0 10px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-head{
+  padding:0 0 7px!important;
+}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-title{
+  gap:7px!important;
+}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-title p{display:none!important}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-body{
+  padding:0!important;
+}
+#checkout #notes{
+  height:44px!important;
+  min-height:44px!important;
+  border-radius:9px!important;
+  padding:11px 14px!important;
+  font-size:11.5px!important;
+}
+#checkout .pfy-note-box small{
+  right:12px!important;
+  bottom:7px!important;
+}
+#checkout .pfy-receipt-row{
+  width:100%!important;
+  height:36px!important;
+  margin:0 0 12px!important;
+  padding:0 12px!important;
+  border:1px solid #e4e8ef!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  color:#111827!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  text-align:left!important;
+}
+#checkout .pfy-receipt-row span{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+#checkout .pfy-receipt-row b{
+  font-size:11.5px!important;
+  font-weight:900!important;
+}
+#checkout .pfy-receipt-row small{
+  font-size:9.5px!important;
+  color:#6b7280!important;
+}
+#checkout .pfy-total-row{
+  margin-bottom:6px!important;
+  font-size:11.5px!important;
+}
+#checkout .pfy-grand-total{
+  margin:10px 0 0!important;
+  padding-top:10px!important;
+}
+#checkout .pfy-grand-total strong{
+  font-size:19px!important;
+  color:#ff4f16!important;
+}
+#checkout .pfy-place-order{
+  width:100%!important;
+  height:38px!important;
+  margin-top:10px!important;
+  border-radius:7px!important;
+  font-size:13px!important;
+}
+#checkout .pfy-sidebar>.pfy-card-payment .pfy-card-head{
+  padding:16px 18px 6px!important;
+}
+#checkout .pfy-sidebar>.pfy-card-payment .pfy-card-body{
+  padding:10px 18px 16px!important;
+}
+#checkout .pfy-payment-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+#checkout .pfy-pay-option{
+  min-height:50px!important;
+  grid-template-columns:16px 52px minmax(0,1fr)!important;
+  gap:9px!important;
+  padding:9px 11px!important;
+  border-radius:8px!important;
+}
+#checkout .pfy-delivery-payment{
+  border:1px solid #e4e8ef!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(17,24,39,.035)!important;
+  overflow:hidden!important;
+}
+#checkout .pfy-delivery-payment>.pfy-card-delivery{
+  border:0!important;
+}
+#checkout .pfy-radio-stack{
+  gap:14px!important;
+}
+#checkout .pfy-delivery-option{
+  min-height:78px!important;
+  grid-template-columns:20px minmax(0,1fr) auto!important;
+  gap:14px!important;
+  padding:16px!important;
+  border:1px solid #e4e8ef!important;
+  border-radius:8px!important;
+  background:#fff!important;
+}
+#checkout .pfy-delivery-option.is-selected{
+  border-color:#ff4f16!important;
+  background:#fff9f5!important;
+}
+#checkout .pfy-delivery-option input{
+  accent-color:#ff4f16!important;
+}
+#checkout .pfy-delivery-copy strong{
+  font-size:13px!important;
+  font-weight:900!important;
+}
+#checkout .pfy-delivery-copy strong em{
+  margin-left:8px!important;
+  background:#f0f2f5!important;
+  color:#111827!important;
+  font-size:10px!important;
+}
+#checkout .pfy-delivery-copy small{
+  margin-top:6px!important;
+  font-size:11.5px!important;
+  line-height:1.35!important;
+}
+#checkout .pfy-delivery-price{
+  font-size:12.5px!important;
+  font-weight:900!important;
+}
+@media(max-width:1260px){
+  #checkout .pfy-page{width:calc(100% - 36px)!important}
+  #checkout .pfy-main-grid{
+    grid-template-columns:1fr!important;
+    grid-template-areas:"steps" "customer" "summary" "delivery"!important;
+  }
+  #checkout .pfy-stepper{margin:0 auto!important}
+}
+@media(max-width:720px){
+  #checkout .pfy-page{width:calc(100% - 22px)!important}
+  #checkout .pfy-customer-shipping .pfy-field-grid,
+  #checkout .pfy-customer-shipping .pfy-field-grid.two,
+  #checkout .pfy-customer-shipping .pfy-field-grid.four,
+  #checkout .pfy-payment-grid{grid-template-columns:1fr!important}
+}
+</style>
+
 <section id="checkout" class="section checkout-section" data-section-id="checkout" data-page="checkout">
 <main class="pfy-page">
   <div class="pfy-breadcrumb">
@@ -220,7 +671,8 @@ html{scroll-behavior:smooth}
             <div class="pfy-radio-stack">
               <label class="pfy-delivery-option" data-radio-wrap><input type="radio" name="shipping" value="standard" data-cost="150"><span class="pfy-delivery-copy"><strong>Standard Delivery <em>3–5 business days</em></strong><small>Reliable delivery to your doorstep.</small></span><span class="pfy-delivery-price">₱150.00</span></label>
               <label class="pfy-delivery-option" data-radio-wrap><input type="radio" name="shipping" value="express" data-cost="350"><span class="pfy-delivery-copy"><strong>Express Delivery <em>1–2 business days</em></strong><small>Faster delivery for urgent orders.</small></span><span class="pfy-delivery-price">₱350.00</span></label>
-              <label class="pfy-delivery-option is-selected" data-radio-wrap><input type="radio" name="shipping" value="pickup" data-cost="0" checked><span class="pfy-delivery-copy"><strong>Store Pick-up <em>No delivery fee</em></strong><small>Pick up your completed order at our store.</small></span><span class="pfy-delivery-price">FREE</span></label>
+              <label class="pfy-delivery-option is-selected" data-radio-wrap><input type="radio" name="shipping" value="lalamove" data-cost="284" checked><span class="pfy-delivery-copy"><strong>Lalamove On-demand <em>Live price</em></strong><small>Use your exact drop-off location and track the driver after checkout.</small></span><span class="pfy-delivery-price">From &#8369;284.00</span></label>
+              <label class="pfy-delivery-option" data-radio-wrap><input type="radio" name="shipping" value="pickup" data-cost="0"><span class="pfy-delivery-copy"><strong>Store Pick-up <em>No delivery fee</em></strong><small>Pick up your completed order at our store.</small></span><span class="pfy-delivery-price">FREE</span></label>
             </div>
           </div>
         </section>
@@ -296,7 +748,7 @@ function normalizeCheckoutItem(item,index){const raw=item&&typeof item==="object
 function loadItems(){state.items=sourceItems().map(normalizeCheckoutItem).filter(function(item){return item.name&&item.qty>0})}
 function itemCount(){return state.items.reduce(function(sum,item){return sum+item.qty},0)}
 function syncFullName(){const first=(document.getElementById("firstName")?.value||"").trim();const last=(document.getElementById("lastName")?.value||"").trim();const full=document.getElementById("fullName");if(full)full.value=[first,last].filter(Boolean).join(" ").trim()}
-function selectedShipping(){const checked=document.querySelector('input[name="shipping"]:checked');const value=checked?checked.value:"pickup";const names={standard:"Standard Delivery",express:"Express Delivery",pickup:"Store Pick-up"};return {name:names[value]||"Store Pick-up",type:value,cost:checked?normalizeNumber(checked.dataset.cost):0}}
+function selectedShipping(){const checked=document.querySelector('input[name="shipping"]:checked');const value=checked?checked.value:"pickup";const names={standard:"Standard Delivery",express:"Express Delivery",lalamove:"Lalamove On-demand",pickup:"Store Pick-up"};return {name:names[value]||"Store Pick-up",type:value,cost:checked?normalizeNumber(checked.dataset.cost):0}}
 function selectedPayment(){const checked=document.querySelector('input[name="payment"]:checked');return checked?checked.value:"card"}
 function calculateTotals(){const subtotal=state.items.reduce(function(sum,item){return sum+item.lineTotal},0);const code=state.promoCode.toUpperCase();let discount=0;if(code==="SAVE10"||code==="DISCOUNT10")discount=subtotal*.10;if(code==="PRINTIFY50")discount=50;discount=Math.min(discount,subtotal);const shipping=selectedShipping().cost;const total=subtotal-discount+shipping;state.totals={subtotal:subtotal,discount:discount,shipping:shipping,tax:0,total:total}}
 function imageMarkup(item){if(item.image)return '<img class="pfy-order-img" src="'+escapeHtml(item.image)+'" alt="'+escapeHtml(item.name)+'">';return '<div class="pfy-order-placeholder"><i class="fa-regular fa-file-lines"></i></div>'}
@@ -312,7 +764,7 @@ function validateForm(){syncFullName();const pickup=selectedShipping().type==="p
 function buildCompletedOrder(){syncFullName();return {reference:makeOrderReference(),items:state.items.map(function(item){return item.raw&&Object.keys(item.raw).length?item.raw:item}),totals:state.totals,customer:{fullName:document.getElementById("fullName").value.trim(),firstName:document.getElementById("firstName").value.trim(),lastName:document.getElementById("lastName").value.trim(),email:document.getElementById("email").value.trim(),phone:document.getElementById("phone").value.trim()},shippingAddress:{street:document.getElementById("street").value.trim(),apartment:document.getElementById("apartment").value.trim(),city:document.getElementById("city").value.trim(),province:document.getElementById("province").value.trim(),postal:document.getElementById("postal").value.trim(),country:document.getElementById("country").value},delivery:selectedShipping(),payment:selectedPayment(),notes:els.notes?els.notes.value.trim():"",promoCode:state.promoCode,createdAt:new Date().toISOString(),status:"placed"}}
 function csrfToken(){const meta=document.querySelector('meta[name="csrf-token"]');return meta?meta.getAttribute("content"):""}
 function numericId(value){const parsed=parseInt(String(value??"").replace(/[^0-9-]/g,""),10);return Number.isFinite(parsed)?parsed:0}
-function checkoutPayloadItems(){const first=state.items[0]||{};const raw=first.raw&&typeof first.raw==="object"?first.raw:{};const names=state.items.map(function(item){return item.name}).filter(Boolean).join(", ");return [{name:names?("Printify Checkout - "+names).slice(0,180):"Printify Checkout Order",qty:1,unit_price:state.totals.total,price:state.totals.total,service_code:"checkout-"+Date.now(),service_id:numericId(raw.service_id||raw.serviceId),variation_id:numericId(raw.variation_id||raw.variationId),service_item_id:raw.service_item_id||raw.serviceItemId||"",category:"Checkout Total",variation_label:selectedShipping().name+" / "+selectedPayment(),unit:"order",image_path:raw.image_path||raw.image||""}]}
+function checkoutPayloadItems(){const first=state.items[0]||{};const raw=first.raw&&typeof first.raw==="object"?first.raw:{};const names=state.items.map(function(item){return item.name}).filter(Boolean).join(", ");return [{name:names?("Printify Checkout - "+names).slice(0,180):"Printify Checkout Order",qty:1,unit_price:state.totals.total,price:state.totals.total,service_code:"checkout-"+Date.now(),service_id:numericId(raw.service_id||raw.serviceId),variation_id:numericId(raw.variation_id||raw.variationId),service_item_id:raw.service_item_id||raw.serviceItemId||raw.serviceId||"",category:"Checkout Total",variation_label:selectedShipping().name+" / "+selectedPayment(),unit:"order",image_path:raw.image_path||raw.image||""}]}
 async function syncCheckoutSession(){if(typeof fetch!=="function")return;const response=await fetch("{{ route('cart.sync') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({items:checkoutPayloadItems()})});if(!response.ok){const body=await response.text();throw new Error(body||"Unable to prepare checkout session.")}}
 async function startPaymentCheckout(){const response=await fetch("{{ route('payment.start') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({payment_method:selectedPayment()})});const data=await response.json().catch(function(){return {}});if(!response.ok||!data.redirect_url){throw new Error(data.message||"Payment provider did not return a checkout link.")}return data.redirect_url}
 window.applyPromo=function(){const code=document.getElementById("promoCode").value.trim().toUpperCase();if(!code){state.promoCode="";renderTotals();return}if(!["SAVE10","DISCOUNT10","PRINTIFY50"].includes(code)){showToast("Invalid promo code. Try SAVE10 or PRINTIFY50.","error");return}state.promoCode=code;localStorage.setItem("printifyPromoCode",code);renderTotals();showToast("Promo code applied.","success")};
@@ -1483,4 +1935,41 @@ window.addEventListener("hashchange",openCheckoutFromHash);window.addEventListen
   #checkout .pfy-promo{grid-template-columns:1fr!important}
   #checkout .pfy-promo button{width:100%!important;min-width:0!important}
 }
+</style>
+
+<style id="checkout-reference-layout-last-lock">
+#checkout .pfy-main-grid{
+  grid-template-columns:minmax(420px,1.05fr) minmax(430px,1fr) minmax(380px,.98fr)!important;
+  grid-template-areas:"steps steps steps" "customer summary delivery"!important;
+  gap:22px 24px!important;
+}
+#checkout .pfy-sidebar{grid-area:summary!important;display:flex!important;flex-direction:column!important;gap:14px!important;position:static!important}
+#checkout .pfy-delivery-payment{grid-area:delivery!important}
+#checkout .pfy-customer-shipping{grid-area:customer!important}
+#checkout .pfy-stepper{grid-area:steps!important;width:min(640px,100%)!important;margin:-70px auto 4px!important}
+#checkout .pfy-delivery-payment .pfy-card-notes,
+#checkout .pfy-delivery-payment .pfy-card-payment{display:none!important}
+#checkout .pfy-sidebar>.pfy-card-payment{display:block!important;border:1px solid #e4e8ef!important;border-radius:12px!important;background:#fff!important;box-shadow:0 10px 28px rgba(17,24,39,.035)!important}
+#checkout .pfy-secure-card{display:none!important}
+#checkout .pfy-delivery-option{min-height:78px!important;padding:16px!important;border-radius:8px!important}
+#checkout .pfy-delivery-option.is-selected{border-color:#ff4f16!important;background:#fff9f5!important}
+#checkout .pfy-summary .pfy-card-notes{display:block!important;margin:0 0 10px!important;border:0!important;background:transparent!important}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-head{padding:0 0 7px!important}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-body{padding:0!important}
+#checkout .pfy-summary .pfy-card-notes .pfy-card-title p{display:none!important}
+#checkout .pfy-receipt-row{display:flex!important}
+@media(max-width:1260px){
+  #checkout .pfy-main-grid{grid-template-columns:1fr!important;grid-template-areas:"steps" "customer" "summary" "delivery"!important}
+  #checkout .pfy-stepper{margin:0 auto!important}
+}
+@media(max-width:720px){
+  #checkout .pfy-main-grid{grid-template-areas:"steps" "customer" "summary" "delivery"!important}
+}
+</style>
+<style id="checkout-section-spacing-true-last-lock">
+#checkout{padding-top:26px!important;padding-bottom:48px!important}
+#checkout .pfy-page{width:min(1520px,calc(100% - 112px))!important;max-width:1520px!important;margin:0 auto!important}
+#checkout .pfy-page-head{margin-bottom:18px!important}
+@media(max-width:1260px){#checkout{padding-top:24px!important;padding-bottom:44px!important}#checkout .pfy-page{width:calc(100% - 44px)!important}}
+@media(max-width:760px){#checkout{padding-top:22px!important;padding-bottom:38px!important}#checkout .pfy-page{width:calc(100% - 28px)!important}}
 </style>

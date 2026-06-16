@@ -231,6 +231,18 @@
             z-index: 3;
         }
 
+        .overlay-kicker {
+            display: block;
+            position: relative;
+            z-index: 3;
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.96);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+        }
+
         .overlay-panel p {
             font-size: 13px;
             line-height: 1.4;
@@ -908,10 +920,106 @@
             .auth-container{width:min(835px,calc(100vw - 28px))!important;min-height:540px!important}
         }
     </style>
+    <style id="customer-auth-logo-inline-final-0615">
+        body,
+        .min-h-screen {
+            background:#fff!important;
+        }
+        .min-h-screen::before {
+            display:block!important;
+            content:""!important;
+            position:absolute!important;
+            inset:-18px!important;
+            z-index:0!important;
+            opacity:.96!important;
+            background:url('/images/customer-auth-collage-bg.jpg?v=0615d') center/cover no-repeat!important;
+            filter:blur(1.35px) brightness(.78) saturate(.96)!important;
+            transform:scale(1.018)!important;
+            pointer-events:none!important;
+            animation:none!important;
+        }
+        .min-h-screen::after {
+            display:block!important;
+            content:""!important;
+            position:absolute!important;
+            inset:0!important;
+            z-index:1!important;
+            opacity:1!important;
+            background:rgba(0,0,0,.08)!important;
+            pointer-events:none!important;
+            animation:none!important;
+        }
+        .overlay-panel::before {
+            width:92px!important;
+            height:92px!important;
+            margin-bottom:22px!important;
+            border:3px solid #111!important;
+            border-radius:50%!important;
+            background-color:#fff!important;
+            background-image:url('{{ asset('images/printify-footer-logo.png') }}')!important;
+            background-repeat:no-repeat!important;
+            background-position:center!important;
+            background-size:86% 86%!important;
+            box-shadow:0 0 0 2px rgba(255,255,255,.75),0 12px 28px rgba(0,0,0,.18)!important;
+        }
+        .forgot-link,
+        .auth-switch-text button {
+            position:relative!important;
+            display:inline-flex!important;
+            align-items:center!important;
+            padding:0 0 2px!important;
+            border:0!important;
+            border-radius:0!important;
+            background:transparent!important;
+            color:#ff4f16!important;
+            line-height:1!important;
+            text-decoration:none!important;
+        }
+        .forgot-link::after,
+        .auth-switch-text button::after {
+            content:"";
+            position:absolute;
+            left:0;
+            right:0;
+            bottom:-1px;
+            height:1.5px;
+            border-radius:999px;
+            background:#ff7a00;
+            opacity:0;
+            transform:scaleX(0);
+            transform-origin:center;
+            transition:opacity .18s ease,transform .18s ease;
+        }
+        .forgot-link:hover::after,
+        .auth-switch-text button:hover::after,
+        .forgot-link:focus-visible::after,
+        .auth-switch-text button:focus-visible::after {
+            opacity:1;
+            transform:scaleX(1);
+        }
+        .form-content > .auth-switch-text:first-child {
+            margin:0 0 13px!important;
+            text-align:center!important;
+        }
+        .form-content > .social-row + .auth-switch-text {
+            display:none!important;
+        }
+        .overlay-panel .ghost-btn {
+            border:2px solid rgba(255,255,255,.98)!important;
+            background:rgba(255,255,255,.03)!important;
+            color:#fff!important;
+        }
+        .overlay-panel .ghost-btn:hover {
+            background:#111!important;
+            border-color:#111!important;
+            color:#fff!important;
+        }
+    </style>
 
     <div class="auth-container" id="auth-container">
         <div class="form-container sign-up-container">
             <div class="form-content">
+                <p class="auth-switch-text">Already have an account? <button type="button" data-auth-switch="login">Sign in</button></p>
                 <h1 class="auth-title">Create Account</h1>
                 <p class="auth-subtitle">Join us today and get started</p>
 
@@ -999,12 +1107,12 @@
                         <span>Facebook</span>
                     </a>
                 </div>
-                <p class="auth-switch-text">Already have an account? <button type="button" data-auth-switch="login">Sign in</button></p>
             </div>
         </div>
 
         <div class="form-container sign-in-container">
             <div class="form-content">
+                <p class="auth-switch-text">Don't have an account? <button type="button" data-auth-switch="register">Sign up</button></p>
                 <h1 class="auth-title">Sign In</h1>
                 <p class="auth-subtitle">Welcome back! Please sign in</p>
 
@@ -1085,32 +1193,110 @@
                         <span>Facebook</span>
                     </a>
                 </div>
-                <p class="auth-switch-text">Don't have an account? <button type="button" data-auth-switch="register">Sign up</button></p>
             </div>
         </div>
 
         <div class="overlay-container">
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
+                    <span class="overlay-kicker">ALREADY WITH US?</span>
                     <h1>Welcome Back!</h1>
-                    <p>Ready to continue? Log in now to access your personal details to keep connected with us.</p>
+                    <p>Sign in with your existing account to continue orders, checkout and account verification.</p>
                     <button class="ghost-btn" id="signIn">Sign In</button>
                 </div>
 
                 <div class="overlay-panel overlay-right">
-                    <h1>Join Us, Today!</h1>
-                    <p>Start your journey. Register with your personal details to begin journey with us.</p>
+                    <span class="overlay-kicker">NEW HERE?</span>
+                    <h1>Hello, friend</h1>
+                    <p>Create a customer account to browse services, place orders and track every print request in one place.</p>
                     <button class="ghost-btn" id="signUp">Sign Up</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <style id="customer-auth-smooth-slide-final-0615">
+        :root {
+            --slide-ease: cubic-bezier(.22, 1, .36, 1) !important;
+            --slide-time: .72s !important;
+            --content-time: .46s !important;
+        }
+        .auth-container,
+        .form-container,
+        .overlay-container,
+        .overlay,
+        .overlay-panel,
+        .form-content {
+            backface-visibility: hidden !important;
+            transform-style: flat !important;
+        }
+        .auth-container.is-sliding .form-content,
+        .auth-container.is-sliding .overlay-panel > * {
+            will-change: transform, opacity !important;
+        }
+        .auth-container.slide-to-register .sign-in-container .form-content {
+            animation: authSmoothOutLeft var(--content-time) var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-register .sign-up-container .form-content {
+            animation: authSmoothInRight var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .sign-up-container .form-content {
+            animation: authSmoothOutRight var(--content-time) var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .sign-in-container .form-content {
+            animation: authSmoothInLeft var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-register .overlay-right > * {
+            animation: authOverlayOutLeft .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-register .overlay-left > * {
+            animation: authOverlayInRight .48s var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .overlay-left > * {
+            animation: authOverlayOutRight .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .overlay-right > * {
+            animation: authOverlayInLeft .48s var(--slide-ease) .08s both !important;
+        }
+        @keyframes authSmoothInRight {
+            from { opacity: 0; transform: translate3d(26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothInLeft {
+            from { opacity: 0; transform: translate3d(-26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-26px,0,0); }
+        }
+        @keyframes authSmoothOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(26px,0,0); }
+        }
+        @keyframes authOverlayInRight {
+            from { opacity: 0; transform: translate3d(18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayInLeft {
+            from { opacity: 0; transform: translate3d(-18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-18px,0,0); }
+        }
+        @keyframes authOverlayOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(18px,0,0); }
+        }
+    </style>
+
     <script>
         const container = document.getElementById('auth-container');
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
-        const authSlideDuration = 980;
+        const authSlideDuration = 760;
 
         function playAuthSlide(direction) {
             if (container.classList.contains('is-sliding')) return;
@@ -1193,4 +1379,20 @@
             }
         }
     </script>
+    <style id="auth-input-icon-field-consistency-0615">
+        .auth-shell .field-icon,
+        .auth-shell .field-icon svg,
+        .auth-shell .password-toggle svg {
+            color:#1f2937!important;
+            stroke:#1f2937!important;
+        }
+        .auth-shell .field-icon svg,
+        .auth-shell .password-toggle svg {
+            width:18px!important;
+            height:18px!important;
+        }
+        .auth-shell .input-field {
+            border-color:#6b7280!important;
+        }
+    </style>
 </x-guest-layout>

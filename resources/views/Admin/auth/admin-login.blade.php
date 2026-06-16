@@ -188,17 +188,18 @@
 
         .overlay-panel::before {
             content: "";
-            width: 74px !important;
-            height: 74px !important;
-            margin-bottom: 21px !important;
+            width: 92px !important;
+            height: 92px !important;
+            margin-bottom: 22px !important;
+            border: 3px solid #111 !important;
             border-radius: 50%;
-            background: rgba(255, 255, 255, .96);
-            box-shadow: 0 0 0 12px rgba(255, 255, 255, .18), 0 12px 28px rgba(20, 30, 95, .16);
+            background-color: #fff !important;
+            box-shadow: 0 0 0 2px rgba(255,255,255,.75), 0 12px 28px rgba(20, 30, 95, .18);
             display: block;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='9.5' cy='7' r='4'/%3E%3Cpath d='M19 8v6'/%3E%3Cpath d='M22 11h-6'/%3E%3C/svg%3E");
+            background-image: url('{{ asset('images/printify-footer-logo.png') }}') !important;
             background-repeat: no-repeat;
             background-position: center;
-            background-size: 42px 42px;
+            background-size: 86% 86% !important;
             position: relative;
             z-index: 3;
         }
@@ -531,6 +532,54 @@
             cursor: pointer;
         }
 
+        .auth-switch-text button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-blue) !important;
+            line-height: 1.15 !important;
+            text-decoration: none !important;
+        }
+
+        .auth-switch-text button::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform .18s ease;
+        }
+
+        .auth-switch-text button:hover::after,
+        .auth-switch-text button:focus-visible::after {
+            transform: scaleX(1);
+        }
+
+        .form-content > .auth-switch-text:first-child {
+            margin: 0 0 13px !important;
+            text-align: center !important;
+        }
+
+        .form-content > form + .auth-switch-text {
+            display: none !important;
+        }
+
+        .overlay-panel .ghost-btn {
+            border: 2px solid rgba(255,255,255,.98) !important;
+            background: rgba(255,255,255,.03) !important;
+            color: #fff !important;
+        }
+
+        .overlay-panel .ghost-btn:hover {
+            background: #111 !important;
+            border-color: #111 !important;
+            color: #fff !important;
+        }
+
         .error-text {
             color: #dc2626;
             font-size: 10px;
@@ -587,6 +636,7 @@
         {{-- ADMIN/DEVELOPER REGISTER FORM --}}
         <div class="form-container sign-up-container">
             <div class="form-content">
+                <p class="auth-switch-text">Already have a staff account? <button type="button" data-auth-switch="login">Sign in</button></p>
                 <h1 class="auth-title">Create Account</h1>
                 <p class="auth-subtitle">Create staff access for the admin portal</p>
 
@@ -677,14 +727,13 @@
 
                     <button type="submit" class="auth-btn">Sign Up</button>
                 </form>
-
-                <p class="auth-switch-text">Already have a staff account? <button type="button" data-auth-switch="login">Sign in</button></p>
             </div>
         </div>
 
         {{-- ADMIN/DEVELOPER LOGIN FORM --}}
         <div class="form-container sign-in-container">
             <div class="form-content">
+                <p class="auth-switch-text">Need staff access? <button type="button" data-auth-switch="register">Sign up</button></p>
                 <h1 class="auth-title">Sign In</h1>
                 <p class="auth-subtitle">Welcome back! Please sign in</p>
 
@@ -753,7 +802,6 @@
                     <button type="submit" class="auth-btn">Sign In</button>
                 </form>
 
-                <p class="auth-switch-text">Need staff access? <button type="button" data-auth-switch="register">Sign up</button></p>
             </div>
         </div>
 
@@ -775,11 +823,88 @@
         </div>
     </div>
 
+    <style id="staff-auth-smooth-slide-final-0615">
+        :root {
+            --slide-ease: cubic-bezier(.22, 1, .36, 1) !important;
+            --slide-time: .72s !important;
+            --content-time: .46s !important;
+        }
+        .auth-container,
+        .form-container,
+        .overlay-container,
+        .overlay,
+        .overlay-panel,
+        .form-content {
+            backface-visibility: hidden !important;
+            transform-style: flat !important;
+        }
+        .auth-container.is-sliding .form-content,
+        .auth-container.is-sliding .overlay-panel > * {
+            will-change: transform, opacity !important;
+        }
+        .auth-container.slide-to-register .sign-in-container .form-content {
+            animation: authSmoothOutLeft var(--content-time) var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-register .sign-up-container .form-content {
+            animation: authSmoothInRight var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .sign-up-container .form-content {
+            animation: authSmoothOutRight var(--content-time) var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .sign-in-container .form-content {
+            animation: authSmoothInLeft var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-register .overlay-right > * {
+            animation: authOverlayOutLeft .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-register .overlay-left > * {
+            animation: authOverlayInRight .48s var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .overlay-left > * {
+            animation: authOverlayOutRight .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .overlay-right > * {
+            animation: authOverlayInLeft .48s var(--slide-ease) .08s both !important;
+        }
+        @keyframes authSmoothInRight {
+            from { opacity: 0; transform: translate3d(26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothInLeft {
+            from { opacity: 0; transform: translate3d(-26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-26px,0,0); }
+        }
+        @keyframes authSmoothOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(26px,0,0); }
+        }
+        @keyframes authOverlayInRight {
+            from { opacity: 0; transform: translate3d(18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayInLeft {
+            from { opacity: 0; transform: translate3d(-18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-18px,0,0); }
+        }
+        @keyframes authOverlayOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(18px,0,0); }
+        }
+    </style>
+
     <script>
         const container = document.getElementById('auth-container');
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
-        const authSlideDuration = 980;
+        const authSlideDuration = 760;
 
         const loginUrl = "/p-co-2026/login-7b5e93-adm-key";
         const registerUrl = "/p-co-2026/register-7b5e93-adm-key";
@@ -877,4 +1002,20 @@
             }
         }
     </script>
+    <style id="staff-auth-input-icon-field-consistency-0615">
+        .auth-shell .field-icon,
+        .auth-shell .field-icon svg,
+        .auth-shell .password-toggle svg {
+            color:#1f2937!important;
+            stroke:#1f2937!important;
+        }
+        .auth-shell .field-icon svg,
+        .auth-shell .password-toggle svg {
+            width:18px!important;
+            height:18px!important;
+        }
+        .auth-shell .input-field {
+            border-color:#6b7280!important;
+        }
+    </style>
 </x-guest-layout>

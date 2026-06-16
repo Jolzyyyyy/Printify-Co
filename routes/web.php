@@ -43,6 +43,8 @@ Route::get('/about', [FrontPageController::class, 'about'])->name('landing.about
 Route::get('/aboutus', [FrontPageController::class, 'about'])->name('landing.aboutus');
 Route::get('/contact', [FrontPageController::class, 'contact'])->name('landing.contact');
 Route::get('/contactus', [FrontPageController::class, 'contact'])->name('landing.contactus');
+Route::post('/contact', [FrontPageController::class, 'submitContact'])->name('landing.contact.submit');
+Route::post('/contactus', [FrontPageController::class, 'submitContact'])->name('landing.contactus.submit');
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
     Route::get('/service-detail', [FrontPageController::class, 'serviceDetail'])->name('landing.service-detail');
     Route::get('/service-details', [FrontPageController::class, 'serviceDetail'])->name('landing.service-details');

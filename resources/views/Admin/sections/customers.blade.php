@@ -1175,7 +1175,6 @@
             <div x-show="activeTab==='security'" class="security-grid">
                 <section class="info-card">
                     <h3>Security Settings</h3>
-                    <div class="toggle-line"><b>Two-Factor Authentication</b><span class="toggle" :class="security.twoFactor ? 'on' : ''" @click="toggleSecurity('twoFactor')"></span></div>
                     <div class="toggle-line"><b>Email Login Alerts</b><span class="toggle" :class="security.loginAlerts ? 'on' : ''" @click="toggleSecurity('loginAlerts')"></span></div>
                     <div class="toggle-line"><b>Require Password Reset</b><span class="toggle" :class="security.forceReset ? 'on' : ''" @click="toggleSecurity('forceReset')"></span></div>
                     <div class="toggle-line"><b>Block Suspicious Login</b><span class="toggle" :class="security.blockSuspicious ? 'on' : ''" @click="toggleSecurity('blockSuspicious')"></span></div>
@@ -1190,7 +1189,6 @@
                         <div class="info-row"><span class="info-label">Last Password Change</span><span class="info-value">May 10, 2026</span></div>
                         <div class="info-row"><span class="info-label">Known Devices</span><span class="info-value" x-text="security.knownDevices + ' Devices'"></span></div>
                         <div class="info-row"><span class="info-label">Login Risk</span><span class="status-pill status-active">Low</span></div>
-                        <div class="info-row"><span class="info-label">2FA Status</span><span class="status-pill" :class="security.twoFactor ? 'status-active' : 'status-inactive'" x-text="security.twoFactor ? 'Enabled' : 'Disabled'"></span></div>
                         <div class="info-row"><span class="info-label">Alerts</span><span class="status-pill" :class="security.loginAlerts ? 'status-active' : 'status-inactive'" x-text="security.loginAlerts ? 'On' : 'Off'"></span></div>
                     </div>
                 </section>
