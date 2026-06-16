@@ -135,6 +135,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === self::ROLE_DEVELOPER;
     }
 
+    public function portalRoleLabel(): string
+    {
+        return match ($this->role) {
+            self::ROLE_DEVELOPER => 'Developer',
+            self::ROLE_ADMIN_CLIENT => 'Admin Client',
+            self::ROLE_CUSTOMER => 'Customer',
+            default => 'User',
+        };
+    }
+
+    public function portalDashboardLabel(): string
+    {
+        return match ($this->role) {
+            self::ROLE_DEVELOPER => 'Developer Dashboard',
+            self::ROLE_ADMIN_CLIENT => 'Admin Client Dashboard',
+            self::ROLE_CUSTOMER => 'Customer Dashboard',
+            default => 'Dashboard',
+        };
+    }
+
     public function canManageAdminClients(): bool
     {
         return $this->isDeveloper();

@@ -7,6 +7,8 @@ use App\Notifications\SendOTP;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
@@ -36,6 +38,65 @@ class PasswordResetTest extends TestCase
                 'email' => $user->email,
                 'flow' => 'forgot_password',
             ], false));
+    }
+
+    public function test_existing_password_reset_otp_session_returns_to_verification_instead_of_cooldown(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->post('/forgot-password', ['email' => $user->email])
+            ->assertRedirect(route('otp.verify', [
+                'email' => $user->email,
+                'flow' => 'forgot_password',
+            ], false));
+
+        $this->get('/forgot-password')
+            ->assertRedirect(route('otp.verify', [
+                'email' => $user->email,
+                'flow' => 'forgot_password',
+            ], false))
+            ->assertSessionHas('status', 'A reset code was already sent. Enter it to continue.');
+    }
+
+    public function test_repeated_password_reset_request_during_cooldown_returns_to_existing_otp_verification(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->post('/forgot-password', ['email' => $user->email])
+            ->assertRedirect(route('otp.verify', [
+                'email' => $user->email,
+                'flow' => 'forgot_password',
+            ], false));
+
+        $this->post('/forgot-password', ['email' => $user->email])
+            ->assertRedirect(route('otp.verify', [
+                'email' => $user->email,
+                'flow' => 'forgot_password',
+            ], false))
+            ->assertSessionHas('status', 'A reset code was already sent. Enter it to continue.');
+
+        Notification::assertSentToTimes($user, SendOTP::class, 1);
+    }
+
+    public function test_stale_password_reset_cooldown_without_pending_otp_does_not_block_form(): void
+    {
+        $email = 'stale-reset@example.com';
+
+        RateLimiter::hit(
+            'password-reset-request:' . Str::transliterate(Str::lower($email . '|127.0.0.1')),
+            60
+        );
+
+        $this
+            ->withSession(['password_reset_throttle_email' => $email])
+            ->get('/forgot-password')
+            ->assertOk()
+            ->assertDontSee('Password reset cooldown active')
+            ->assertSessionMissing('password_reset_throttle_email');
     }
 
     public function test_password_reset_request_does_not_reveal_unknown_email(): void
@@ -69,6 +130,31 @@ class PasswordResetTest extends TestCase
             ], false));
 
         $response->assertStatus(200);
+    }
+
+    public function test_reset_password_screen_uses_shared_custom_validation_and_action_choices(): void
+    {
+        $user = User::factory()->create();
+        $token = 'test-reset-token';
+
+        $response = $this
+            ->withSession([
+                'password_reset_token' => $token,
+                'password_reset_email' => $user->email,
+            ])
+            ->get(route('password.reset', [
+                'token' => $token,
+                'email' => $user->email,
+            ], false));
+
+        $response
+            ->assertOk()
+            ->assertSee('id="resetForm" novalidate', false)
+            ->assertSee('data-submit-reset="auto_login"', false)
+            ->assertSee('data-submit-reset="manual_login"', false)
+            ->assertSee('Dashboard')
+            ->assertSee('Login')
+            ->assertDontSee('Success!');
     }
 
     public function test_password_can_be_reset_after_otp_context_is_verified(): void

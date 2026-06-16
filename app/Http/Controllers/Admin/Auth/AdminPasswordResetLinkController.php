@@ -20,8 +20,14 @@ class AdminPasswordResetLinkController extends Controller
     private const PASSWORD_RESET_REQUEST_MAX_ATTEMPTS = 1;
     private const PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS = 60;
 
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
+        if ($redirect = $this->redirectToPendingPasswordResetOtp($request)) {
+            return $redirect;
+        }
+
+        $request->session()->forget('staff_password_reset_throttle_email');
+
         return view('auth.forgot-password', [
             'resetCooldownSeconds' => $this->passwordResetCooldownSeconds($request),
             'passwordResetAction' => route('admin.password.email'),
@@ -39,9 +45,13 @@ class AdminPasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
+        if (RateLimiter::tooManyAttempts($this->passwordResetThrottleKey($request), self::PASSWORD_RESET_REQUEST_MAX_ATTEMPTS)) {
+            if ($redirect = $this->redirectToPendingPasswordResetOtp($request, $request->input('email'))) {
+                return $redirect;
+            }
+        }
+
         $this->ensureResetRequestIsNotRateLimited($request);
-        $request->session()->put('staff_password_reset_throttle_email', Str::lower((string) $request->input('email', '')));
-        RateLimiter::hit($this->passwordResetThrottleKey($request), self::PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS);
 
         $user = User::where('email', trim((string) $request->email))
             ->whereIn('role', [User::ROLE_ADMIN_CLIENT, User::ROLE_DEVELOPER])
@@ -80,10 +90,55 @@ class AdminPasswordResetLinkController extends Controller
             'auth_type' => 'forgot_password',
         ]);
 
+        $request->session()->put('staff_password_reset_throttle_email', Str::lower((string) $request->input('email', '')));
+        RateLimiter::hit($this->passwordResetThrottleKey($request), self::PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS);
+
         return redirect()->route('otp.verify', [
             'email' => $user->email,
             'flow' => 'forgot_password',
         ])->with('status', 'A 6-digit staff password reset code has been sent to your email.');
+    }
+
+    private function redirectToPendingPasswordResetOtp(Request $request, ?string $requestedEmail = null): ?RedirectResponse
+    {
+        $email = $this->pendingPasswordResetOtpEmail($requestedEmail);
+
+        if (!$email) {
+            return null;
+        }
+
+        return redirect()->route('otp.verify', [
+            'email' => $email,
+            'flow' => 'forgot_password',
+        ])->with('status', 'A reset code was already sent. Enter it to continue.');
+    }
+
+    private function pendingPasswordResetOtpEmail(?string $requestedEmail = null): ?string
+    {
+        if (
+            session('is_forgot_password') !== true
+            || session('password_reset_portal') !== 'staff'
+            || !session('password_reset_token')
+        ) {
+            return null;
+        }
+
+        $deliveryEmail = session('otp_email') ?: session('password_reset_email');
+
+        if (!$deliveryEmail) {
+            return null;
+        }
+
+        if ($requestedEmail) {
+            $requestedEmail = Str::lower(trim((string) $requestedEmail));
+            $sessionEmail = Str::lower(trim((string) session('password_reset_email')));
+
+            if ($requestedEmail !== $sessionEmail) {
+                return null;
+            }
+        }
+
+        return $deliveryEmail;
     }
 
     private function ensureResetRequestIsNotRateLimited(Request $request): void

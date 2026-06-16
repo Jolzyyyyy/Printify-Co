@@ -161,6 +161,16 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
 */
 
 // Admin Login/Register Guest Routes
+Route::get('/p-co-2026', function () {
+    if (!auth()->check() || !auth()->user()->canAccessAdminPortal()) {
+        return redirect()->route('admin.login');
+    }
+
+    return session('staff_otp_passed') === true
+        ? redirect()->route('admin.dashboard')
+        : redirect()->route('admin.otp.verify');
+})->name('admin.portal.entry');
+
 Route::middleware('guest')->prefix('p-co-2026')->group(function () {
     Route::get('/login-7b5e93-adm-key', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
     Route::get('/register-7b5e93-adm-key', [AdminAuthController::class, 'showRegisterForm'])->name('admin.register');

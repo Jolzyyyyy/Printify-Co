@@ -2849,7 +2849,7 @@ body:has(.customer-dashboard-v2) .text-gray-900,
         <div class="dashboard-header-row reveal-card" style="--delay:0ms">
             <div class="overview-title-wrap">
                 <div>
-                    <h2 class="overview-kicker">Overview</h2>
+                    <h2 class="overview-kicker">Dashboard Overview</h2>
                     <p class="overview-copy">Here’s what’s happening with your account.</p>
                 </div>
             </div>

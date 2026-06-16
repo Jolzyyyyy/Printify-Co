@@ -185,10 +185,10 @@
             }
          }">
         
-        <h1 class="auth-title">Verify Admin Account</h1>
+        <h1 class="auth-title">Verify {{ $portalRoleLabel ?? session('admin_role_label', 'Staff') }} Account</h1>
         
         <p class="instruction-text">
-            Please enter the 6-digit security code sent to your email address to continue.
+            Please enter the 6-digit security code sent to your email address to continue to your {{ $portalDashboardLabel ?? session('admin_dashboard_label', 'staff dashboard') }}.
         </p>
 
         <div x-show="otpLocked" class="lockout-info" role="alert">

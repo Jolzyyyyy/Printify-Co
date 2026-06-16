@@ -24,8 +24,14 @@ class PasswordResetLinkController extends Controller
     /**
      * Display the forgot password view.
      */
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
+        if ($redirect = $this->redirectToPendingPasswordResetOtp($request)) {
+            return $redirect;
+        }
+
+        $request->session()->forget('password_reset_throttle_email');
+
         // Tumuturo sa resources/views/auth/forgot-password.blade.php
         return view('auth.forgot-password', [
             'resetCooldownSeconds' => $this->passwordResetCooldownSeconds($request),
@@ -42,12 +48,13 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
+        if (RateLimiter::tooManyAttempts($this->passwordResetThrottleKey($request), self::PASSWORD_RESET_REQUEST_MAX_ATTEMPTS)) {
+            if ($redirect = $this->redirectToPendingPasswordResetOtp($request, $request->input('email'))) {
+                return $redirect;
+            }
+        }
+
         $this->ensureResetRequestIsNotRateLimited($request);
-        $request->session()->put('password_reset_throttle_email', Str::lower((string) $request->input('email', '')));
-        RateLimiter::hit(
-            $this->passwordResetThrottleKey($request),
-            self::PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS
-        );
 
         // --- SECURITY UPDATE: CHECK IF USING BACKUP EMAIL ---
         $isBackup = $request->has('use_backup');
@@ -109,6 +116,12 @@ class PasswordResetLinkController extends Controller
             'auth_type'           => 'forgot_password', 
         ]);
 
+        $request->session()->put('password_reset_throttle_email', Str::lower((string) $request->input('email', '')));
+        RateLimiter::hit(
+            $this->passwordResetThrottleKey($request),
+            self::PASSWORD_RESET_REQUEST_COOLDOWN_SECONDS
+        );
+
         /**
          * 8. Redirect to OTP verification page
          */
@@ -122,6 +135,49 @@ class PasswordResetLinkController extends Controller
     private function customerOtpResendThrottleKey(string $email, string $ip): string
     {
         return 'customer-otp-resend:' . Str::transliterate(Str::lower($email) . '|' . $ip);
+    }
+
+    private function redirectToPendingPasswordResetOtp(Request $request, ?string $requestedEmail = null): ?RedirectResponse
+    {
+        $email = $this->pendingPasswordResetOtpEmail($requestedEmail);
+
+        if (!$email) {
+            return null;
+        }
+
+        return redirect()->route('otp.verify', [
+            'email' => $email,
+            'flow' => 'forgot_password',
+        ])->with('status', 'A reset code was already sent. Enter it to continue.');
+    }
+
+    private function pendingPasswordResetOtpEmail(?string $requestedEmail = null): ?string
+    {
+        if (session('is_forgot_password') !== true || !session('password_reset_token')) {
+            return null;
+        }
+
+        $deliveryEmail = session('otp_email') ?: session('password_reset_email');
+
+        if (!$deliveryEmail) {
+            return null;
+        }
+
+        if ($requestedEmail) {
+            $requestedEmail = Str::lower(trim((string) $requestedEmail));
+            $validEmails = collect([
+                session('otp_email'),
+                session('password_reset_email'),
+            ])
+                ->filter()
+                ->map(fn (string $email) => Str::lower(trim($email)));
+
+            if (!$validEmails->contains($requestedEmail)) {
+                return null;
+            }
+        }
+
+        return $deliveryEmail;
     }
 
     private function ensureResetRequestIsNotRateLimited(Request $request): void

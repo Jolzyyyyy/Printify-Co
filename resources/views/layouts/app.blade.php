@@ -1575,7 +1575,7 @@
                 </a>
             </div>
 
-            <div class="hero-title-area"><p class="hero-kicker">Client Management Portal</p><h1 class="hero-main-title"><span>CUSTOMER</span> <span style="color:var(--yellow)">DASHBOARD</span></h1><p class="hero-subline">Manage orders, upload artwork, track progress, review notifications, and reach support from one upgraded customer workspace.</p></div>
+            <div class="hero-title-area"><p class="hero-kicker">Client Portal</p><h1 class="hero-main-title"><span>CUSTOMER</span> <span style="color:var(--yellow)">DASHBOARD</span></h1><p class="hero-subline">Manage orders, upload artwork, track progress, review notifications, and reach support from one upgraded customer workspace.</p></div>
             <div class="dots-container"><template x-for="(slide,index) in slides" :key="index"><button type="button" class="dot no-move" :class="activeSlide === index ? 'active' : ''" @click="goToSlide(index)" aria-label="Change header slide"></button></template></div>
             <div class="quick-actions-container">
                 <a href="{{ $orderCreateRoute }}" class="action-circle-group" @click="setSection('ORDERS')"><div class="action-circle circle-purple"><i data-lucide="file-plus-2" style="width:24px"></i></div><span class="action-label">New Print Job</span></a>
