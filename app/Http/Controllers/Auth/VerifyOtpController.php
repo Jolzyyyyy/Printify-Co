@@ -193,6 +193,14 @@ class VerifyOtpController extends Controller
         // Linisin ang otp-related session data
         $request->session()->forget(['otp_email', 'password_reset_email', 'auth_type']);
 
+        $intended = $this->safeCustomerIntendedUrl($request);
+
+        if ($intended) {
+            $request->session()->forget('url.intended');
+
+            return redirect()->to($intended)->with('status', 'Verified successfully!');
+        }
+
         // Redirect sa Dashboard
         return redirect()->route('dashboard')->with('status', 'Verified successfully!');
     }
@@ -357,5 +365,22 @@ class VerifyOtpController extends Controller
         $prefix = $portal === 'staff' ? 'staff-otp-resend:' : 'customer-otp-resend:';
 
         return $prefix . Str::transliterate(Str::lower((string) $email) . '|' . $ip);
+    }
+
+    private function safeCustomerIntendedUrl(Request $request): ?string
+    {
+        $intended = (string) $request->session()->get('url.intended', '');
+
+        if ($intended === '') {
+            return null;
+        }
+
+        $path = parse_url($intended, PHP_URL_PATH) ?: '';
+
+        if (!in_array($path, ['/cart', '/checkout', '/payment/checkout'], true)) {
+            return null;
+        }
+
+        return url($path);
     }
 }

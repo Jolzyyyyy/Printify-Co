@@ -21,8 +21,10 @@ class RegisteredUserController extends Controller
     /**
      * Ipakita ang registration view (login.blade.php handles both).
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        $this->storeSafeIntendedUrl($request);
+
         return view('auth.login'); // Dahil split-screen ang design mo
     }
 
@@ -108,5 +110,20 @@ class RegisteredUserController extends Controller
          */
         return redirect()->route('otp.verify', ['email' => $user->email])
             ->with('status', 'Registration successful! Please check your email for the verification code.');
+    }
+
+    private function storeSafeIntendedUrl(Request $request): void
+    {
+        $intended = (string) $request->query('intended', '');
+
+        if ($intended === '') {
+            return;
+        }
+
+        $path = parse_url($intended, PHP_URL_PATH) ?: '';
+
+        if (in_array($path, ['/cart', '/checkout', '/payment/checkout'], true)) {
+            $request->session()->put('url.intended', url($path));
+        }
     }
 }

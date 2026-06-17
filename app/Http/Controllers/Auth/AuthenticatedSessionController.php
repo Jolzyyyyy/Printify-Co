@@ -24,6 +24,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): View
     {
+        $this->storeSafeIntendedUrl($request);
+
         return view('auth.login', [
             'loginCooldownSeconds' => $this->customerLoginCooldownSeconds($request),
         ]);
@@ -208,5 +210,20 @@ class AuthenticatedSessionController extends Controller
         return RateLimiter::tooManyAttempts($key, self::CUSTOMER_LOGIN_MAX_ATTEMPTS)
             ? RateLimiter::availableIn($key)
             : 0;
+    }
+
+    private function storeSafeIntendedUrl(Request $request): void
+    {
+        $intended = (string) $request->query('intended', '');
+
+        if ($intended === '') {
+            return;
+        }
+
+        $path = parse_url($intended, PHP_URL_PATH) ?: '';
+
+        if (in_array($path, ['/cart', '/checkout', '/payment/checkout'], true)) {
+            $request->session()->put('url.intended', url($path));
+        }
     }
 }

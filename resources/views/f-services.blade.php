@@ -2823,7 +2823,6 @@ express:service.express, order:displayOrder[option.slug] || ((service.order*100)
   if(!text || /inquiry/i.test(text)) return "View price";
   return text.replace(/^from\s+/i,"").trim();
 } function pfsvcOpenOption(serviceKey,index){
-  if(typeof window.requireSignedInForOrder==="function"&&!window.requireSignedInForOrder())return false;
   pfsvcState.activeKey=serviceKey;
   pfsvcState.activeIndex=Number(index)||0;
   return pfsvcProceedSelected();
@@ -2928,7 +2927,6 @@ ${item.img ? `<img src="${item.img}" alt="${pfsvcSafe(item.title)}" loading="eag
   pfsvcState.activeIndex=index;
   pfsvcRenderDeck();
 } function pfsvcChooseOption(index){
-  if(typeof window.requireSignedInForOrder==="function"&&!window.requireSignedInForOrder())return false;
   pfsvcState.activeIndex=index;
   pfsvcRenderDeck();
   setTimeout(pfsvcProceedSelected,180);
@@ -2950,7 +2948,6 @@ ${item.img ? `<img src="${item.img}" alt="${pfsvcSafe(item.title)}" loading="eag
 serviceIcon:option.icon||service.icon, serviceImage:option.image||service.img, serviceId:option.serviceId, servicePriceText:String(option.price).replace(/<[^>]+>/g,"")
   };
 } function pfsvcProceedSelected(){
-  if(typeof window.requireSignedInForOrder==="function"&&!window.requireSignedInForOrder())return false;
   const payload=pfsvcPayload();
   pfsvcState.selected=payload;
   sessionStorage.setItem("selectedPrintifyService",JSON.stringify(payload));

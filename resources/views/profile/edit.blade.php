@@ -565,7 +565,7 @@
 <input x-ref="profilePhotoInput" id="profilePhoto" type="file" accept="image/*" hidden @change="openCrop($event)">
         </div>
 <div>
-<h1 class="prof-name" x-text="fullName">
+<h1 class="prof-name" x-text="displayName">
 </h1>
 <p class="prof-role">Customer Account</p>
 <p class="prof-loc">
@@ -604,7 +604,7 @@
 <div class="prof-title-wrap">
 <div>
 <h2 class="prof-card-title">Profile Information</h2>
-<p class="prof-subtitle">Personal Information, Address Details, and Account Details are combined in one clean box.</p>
+<p class="prof-subtitle">Personal Information, Philippine Address Details, and Account Details are combined in one clean box.</p>
 </div>
 </div>
 
@@ -637,6 +637,7 @@
 <path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0Z" stroke="currentColor" stroke-width="2"/>
 <circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
 </svg>Address Details</h3>
+<p class="prof-subtitle" style="margin-bottom:10px">Use Philippine address suggestions: start with region, then province/city, then barangay. Street/unit is the only free-form line.</p>
 <div class="prof-fields">
 <template x-for="f in address" :key="f.k">
 <div class="prof-field">
@@ -647,7 +648,16 @@
 </span>
 </template>
 <template x-if="editing">
-<input class="prof-input" type="text" x-model="p[f.k]" @input="markDirty()">
+<div>
+<input class="prof-input" type="text" x-model="p[f.k]" :list="f.options ? 'profile-'+f.k+'-options' : null" @input="markDirty()" :placeholder="f.ph || ''">
+<template x-if="f.options">
+<datalist :id="'profile-'+f.k+'-options'">
+<template x-for="option in f.options" :key="option">
+<option :value="option"></option>
+</template>
+</datalist>
+</template>
+</div>
 </template>
 </div>
 </template>
@@ -660,29 +670,17 @@
 <path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>Account Details</h3>
 <div class="prof-fields">
+<template x-for="f in account" :key="f.k">
 <div class="prof-field">
-<span class="prof-label">Username</span>
-<span class="prof-value" x-text="p.email">
-</span>
+<span class="prof-label" x-text="f.l"></span>
+<template x-if="!f.badge">
+<span class="prof-value" x-text="p[f.k]"></span>
+</template>
+<template x-if="f.badge">
+<span class="prof-badge" x-text="p[f.k]"></span>
+</template>
 </div>
-<div class="prof-field">
-<span class="prof-label">Last Login</span>
-<span class="prof-value" x-text="p.lastLogin">
-</span>
-</div>
-<div class="prof-field">
-<span class="prof-label">Member Since</span>
-<span class="prof-value" x-text="p.memberSince">
-</span>
-</div>
-<div class="prof-field">
-<span class="prof-label">Account Type</span>
-<span class="prof-value">Customer</span>
-</div>
-<div class="prof-field">
-<span class="prof-label">Account Status</span>
-<span class="prof-badge">Active</span>
-</div>
+</template>
 </div>
 </div>
         <div class="prof-savebar" x-show="editing || dirty || photoDirty" x-transition x-cloak>
@@ -887,18 +885,18 @@
 function printifyProfile(){return{
 csrf:@json(csrf_token()),updateUrl:@json(Route::has('profile.update')?route('profile.update'):url()->current()),saving:false,editing:false,dirty:false,photoDirty:false,suggest:false,allActs:false,datePickerOpen:false,selectedDateValue:@json(now()->format('Y-m-d')),selectedDateText:'Today is '+@json(now()->format('M d, Y')),photo:@json($photo),fullPhoto:@json($photo),saved:null,photoMenu:{open:false},viewPhoto:{open:false},toast:{show:false,text:''},to:null,
 crop:{open:false,src:'',x:0,y:0,z:1,file:null,drag:false,sx:0,sy:0,ox:0,oy:0,naturalW:0,naturalH:0,baseW:270,baseH:270,cropSize:270},
-p:{firstName:@json($firstName),lastName:@json($lastName),email:@json($user->email ?? ''),phone:@json($user->phone ?? ''),birthdate:@json($user->birthdate ?? ''),gender:@json($user->gender ?? ''),street:@json($user->street ?? ''),barangay:@json($user->barangay ?? ''),region:@json($user->region ?? ''),city:@json($user->city ?? ''),postalCode:@json($user->postal_code ?? ''),memberSince:@json(optional($user->created_at)->format('F d, Y') ?? ''),lastLogin:'Current session'},
-personal:[{k:'firstName',l:'First Name'},{k:'lastName',l:'Last Name'},{k:'email',l:'Email Address',t:'email'},{k:'phone',l:'Phone Number'},{k:'birthdate',l:'Birthdate'},{k:'gender',l:'Gender'}],address:[{k:'street',l:'Street Address'},{k:'region',l:'Region'},{k:'barangay',l:'Barangay'},{k:'city',l:'City'},{k:'postalCode',l:'Postal Code'}],prefs:[{k:'email',l:'Email Notifications',on:true},{k:'sms',l:'SMS Notifications',on:true},{k:'marketing',l:'Marketing Updates',on:false},{k:'orders',l:'Order Updates',on:true}],
+p:{firstName:@json($firstName),lastName:@json($lastName),username:@json($user->username ?? ''),email:@json($user->email ?? ''),alternateEmail:@json($user->backup_email ?? ''),phone:@json($user->phone ?? ''),birthdate:@json($user->birthdate ?? ''),gender:@json($user->gender ?? ''),street:@json($user->street ?? ''),barangay:@json($user->barangay ?? ''),region:@json($user->region ?? ''),province:@json($user->province ?? ''),city:@json($user->city ?? ''),postalCode:@json($user->postal_code ?? ''),memberSince:@json(optional($user->created_at)->format('F d, Y') ?? ''),lastLogin:'Current session',emailStatus:@json($user->email_verified_at ? 'Verified' : 'Unverified'),recoveryStatus:@json($user->backup_email ? 'Recovery email added' : 'Not set'),accountType:'Customer',accountStatus:'Active'},
+personal:[{k:'firstName',l:'First Name'},{k:'lastName',l:'Last Name'},{k:'username',l:'Username'},{k:'email',l:'Email Address',t:'email'},{k:'alternateEmail',l:'Alternate Email',t:'email'},{k:'phone',l:'Phone Number'},{k:'birthdate',l:'Birthdate'},{k:'gender',l:'Gender'}],address:[{k:'street',l:'Street / Unit / House No.',ph:'House no., street, subdivision'},{k:'region',l:'Region',options:['National Capital Region (NCR)','Cordillera Administrative Region (CAR)','Region I - Ilocos Region','Region II - Cagayan Valley','Region III - Central Luzon','Region IV-A - CALABARZON','MIMAROPA Region','Region V - Bicol Region','Region VI - Western Visayas','Region VII - Central Visayas','Region VIII - Eastern Visayas','Region IX - Zamboanga Peninsula','Region X - Northern Mindanao','Region XI - Davao Region','Region XII - SOCCSKSARGEN','Region XIII - Caraga','Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)']},{k:'province',l:'Province',ph:'Auto-suggest from PH province list'},{k:'city',l:'City / Municipality',ph:'City or municipality'},{k:'barangay',l:'Barangay',ph:'Barangay name'},{k:'postalCode',l:'Postal Code'}],account:[{k:'lastLogin',l:'Last Login'},{k:'memberSince',l:'Member Since'},{k:'emailStatus',l:'Email Verification',badge:true},{k:'recoveryStatus',l:'Recovery Email',badge:true},{k:'accountType',l:'Account Type'},{k:'accountStatus',l:'Account Status',badge:true}],prefs:[{k:'email',l:'Email Notifications',on:true},{k:'sms',l:'SMS Notifications',on:true},{k:'marketing',l:'Marketing Updates',on:false},{k:'orders',l:'Order Updates',on:true}],
 stats:[{n:24,l:'Total Orders',c:'ico-orange',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M6 7h12l1 14H5L6 7Z" stroke="currentColor" stroke-width="2"/><path d="M9 7a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="2"/></svg>'},{n:18,l:'Completed Orders',c:'ico-green',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5" stroke="currentColor" stroke-width="2"/></svg>'},{n:7,l:'Saved Designs',c:'ico-purple',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6M9 15l2 2 4-5" stroke="currentColor" stroke-width="2"/></svg>'},{n:3,l:'Pending Jobs',c:'ico-yellow',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2"/></svg>'}],
 acts:[{t:'Order #PRN-2026-0054 completed',d:'May 31, 2026 11:24 AM'},{t:'Uploaded design for Order #PRN-2026-0055',d:'May 31, 2026 10:43 AM'},{t:'Updated profile information',d:'May 31, 2026 10:15 AM'},{t:'Changed communication preference settings',d:'May 30, 2026 6:10 PM'},{t:'Logged in successfully',d:'May 30, 2026 5:58 PM'}],
 init(){this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs});this.syncHeader();window.addEventListener('pointermove',e=>this.dragMove(e));window.addEventListener('pointerup',()=>this.dragEnd());window.addEventListener('pointercancel',()=>this.dragEnd())},
-get fullName(){return `${this.p.firstName} ${this.p.lastName}`.trim()},get initials(){let parts=`${this.p.firstName||''} ${this.p.lastName||''}`.trim().split(/\s+/).filter(Boolean);return ((parts[0]?.[0]||'E')+(parts[1]?.[0]||'M')).toUpperCase()},get shownActs(){return this.allActs?this.acts:this.acts.slice(0,3)},get viewPhotoSrc(){return this.fullPhoto||this.photo},openDatePicker(){this.datePickerOpen=true},closeDatePicker(){this.datePickerOpen=false},applySelectedDate(){let d=new Date((this.selectedDateValue||'')+'T00:00:00');if(!Number.isNaN(d.getTime())){this.selectedDateText='Today is '+d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});this.toastMsg('Calendar date selected.')}this.closeDatePicker()},clone(v){return JSON.parse(JSON.stringify(v))},editAll(){this.editing=true;this.toastMsg('Edit mode enabled. Save Changes will appear after edits.')},markDirty(){this.dirty=true},markPhotoDirty(){this.photoDirty=true},togglePref(pr){pr.on=!pr.on;this.editing=true;this.markDirty();this.toastMsg(`${pr.l} turned ${pr.on?'On':'Off'}. Click Save Changes to keep it.`)},cancel(){let d=this.clone(this.saved);this.p=d.p;this.photo=d.photo;this.fullPhoto=d.fullPhoto||d.photo;this.prefs=d.prefs;this.editing=false;this.dirty=false;this.photoDirty=false;this.photoMenu.open=false;this.viewPhoto.open=false;this.syncHeader();this.toastMsg('Changes cancelled.')},
+get fullName(){return `${this.p.firstName} ${this.p.lastName}`.trim()},get displayName(){return (this.p.username||'').trim()||this.fullName},get initials(){let parts=(this.fullName||this.displayName).trim().split(/\s+/).filter(Boolean);return ((parts[0]?.[0]||'E')+(parts[1]?.[0]||'M')).toUpperCase()},get shownActs(){return this.allActs?this.acts:this.acts.slice(0,3)},get viewPhotoSrc(){return this.fullPhoto||this.photo},openDatePicker(){this.datePickerOpen=true},closeDatePicker(){this.datePickerOpen=false},applySelectedDate(){let d=new Date((this.selectedDateValue||'')+'T00:00:00');if(!Number.isNaN(d.getTime())){this.selectedDateText='Today is '+d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});this.toastMsg('Calendar date selected.')}this.closeDatePicker()},clone(v){return JSON.parse(JSON.stringify(v))},editAll(){this.editing=true;this.toastMsg('Edit mode enabled. Save Changes will appear after edits.')},markDirty(){this.dirty=true},markPhotoDirty(){this.photoDirty=true},togglePref(pr){pr.on=!pr.on;this.editing=true;this.markDirty();this.toastMsg(`${pr.l} turned ${pr.on?'On':'Off'}. Click Save Changes to keep it.`)},cancel(){let d=this.clone(this.saved);this.p=d.p;this.photo=d.photo;this.fullPhoto=d.fullPhoto||d.photo;this.prefs=d.prefs;this.editing=false;this.dirty=false;this.photoDirty=false;this.photoMenu.open=false;this.viewPhoto.open=false;this.syncHeader();this.toastMsg('Changes cancelled.')},
 openProfileFilePicker(){this.photoMenu.open=false;this.viewPhoto.open=false;this.$nextTick(()=>this.$refs.profilePhotoInput?.click())},handleProfilePhotoClick(){if(this.photo){this.photoMenu.open=!this.photoMenu.open}else{this.openProfileFilePicker()}},handleUploadButton(){if(this.photo){this.photoMenu.open=!this.photoMenu.open}else{this.openProfileFilePicker()}},viewProfilePhoto(){if(!this.photo){this.openProfileFilePicker();return}this.photoMenu.open=false;this.viewPhoto.open=true},closeViewProfilePhoto(){this.viewPhoto.open=false},changeProfilePhoto(){this.photoMenu.open=false;this.viewPhoto.open=false;this.openProfileFilePicker()},
-profilePayload(source=this.p,prefs=this.prefs){return{first_name:source.firstName,last_name:source.lastName,name:`${source.firstName||''} ${source.lastName||''}`.trim(),email:source.email,phone:source.phone,birthdate:source.birthdate,gender:source.gender,street:source.street,barangay:source.barangay,region:source.region,city:source.city,postal_code:source.postalCode,preferences:prefs}},
+profilePayload(source=this.p,prefs=this.prefs){return{first_name:source.firstName,last_name:source.lastName,name:`${source.firstName||''} ${source.lastName||''}`.trim(),username:source.username,email:source.email,backup_email:source.alternateEmail,phone:source.phone,birthdate:source.birthdate,gender:source.gender,street:source.street,barangay:source.barangay,region:source.region,province:source.province,city:source.city,postal_code:source.postalCode,preferences:prefs}},
 async save(){this.saving=true;let wasPhotoOnly=this.photoDirty&&!this.dirty,base=this.dirty?this.profilePayload(this.p,this.prefs):this.profilePayload(this.saved.p,this.saved.prefs);let payload={...base};if(this.photoDirty)payload.photo_base64=this.photo;let serverSaved=false;try{let r=await fetch(this.updateUrl,{method:'PATCH',headers:{'X-CSRF-TOKEN':this.csrf,'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(payload)});serverSaved=r.ok;if(!r.ok)throw new Error('Profile save failed')}catch(e){this.saving=false;this.toastMsg('Profile was not saved. Please check the details and try again.');return}this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs});this.editing=false;this.dirty=false;this.photoDirty=false;this.saving=false;this.syncHeader();this.toastMsg(serverSaved?(wasPhotoOnly?'Profile photo updated successfully.':'Profile updated successfully.'):'Profile saved successfully.')},
 openCrop(e){let f=e.target.files[0];e.target.value='';if(!f)return;if(!f.type.startsWith('image/')){this.toastMsg('Please upload a valid image file.');return}let reader=new FileReader();reader.onload=()=>{let src=reader.result,img=new Image();img.onload=()=>{let cropSize=286,aspect=img.naturalWidth/img.naturalHeight,baseW=cropSize,baseH=cropSize;if(aspect>=1){baseW=cropSize*aspect}else{baseH=cropSize/aspect}this.fullPhoto=src;this.crop={open:true,src,x:0,y:0,z:1,file:f,drag:false,sx:0,sy:0,ox:0,oy:0,naturalW:img.naturalWidth,naturalH:img.naturalHeight,baseW,baseH,cropSize};this.toastMsg('Drag, zoom, preview, then apply the profile photo.')};img.src=src};reader.readAsDataURL(f)},closeCrop(){this.crop.open=false;this.crop.drag=false},resetCrop(){this.crop.x=0;this.crop.y=0;this.crop.z=1},centerCrop(){this.crop.x=0;this.crop.y=0},clampZoom(v){return Math.max(1,Math.min(2.8,Number(v.toFixed(2))))},zoomBy(v){this.crop.z=this.clampZoom(this.crop.z+v)},wheelZoom(e){this.zoomBy((e.deltaY < 0 ? 0.06 : -0.06))},previewVars(){let preview=58,scale=preview/(this.crop.cropSize||286);return `--pw:${this.crop.baseW*scale}px; --ph:${this.crop.baseH*scale}px; --px:${this.crop.x*scale}px; --py:${this.crop.y*scale}px; --pz:${this.crop.z};`},dragStart(e){if(!this.crop.open)return;this.crop.drag=true;this.crop.sx=e.clientX;this.crop.sy=e.clientY;this.crop.ox=this.crop.x;this.crop.oy=this.crop.y;if(e.currentTarget&&e.currentTarget.setPointerCapture){try{e.currentTarget.setPointerCapture(e.pointerId)}catch(err){}}},dragMove(e){if(!this.crop.drag||!e)return;this.crop.x=this.crop.ox+(e.clientX-this.crop.sx);this.crop.y=this.crop.oy+(e.clientY-this.crop.sy)},dragEnd(){this.crop.drag=false},
 async savePhotoOnly(){this.saving=true;let payload={...this.profilePayload(this.saved?.p||this.p,this.saved?.prefs||this.prefs),photo_base64:this.photo};try{let r=await fetch(this.updateUrl,{method:'PATCH',headers:{'X-CSRF-TOKEN':this.csrf,'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('Profile photo upload failed');this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs});this.photoDirty=false;this.saving=false;this.syncHeader();this.toastMsg('Profile photo uploaded successfully.')}catch(e){this.saving=false;this.photoDirty=true;this.toastMsg('Photo preview is ready, but upload failed. Click Save Changes to try again.')}},
 applyCrop(){let img=new Image();img.onload=async()=>{let c=document.createElement('canvas'),ctx=c.getContext('2d'),out=512,crop=this.crop.cropSize||286,f=out/crop;c.width=out;c.height=out;ctx.fillStyle='#fff';ctx.fillRect(0,0,out,out);let w=this.crop.baseW*this.crop.z*f,h=this.crop.baseH*this.crop.z*f,x=out/2-w/2+this.crop.x*f,y=out/2-h/2+this.crop.y*f;ctx.drawImage(img,x,y,w,h);this.photo=c.toDataURL('image/png');this.fullPhoto=this.crop.src;this.crop.open=false;this.crop.drag=false;this.markPhotoDirty();this.syncHeader();this.toastMsg('Uploading profile photo...');await this.savePhotoOnly()};img.src=this.crop.src},
-syncHeader(){let d={name:this.fullName,photo:this.photo,initials:this.initials};window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:d}));document.querySelectorAll('[data-profile-name],.header-profile-name,.user-name').forEach(el=>el.textContent=d.name);document.querySelectorAll('[data-profile-avatar],.header-profile-img,.profile-avatar-img').forEach(el=>{if(d.photo){if(el.tagName==='IMG')el.src=d.photo;else el.style.backgroundImage=`url(${d.photo})`}});document.querySelectorAll('[data-profile-initials],.header-profile-initials').forEach(el=>el.textContent=d.initials)},toastMsg(t){this.toast.text=t;this.toast.show=true;clearTimeout(this.to);this.to=setTimeout(()=>this.toast.show=false,2400)}
+syncHeader(){let d={name:this.displayName,photo:this.photo,initials:this.initials};window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:d}));document.querySelectorAll('[data-profile-name],.header-profile-name,.user-name').forEach(el=>el.textContent=d.name);document.querySelectorAll('[data-profile-avatar],.header-profile-img,.profile-avatar-img').forEach(el=>{if(d.photo){if(el.tagName==='IMG')el.src=d.photo;else el.style.backgroundImage=`url(${d.photo})`}});document.querySelectorAll('[data-profile-initials],.header-profile-initials').forEach(el=>el.textContent=d.initials)},toastMsg(t){this.toast.text=t;this.toast.show=true;clearTimeout(this.to);this.to=setTimeout(()=>this.toast.show=false,2400)}
 }}
 </script></x-app-layout>

@@ -13,11 +13,34 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'admin_client_id',
-        'admin_client_id',
+        'order_reference',
         'customer_name',
         'customer_email',
+        'customer_phone',
         'status',
         'total_price',
+        'checkout_details',
+        'payment_method',
+        'payment_provider',
+        'payment_checkout_id',
+        'payment_reference',
+        'paid_at',
+        'receipt_number',
+        'receipt_sent_at',
+        'delivery_method',
+        'delivery_address',
+        'delivery_booking_status',
+        'delivery_tracking_number',
+        'delivery_tracking_url',
+        'delivery_booked_at',
+    ];
+
+    protected $casts = [
+        'checkout_details' => 'array',
+        'total_price' => 'decimal:2',
+        'paid_at' => 'datetime',
+        'receipt_sent_at' => 'datetime',
+        'delivery_booked_at' => 'datetime',
     ];
 
     public function user()
