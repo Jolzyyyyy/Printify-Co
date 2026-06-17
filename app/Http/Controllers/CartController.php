@@ -209,8 +209,52 @@ class CartController extends Controller
         $cart = [];
 
         foreach ($validated['items'] as $idx => $i) {
-            $key = !empty($i['service_code']) ? $i['service_code'] : ('LS-' . $idx . '-' . uniqid());
+            $priceType = $i['price_type'] ?? 'retail';
+            $qty = (int) $i['qty'];
+            $variation = $this->findSyncedVariation($i);
+
+            if ($variation) {
+                $service = $variation->service;
+                $key = $service->id . '_' . $variation->id . '_' . $priceType;
+                $price = $priceType === 'bulk'
+                    ? (float) $variation->bulk_price
+                    : (float) $variation->retail_price;
+
+                if (isset($cart[$key])) {
+                    $cart[$key]['qty'] += $qty;
+                    $cart[$key]['price'] = $price;
+                    $cart[$key]['price_type'] = $priceType;
+                    continue;
+                }
+
+                $cart[$key] = [
+                    'service_id'      => $service->id,
+                    'variation_id'    => $variation->id,
+                    'service_item_id' => $variation->service_item_id,
+                    'name'            => $service->name,
+                    'category'        => $service->category,
+                    'variation_label' => $variation->variation_label,
+                    'unit'            => $service->unit,
+                    'price'           => $price,
+                    'price_type'      => $priceType,
+                    'qty'             => $qty,
+                    'image_path'      => $variation->variation_image_path ?? $service->image_path,
+                ];
+
+                continue;
+            }
+
+            $key = !empty($i['service_code'])
+                ? $i['service_code']
+                : ($i['service_item_id'] ?? ('LS-' . $idx . '-' . uniqid()));
             $unitPrice = (float) ($i['unit_price'] ?? $i['price'] ?? 0);
+
+            if (isset($cart[$key])) {
+                $cart[$key]['qty'] += $qty;
+                $cart[$key]['price'] = $unitPrice;
+                $cart[$key]['price_type'] = $priceType;
+                continue;
+            }
 
             $cart[$key] = [
                 'service_id'      => (int) ($i['service_id'] ?? 0),
@@ -221,8 +265,8 @@ class CartController extends Controller
                 'variation_label' => $i['variation_label'] ?? null,
                 'unit'            => $i['unit'] ?? null,
                 'price'           => $unitPrice,
-                'price_type'      => $i['price_type'] ?? 'retail',
-                'qty'             => (int) $i['qty'],
+                'price_type'      => $priceType,
+                'qty'             => $qty,
                 'image_path'      => $i['image_path'] ?? null,
             ];
         }
@@ -266,5 +310,33 @@ class CartController extends Controller
 
         // ✅ go to SAME checkout page
         return response()->json(['ok' => true]);
+    }
+
+    private function findSyncedVariation(array $item): ?ServiceVariation
+    {
+        $variationId = (int) ($item['variation_id'] ?? 0);
+
+        if ($variationId > 0) {
+            $variation = ServiceVariation::with('service')
+                ->where('id', $variationId)
+                ->where('is_active', true)
+                ->first();
+
+            if ($variation && $variation->service?->is_active) {
+                return $variation;
+            }
+        }
+
+        $serviceItemId = $item['service_item_id'] ?? $item['service_code'] ?? null;
+
+        if (!$serviceItemId) {
+            return null;
+        }
+
+        return ServiceVariation::with('service')
+            ->where('service_item_id', $serviceItemId)
+            ->where('is_active', true)
+            ->whereHas('service', fn ($query) => $query->where('is_active', true))
+            ->first();
     }
 }

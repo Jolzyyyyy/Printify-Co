@@ -47,11 +47,11 @@
 </div>
 </div>
 <div class="form-row">
-<span>Phone Number</span>
+<span>Mobile Number</span>
 <div class="input-wrapper">
 <i class="fa-solid fa-phone">
 </i>
-<input type="tel" name="phone" placeholder="Enter your phone number">
+<input type="tel" name="phone" placeholder="09171234567 or +639171234567" inputmode="tel">
 </div>
 </div>
 <div class="form-row message-row">

@@ -89,6 +89,7 @@ class AdminClientAccessTest extends TestCase
             'user_id' => $adminClient->id,
             'business_name' => 'Client Studio',
             'contact_person' => 'Client Owner',
+            'contact_number' => '+639170000000',
         ]);
     }
 

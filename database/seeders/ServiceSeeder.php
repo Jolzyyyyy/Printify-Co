@@ -9,74 +9,59 @@ class ServiceSeeder extends Seeder
 {
     public function run(): void
     {
-        $services = [
-
-            [
-                'name' => 'Document Printing',
-                'category' => 'Printing',
-                'retail_price' => 5,
-                'bulk_price' => 4,
-                'description' => 'Professional document printing services.',
-                'image_path' => 'images/services/document-printing.jpg',
-                'is_active' => true,
-            ],
-
-            [
-                'name' => 'Photocopy & Scanning',
-                'category' => 'Printing',
-                'retail_price' => 3,
-                'bulk_price' => 2,
-                'description' => 'High speed photocopy and scanning services.',
-                'image_path' => 'images/services/photocopy.jpg',
-                'is_active' => true,
-            ],
-
-            [
-                'name' => 'ID & Photo Services',
-                'category' => 'Photo',
-                'retail_price' => 60,
-                'bulk_price' => 60,
-                'description' => 'Professional ID and photo printing services.',
-                'image_path' => 'images/services/id-photo.jpg',
-                'is_active' => true,
-            ],
-
-            [
-                'name' => 'Lamination & Binding',
-                'category' => 'Finishing',
-                'retail_price' => 25,
-                'bulk_price' => 20,
-                'description' => 'Document lamination and binding.',
-                'image_path' => 'images/services/lamination.jpg',
-                'is_active' => true,
-            ],
-
-            [
-                'name' => 'Large Format Printing',
-                'category' => 'Large Format',
-                'retail_price' => 100,
-                'bulk_price' => 95,
-                'description' => 'Tarpaulin and large format printing.',
-                'image_path' => 'images/services/tarpaulin.jpg',
-                'is_active' => true,
-            ],
-
-            [
-                'name' => 'Custom Special Printing',
-                'category' => 'Custom',
-                'retail_price' => 150,
-                'bulk_price' => 140,
-                'description' => 'Special custom printing services.',
-                'image_path' => 'images/services/custom.jpg',
-                'is_active' => true,
-            ],
-        ];
-
-        foreach ($services as $service) {
+        foreach ($this->servicesFromCatalog() as $service) {
             Service::updateOrCreate(
                 ['name' => $service['name']],
                 $service
             );
         }
+    }
+
+    private function servicesFromCatalog(): array
+    {
+        $descriptions = [
+            'Checkout Preview Printing' => 'Internal checkout preview item used to verify checkout pricing.',
+            'Custom Special Printing' => 'Special custom printing services.',
+            'Document Printing' => 'Professional document printing services.',
+            'ID & Photo Services' => 'Professional ID and photo printing services.',
+            'Lamination & Binding' => 'Document lamination and binding.',
+            'Large Format Printing' => 'Tarpaulin and large format printing.',
+            'Photocopy & Scanning' => 'High speed photocopy and scanning services.',
+        ];
+
+        $images = [
+            'Checkout Preview Printing' => 'images/services/document-printing.jpg',
+            'Custom Special Printing' => 'images/services/custom.jpg',
+            'Document Printing' => 'images/services/document-printing.jpg',
+            'ID & Photo Services' => 'images/services/id-photo.jpg',
+            'Lamination & Binding' => 'images/services/lamination.jpg',
+            'Large Format Printing' => 'images/services/tarpaulin.jpg',
+            'Photocopy & Scanning' => 'images/services/photocopy.jpg',
+        ];
+
+        return collect(ServiceCatalogCsv::rows())
+            ->groupBy('service')
+            ->map(function ($rows, string $serviceName) use ($descriptions, $images) {
+                $category = $rows->first()['category'] ?? null;
+                $retailPrices = $rows
+                    ->map(fn ($row) => ServiceCatalogCsv::numericPrice($row['retail_price'] ?? null))
+                    ->filter(fn ($price) => $price > 0);
+                $bulkPrices = $rows
+                    ->map(fn ($row) => ServiceCatalogCsv::numericPrice($row['bulk_price'] ?? null))
+                    ->filter(fn ($price) => $price > 0);
+
+                return [
+                    'name' => $serviceName,
+                    'category' => $category,
+                    'retail_price' => $retailPrices->min() ?? 0,
+                    'bulk_price' => $bulkPrices->min() ?? 0,
+                    'description' => $descriptions[$serviceName] ?? 'Printing service.',
+                    'image_path' => $images[$serviceName] ?? null,
+                    'is_active' => true,
+                ];
+            })
+            ->sortKeys()
+            ->values()
+            ->all();
     }
 }

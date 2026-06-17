@@ -388,6 +388,14 @@ html{scroll-behavior:smooth}
   margin:0!important;
   font-size:12px!important;
 }
+#checkout .pfy-card-shipping.is-disabled{
+  opacity:.62!important;
+}
+#checkout .pfy-card-shipping.is-disabled input,
+#checkout .pfy-card-shipping.is-disabled select,
+#checkout .pfy-card-shipping.is-disabled .pfy-section-control{
+  cursor:not-allowed!important;
+}
 #checkout .pfy-summary{
   padding:16px 16px 15px!important;
 }
@@ -627,6 +635,12 @@ html{scroll-behavior:smooth}
       </div>
 
       <div class="pfy-form-group pfy-customer-shipping">
+        @php
+          $checkoutUser = auth()->user();
+          $checkoutPhone = $checkoutUser?->phone
+              ? \App\Services\PhilippinePhoneNumber::normalize($checkoutUser->phone)
+              : null;
+        @endphp
         <section class="pfy-card pfy-card-customer">
           <div class="pfy-card-head">
             <div class="pfy-card-title"><span class="pfy-card-icon"><i class="fa-solid fa-user"></i></span><div><h2>Customer Information</h2><p>We'll use this information to contact you about your order.</p></div></div>
@@ -634,10 +648,10 @@ html{scroll-behavior:smooth}
           <div class="pfy-card-body">
             <input type="hidden" id="fullName" value="{{ old('fullName', Auth::check() ? Auth::user()->name : '') }}">
             <div class="pfy-field-grid">
-              <div class="pfy-field"><label for="firstName">First Name</label><input type="text" id="firstName" placeholder="First Name" autocomplete="given-name" required></div>
-              <div class="pfy-field"><label for="lastName">Last Name</label><input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name" required></div>
+              <div class="pfy-field"><label for="firstName">First Name</label><input type="text" id="firstName" placeholder="First Name" value="{{ old('firstName', $checkoutUser?->first_name ?? '') }}" autocomplete="given-name" required></div>
+              <div class="pfy-field"><label for="lastName">Last Name</label><input type="text" id="lastName" placeholder="Last Name" value="{{ old('lastName', $checkoutUser?->last_name ?? '') }}" autocomplete="family-name" required></div>
               <div class="pfy-field"><label for="email">Email Address</label><input type="email" id="email" placeholder="Email Address" value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}" autocomplete="email" required></div>
-              <div class="pfy-field"><label for="phone">Phone Number</label><input type="tel" id="phone" placeholder="Phone Number" value="{{ old('phone', '') }}" autocomplete="tel" required></div>
+              <div class="pfy-field"><label for="phone">Mobile Number</label><input type="tel" id="phone" placeholder="09171234567 or +639171234567" value="{{ old('phone', $checkoutPhone ?? '') }}" autocomplete="tel" inputmode="tel" pattern="^(09\d{9}|\+639\d{9}|639\d{9})$" title="Use a valid Philippine mobile number: 09171234567 or +639171234567" required></div>
             </div>
           </div>
         </section>
@@ -650,13 +664,14 @@ html{scroll-behavior:smooth}
           <div class="pfy-card-body">
             <div class="pfy-field-grid two">
               <div class="pfy-field full"><label for="street">Street Address</label><input type="text" id="street" placeholder="Street Address" value="{{ old('street', '') }}" autocomplete="street-address" required></div>
-              <div class="pfy-field full"><label for="apartment">Apartment, suite, etc. (optional)</label><input type="text" id="apartment" placeholder="Apartment, suite, etc. (optional)" value="{{ old('apartment', '') }}"></div>
+              <div class="pfy-field full"><label for="apartment">House / Unit / Landmark</label><input type="text" id="apartment" placeholder="House / Unit / Landmark" value="{{ old('apartment', '') }}" autocomplete="address-line2" required></div>
             </div>
             <div class="pfy-field-grid four">
-              <div class="pfy-field"><label for="city">City / Town</label><input type="text" id="city" placeholder="City / Town" value="{{ old('city', '') }}" required></div>
-              <div class="pfy-field"><label for="province">State / Province</label><input type="text" id="province" placeholder="State / Province" value="{{ old('province', '') }}" required></div>
+              <div class="pfy-field"><label for="country">Country</label><select id="country" data-old="{{ old('country', 'Philippines') }}"><option value="Philippines" selected>Philippines</option></select></div>
+              <div class="pfy-field"><label for="province">State / Province</label><select id="province" data-old="{{ old('province', '') }}" required><option value="">State / Province</option></select></div>
+              <div class="pfy-field"><label for="city">City / Town</label><select id="city" data-old="{{ old('city', '') }}" required disabled><option value="">City / Town</option></select></div>
+              <div class="pfy-field"><label for="barangay">Barangay</label><select id="barangay" data-old="{{ old('barangay', '') }}" required disabled><option value="">Barangay</option></select></div>
               <div class="pfy-field"><label for="postal">Postal Code</label><input type="text" id="postal" placeholder="Postal Code" value="{{ old('postal', '') }}" required></div>
-              <div class="pfy-field"><label for="country">Country</label><select id="country"><option value="Philippines" selected>Philippines</option></select></div>
             </div>
           </div>
         </section>
@@ -742,6 +757,33 @@ function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,function(
 function normalizeNumber(value){return Number(String(value||0).replace(/[^0-9.]/g,""))||0}
 function showToast(message,type){if(!els.toast)return;els.toast.textContent=message;els.toast.classList.remove("is-success","is-error","is-info");els.toast.classList.add(type==="success"?"is-success":type==="error"?"is-error":"is-info","show");clearTimeout(showToast.timer);showToast.timer=setTimeout(function(){els.toast.classList.remove("show")},3600)}
 function makeOrderReference(){return "PFY-"+new Date().getFullYear()+"-"+Date.now().toString(36).toUpperCase().slice(-6)+"-"+Math.random().toString(36).slice(2,5).toUpperCase()}
+function normalizePhilippineMobile(value){
+  const cleaned=String(value||"").trim().replace(/[^\d+]/g,"");
+  if(!cleaned)return "";
+  if(/^09\d{9}$/.test(cleaned))return "+63"+cleaned.slice(1);
+  if(/^639\d{9}$/.test(cleaned))return "+"+cleaned;
+  if(/^\+639\d{9}$/.test(cleaned))return cleaned;
+  return "";
+}
+function syncCheckoutPhone(showInvalidMessage){
+  const input=document.getElementById("phone");
+  if(!input)return true;
+  const raw=input.value.trim();
+  if(!raw){
+    input.setCustomValidity("");
+    return false;
+  }
+  const normalized=normalizePhilippineMobile(raw);
+  if(!normalized){
+    input.value="";
+    input.setCustomValidity("Use a valid Philippine mobile number: 09171234567 or +639171234567.");
+    if(showInvalidMessage)showToast("Please enter a valid Philippine mobile number starting with 09 or +639.","error");
+    return false;
+  }
+  input.value=normalized;
+  input.setCustomValidity("");
+  return true;
+}
 function sourceItems(){const checkoutItems=safeJson("printifyCheckoutItems","[]");const active=safeJson("printifyActiveCheckout","null");const cartItems=safeJson("printifyCartItems","[]");const oldCartItems=safeJson("cartItems","[]");if(Array.isArray(checkoutItems)&&checkoutItems.length)return checkoutItems;if(active&&typeof active==="object")return [active];if(Array.isArray(cartItems)&&cartItems.length)return cartItems;if(Array.isArray(oldCartItems)&&oldCartItems.length)return oldCartItems;return []}
 function firstMeta(item){if(Array.isArray(item.meta))return item.meta;const meta=[];if(item.category)meta.push(item.category);if(item.paperSize||item.colorVariation)meta.push([item.paperSize,item.colorVariation].filter(Boolean).join(" - "));if(item.serviceOption)meta.push(item.serviceOption);if(item.fileName)meta.push("File: "+item.fileName);return meta.filter(Boolean)}
 function normalizeCheckoutItem(item,index){const raw=item&&typeof item==="object"?item:{};const qty=Math.max(1,parseInt(raw.qty||raw.quantity||1,10)||1);const lineTotal=normalizeNumber(raw.total||raw.lineTotal||raw.amountTotal);const rawPrice=normalizeNumber(raw.price||raw.unitPrice||raw.unit_price||raw.amount);const price=rawPrice||(lineTotal&&qty?lineTotal/qty:0);const name=raw.name||raw.serviceName||raw.title||raw.summaryTitle||"Print Item";const meta=firstMeta(raw);const image=raw.image||raw.img||raw.thumbnail||raw.previewImage||"";return {id:String(raw.id||"checkout-item-"+index),name:String(name),qty:qty,price:Number(money(price)),lineTotal:Number(money(lineTotal||price*qty)),image:image,meta:meta,raw:raw,fileName:raw.fileName||((raw.fileMeta&&raw.fileMeta.name)||"")}}
@@ -757,23 +799,93 @@ function renderCheckoutBreadcrumb(){const first=state.items[0]||{};const raw=fir
 function renderTotals(){calculateTotals();const count=itemCount();if(els.summaryItemCount)els.summaryItemCount.textContent=count+" "+(count===1?"Item":"Items");if(els.subtotal)els.subtotal.textContent=peso(state.totals.subtotal);if(els.discount)els.discount.textContent="-"+peso(state.totals.discount);if(els.shippingCost)els.shippingCost.textContent=state.totals.shipping===0?"₱0.00":peso(state.totals.shipping);if(els.shippingLabel)els.shippingLabel.textContent="Shipping ("+selectedShipping().name+")";if(els.total)els.total.textContent=peso(state.totals.total)}
 function updateStep(step){document.querySelectorAll(".pfy-step").forEach(function(node){const current=Number(node.dataset.step);node.classList.toggle("is-active",current===step);node.classList.toggle("is-done",current<step)})}
 function hasValues(ids){return ids.every(function(id){const input=document.getElementById(id);return input&&input.value.trim()})}
-function syncCheckoutStep(){syncFullName();if(!state.items.length){updateStep(1);return}const customerDone=hasValues(["firstName","lastName","email","phone"]);const pickup=selectedShipping().type==="pickup";const shippingDone=pickup||hasValues(["street","city","province","postal"]);if(customerDone&&shippingDone){updateStep(3);return}if(customerDone){updateStep(2);return}updateStep(1)}
+let locationCatalog={provinces:[]};
+let locationCatalogLoaded=false;
+async function loadLocationCatalog(){
+  if(locationCatalogLoaded)return locationCatalog;
+  const province=document.getElementById("province"),city=document.getElementById("city"),barangay=document.getElementById("barangay");
+  [province,city,barangay].forEach(function(select){if(select)select.disabled=true});
+  try{
+    const response=await fetch("{{ asset('data/ph-locations.json') }}",{headers:{"Accept":"application/json"}});
+    if(!response.ok)throw new Error("Unable to load Philippine location catalog.");
+    const data=await response.json();
+    locationCatalog={provinces:Array.isArray(data.provinces)?data.provinces:[]};
+    locationCatalogLoaded=true;
+    return locationCatalog;
+  }catch(error){
+    console.error("PSGC location catalog failed to load:",error);
+    showToast("Location list could not load. Please refresh the checkout page.","error");
+    return locationCatalog;
+  }
+}
+function setSelectOptions(select,options,placeholder,selectedValue){
+  if(!select)return;
+  const rows=options.map(function(option){const label=typeof option==="string"?option:option.name;return '<option value="'+escapeHtml(label)+'">'+escapeHtml(label)+'</option>'}).join("");
+  select.innerHTML='<option value="">'+escapeHtml(placeholder)+'</option>'+rows;
+  const labels=options.map(function(option){return typeof option==="string"?option:option.name});
+  if(selectedValue&&labels.includes(selectedValue))select.value=selectedValue;
+}
+function selectedProvinceRecord(){
+  const province=document.getElementById("province");
+  return locationCatalog.provinces.find(function(item){return item.name===(province?province.value:"")})||null;
+}
+function selectedCityRecord(){
+  const city=document.getElementById("city"),provinceRecord=selectedProvinceRecord();
+  return (provinceRecord?.cities||[]).find(function(item){return item.name===(city?city.value:"")})||null;
+}
+async function setupLocationDropdowns(){
+  const country=document.getElementById("country"),province=document.getElementById("province"),city=document.getElementById("city"),barangay=document.getElementById("barangay");
+  if(!country||!province||!city||!barangay)return;
+  await loadLocationCatalog();
+  setSelectOptions(province,locationCatalog.provinces,"State / Province",province.dataset.old||province.value||"");
+  province.disabled=!locationCatalog.provinces.length;
+  function populateCities(){
+    const provinceRecord=selectedProvinceRecord();
+    const cities=provinceRecord?.cities||[];
+    const selectedCity=city.dataset.old||city.value||"";
+    setSelectOptions(city,cities,"City / Town",selectedCity);
+    city.disabled=!province.value||!cities.length;
+    if(!cities.some(function(item){return item.name===city.value}))city.value="";
+    populateBarangays();
+  }
+  function populateBarangays(){
+    const cityRecord=selectedCityRecord();
+    const barangays=cityRecord?.barangays||[];
+    const selectedBarangay=barangay.dataset.old||barangay.value||"";
+    setSelectOptions(barangay,barangays,"Barangay",selectedBarangay);
+    barangay.disabled=!city.value||!barangays.length;
+    if(!barangays.some(function(item){return item.name===barangay.value}))barangay.value="";
+  }
+  province.addEventListener("change",function(){city.dataset.old="";barangay.dataset.old="";populateCities();syncCheckoutStep()});
+  city.addEventListener("change",function(){barangay.dataset.old="";populateBarangays();syncCheckoutStep()});
+  barangay.addEventListener("change",syncCheckoutStep);
+  populateCities();
+}
+function syncCheckoutStep(){syncFullName();if(!state.items.length){updateStep(1);return}const customerDone=hasValues(["firstName","lastName","email","phone"]);const pickup=selectedShipping().type==="pickup";const shippingDone=pickup||hasValues(["street","apartment","province","city","barangay","postal"]);if(customerDone&&shippingDone){updateStep(3);return}if(customerDone){updateStep(2);return}updateStep(1)}
 function updateRadioCards(){document.querySelectorAll("[data-radio-wrap]").forEach(function(label){const input=label.querySelector('input[type="radio"]');label.classList.toggle("is-selected",Boolean(input&&input.checked))})}
-function syncPickupAddressState(){const pickup=selectedShipping().type==="pickup";["street","city","province","postal"].forEach(function(id){const input=document.getElementById(id);if(input)input.required=!pickup})}
-function validateForm(){syncFullName();const pickup=selectedShipping().type==="pickup";const required=pickup?["firstName","lastName","email","phone"]:["firstName","lastName","email","phone","street","city","province","postal"];for(const id of required){const input=document.getElementById(id);if(input&&!input.value.trim()){input.focus();showToast("Please complete all required checkout fields.","error");return false}}if(!state.items.length){showToast("Checkout is empty. Please add a service first.","error");return false}return true}
-function buildCompletedOrder(){syncFullName();return {reference:makeOrderReference(),items:state.items.map(function(item){return item.raw&&Object.keys(item.raw).length?item.raw:item}),totals:state.totals,customer:{fullName:document.getElementById("fullName").value.trim(),firstName:document.getElementById("firstName").value.trim(),lastName:document.getElementById("lastName").value.trim(),email:document.getElementById("email").value.trim(),phone:document.getElementById("phone").value.trim()},shippingAddress:{street:document.getElementById("street").value.trim(),apartment:document.getElementById("apartment").value.trim(),city:document.getElementById("city").value.trim(),province:document.getElementById("province").value.trim(),postal:document.getElementById("postal").value.trim(),country:document.getElementById("country").value},delivery:selectedShipping(),payment:selectedPayment(),notes:els.notes?els.notes.value.trim():"",promoCode:state.promoCode,createdAt:new Date().toISOString(),status:"placed"}}
+function syncPickupAddressState(){const pickup=selectedShipping().type==="pickup";const shippingCard=document.querySelector(".pfy-card-shipping");if(shippingCard)shippingCard.classList.toggle("is-disabled",pickup);["differentAddress","country","street","apartment","province","city","barangay","postal"].forEach(function(id){const input=document.getElementById(id);if(input){input.required=!pickup&&id!=="differentAddress"&&id!=="country";input.disabled=pickup;input.classList.toggle("is-disabled",pickup);if(pickup&&id==="differentAddress")input.checked=false}})}
+function validateForm(){syncFullName();const pickup=selectedShipping().type==="pickup";const required=pickup?["firstName","lastName","email","phone"]:["firstName","lastName","email","phone","street","apartment","province","city","barangay","postal"];for(const id of required){const input=document.getElementById(id);if(input&&!input.value.trim()){input.focus();showToast(pickup?"Please complete Customer Information before checkout.":"Please complete Customer Information and Shipping Address before checkout.","error");return false}}if(!syncCheckoutPhone(true)){document.getElementById("phone")?.focus();return false}if(!state.items.length){showToast("Checkout is empty. Please add a service first.","error");return false}return true}
+function buildCompletedOrder(){syncFullName();return {reference:makeOrderReference(),items:state.items.map(function(item){return item.raw&&Object.keys(item.raw).length?item.raw:item}),totals:state.totals,customer:{fullName:document.getElementById("fullName").value.trim(),firstName:document.getElementById("firstName").value.trim(),lastName:document.getElementById("lastName").value.trim(),email:document.getElementById("email").value.trim(),phone:document.getElementById("phone").value.trim()},shippingAddress:{street:document.getElementById("street").value.trim(),apartment:document.getElementById("apartment").value.trim(),barangay:document.getElementById("barangay").value.trim(),city:document.getElementById("city").value.trim(),province:document.getElementById("province").value.trim(),postal:document.getElementById("postal").value.trim(),country:document.getElementById("country").value},delivery:selectedShipping(),payment:selectedPayment(),notes:els.notes?els.notes.value.trim():"",promoCode:state.promoCode,createdAt:new Date().toISOString(),status:"placed"}}
 function csrfToken(){const meta=document.querySelector('meta[name="csrf-token"]');return meta?meta.getAttribute("content"):""}
 function numericId(value){const parsed=parseInt(String(value??"").replace(/[^0-9-]/g,""),10);return Number.isFinite(parsed)?parsed:0}
 function checkoutPayloadItems(){const first=state.items[0]||{};const raw=first.raw&&typeof first.raw==="object"?first.raw:{};const names=state.items.map(function(item){return item.name}).filter(Boolean).join(", ");return [{name:names?("Printify Checkout - "+names).slice(0,180):"Printify Checkout Order",qty:1,unit_price:state.totals.total,price:state.totals.total,service_code:"checkout-"+Date.now(),service_id:numericId(raw.service_id||raw.serviceId),variation_id:numericId(raw.variation_id||raw.variationId),service_item_id:raw.service_item_id||raw.serviceItemId||raw.serviceId||"",category:"Checkout Total",variation_label:selectedShipping().name+" / "+selectedPayment(),unit:"order",image_path:raw.image_path||raw.image||""}]}
 async function syncCheckoutSession(){if(typeof fetch!=="function")return;const response=await fetch("{{ route('cart.sync') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({items:checkoutPayloadItems()})});if(!response.ok){const body=await response.text();throw new Error(body||"Unable to prepare checkout session.")}}
-async function startPaymentCheckout(){const response=await fetch("{{ route('payment.start') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({payment_method:selectedPayment()})});const data=await response.json().catch(function(){return {}});if(!response.ok||!data.redirect_url){throw new Error(data.message||"Payment provider did not return a checkout link.")}return data.redirect_url}
+async function startPaymentCheckout(order){const response=await fetch("{{ route('payment.start') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({payment_method:selectedPayment(),checkout:order})});const data=await response.json().catch(function(){return {}});if(!response.ok||!data.redirect_url){throw new Error(data.message||"Payment provider did not return a checkout link.")}return data.redirect_url}
 window.applyPromo=function(){const code=document.getElementById("promoCode").value.trim().toUpperCase();if(!code){state.promoCode="";renderTotals();return}if(!["SAVE10","DISCOUNT10","PRINTIFY50"].includes(code)){showToast("Invalid promo code. Try SAVE10 or PRINTIFY50.","error");return}state.promoCode=code;localStorage.setItem("printifyPromoCode",code);renderTotals();showToast("Promo code applied.","success")};
-window.placeOrder=async function(){if(!validateForm()){syncCheckoutStep();return}updateStep(4);calculateTotals();const order=buildCompletedOrder();const orders=safeJson("printifyOrders","[]");orders.push(order);saveJson("printifyOrders",orders);saveJson("printifyLastPlacedOrder",order);const button=document.getElementById("placeOrderBtn");if(button){button.disabled=true;button.innerHTML='Processing <i class="fa-solid fa-spinner fa-spin"></i>'}try{await syncCheckoutSession();showToast("Opening secure payment checkout...");const redirectUrl=await startPaymentCheckout();window.location.href=redirectUrl}catch(error){if(button){button.disabled=false;button.innerHTML='Place Order <i class="fa-solid fa-lock"></i>'}showToast(error&&error.message?error.message:"Payment checkout failed to start. Please try again.","error");console.error("Checkout payment start failed:",error)}};
+window.placeOrder=async function(){if(!validateForm()){syncCheckoutStep();return}updateStep(4);calculateTotals();const order=buildCompletedOrder();const orders=safeJson("printifyOrders","[]");orders.push(order);saveJson("printifyOrders",orders);saveJson("printifyLastPlacedOrder",order);const button=document.getElementById("placeOrderBtn");if(button){button.disabled=true;button.innerHTML='Processing <i class="fa-solid fa-spinner fa-spin"></i>'}try{await syncCheckoutSession();showToast("Opening secure payment checkout...");const redirectUrl=await startPaymentCheckout(order);window.location.href=redirectUrl}catch(error){if(button){button.disabled=false;button.innerHTML='Place Order <i class="fa-solid fa-lock"></i>'}showToast(error&&error.message?error.message:"Payment checkout failed to start. Please try again.","error");console.error("Checkout payment start failed:",error)}};
 function renderAll(){updateRadioCards();syncPickupAddressState();renderItems();renderCheckoutBreadcrumb();renderTotals();syncCheckoutStep()}
 window.refreshPrintifyCheckout=function(){loadItems();state.promoCode=(localStorage.getItem("printifyPromoCode")||"").toUpperCase();const promo=document.getElementById("promoCode");if(state.promoCode&&promo)promo.value=state.promoCode;if(els.successBox)els.successBox.classList.remove("show");if(els.checkoutGrid)els.checkoutGrid.style.display="";renderAll();applyPaymentReturnState()};
 function applyPaymentReturnState(){const params=new URLSearchParams(window.location.search);const status=(params.get("payment")||"").toLowerCase();if(status==="success"){const last=safeJson("printifyLastPlacedOrder","{}");const ref=params.get("ref")||last.reference||"PAYMENT-SUCCESS";if(els.successRef)els.successRef.textContent=ref;if(els.successBox)els.successBox.classList.add("show");if(els.checkoutGrid)els.checkoutGrid.style.display="none";localStorage.removeItem("printifyCheckoutItems");localStorage.removeItem("printifyActiveCheckout");localStorage.removeItem("printifyCheckoutTotals");showToast("Payment successful. Your order is confirmed.","success");return}if(status==="cancel")showToast("Payment was cancelled. You can choose another payment method and try again.","error")}
 document.querySelectorAll('input[name="shipping"], input[name="payment"]').forEach(function(input){input.addEventListener("change",function(){updateRadioCards();syncPickupAddressState();renderTotals();syncCheckoutStep()})});
-["firstName","lastName","email","phone","street","city","province","postal"].forEach(function(id){const node=document.getElementById(id);if(node){node.addEventListener("input",syncCheckoutStep);node.addEventListener("change",syncCheckoutStep)}});
+setupLocationDropdowns();
+["firstName","lastName","email","phone","street","apartment","province","city","barangay","postal"].forEach(function(id){const node=document.getElementById(id);if(node){node.addEventListener("input",syncCheckoutStep);node.addEventListener("change",syncCheckoutStep)}});
+const phoneInput=document.getElementById("phone");
+if(phoneInput){
+  phoneInput.addEventListener("blur",function(){syncCheckoutPhone(Boolean(phoneInput.value.trim()))});
+  phoneInput.addEventListener("change",function(){syncCheckoutPhone(false)});
+  setTimeout(function(){syncCheckoutPhone(false);syncCheckoutStep()},150);
+  setTimeout(function(){syncCheckoutPhone(false);syncCheckoutStep()},900);
+}
 if(els.notes)els.notes.addEventListener("input",function(){els.noteCount.textContent=els.notes.value.length+"/250"});
 document.addEventListener("printify:checkout-opened",window.refreshPrintifyCheckout);
 function openCheckoutFromHash(){if((location.hash||"").toLowerCase()!=="#checkout"&&!/\/checkout\/?$/.test(location.pathname.toLowerCase()))return;if(typeof window.jumpTo==="function")window.jumpTo("checkout");else{const section=document.getElementById("checkout");if(section){section.classList.add("active");section.style.display="block"}}window.refreshPrintifyCheckout()}

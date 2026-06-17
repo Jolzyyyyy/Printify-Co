@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Rules\PhilippineMobileNumber;
+use App\Services\PhilippinePhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -35,7 +37,7 @@ class FrontPageController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:160'],
-            'phone' => ['nullable', 'string', 'max:40'],
+            'phone' => ['nullable', 'string', 'max:40', new PhilippineMobileNumber],
             'message' => ['required', 'string', 'max:3000'],
             'attachment' => ['nullable', 'file', 'mimes:pdf,ai,psd,jpg,jpeg,png', 'max:10240'],
         ]);
@@ -48,7 +50,7 @@ class FrontPageController extends Controller
         $record = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'phone' => PhilippinePhoneNumber::normalize($validated['phone'] ?? null),
             'message' => $validated['message'],
             'attachment_path' => $attachmentPath,
             'submitted_at' => now()->toDateTimeString(),
@@ -72,10 +74,6 @@ class FrontPageController extends Controller
 
     public function serviceDetail()
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please sign in or create an account to continue to service details.');
-        }
-
         return $this->page('service-details');
     }
 

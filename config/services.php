@@ -50,12 +50,19 @@ return [
     'paymongo' => [
         'secret_key' => env('PAYMONGO_SECRET_KEY'),
         'public_key' => env('PAYMONGO_PUBLIC_KEY'),
+        'webhook_secret' => env('PAYMONGO_WEBHOOK_SECRET'),
     ],
 
     'maya' => [
         'public_key' => env('MAYA_PUBLIC_KEY'),
         'secret_key' => env('MAYA_SECRET_KEY'),
         'checkout_url' => env('MAYA_CHECKOUT_URL', 'https://pg-sandbox.paymaya.com/checkout/v1/checkouts'),
+    ],
+
+    'lalamove' => [
+        'api_key' => env('LALAMOVE_API_KEY'),
+        'api_secret' => env('LALAMOVE_API_SECRET'),
+        'base_url' => env('LALAMOVE_BASE_URL', 'https://rest.sandbox.lalamove.com'),
     ],
 
 ];

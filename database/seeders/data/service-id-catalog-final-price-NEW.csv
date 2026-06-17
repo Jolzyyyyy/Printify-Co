@@ -1,0 +1,648 @@
+service,category,service_item_id,printing_category,color_mode,product_size,finish_type,package_type,retail_price,bulk_price
+Checkout Preview Printing,Documents,CHK-PREVIEW-A4,Document Printing,Black and White,A4,,,25,20
+Custom Special Printing,Custom,CSP-LYT-PRM-A3-CQ,Custom Layout,Premium Production,A3,Custom Quote,,290,280
+Custom Special Printing,Custom,CSP-LYT-PRM-A3-LC,Custom Layout,Premium Production,A3,Layout Consultation,,290,280
+Custom Special Printing,Custom,CSP-LYT-PRM-A3-RR,Custom Layout,Premium Production,A3,Rush Request,,290,280
+Custom Special Printing,Custom,CSP-LYT-PRM-A4-CQ,Custom Layout,Premium Production,A4,Custom Quote,,210,200
+Custom Special Printing,Custom,CSP-LYT-PRM-A4-LC,Custom Layout,Premium Production,A4,Layout Consultation,,210,200
+Custom Special Printing,Custom,CSP-LYT-PRM-A4-RR,Custom Layout,Premium Production,A4,Rush Request,,210,200
+Custom Special Printing,Custom,CSP-LYT-PRM-C-CQ,Custom Layout,Premium Production,Custom Size,Custom Quote,,380,380
+Custom Special Printing,Custom,CSP-LYT-PRM-C-LC,Custom Layout,Premium Production,Custom Size,Layout Consultation,,380,380
+Custom Special Printing,Custom,CSP-LYT-PRM-C-RR,Custom Layout,Premium Production,Custom Size,Rush Request,,380,380
+Custom Special Printing,Custom,CSP-LYT-STD-A3-CQ,Custom Layout,Standard Production,A3,Custom Quote,,220,210
+Custom Special Printing,Custom,CSP-LYT-STD-A3-LC,Custom Layout,Standard Production,A3,Layout Consultation,,220,210
+Custom Special Printing,Custom,CSP-LYT-STD-A3-RR,Custom Layout,Standard Production,A3,Rush Request,,220,210
+Custom Special Printing,Custom,CSP-LYT-STD-A4-CQ,Custom Layout,Standard Production,A4,Custom Quote,,150,140
+Custom Special Printing,Custom,CSP-LYT-STD-A4-LC,Custom Layout,Standard Production,A4,Layout Consultation,,150,140
+Custom Special Printing,Custom,CSP-LYT-STD-A4-RR,Custom Layout,Standard Production,A4,Rush Request,,150,140
+Custom Special Printing,Custom,CSP-LYT-STD-C-CQ,Custom Layout,Standard Production,Custom Size,Custom Quote,,300,300
+Custom Special Printing,Custom,CSP-LYT-STD-C-LC,Custom Layout,Standard Production,Custom Size,Layout Consultation,,300,300
+Custom Special Printing,Custom,CSP-LYT-STD-C-RR,Custom Layout,Standard Production,Custom Size,Rush Request,,300,300
+Custom Special Printing,Custom,CSP-MKT-PRM-A3-CQ,Marketing Collateral,Premium Production,A3,Custom Quote,,320,310
+Custom Special Printing,Custom,CSP-MKT-PRM-A3-LC,Marketing Collateral,Premium Production,A3,Layout Consultation,,320,310
+Custom Special Printing,Custom,CSP-MKT-PRM-A3-RR,Marketing Collateral,Premium Production,A3,Rush Request,,320,310
+Custom Special Printing,Custom,CSP-MKT-PRM-A4-CQ,Marketing Collateral,Premium Production,A4,Custom Quote,,240,230
+Custom Special Printing,Custom,CSP-MKT-PRM-A4-LC,Marketing Collateral,Premium Production,A4,Layout Consultation,,240,230
+Custom Special Printing,Custom,CSP-MKT-PRM-A4-RR,Marketing Collateral,Premium Production,A4,Rush Request,,240,230
+Custom Special Printing,Custom,CSP-MKT-PRM-C-CQ,Marketing Collateral,Premium Production,Custom Size,Custom Quote,,420,420
+Custom Special Printing,Custom,CSP-MKT-PRM-C-LC,Marketing Collateral,Premium Production,Custom Size,Layout Consultation,,420,420
+Custom Special Printing,Custom,CSP-MKT-PRM-C-RR,Marketing Collateral,Premium Production,Custom Size,Rush Request,,420,420
+Custom Special Printing,Custom,CSP-MKT-STD-A3-CQ,Marketing Collateral,Standard Production,A3,Custom Quote,,260,250
+Custom Special Printing,Custom,CSP-MKT-STD-A3-LC,Marketing Collateral,Standard Production,A3,Layout Consultation,,260,250
+Custom Special Printing,Custom,CSP-MKT-STD-A3-RR,Marketing Collateral,Standard Production,A3,Rush Request,,260,250
+Custom Special Printing,Custom,CSP-MKT-STD-A4-CQ,Marketing Collateral,Standard Production,A4,Custom Quote,,180,170
+Custom Special Printing,Custom,CSP-MKT-STD-A4-LC,Marketing Collateral,Standard Production,A4,Layout Consultation,,180,170
+Custom Special Printing,Custom,CSP-MKT-STD-A4-RR,Marketing Collateral,Standard Production,A4,Rush Request,,180,170
+Custom Special Printing,Custom,CSP-MKT-STD-C-CQ,Marketing Collateral,Standard Production,Custom Size,Custom Quote,,340,340
+Custom Special Printing,Custom,CSP-MKT-STD-C-LC,Marketing Collateral,Standard Production,Custom Size,Layout Consultation,,340,340
+Custom Special Printing,Custom,CSP-MKT-STD-C-RR,Marketing Collateral,Standard Production,Custom Size,Rush Request,,340,340
+Custom Special Printing,Custom,CSP-STK-PRM-A3-CQ,Sticker Cut,Premium Production,A3,Custom Quote,,340,330
+Custom Special Printing,Custom,CSP-STK-PRM-A3-LC,Sticker Cut,Premium Production,A3,Layout Consultation,,340,330
+Custom Special Printing,Custom,CSP-STK-PRM-A3-RR,Sticker Cut,Premium Production,A3,Rush Request,,340,330
+Custom Special Printing,Custom,CSP-STK-PRM-A4-CQ,Sticker Cut,Premium Production,A4,Custom Quote,,260,250
+Custom Special Printing,Custom,CSP-STK-PRM-A4-LC,Sticker Cut,Premium Production,A4,Layout Consultation,,260,250
+Custom Special Printing,Custom,CSP-STK-PRM-A4-RR,Sticker Cut,Premium Production,A4,Rush Request,,260,250
+Custom Special Printing,Custom,CSP-STK-PRM-C-CQ,Sticker Cut,Premium Production,Custom Size,Custom Quote,,440,440
+Custom Special Printing,Custom,CSP-STK-PRM-C-LC,Sticker Cut,Premium Production,Custom Size,Layout Consultation,,440,440
+Custom Special Printing,Custom,CSP-STK-PRM-C-RR,Sticker Cut,Premium Production,Custom Size,Rush Request,,440,440
+Custom Special Printing,Custom,CSP-STK-STD-A3-CQ,Sticker Cut,Standard Production,A3,Custom Quote,,280,270
+Custom Special Printing,Custom,CSP-STK-STD-A3-LC,Sticker Cut,Standard Production,A3,Layout Consultation,,280,270
+Custom Special Printing,Custom,CSP-STK-STD-A3-RR,Sticker Cut,Standard Production,A3,Rush Request,,280,270
+Custom Special Printing,Custom,CSP-STK-STD-A4-CQ,Sticker Cut,Standard Production,A4,Custom Quote,,200,190
+Custom Special Printing,Custom,CSP-STK-STD-A4-LC,Sticker Cut,Standard Production,A4,Layout Consultation,,200,190
+Custom Special Printing,Custom,CSP-STK-STD-A4-RR,Sticker Cut,Standard Production,A4,Rush Request,,200,190
+Custom Special Printing,Custom,CSP-STK-STD-C-CQ,Sticker Cut,Standard Production,Custom Size,Custom Quote,,360,360
+Custom Special Printing,Custom,CSP-STK-STD-C-LC,Sticker Cut,Standard Production,Custom Size,Layout Consultation,,360,360
+Custom Special Printing,Custom,CSP-STK-STD-C-RR,Sticker Cut,Standard Production,Custom Size,Rush Request,,360,360
+Document Printing,Printing,DOC-BW-A4,Document,Black and White,A4,,,,
+Document Printing,Printing,DOC-FC-A4,Document,Full Color,A4,,,,
+Document Printing,Printing,DOC-IM-BW-A4-CS,Image Only,B&W,A4 (8.27 x 11.69),Collated Set,,10,8
+Document Printing,Printing,DOC-IM-BW-A4-FT,Image Only,B&W,A4 (8.27 x 11.69),Fast Turnaround,,10,8
+Document Printing,Printing,DOC-IM-BW-A4-LC,Image Only,B&W,A4 (8.27 x 11.69),Layout Check,,10,8
+Document Printing,Printing,DOC-IM-BW-A4-SP,Image Only,B&W,A4 (8.27 x 11.69),Standard Print,,10,8
+Document Printing,Printing,DOC-IM-BW-LGL-CS,Image Only,B&W,Legal (8.5 x 14),Collated Set,,12,10
+Document Printing,Printing,DOC-IM-BW-LGL-FT,Image Only,B&W,Legal (8.5 x 14),Fast Turnaround,,12,10
+Document Printing,Printing,DOC-IM-BW-LGL-LC,Image Only,B&W,Legal (8.5 x 14),Layout Check,,12,10
+Document Printing,Printing,DOC-IM-BW-LGL-SP,Image Only,B&W,Legal (8.5 x 14),Standard Print,,12,10
+Document Printing,Printing,DOC-IM-BW-SHT-CS,Image Only,B&W,Short (8.5 x 11),Collated Set,,8,6
+Document Printing,Printing,DOC-IM-BW-SHT-FT,Image Only,B&W,Short (8.5 x 11),Fast Turnaround,,8,6
+Document Printing,Printing,DOC-IM-BW-SHT-LC,Image Only,B&W,Short (8.5 x 11),Layout Check,,8,6
+Document Printing,Printing,DOC-IM-BW-SHT-SP,Image Only,B&W,Short (8.5 x 11),Standard Print,,8,6
+Document Printing,Printing,DOC-IM-FC-A4-CS,Image Only,Full Color,A4 (8.27 x 11.69),Collated Set,,25,20
+Document Printing,Printing,DOC-IM-FC-A4-FT,Image Only,Full Color,A4 (8.27 x 11.69),Fast Turnaround,,25,20
+Document Printing,Printing,DOC-IM-FC-A4-LC,Image Only,Full Color,A4 (8.27 x 11.69),Layout Check,,25,20
+Document Printing,Printing,DOC-IM-FC-A4-SP,Image Only,Full Color,A4 (8.27 x 11.69),Standard Print,,25,20
+Document Printing,Printing,DOC-IM-FC-LGL-CS,Image Only,Full Color,Legal (8.5 x 14),Collated Set,,30,24
+Document Printing,Printing,DOC-IM-FC-LGL-FT,Image Only,Full Color,Legal (8.5 x 14),Fast Turnaround,,30,24
+Document Printing,Printing,DOC-IM-FC-LGL-LC,Image Only,Full Color,Legal (8.5 x 14),Layout Check,,30,24
+Document Printing,Printing,DOC-IM-FC-LGL-SP,Image Only,Full Color,Legal (8.5 x 14),Standard Print,,30,24
+Document Printing,Printing,DOC-IM-FC-SHT-CS,Image Only,Full Color,Short (8.5 x 11),Collated Set,,22,18
+Document Printing,Printing,DOC-IM-FC-SHT-FT,Image Only,Full Color,Short (8.5 x 11),Fast Turnaround,,22,18
+Document Printing,Printing,DOC-IM-FC-SHT-LC,Image Only,Full Color,Short (8.5 x 11),Layout Check,,22,18
+Document Printing,Printing,DOC-IM-FC-SHT-SP,Image Only,Full Color,Short (8.5 x 11),Standard Print,,22,18
+Document Printing,Printing,DOC-IM-PC-A4-CS,Image Only,Partial Color,A4 (8.27 x 11.69),Collated Set,,18,13
+Document Printing,Printing,DOC-IM-PC-A4-FT,Image Only,Partial Color,A4 (8.27 x 11.69),Fast Turnaround,,18,13
+Document Printing,Printing,DOC-IM-PC-A4-LC,Image Only,Partial Color,A4 (8.27 x 11.69),Layout Check,,18,13
+Document Printing,Printing,DOC-IM-PC-A4-SP,Image Only,Partial Color,A4 (8.27 x 11.69),Standard Print,,18,13
+Document Printing,Printing,DOC-IM-PC-LGL-CS,Image Only,Partial Color,Legal (8.5 x 14),Collated Set,,22,16
+Document Printing,Printing,DOC-IM-PC-LGL-FT,Image Only,Partial Color,Legal (8.5 x 14),Fast Turnaround,,22,16
+Document Printing,Printing,DOC-IM-PC-LGL-LC,Image Only,Partial Color,Legal (8.5 x 14),Layout Check,,22,16
+Document Printing,Printing,DOC-IM-PC-LGL-SP,Image Only,Partial Color,Legal (8.5 x 14),Standard Print,,22,16
+Document Printing,Printing,DOC-IM-PC-SHT-CS,Image Only,Partial Color,Short (8.5 x 11),Collated Set,,15,11
+Document Printing,Printing,DOC-IM-PC-SHT-FT,Image Only,Partial Color,Short (8.5 x 11),Fast Turnaround,,15,11
+Document Printing,Printing,DOC-IM-PC-SHT-LC,Image Only,Partial Color,Short (8.5 x 11),Layout Check,,15,11
+Document Printing,Printing,DOC-IM-PC-SHT-SP,Image Only,Partial Color,Short (8.5 x 11),Standard Print,,15,11
+Document Printing,Printing,DOC-TWI-BW-A4-CS,Text with Image,B&W,A4 (8.27 x 11.69),Collated Set,,8,6
+Document Printing,Printing,DOC-TWI-BW-A4-FT,Text with Image,B&W,A4 (8.27 x 11.69),Fast Turnaround,,8,6
+Document Printing,Printing,DOC-TWI-BW-A4-LC,Text with Image,B&W,A4 (8.27 x 11.69),Layout Check,,8,6
+Document Printing,Printing,DOC-TWI-BW-A4-SP,Text with Image,B&W,A4 (8.27 x 11.69),Standard Print,,8,6
+Document Printing,Printing,DOC-TWI-BW-LGL-CS,Text with Image,B&W,Legal (8.5 x 14),Collated Set,,10,7
+Document Printing,Printing,DOC-TWI-BW-LGL-FT,Text with Image,B&W,Legal (8.5 x 14),Fast Turnaround,,10,7
+Document Printing,Printing,DOC-TWI-BW-LGL-LC,Text with Image,B&W,Legal (8.5 x 14),Layout Check,,10,7
+Document Printing,Printing,DOC-TWI-BW-LGL-SP,Text with Image,B&W,Legal (8.5 x 14),Standard Print,,10,7
+Document Printing,Printing,DOC-TWI-BW-SHT-CS,Text with Image,B&W,Short (8.5 x 11),Collated Set,,6,4.5
+Document Printing,Printing,DOC-TWI-BW-SHT-FT,Text with Image,B&W,Short (8.5 x 11),Fast Turnaround,,6,4.5
+Document Printing,Printing,DOC-TWI-BW-SHT-LC,Text with Image,B&W,Short (8.5 x 11),Layout Check,,6,4.5
+Document Printing,Printing,DOC-TWI-BW-SHT-SP,Text with Image,B&W,Short (8.5 x 11),Standard Print,,6,4.5
+Document Printing,Printing,DOC-TWI-FC-A4-CS,Text with Image,Full Color,A4 (8.27 x 11.69),Collated Set,,15,12
+Document Printing,Printing,DOC-TWI-FC-A4-FT,Text with Image,Full Color,A4 (8.27 x 11.69),Fast Turnaround,,15,12
+Document Printing,Printing,DOC-TWI-FC-A4-LC,Text with Image,Full Color,A4 (8.27 x 11.69),Layout Check,,15,12
+Document Printing,Printing,DOC-TWI-FC-A4-SP,Text with Image,Full Color,A4 (8.27 x 11.69),Standard Print,,15,12
+Document Printing,Printing,DOC-TWI-FC-LGL-CS,Text with Image,Full Color,Legal (8.5 x 14),Collated Set,,18,14
+Document Printing,Printing,DOC-TWI-FC-LGL-FT,Text with Image,Full Color,Legal (8.5 x 14),Fast Turnaround,,18,14
+Document Printing,Printing,DOC-TWI-FC-LGL-LC,Text with Image,Full Color,Legal (8.5 x 14),Layout Check,,18,14
+Document Printing,Printing,DOC-TWI-FC-LGL-SP,Text with Image,Full Color,Legal (8.5 x 14),Standard Print,,18,14
+Document Printing,Printing,DOC-TWI-FC-SHT-CS,Text with Image,Full Color,Short (8.5 x 11),Collated Set,,12,10
+Document Printing,Printing,DOC-TWI-FC-SHT-FT,Text with Image,Full Color,Short (8.5 x 11),Fast Turnaround,,12,10
+Document Printing,Printing,DOC-TWI-FC-SHT-LC,Text with Image,Full Color,Short (8.5 x 11),Layout Check,,12,10
+Document Printing,Printing,DOC-TWI-FC-SHT-SP,Text with Image,Full Color,Short (8.5 x 11),Standard Print,,12,10
+Document Printing,Printing,DOC-TWI-PC-A4-CS,Text with Image,Partial Color,A4 (8.27 x 11.69),Collated Set,,9,7
+Document Printing,Printing,DOC-TWI-PC-A4-FT,Text with Image,Partial Color,A4 (8.27 x 11.69),Fast Turnaround,,9,7
+Document Printing,Printing,DOC-TWI-PC-A4-LC,Text with Image,Partial Color,A4 (8.27 x 11.69),Layout Check,,9,7
+Document Printing,Printing,DOC-TWI-PC-A4-SP,Text with Image,Partial Color,A4 (8.27 x 11.69),Standard Print,,9,7
+Document Printing,Printing,DOC-TWI-PC-LGL-CS,Text with Image,Partial Color,Legal (8.5 x 14),Collated Set,,11,8.5
+Document Printing,Printing,DOC-TWI-PC-LGL-FT,Text with Image,Partial Color,Legal (8.5 x 14),Fast Turnaround,,11,8.5
+Document Printing,Printing,DOC-TWI-PC-LGL-LC,Text with Image,Partial Color,Legal (8.5 x 14),Layout Check,,11,8.5
+Document Printing,Printing,DOC-TWI-PC-LGL-SP,Text with Image,Partial Color,Legal (8.5 x 14),Standard Print,,11,8.5
+Document Printing,Printing,DOC-TWI-PC-SHT-CS,Text with Image,Partial Color,Short (8.5 x 11),Collated Set,,8,6
+Document Printing,Printing,DOC-TWI-PC-SHT-FT,Text with Image,Partial Color,Short (8.5 x 11),Fast Turnaround,,8,6
+Document Printing,Printing,DOC-TWI-PC-SHT-LC,Text with Image,Partial Color,Short (8.5 x 11),Layout Check,,8,6
+Document Printing,Printing,DOC-TWI-PC-SHT-SP,Text with Image,Partial Color,Short (8.5 x 11),Standard Print,,8,6
+Document Printing,Printing,DOC-TX-BW-A4-CS,Text Only,B&W,A4 (8.27 x 11.69),Collated Set,,6,4
+Document Printing,Printing,DOC-TX-BW-A4-FT,Text Only,B&W,A4 (8.27 x 11.69),Fast Turnaround,,6,4
+Document Printing,Printing,DOC-TX-BW-A4-LC,Text Only,B&W,A4 (8.27 x 11.69),Layout Check,,6,4
+Document Printing,Printing,DOC-TX-BW-A4-SP,Text Only,B&W,A4 (8.27 x 11.69),Standard Print,,6,4
+Document Printing,Printing,DOC-TX-BW-LGL-CS,Text Only,B&W,Legal (8.5 x 14),Collated Set,,7,5
+Document Printing,Printing,DOC-TX-BW-LGL-FT,Text Only,B&W,Legal (8.5 x 14),Fast Turnaround,,7,5
+Document Printing,Printing,DOC-TX-BW-LGL-LC,Text Only,B&W,Legal (8.5 x 14),Layout Check,,7,5
+Document Printing,Printing,DOC-TX-BW-LGL-SP,Text Only,B&W,Legal (8.5 x 14),Standard Print,,7,5
+Document Printing,Printing,DOC-TX-BW-SHT-CS,Text Only,B&W,Short (8.5 x 11),Collated Set,,5,3
+Document Printing,Printing,DOC-TX-BW-SHT-FT,Text Only,B&W,Short (8.5 x 11),Fast Turnaround,,5,3
+Document Printing,Printing,DOC-TX-BW-SHT-LC,Text Only,B&W,Short (8.5 x 11),Layout Check,,5,3
+Document Printing,Printing,DOC-TX-BW-SHT-SP,Text Only,B&W,Short (8.5 x 11),Standard Print,,5,3
+Document Printing,Printing,DOC-TX-FC-A4-CS,Text Only,Full Color,A4 (8.27 x 11.69),Collated Set,,10,7
+Document Printing,Printing,DOC-TX-FC-A4-FT,Text Only,Full Color,A4 (8.27 x 11.69),Fast Turnaround,,10,7
+Document Printing,Printing,DOC-TX-FC-A4-LC,Text Only,Full Color,A4 (8.27 x 11.69),Layout Check,,10,7
+Document Printing,Printing,DOC-TX-FC-A4-SP,Text Only,Full Color,A4 (8.27 x 11.69),Standard Print,,10,7
+Document Printing,Printing,DOC-TX-FC-LGL-CS,Text Only,Full Color,Legal (8.5 x 14),Collated Set,,12,9
+Document Printing,Printing,DOC-TX-FC-LGL-FT,Text Only,Full Color,Legal (8.5 x 14),Fast Turnaround,,12,9
+Document Printing,Printing,DOC-TX-FC-LGL-LC,Text Only,Full Color,Legal (8.5 x 14),Layout Check,,12,9
+Document Printing,Printing,DOC-TX-FC-LGL-SP,Text Only,Full Color,Legal (8.5 x 14),Standard Print,,12,9
+Document Printing,Printing,DOC-TX-FC-SHT-CS,Text Only,Full Color,Short (8.5 x 11),Collated Set,,8,6
+Document Printing,Printing,DOC-TX-FC-SHT-FT,Text Only,Full Color,Short (8.5 x 11),Fast Turnaround,,8,6
+Document Printing,Printing,DOC-TX-FC-SHT-LC,Text Only,Full Color,Short (8.5 x 11),Layout Check,,8,6
+Document Printing,Printing,DOC-TX-FC-SHT-SP,Text Only,Full Color,Short (8.5 x 11),Standard Print,,8,6
+Document Printing,Printing,DOC-TX-PC-A4-CS,Text Only,Partial Color,A4 (8.27 x 11.69),Collated Set,,7,5
+Document Printing,Printing,DOC-TX-PC-A4-FT,Text Only,Partial Color,A4 (8.27 x 11.69),Fast Turnaround,,7,5
+Document Printing,Printing,DOC-TX-PC-A4-LC,Text Only,Partial Color,A4 (8.27 x 11.69),Layout Check,,7,5
+Document Printing,Printing,DOC-TX-PC-A4-SP,Text Only,Partial Color,A4 (8.27 x 11.69),Standard Print,,7,5
+Document Printing,Printing,DOC-TX-PC-LGL-CS,Text Only,Partial Color,Legal (8.5 x 14),Collated Set,,8,6
+Document Printing,Printing,DOC-TX-PC-LGL-FT,Text Only,Partial Color,Legal (8.5 x 14),Fast Turnaround,,8,6
+Document Printing,Printing,DOC-TX-PC-LGL-LC,Text Only,Partial Color,Legal (8.5 x 14),Layout Check,,8,6
+Document Printing,Printing,DOC-TX-PC-LGL-SP,Text Only,Partial Color,Legal (8.5 x 14),Standard Print,,8,6
+Document Printing,Printing,DOC-TX-PC-SHT-CS,Text Only,Partial Color,Short (8.5 x 11),Collated Set,,6,4
+Document Printing,Printing,DOC-TX-PC-SHT-FT,Text Only,Partial Color,Short (8.5 x 11),Fast Turnaround,,6,4
+Document Printing,Printing,DOC-TX-PC-SHT-LC,Text Only,Partial Color,Short (8.5 x 11),Layout Check,,6,4
+Document Printing,Printing,DOC-TX-PC-SHT-SP,Text Only,Partial Color,Short (8.5 x 11),Standard Print,,6,4
+ID & Photo Services,Photo,IDP-ID-A-BW-BC,ID Photo,B&W,Package A: Mixed 1x1 & 2x2,Background Cleanup,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-BW-BR,ID Photo,B&W,Package A: Mixed 1x1 & 2x2,Basic Retouch,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-BW-GF,ID Photo,B&W,Package A: Mixed 1x1 & 2x2,Glossy Finish,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-BW-SCI,ID Photo,B&W,Package A: Mixed 1x1 & 2x2,Soft Copy Included,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-FC-BC,ID Photo,Full Color,Package A: Mixed 1x1 & 2x2,Background Cleanup,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-FC-BR,ID Photo,Full Color,Package A: Mixed 1x1 & 2x2,Basic Retouch,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-FC-GF,ID Photo,Full Color,Package A: Mixed 1x1 & 2x2,Glossy Finish,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-FC-SCI,ID Photo,Full Color,Package A: Mixed 1x1 & 2x2,Soft Copy Included,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-MT-BC,ID Photo,Matte Tone,Package A: Mixed 1x1 & 2x2,Background Cleanup,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-MT-BR,ID Photo,Matte Tone,Package A: Mixed 1x1 & 2x2,Basic Retouch,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-MT-GF,ID Photo,Matte Tone,Package A: Mixed 1x1 & 2x2,Glossy Finish,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-A-MT-SCI,ID Photo,Matte Tone,Package A: Mixed 1x1 & 2x2,Soft Copy Included,Package A,55,45
+ID & Photo Services,Photo,IDP-ID-B-BW-BC,ID Photo,B&W,Package B: 1x1 Set,Background Cleanup,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-BW-BR,ID Photo,B&W,Package B: 1x1 Set,Basic Retouch,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-BW-GF,ID Photo,B&W,Package B: 1x1 Set,Glossy Finish,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-BW-SCI,ID Photo,B&W,Package B: 1x1 Set,Soft Copy Included,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-FC-BC,ID Photo,Full Color,Package B: 1x1 Set,Background Cleanup,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-FC-BR,ID Photo,Full Color,Package B: 1x1 Set,Basic Retouch,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-FC-GF,ID Photo,Full Color,Package B: 1x1 Set,Glossy Finish,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-FC-SCI,ID Photo,Full Color,Package B: 1x1 Set,Soft Copy Included,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-MT-BC,ID Photo,Matte Tone,Package B: 1x1 Set,Background Cleanup,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-MT-BR,ID Photo,Matte Tone,Package B: 1x1 Set,Basic Retouch,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-MT-GF,ID Photo,Matte Tone,Package B: 1x1 Set,Glossy Finish,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-B-MT-SCI,ID Photo,Matte Tone,Package B: 1x1 Set,Soft Copy Included,Package B,45,35
+ID & Photo Services,Photo,IDP-ID-C-BW-BC,ID Photo,B&W,Package C: 2x2 Set,Background Cleanup,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-BW-BR,ID Photo,B&W,Package C: 2x2 Set,Basic Retouch,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-BW-GF,ID Photo,B&W,Package C: 2x2 Set,Glossy Finish,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-BW-SCI,ID Photo,B&W,Package C: 2x2 Set,Soft Copy Included,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-FC-BC,ID Photo,Full Color,Package C: 2x2 Set,Background Cleanup,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-FC-BR,ID Photo,Full Color,Package C: 2x2 Set,Basic Retouch,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-FC-GF,ID Photo,Full Color,Package C: 2x2 Set,Glossy Finish,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-FC-SCI,ID Photo,Full Color,Package C: 2x2 Set,Soft Copy Included,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-MT-BC,ID Photo,Matte Tone,Package C: 2x2 Set,Background Cleanup,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-MT-BR,ID Photo,Matte Tone,Package C: 2x2 Set,Basic Retouch,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-MT-GF,ID Photo,Matte Tone,Package C: 2x2 Set,Glossy Finish,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-C-MT-SCI,ID Photo,Matte Tone,Package C: 2x2 Set,Soft Copy Included,Package C,45,35
+ID & Photo Services,Photo,IDP-ID-D-BW-BC,ID Photo,B&W,Package D: 1.5 x 1.5 Set,Background Cleanup,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-BW-BR,ID Photo,B&W,Package D: 1.5 x 1.5 Set,Basic Retouch,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-BW-GF,ID Photo,B&W,Package D: 1.5 x 1.5 Set,Glossy Finish,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-BW-SCI,ID Photo,B&W,Package D: 1.5 x 1.5 Set,Soft Copy Included,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-FC-BC,ID Photo,Full Color,Package D: 1.5 x 1.5 Set,Background Cleanup,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-FC-BR,ID Photo,Full Color,Package D: 1.5 x 1.5 Set,Basic Retouch,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-FC-GF,ID Photo,Full Color,Package D: 1.5 x 1.5 Set,Glossy Finish,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-FC-SCI,ID Photo,Full Color,Package D: 1.5 x 1.5 Set,Soft Copy Included,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-MT-BC,ID Photo,Matte Tone,Package D: 1.5 x 1.5 Set,Background Cleanup,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-MT-BR,ID Photo,Matte Tone,Package D: 1.5 x 1.5 Set,Basic Retouch,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-MT-GF,ID Photo,Matte Tone,Package D: 1.5 x 1.5 Set,Glossy Finish,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-D-MT-SCI,ID Photo,Matte Tone,Package D: 1.5 x 1.5 Set,Soft Copy Included,Package E,45,35
+ID & Photo Services,Photo,IDP-ID-E-BW-BC,ID Photo,B&W,Package E: Wallet Size Set,Background Cleanup,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-BW-BR,ID Photo,B&W,Package E: Wallet Size Set,Basic Retouch,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-BW-GF,ID Photo,B&W,Package E: Wallet Size Set,Glossy Finish,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-BW-SCI,ID Photo,B&W,Package E: Wallet Size Set,Soft Copy Included,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-FC-BC,ID Photo,Full Color,Package E: Wallet Size Set,Background Cleanup,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-FC-BR,ID Photo,Full Color,Package E: Wallet Size Set,Basic Retouch,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-FC-GF,ID Photo,Full Color,Package E: Wallet Size Set,Glossy Finish,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-FC-SCI,ID Photo,Full Color,Package E: Wallet Size Set,Soft Copy Included,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-MT-BC,ID Photo,Matte Tone,Package E: Wallet Size Set,Background Cleanup,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-MT-BR,ID Photo,Matte Tone,Package E: Wallet Size Set,Basic Retouch,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-MT-GF,ID Photo,Matte Tone,Package E: Wallet Size Set,Glossy Finish,Package F,55,45
+ID & Photo Services,Photo,IDP-ID-E-MT-SCI,ID Photo,Matte Tone,Package E: Wallet Size Set,Soft Copy Included,Package F,55,45
+ID & Photo Services,Photo,IDP-PV-PASS-BW-BCC,Passport / Visa,B&W,Passport,Background Compliance Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-BW-BR,Passport / Visa,B&W,Passport,Basic Retouch,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-BW-GF,Passport / Visa,B&W,Passport,Glossy Finish,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-BW-PCC,Passport / Visa,B&W,Passport,Passport Crop Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-FC-BCC,Passport / Visa,Full Color,Passport,Background Compliance Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-FC-BR,Passport / Visa,Full Color,Passport,Basic Retouch,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-FC-GF,Passport / Visa,Full Color,Passport,Glossy Finish,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-FC-PCC,Passport / Visa,Full Color,Passport,Passport Crop Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-SB-BCC,Passport / Visa,Studio Bright,Passport,Background Compliance Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-SB-BR,Passport / Visa,Studio Bright,Passport,Basic Retouch,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-SB-GF,Passport / Visa,Studio Bright,Passport,Glossy Finish,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-PASS-SB-PCC,Passport / Visa,Studio Bright,Passport,Passport Crop Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-BW-BCC,Passport / Visa,B&W,Visa,Background Compliance Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-BW-BR,Passport / Visa,B&W,Visa,Basic Retouch,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-BW-GF,Passport / Visa,B&W,Visa,Glossy Finish,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-BW-VSR,Passport / Visa,B&W,Visa,Visa Spec Review,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-FC-BCC,Passport / Visa,Full Color,Visa,Background Compliance Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-FC-BR,Passport / Visa,Full Color,Visa,Basic Retouch,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-FC-GF,Passport / Visa,Full Color,Visa,Glossy Finish,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-FC-VSR,Passport / Visa,Full Color,Visa,Visa Spec Review,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-SB-BCC,Passport / Visa,Studio Bright,Visa,Background Compliance Check,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-SB-BR,Passport / Visa,Studio Bright,Visa,Basic Retouch,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-SB-GF,Passport / Visa,Studio Bright,Visa,Glossy Finish,Package D,80,70
+ID & Photo Services,Photo,IDP-PV-VISA-SB-VSR,Passport / Visa,Studio Bright,Visa,Visa Spec Review,Package D,80,70
+ID & Photo Services,Photo,IDP-SP-2R-BW-BC,Single Photo Print,B&W,2R (2.5x3.5),Borderless Crop,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-BW-GF,Single Photo Print,B&W,2R (2.5x3.5),Glossy Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-BW-MF,Single Photo Print,B&W,2R (2.5x3.5),Matte Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-BW-PER,Single Photo Print,B&W,2R (2.5x3.5),Photo Editing / Retouch,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-CT-BC,Single Photo Print,Cool Tone,2R (2.5x3.5),Borderless Crop,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-CT-GF,Single Photo Print,Cool Tone,2R (2.5x3.5),Glossy Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-CT-MF,Single Photo Print,Cool Tone,2R (2.5x3.5),Matte Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-CT-PER,Single Photo Print,Cool Tone,2R (2.5x3.5),Photo Editing / Retouch,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-FC-BC,Single Photo Print,Full Color,2R (2.5x3.5),Borderless Crop,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-FC-GF,Single Photo Print,Full Color,2R (2.5x3.5),Glossy Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-FC-MF,Single Photo Print,Full Color,2R (2.5x3.5),Matte Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-FC-PER,Single Photo Print,Full Color,2R (2.5x3.5),Photo Editing / Retouch,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-WT-BC,Single Photo Print,Warm Tone,2R (2.5x3.5),Borderless Crop,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-WT-GF,Single Photo Print,Warm Tone,2R (2.5x3.5),Glossy Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-WT-MF,Single Photo Print,Warm Tone,2R (2.5x3.5),Matte Finish,,5,4
+ID & Photo Services,Photo,IDP-SP-2R-WT-PER,Single Photo Print,Warm Tone,2R (2.5x3.5),Photo Editing / Retouch,,5,4
+ID & Photo Services,Photo,IDP-SP-3R-BW-BC,Single Photo Print,B&W,3R (3.5x5.0),Borderless Crop,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-BW-GF,Single Photo Print,B&W,3R (3.5x5.0),Glossy Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-BW-MF,Single Photo Print,B&W,3R (3.5x5.0),Matte Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-BW-PER,Single Photo Print,B&W,3R (3.5x5.0),Photo Editing / Retouch,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-CT-BC,Single Photo Print,Cool Tone,3R (3.5x5.0),Borderless Crop,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-CT-GF,Single Photo Print,Cool Tone,3R (3.5x5.0),Glossy Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-CT-MF,Single Photo Print,Cool Tone,3R (3.5x5.0),Matte Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-CT-PER,Single Photo Print,Cool Tone,3R (3.5x5.0),Photo Editing / Retouch,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-FC-BC,Single Photo Print,Full Color,3R (3.5x5.0),Borderless Crop,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-FC-GF,Single Photo Print,Full Color,3R (3.5x5.0),Glossy Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-FC-MF,Single Photo Print,Full Color,3R (3.5x5.0),Matte Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-FC-PER,Single Photo Print,Full Color,3R (3.5x5.0),Photo Editing / Retouch,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-WT-BC,Single Photo Print,Warm Tone,3R (3.5x5.0),Borderless Crop,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-WT-GF,Single Photo Print,Warm Tone,3R (3.5x5.0),Glossy Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-WT-MF,Single Photo Print,Warm Tone,3R (3.5x5.0),Matte Finish,,8,6
+ID & Photo Services,Photo,IDP-SP-3R-WT-PER,Single Photo Print,Warm Tone,3R (3.5x5.0),Photo Editing / Retouch,,8,6
+ID & Photo Services,Photo,IDP-SP-4R-BW-BC,Single Photo Print,B&W,4R (4.0x6.0),Borderless Crop,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-BW-GF,Single Photo Print,B&W,4R (4.0x6.0),Glossy Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-BW-MF,Single Photo Print,B&W,4R (4.0x6.0),Matte Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-BW-PER,Single Photo Print,B&W,4R (4.0x6.0),Photo Editing / Retouch,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-CT-BC,Single Photo Print,Cool Tone,4R (4.0x6.0),Borderless Crop,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-CT-GF,Single Photo Print,Cool Tone,4R (4.0x6.0),Glossy Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-CT-MF,Single Photo Print,Cool Tone,4R (4.0x6.0),Matte Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-CT-PER,Single Photo Print,Cool Tone,4R (4.0x6.0),Photo Editing / Retouch,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-FC-BC,Single Photo Print,Full Color,4R (4.0x6.0),Borderless Crop,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-FC-GF,Single Photo Print,Full Color,4R (4.0x6.0),Glossy Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-FC-MF,Single Photo Print,Full Color,4R (4.0x6.0),Matte Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-FC-PER,Single Photo Print,Full Color,4R (4.0x6.0),Photo Editing / Retouch,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-WT-BC,Single Photo Print,Warm Tone,4R (4.0x6.0),Borderless Crop,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-WT-GF,Single Photo Print,Warm Tone,4R (4.0x6.0),Glossy Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-WT-MF,Single Photo Print,Warm Tone,4R (4.0x6.0),Matte Finish,,10,8
+ID & Photo Services,Photo,IDP-SP-4R-WT-PER,Single Photo Print,Warm Tone,4R (4.0x6.0),Photo Editing / Retouch,,10,8
+ID & Photo Services,Photo,IDP-SP-5R-BW-BC,Single Photo Print,B&W,5R (5.0x7.0),Borderless Crop,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-BW-GF,Single Photo Print,B&W,5R (5.0x7.0),Glossy Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-BW-MF,Single Photo Print,B&W,5R (5.0x7.0),Matte Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-BW-PER,Single Photo Print,B&W,5R (5.0x7.0),Photo Editing / Retouch,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-CT-BC,Single Photo Print,Cool Tone,5R (5.0x7.0),Borderless Crop,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-CT-GF,Single Photo Print,Cool Tone,5R (5.0x7.0),Glossy Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-CT-MF,Single Photo Print,Cool Tone,5R (5.0x7.0),Matte Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-CT-PER,Single Photo Print,Cool Tone,5R (5.0x7.0),Photo Editing / Retouch,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-FC-BC,Single Photo Print,Full Color,5R (5.0x7.0),Borderless Crop,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-FC-GF,Single Photo Print,Full Color,5R (5.0x7.0),Glossy Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-FC-MF,Single Photo Print,Full Color,5R (5.0x7.0),Matte Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-FC-PER,Single Photo Print,Full Color,5R (5.0x7.0),Photo Editing / Retouch,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-WT-BC,Single Photo Print,Warm Tone,5R (5.0x7.0),Borderless Crop,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-WT-GF,Single Photo Print,Warm Tone,5R (5.0x7.0),Glossy Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-WT-MF,Single Photo Print,Warm Tone,5R (5.0x7.0),Matte Finish,,15,12
+ID & Photo Services,Photo,IDP-SP-5R-WT-PER,Single Photo Print,Warm Tone,5R (5.0x7.0),Photo Editing / Retouch,,15,12
+ID & Photo Services,Photo,IDP-SP-6R-BW-BC,Single Photo Print,B&W,6R (6.0x8.0),Borderless Crop,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-BW-GF,Single Photo Print,B&W,6R (6.0x8.0),Glossy Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-BW-MF,Single Photo Print,B&W,6R (6.0x8.0),Matte Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-BW-PER,Single Photo Print,B&W,6R (6.0x8.0),Photo Editing / Retouch,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-CT-BC,Single Photo Print,Cool Tone,6R (6.0x8.0),Borderless Crop,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-CT-GF,Single Photo Print,Cool Tone,6R (6.0x8.0),Glossy Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-CT-MF,Single Photo Print,Cool Tone,6R (6.0x8.0),Matte Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-CT-PER,Single Photo Print,Cool Tone,6R (6.0x8.0),Photo Editing / Retouch,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-FC-BC,Single Photo Print,Full Color,6R (6.0x8.0),Borderless Crop,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-FC-GF,Single Photo Print,Full Color,6R (6.0x8.0),Glossy Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-FC-MF,Single Photo Print,Full Color,6R (6.0x8.0),Matte Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-FC-PER,Single Photo Print,Full Color,6R (6.0x8.0),Photo Editing / Retouch,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-WT-BC,Single Photo Print,Warm Tone,6R (6.0x8.0),Borderless Crop,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-WT-GF,Single Photo Print,Warm Tone,6R (6.0x8.0),Glossy Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-WT-MF,Single Photo Print,Warm Tone,6R (6.0x8.0),Matte Finish,,25,20
+ID & Photo Services,Photo,IDP-SP-6R-WT-PER,Single Photo Print,Warm Tone,6R (6.0x8.0),Photo Editing / Retouch,,25,20
+ID & Photo Services,Photo,IDP-SP-8R-BW-BC,Single Photo Print,B&W,8R (8.0x10.0),Borderless Crop,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-BW-GF,Single Photo Print,B&W,8R (8.0x10.0),Glossy Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-BW-MF,Single Photo Print,B&W,8R (8.0x10.0),Matte Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-BW-PER,Single Photo Print,B&W,8R (8.0x10.0),Photo Editing / Retouch,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-CT-BC,Single Photo Print,Cool Tone,8R (8.0x10.0),Borderless Crop,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-CT-GF,Single Photo Print,Cool Tone,8R (8.0x10.0),Glossy Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-CT-MF,Single Photo Print,Cool Tone,8R (8.0x10.0),Matte Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-CT-PER,Single Photo Print,Cool Tone,8R (8.0x10.0),Photo Editing / Retouch,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-FC-BC,Single Photo Print,Full Color,8R (8.0x10.0),Borderless Crop,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-FC-GF,Single Photo Print,Full Color,8R (8.0x10.0),Glossy Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-FC-MF,Single Photo Print,Full Color,8R (8.0x10.0),Matte Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-FC-PER,Single Photo Print,Full Color,8R (8.0x10.0),Photo Editing / Retouch,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-WT-BC,Single Photo Print,Warm Tone,8R (8.0x10.0),Borderless Crop,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-WT-GF,Single Photo Print,Warm Tone,8R (8.0x10.0),Glossy Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-WT-MF,Single Photo Print,Warm Tone,8R (8.0x10.0),Matte Finish,,40,32
+ID & Photo Services,Photo,IDP-SP-8R-WT-PER,Single Photo Print,Warm Tone,8R (8.0x10.0),Photo Editing / Retouch,,40,32
+ID & Photo Services,Photo,IDP-SP-A4-BW-BC,Single Photo Print,B&W,A4 (8.27x11.69),Borderless Crop,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-BW-GF,Single Photo Print,B&W,A4 (8.27x11.69),Glossy Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-BW-MF,Single Photo Print,B&W,A4 (8.27x11.69),Matte Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-BW-PER,Single Photo Print,B&W,A4 (8.27x11.69),Photo Editing / Retouch,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-CT-BC,Single Photo Print,Cool Tone,A4 (8.27x11.69),Borderless Crop,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-CT-GF,Single Photo Print,Cool Tone,A4 (8.27x11.69),Glossy Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-CT-MF,Single Photo Print,Cool Tone,A4 (8.27x11.69),Matte Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-CT-PER,Single Photo Print,Cool Tone,A4 (8.27x11.69),Photo Editing / Retouch,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-FC-BC,Single Photo Print,Full Color,A4 (8.27x11.69),Borderless Crop,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-FC-GF,Single Photo Print,Full Color,A4 (8.27x11.69),Glossy Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-FC-MF,Single Photo Print,Full Color,A4 (8.27x11.69),Matte Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-FC-PER,Single Photo Print,Full Color,A4 (8.27x11.69),Photo Editing / Retouch,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-WT-BC,Single Photo Print,Warm Tone,A4 (8.27x11.69),Borderless Crop,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-WT-GF,Single Photo Print,Warm Tone,A4 (8.27x11.69),Glossy Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-WT-MF,Single Photo Print,Warm Tone,A4 (8.27x11.69),Matte Finish,,50,40
+ID & Photo Services,Photo,IDP-SP-A4-WT-PER,Single Photo Print,Warm Tone,A4 (8.27x11.69),Photo Editing / Retouch,,50,40
+ID & Photo Services,Photo,PHOTO-ID-1X1,Photo,Full Color,1x1 ID Photo,,Set of 6,60,60
+Lamination & Binding,Finishing,BND-LAM-PRM-A4-CCS,Lamination,Premium,A4,Clear Cover Set,,50,45
+Lamination & Binding,Finishing,BND-LAM-PRM-A4-LC,Lamination,Premium,A4,Laminated Cover,,50,45
+Lamination & Binding,Finishing,BND-LAM-PRM-A4-SF,Lamination,Premium,A4,Spiral Finish,,50,45
+Lamination & Binding,Finishing,BND-LAM-PRM-LGL-CCS,Lamination,Premium,Legal,Clear Cover Set,,60,55
+Lamination & Binding,Finishing,BND-LAM-PRM-LGL-LC,Lamination,Premium,Legal,Laminated Cover,,60,55
+Lamination & Binding,Finishing,BND-LAM-PRM-LGL-SF,Lamination,Premium,Legal,Spiral Finish,,60,55
+Lamination & Binding,Finishing,BND-LAM-STD-A4-CCS,Lamination,Standard,A4,Clear Cover Set,,35,30
+Lamination & Binding,Finishing,BND-LAM-STD-A4-LC,Lamination,Standard,A4,Laminated Cover,,35,30
+Lamination & Binding,Finishing,BND-LAM-STD-A4-SF,Lamination,Standard,A4,Spiral Finish,,35,30
+Lamination & Binding,Finishing,BND-LAM-STD-LGL-CCS,Lamination,Standard,Legal,Clear Cover Set,,45,40
+Lamination & Binding,Finishing,BND-LAM-STD-LGL-LC,Lamination,Standard,Legal,Laminated Cover,,45,40
+Lamination & Binding,Finishing,BND-LAM-STD-LGL-SF,Lamination,Standard,Legal,Spiral Finish,,45,40
+Lamination & Binding,Finishing,BND-SPR-PRM-A4-CCS,Spiral Binding,Premium,A4,Clear Cover Set,,160,150
+Lamination & Binding,Finishing,BND-SPR-PRM-A4-LC,Spiral Binding,Premium,A4,Laminated Cover,,160,150
+Lamination & Binding,Finishing,BND-SPR-PRM-A4-SF,Spiral Binding,Premium,A4,Spiral Finish,,160,150
+Lamination & Binding,Finishing,BND-SPR-PRM-LGL-CCS,Spiral Binding,Premium,Legal,Clear Cover Set,,180,170
+Lamination & Binding,Finishing,BND-SPR-PRM-LGL-LC,Spiral Binding,Premium,Legal,Laminated Cover,,180,170
+Lamination & Binding,Finishing,BND-SPR-PRM-LGL-SF,Spiral Binding,Premium,Legal,Spiral Finish,,180,170
+Lamination & Binding,Finishing,BND-SPR-STD-A4-CCS,Spiral Binding,Standard,A4,Clear Cover Set,,120,110
+Lamination & Binding,Finishing,BND-SPR-STD-A4-LC,Spiral Binding,Standard,A4,Laminated Cover,,120,110
+Lamination & Binding,Finishing,BND-SPR-STD-A4-SF,Spiral Binding,Standard,A4,Spiral Finish,,120,110
+Lamination & Binding,Finishing,BND-SPR-STD-LGL-CCS,Spiral Binding,Standard,Legal,Clear Cover Set,,140,130
+Lamination & Binding,Finishing,BND-SPR-STD-LGL-LC,Spiral Binding,Standard,Legal,Laminated Cover,,140,130
+Lamination & Binding,Finishing,BND-SPR-STD-LGL-SF,Spiral Binding,Standard,Legal,Spiral Finish,,140,130
+Lamination & Binding,Finishing,LAM-A4-GLOSS,Finishing,,A4,Gloss Lamination,,,
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-3D-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),3D Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-3D-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),3D Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-3D-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),3D Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-BRG-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Broken Glass Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-BRG-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Broken Glass Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-BRG-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Broken Glass Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-CVM-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Canvas Matte Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-CVM-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Canvas Matte Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-CVM-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Canvas Matte Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-GLS-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Glossy Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-GLS-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Glossy Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-GLS-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Glossy Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-GLT-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Glittered Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-GLT-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Glittered Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-GLT-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Glittered Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-LTH-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Leather Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-LTH-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Leather Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-LTH-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Leather Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-MAT-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Matte Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-MAT-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Matte Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-MAT-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Matte Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-R-ID,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Rainbow Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-R-PFC,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Rainbow Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-BW-R-RTM,Sintra Board Printing,B&W,A4 (8.27 x 11.69),Rainbow Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-3D-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),3D Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-3D-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),3D Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-3D-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),3D Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-BRG-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Broken Glass Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-BRG-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Broken Glass Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-BRG-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Broken Glass Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-CVM-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Canvas Matte Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-CVM-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Canvas Matte Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-CVM-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Canvas Matte Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-GLS-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Glossy Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-GLS-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Glossy Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-GLS-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Glossy Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-GLT-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Glittered Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-GLT-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Glittered Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-GLT-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Glittered Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-LTH-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Leather Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-LTH-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Leather Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-LTH-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Leather Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-MAT-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Matte Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-MAT-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Matte Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-MAT-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Matte Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-R-ID,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Rainbow Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-R-PFC,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Rainbow Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-FC-R-RTM,Sintra Board Printing,Full Color,A4 (8.27 x 11.69),Rainbow Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-3D-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),3D Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-3D-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),3D Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-3D-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),3D Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-BRG-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Broken Glass Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-BRG-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Broken Glass Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-BRG-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Broken Glass Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-CVM-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Canvas Matte Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-CVM-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Canvas Matte Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-CVM-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Canvas Matte Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-GLS-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Glossy Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-GLS-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Glossy Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-GLS-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Glossy Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-GLT-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Glittered Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-GLT-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Glittered Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-GLT-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Glittered Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-LTH-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Leather Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-LTH-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Leather Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-LTH-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Leather Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-MAT-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Matte Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-MAT-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Matte Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-MAT-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Matte Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-R-ID,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Rainbow Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-R-PFC,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Rainbow Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-HC-R-RTM,Sintra Board Printing,High Contrast,A4 (8.27 x 11.69),Rainbow Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-3D-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),3D Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-3D-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),3D Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-3D-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),3D Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-BRG-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Broken Glass Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-BRG-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Broken Glass Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-BRG-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Broken Glass Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-CVM-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Canvas Matte Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-CVM-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Canvas Matte Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-CVM-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Canvas Matte Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-GLS-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Glossy Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-GLS-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Glossy Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-GLS-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Glossy Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-GLT-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Glittered Finish / Indoor Display,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-GLT-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Glittered Finish / Photo Finish Check,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-GLT-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Glittered Finish / Ready to Mount,,120,110
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-LTH-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Leather Finish / Indoor Display,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-LTH-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Leather Finish / Photo Finish Check,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-LTH-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Leather Finish / Ready to Mount,,110,100
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-MAT-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Matte Finish / Indoor Display,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-MAT-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Matte Finish / Photo Finish Check,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-MAT-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Matte Finish / Ready to Mount,,100,90
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-R-ID,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Rainbow Finish / Indoor Display,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-R-PFC,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Rainbow Finish / Photo Finish Check,,130,120
+Large Format Printing,Large Format,LFP-SINTRA-A4-MT-R-RTM,Sintra Board Printing,Matte Tone,A4 (8.27 x 11.69),Rainbow Finish / Ready to Mount,,130,120
+Large Format Printing,Large Format,LFP-TARP-3X4,Tarpaulin,Full Color,3x4 ft,,,,
+Photocopy & Scanning,Printing,COPY-BW-A4,Photocopy,Black and White,A4,,,,6
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-BW-SRT,Photocopy / Image Only,B&W,A4 (8.27 x 11.69),Sorted Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-BW-STP,Photocopy / Image Only,B&W,A4 (8.27 x 11.69),Stapled Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-BW-WIC,Photocopy / Image Only,B&W,A4 (8.27 x 11.69),Walk-in Copy,,8,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-FC-SRT,Photocopy / Image Only,Full Color,A4 (8.27 x 11.69),Sorted Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-FC-STP,Photocopy / Image Only,Full Color,A4 (8.27 x 11.69),Stapled Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-FC-WIC,Photocopy / Image Only,Full Color,A4 (8.27 x 11.69),Walk-in Copy,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-PC-SRT,Photocopy / Image Only,Partial Color,A4 (8.27 x 11.69),Sorted Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-PC-STP,Photocopy / Image Only,Partial Color,A4 (8.27 x 11.69),Stapled Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-A4-PC-WIC,Photocopy / Image Only,Partial Color,A4 (8.27 x 11.69),Walk-in Copy,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-BW-SRT,Photocopy / Image Only,B&W,Legal (8.5 x 14),Sorted Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-BW-STP,Photocopy / Image Only,B&W,Legal (8.5 x 14),Stapled Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-BW-WIC,Photocopy / Image Only,B&W,Legal (8.5 x 14),Walk-in Copy,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-FC-SRT,Photocopy / Image Only,Full Color,Legal (8.5 x 14),Sorted Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-FC-STP,Photocopy / Image Only,Full Color,Legal (8.5 x 14),Stapled Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-FC-WIC,Photocopy / Image Only,Full Color,Legal (8.5 x 14),Walk-in Copy,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-PC-SRT,Photocopy / Image Only,Partial Color,Legal (8.5 x 14),Sorted Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-PC-STP,Photocopy / Image Only,Partial Color,Legal (8.5 x 14),Stapled Set,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-LGL-PC-WIC,Photocopy / Image Only,Partial Color,Legal (8.5 x 14),Walk-in Copy,,10,8
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-BW-SRT,Photocopy / Image Only,B&W,Short (8.5 x 11),Sorted Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-BW-STP,Photocopy / Image Only,B&W,Short (8.5 x 11),Stapled Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-BW-WIC,Photocopy / Image Only,B&W,Short (8.5 x 11),Walk-in Copy,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-FC-SRT,Photocopy / Image Only,Full Color,Short (8.5 x 11),Sorted Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-FC-STP,Photocopy / Image Only,Full Color,Short (8.5 x 11),Stapled Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-FC-WIC,Photocopy / Image Only,Full Color,Short (8.5 x 11),Walk-in Copy,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-PC-SRT,Photocopy / Image Only,Partial Color,Short (8.5 x 11),Sorted Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-PC-STP,Photocopy / Image Only,Partial Color,Short (8.5 x 11),Stapled Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-IM-SHT-PC-WIC,Photocopy / Image Only,Partial Color,Short (8.5 x 11),Walk-in Copy,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-BW-SRT,Photocopy / Text with Image,B&W,A4 (8.27 x 11.69),Sorted Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-BW-STP,Photocopy / Text with Image,B&W,A4 (8.27 x 11.69),Stapled Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-BW-WIC,Photocopy / Text with Image,B&W,A4 (8.27 x 11.69),Walk-in Copy,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-FC-SRT,Photocopy / Text with Image,Full Color,A4 (8.27 x 11.69),Sorted Set,,7,5.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-FC-STP,Photocopy / Text with Image,Full Color,A4 (8.27 x 11.69),Stapled Set,,7,5.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-FC-WIC,Photocopy / Text with Image,Full Color,A4 (8.27 x 11.69),Walk-in Copy,,7,5.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-PC-SRT,Photocopy / Text with Image,Partial Color,A4 (8.27 x 11.69),Sorted Set,,7,5.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-PC-STP,Photocopy / Text with Image,Partial Color,A4 (8.27 x 11.69),Stapled Set,,7,5.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-A4-PC-WIC,Photocopy / Text with Image,Partial Color,A4 (8.27 x 11.69),Walk-in Copy,,7,5.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-BW-SRT,Photocopy / Text with Image,B&W,Legal (8.5 x 14),Sorted Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-BW-STP,Photocopy / Text with Image,B&W,Legal (8.5 x 14),Stapled Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-BW-WIC,Photocopy / Text with Image,B&W,Legal (8.5 x 14),Walk-in Copy,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-FC-SRT,Photocopy / Text with Image,Full Color,Legal (8.5 x 14),Sorted Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-FC-STP,Photocopy / Text with Image,Full Color,Legal (8.5 x 14),Stapled Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-FC-WIC,Photocopy / Text with Image,Full Color,Legal (8.5 x 14),Walk-in Copy,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-PC-SRT,Photocopy / Text with Image,Partial Color,Legal (8.5 x 14),Sorted Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-PC-STP,Photocopy / Text with Image,Partial Color,Legal (8.5 x 14),Stapled Set,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-LGL-PC-WIC,Photocopy / Text with Image,Partial Color,Legal (8.5 x 14),Walk-in Copy,,8,6
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-BW-SRT,Photocopy / Text with Image,B&W,Short (8.5 x 11),Sorted Set,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-BW-STP,Photocopy / Text with Image,B&W,Short (8.5 x 11),Stapled Set,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-BW-WIC,Photocopy / Text with Image,B&W,Short (8.5 x 11),Walk-in Copy,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-FC-SRT,Photocopy / Text with Image,Full Color,Short (8.5 x 11),Sorted Set,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-FC-STP,Photocopy / Text with Image,Full Color,Short (8.5 x 11),Stapled Set,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-FC-WIC,Photocopy / Text with Image,Full Color,Short (8.5 x 11),Walk-in Copy,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-PC-SRT,Photocopy / Text with Image,Partial Color,Short (8.5 x 11),Sorted Set,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-PC-STP,Photocopy / Text with Image,Partial Color,Short (8.5 x 11),Stapled Set,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TWI-SHT-PC-WIC,Photocopy / Text with Image,Partial Color,Short (8.5 x 11),Walk-in Copy,,4,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-BW-SRT,Photocopy / Text Only,B&W,A4 (8.27 x 11.69),Sorted Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-BW-STP,Photocopy / Text Only,B&W,A4 (8.27 x 11.69),Stapled Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-BW-WIC,Photocopy / Text Only,B&W,A4 (8.27 x 11.69),Walk-in Copy,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-FC-SRT,Photocopy / Text Only,Full Color,A4 (8.27 x 11.69),Sorted Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-FC-STP,Photocopy / Text Only,Full Color,A4 (8.27 x 11.69),Stapled Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-FC-WIC,Photocopy / Text Only,Full Color,A4 (8.27 x 11.69),Walk-in Copy,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-PC-SRT,Photocopy / Text Only,Partial Color,A4 (8.27 x 11.69),Sorted Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-PC-STP,Photocopy / Text Only,Partial Color,A4 (8.27 x 11.69),Stapled Set,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-A4-PC-WIC,Photocopy / Text Only,Partial Color,A4 (8.27 x 11.69),Walk-in Copy,,5,3.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-BW-SRT,Photocopy / Text Only,B&W,Legal (8.5 x 14),Sorted Set,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-BW-STP,Photocopy / Text Only,B&W,Legal (8.5 x 14),Stapled Set,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-BW-WIC,Photocopy / Text Only,B&W,Legal (8.5 x 14),Walk-in Copy,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-FC-SRT,Photocopy / Text Only,Full Color,Legal (8.5 x 14),Sorted Set,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-FC-STP,Photocopy / Text Only,Full Color,Legal (8.5 x 14),Stapled Set,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-FC-WIC,Photocopy / Text Only,Full Color,Legal (8.5 x 14),Walk-in Copy,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-PC-SRT,Photocopy / Text Only,Partial Color,Legal (8.5 x 14),Sorted Set,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-PC-STP,Photocopy / Text Only,Partial Color,Legal (8.5 x 14),Stapled Set,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-LGL-PC-WIC,Photocopy / Text Only,Partial Color,Legal (8.5 x 14),Walk-in Copy,,6,4.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-BW-SRT,Photocopy / Text Only,B&W,Short (8.5 x 11),Sorted Set,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-BW-STP,Photocopy / Text Only,B&W,Short (8.5 x 11),Stapled Set,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-BW-WIC,Photocopy / Text Only,B&W,Short (8.5 x 11),Walk-in Copy,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-FC-SRT,Photocopy / Text Only,Full Color,Short (8.5 x 11),Sorted Set,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-FC-STP,Photocopy / Text Only,Full Color,Short (8.5 x 11),Stapled Set,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-FC-WIC,Photocopy / Text Only,Full Color,Short (8.5 x 11),Walk-in Copy,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-PC-SRT,Photocopy / Text Only,Partial Color,Short (8.5 x 11),Sorted Set,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-PC-STP,Photocopy / Text Only,Partial Color,Short (8.5 x 11),Stapled Set,,4,2.5
+Photocopy & Scanning,Printing,PCS-COPY-TX-SHT-PC-WIC,Photocopy / Text Only,Partial Color,Short (8.5 x 11),Walk-in Copy,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-BW-ARF,Scanning / Image Only,B&W,A4 (8.27 x 11.69),Archive-ready File,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-BW-MPS,Scanning / Image Only,B&W,A4 (8.27 x 11.69),Multi-page Scan,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-BW-STD,Scanning / Image Only,B&W,A4 (8.27 x 11.69),Standard Scan,,8,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-FC-ARF,Scanning / Image Only,Full Color,A4 (8.27 x 11.69),Archive-ready File,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-FC-MPS,Scanning / Image Only,Full Color,A4 (8.27 x 11.69),Multi-page Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-FC-STD,Scanning / Image Only,Full Color,A4 (8.27 x 11.69),Standard Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-PC-ARF,Scanning / Image Only,Partial Color,A4 (8.27 x 11.69),Archive-ready File,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-PC-MPS,Scanning / Image Only,Partial Color,A4 (8.27 x 11.69),Multi-page Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-A4-PC-STD,Scanning / Image Only,Partial Color,A4 (8.27 x 11.69),Standard Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-BW-ARF,Scanning / Image Only,B&W,Legal (8.5 x 14),Archive-ready File,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-BW-MPS,Scanning / Image Only,B&W,Legal (8.5 x 14),Multi-page Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-BW-STD,Scanning / Image Only,B&W,Legal (8.5 x 14),Standard Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-FC-ARF,Scanning / Image Only,Full Color,Legal (8.5 x 14),Archive-ready File,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-FC-MPS,Scanning / Image Only,Full Color,Legal (8.5 x 14),Multi-page Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-FC-STD,Scanning / Image Only,Full Color,Legal (8.5 x 14),Standard Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-PC-ARF,Scanning / Image Only,Partial Color,Legal (8.5 x 14),Archive-ready File,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-PC-MPS,Scanning / Image Only,Partial Color,Legal (8.5 x 14),Multi-page Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-LGL-PC-STD,Scanning / Image Only,Partial Color,Legal (8.5 x 14),Standard Scan,,10,8
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-BW-ARF,Scanning / Image Only,B&W,Short (8.5 x 11),Archive-ready File,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-BW-MPS,Scanning / Image Only,B&W,Short (8.5 x 11),Multi-page Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-BW-STD,Scanning / Image Only,B&W,Short (8.5 x 11),Standard Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-FC-ARF,Scanning / Image Only,Full Color,Short (8.5 x 11),Archive-ready File,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-FC-MPS,Scanning / Image Only,Full Color,Short (8.5 x 11),Multi-page Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-FC-STD,Scanning / Image Only,Full Color,Short (8.5 x 11),Standard Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-PC-ARF,Scanning / Image Only,Partial Color,Short (8.5 x 11),Archive-ready File,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-PC-MPS,Scanning / Image Only,Partial Color,Short (8.5 x 11),Multi-page Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-IM-SHT-PC-STD,Scanning / Image Only,Partial Color,Short (8.5 x 11),Standard Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-BW-ARF,Scanning / Text with Image,B&W,A4 (8.27 x 11.69),Archive-ready File,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-BW-MPS,Scanning / Text with Image,B&W,A4 (8.27 x 11.69),Multi-page Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-BW-STD,Scanning / Text with Image,B&W,A4 (8.27 x 11.69),Standard Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-FC-ARF,Scanning / Text with Image,Full Color,A4 (8.27 x 11.69),Archive-ready File,,7,5.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-FC-MPS,Scanning / Text with Image,Full Color,A4 (8.27 x 11.69),Multi-page Scan,,7,5.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-FC-STD,Scanning / Text with Image,Full Color,A4 (8.27 x 11.69),Standard Scan,,7,5.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-PC-ARF,Scanning / Text with Image,Partial Color,A4 (8.27 x 11.69),Archive-ready File,,7,5.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-PC-MPS,Scanning / Text with Image,Partial Color,A4 (8.27 x 11.69),Multi-page Scan,,7,5.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-A4-PC-STD,Scanning / Text with Image,Partial Color,A4 (8.27 x 11.69),Standard Scan,,7,5.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-BW-ARF,Scanning / Text with Image,B&W,Legal (8.5 x 14),Archive-ready File,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-BW-MPS,Scanning / Text with Image,B&W,Legal (8.5 x 14),Multi-page Scan,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-BW-STD,Scanning / Text with Image,B&W,Legal (8.5 x 14),Standard Scan,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-FC-ARF,Scanning / Text with Image,Full Color,Legal (8.5 x 14),Archive-ready File,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-FC-MPS,Scanning / Text with Image,Full Color,Legal (8.5 x 14),Multi-page Scan,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-FC-STD,Scanning / Text with Image,Full Color,Legal (8.5 x 14),Standard Scan,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-PC-ARF,Scanning / Text with Image,Partial Color,Legal (8.5 x 14),Archive-ready File,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-PC-MPS,Scanning / Text with Image,Partial Color,Legal (8.5 x 14),Multi-page Scan,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-LGL-PC-STD,Scanning / Text with Image,Partial Color,Legal (8.5 x 14),Standard Scan,,8,6
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-BW-ARF,Scanning / Text with Image,B&W,Short (8.5 x 11),Archive-ready File,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-BW-MPS,Scanning / Text with Image,B&W,Short (8.5 x 11),Multi-page Scan,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-BW-STD,Scanning / Text with Image,B&W,Short (8.5 x 11),Standard Scan,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-FC-ARF,Scanning / Text with Image,Full Color,Short (8.5 x 11),Archive-ready File,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-FC-MPS,Scanning / Text with Image,Full Color,Short (8.5 x 11),Multi-page Scan,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-FC-STD,Scanning / Text with Image,Full Color,Short (8.5 x 11),Standard Scan,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-PC-ARF,Scanning / Text with Image,Partial Color,Short (8.5 x 11),Archive-ready File,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-PC-MPS,Scanning / Text with Image,Partial Color,Short (8.5 x 11),Multi-page Scan,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TWI-SHT-PC-STD,Scanning / Text with Image,Partial Color,Short (8.5 x 11),Standard Scan,,4,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-BW-ARF,Scanning / Text Only,B&W,A4 (8.27 x 11.69),Archive-ready File,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-BW-MPS,Scanning / Text Only,B&W,A4 (8.27 x 11.69),Multi-page Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-BW-STD,Scanning / Text Only,B&W,A4 (8.27 x 11.69),Standard Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-FC-ARF,Scanning / Text Only,Full Color,A4 (8.27 x 11.69),Archive-ready File,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-FC-MPS,Scanning / Text Only,Full Color,A4 (8.27 x 11.69),Multi-page Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-FC-STD,Scanning / Text Only,Full Color,A4 (8.27 x 11.69),Standard Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-PC-ARF,Scanning / Text Only,Partial Color,A4 (8.27 x 11.69),Archive-ready File,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-PC-MPS,Scanning / Text Only,Partial Color,A4 (8.27 x 11.69),Multi-page Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-A4-PC-STD,Scanning / Text Only,Partial Color,A4 (8.27 x 11.69),Standard Scan,,5,3.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-BW-ARF,Scanning / Text Only,B&W,Legal (8.5 x 14),Archive-ready File,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-BW-MPS,Scanning / Text Only,B&W,Legal (8.5 x 14),Multi-page Scan,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-BW-STD,Scanning / Text Only,B&W,Legal (8.5 x 14),Standard Scan,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-FC-ARF,Scanning / Text Only,Full Color,Legal (8.5 x 14),Archive-ready File,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-FC-MPS,Scanning / Text Only,Full Color,Legal (8.5 x 14),Multi-page Scan,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-FC-STD,Scanning / Text Only,Full Color,Legal (8.5 x 14),Standard Scan,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-PC-ARF,Scanning / Text Only,Partial Color,Legal (8.5 x 14),Archive-ready File,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-PC-MPS,Scanning / Text Only,Partial Color,Legal (8.5 x 14),Multi-page Scan,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-LGL-PC-STD,Scanning / Text Only,Partial Color,Legal (8.5 x 14),Standard Scan,,6,4.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-BW-ARF,Scanning / Text Only,B&W,Short (8.5 x 11),Archive-ready File,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-BW-MPS,Scanning / Text Only,B&W,Short (8.5 x 11),Multi-page Scan,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-BW-STD,Scanning / Text Only,B&W,Short (8.5 x 11),Standard Scan,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-FC-ARF,Scanning / Text Only,Full Color,Short (8.5 x 11),Archive-ready File,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-FC-MPS,Scanning / Text Only,Full Color,Short (8.5 x 11),Multi-page Scan,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-FC-STD,Scanning / Text Only,Full Color,Short (8.5 x 11),Standard Scan,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-PC-ARF,Scanning / Text Only,Partial Color,Short (8.5 x 11),Archive-ready File,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-PC-MPS,Scanning / Text Only,Partial Color,Short (8.5 x 11),Multi-page Scan,,4,2.5
+Photocopy & Scanning,Printing,PCS-SCAN-TX-SHT-PC-STD,Scanning / Text Only,Partial Color,Short (8.5 x 11),Standard Scan,,4,2.5

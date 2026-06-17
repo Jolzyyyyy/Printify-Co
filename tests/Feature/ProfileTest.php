@@ -16,6 +16,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->get('/profile');
 
         $response->assertOk();
@@ -27,10 +28,13 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->patch('/profile', [
+                'username' => 'test_user',
                 'first_name' => 'Test',
                 'last_name' => 'User',
                 'email' => 'test@example.com',
+                'backup_email' => 'test.backup@example.com',
             ]);
 
         $response
@@ -40,7 +44,9 @@ class ProfileTest extends TestCase
         $user->refresh();
 
         $this->assertSame('Test User', $user->name);
+        $this->assertSame('test_user', $user->username);
         $this->assertSame('test@example.com', $user->email);
+        $this->assertSame('test.backup@example.com', $user->backup_email);
         $this->assertNull($user->email_verified_at);
     }
 
@@ -50,6 +56,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->patch('/profile', [
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
@@ -71,15 +78,19 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->patchJson('/profile', [
                 'name' => 'Maria Santos',
+                'username' => 'maria_santos',
                 'email' => 'customer@example.com',
+                'backup_email' => 'maria.backup@example.com',
                 'phone' => '+639171112222',
                 'birthdate' => '1998-04-12',
                 'gender' => 'Female',
                 'street' => 'Blk 6 Lot 8',
                 'barangay' => 'Ninada',
                 'region' => 'Metro Manila',
+                'province' => 'Metro Manila',
                 'city' => 'Quezon City',
                 'postal_code' => '1121',
                 'company' => 'Printify Co.',
@@ -92,15 +103,104 @@ class ProfileTest extends TestCase
         $user->refresh();
 
         $this->assertSame('Maria Santos', $user->name);
+        $this->assertSame('maria_santos', $user->username);
+        $this->assertSame('maria.backup@example.com', $user->backup_email);
         $this->assertSame('+639171112222', $user->phone);
         $this->assertSame('1998-04-12', $user->birthdate);
         $this->assertSame('Female', $user->gender);
         $this->assertSame('Blk 6 Lot 8', $user->street);
         $this->assertSame('Ninada', $user->barangay);
         $this->assertSame('Metro Manila', $user->region);
+        $this->assertSame('Metro Manila', $user->province);
         $this->assertSame('Quezon City', $user->city);
         $this->assertSame('1121', $user->postal_code);
         $this->assertSame('Printify Co.', $user->company);
+    }
+
+    public function test_profile_phone_number_is_normalized_to_e164_format(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'phone-normalize@example.com',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
+            ->patchJson('/profile', [
+                'first_name' => 'Phone',
+                'last_name' => 'User',
+                'email' => 'phone-normalize@example.com',
+                'phone' => '0917 111 2222',
+            ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('ok', true);
+
+        $this->assertSame('+639171112222', $user->refresh()->phone);
+    }
+
+    public function test_profile_accepts_plain_country_code_mobile_number_and_stores_plus639(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'phone-country-code@example.com',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
+            ->patchJson('/profile', [
+                'first_name' => 'Phone',
+                'last_name' => 'User',
+                'email' => 'phone-country-code@example.com',
+                'phone' => '639171112222',
+            ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('ok', true);
+
+        $this->assertSame('+639171112222', $user->refresh()->phone);
+    }
+
+    public function test_profile_rejects_philippine_landline_number(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'phone-landline@example.com',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
+            ->patchJson('/profile', [
+                'first_name' => 'Phone',
+                'last_name' => 'User',
+                'email' => 'phone-landline@example.com',
+                'phone' => '+63281234567',
+            ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('phone');
+    }
+
+    public function test_profile_rejects_invalid_philippine_mobile_number(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'phone-invalid@example.com',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
+            ->patchJson('/profile', [
+                'first_name' => 'Phone',
+                'last_name' => 'User',
+                'email' => 'phone-invalid@example.com',
+                'phone' => '12345',
+            ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('phone');
     }
 
     public function test_backup_email_can_be_updated(): void
@@ -109,6 +209,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->patch('/profile/backup-email', [
                 'backup_email' => 'backup@example.com',
             ]);
@@ -128,6 +229,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->from('/profile')
             ->patch('/profile/backup-email', [
                 'backup_email' => 'primary@example.com',
@@ -144,6 +246,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->delete('/profile', [
                 'password' => 'password',
             ]);
@@ -162,6 +265,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
+            ->withSession(['customer_otp_passed' => true])
             ->from('/profile')
             ->delete('/profile', [
                 'password' => 'wrong-password',

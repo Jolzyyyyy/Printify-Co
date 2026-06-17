@@ -45,9 +45,9 @@ Route::get('/contact', [FrontPageController::class, 'contact'])->name('landing.c
 Route::get('/contactus', [FrontPageController::class, 'contact'])->name('landing.contactus');
 Route::post('/contact', [FrontPageController::class, 'submitContact'])->name('landing.contact.submit');
 Route::post('/contactus', [FrontPageController::class, 'submitContact'])->name('landing.contactus.submit');
+Route::get('/service-detail', [FrontPageController::class, 'serviceDetail'])->name('landing.service-detail');
+Route::get('/service-details', [FrontPageController::class, 'serviceDetail'])->name('landing.service-details');
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
-    Route::get('/service-detail', [FrontPageController::class, 'serviceDetail'])->name('landing.service-detail');
-    Route::get('/service-details', [FrontPageController::class, 'serviceDetail'])->name('landing.service-details');
     Route::get('/checkout', [FrontPageController::class, 'checkout'])->name('checkout.index');
 });
 
@@ -63,11 +63,14 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->prefix('cart')->na
     Route::post('/sync', [CartController::class, 'syncCart'])->name('sync');
 });
 
-Route::get('/payment/checkout', [PaymongoCheckoutController::class, 'checkout'])->name('payment.checkout');
-Route::post('/payment/start', [PaymongoCheckoutController::class, 'start'])->name('payment.start');
-Route::post('/payment/pay', [PaymongoCheckoutController::class, 'pay'])->name('payment.pay');
-Route::get('/payment/success', [PaymongoCheckoutController::class, 'success'])->name('payment.success');
-Route::get('/payment/cancel', [PaymongoCheckoutController::class, 'cancel'])->name('payment.cancel');
+Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
+    Route::get('/payment/checkout', [PaymongoCheckoutController::class, 'checkout'])->name('payment.checkout');
+    Route::post('/payment/start', [PaymongoCheckoutController::class, 'start'])->name('payment.start');
+    Route::post('/payment/pay', [PaymongoCheckoutController::class, 'pay'])->name('payment.pay');
+    Route::get('/payment/success', [PaymongoCheckoutController::class, 'success'])->name('payment.success');
+    Route::get('/payment/cancel', [PaymongoCheckoutController::class, 'cancel'])->name('payment.cancel');
+});
+Route::post('/paymongo/webhook', [PaymongoCheckoutController::class, 'webhook'])->name('payment.paymongo.webhook');
 Route::get('/checkout.php', fn () => redirect('/checkout'));
 
 /*
