@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Models\Order;
 
 // --- CUSTOMER CONTROLLERS ---
 use App\Http\Controllers\FrontPageController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymongoCheckoutController;
 use App\Http\Controllers\SupportTicketController;
+use App\Http\Controllers\LalamoveDeliveryController;
 
 // --- CUSTOMER AUTH CONTROLLERS ---
 use App\Http\Controllers\Auth\AuthenticatedSessionController; 
@@ -108,9 +110,12 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    // --- FIXED ORDERS SECTION PARA SA CUSTOMER ---
-    Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('my-orders');
-    Route::get('/my-orders/{order}', [OrderController::class, 'myShow'])->name('my-orders.show');
+    // --- CUSTOMER ORDER FLOW ---
+    Route::get('/co/place-order', [OrderController::class, 'myOrders'])->name('co.place-order');
+    Route::get('/co/place-order/{order}', [OrderController::class, 'myShow'])->name('co.place-order.show');
+    Route::get('/co/place-order/{order}/tracking', [OrderController::class, 'myTracking'])->name('co.place-order.tracking');
+    Route::get('/my-orders', fn () => redirect()->route('co.place-order'))->name('my-orders');
+    Route::get('/my-orders/{order}', fn (Order $order) => redirect()->route('co.place-order.show', $order))->name('my-orders.show');
     
     Route::get('/orders', [OrderController::class, 'myOrders'])->name('orders.index');
 
@@ -154,6 +159,9 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     Route::post('/help-center/tickets', [SupportTicketController::class, 'store'])->name('help-center.tickets.store');
 
     Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
+    Route::post('/delivery/lalamove/quote', [LalamoveDeliveryController::class, 'quote'])->name('delivery.lalamove.quote');
+    Route::post('/orders/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('orders.delivery.book');
+    Route::post('/orders/{order}/delivery/refresh', [LalamoveDeliveryController::class, 'refresh'])->name('orders.delivery.refresh');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('customer.logout');
 });
 
@@ -210,6 +218,8 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
         Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
         Route::get('/orders-database', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/orders-database/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+        Route::post('/orders-database/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('admin.orders.delivery.book');
+        Route::post('/orders-database/{order}/delivery/refresh', [LalamoveDeliveryController::class, 'refresh'])->name('admin.orders.delivery.refresh');
         Route::middleware('role:developer')->group(function () {
             Route::get('/orders-database/{order}/edit', [OrderController::class, 'edit'])->name('admin.orders.edit');
             Route::put('/orders-database/{order}', [OrderController::class, 'update'])->name('admin.orders.update');

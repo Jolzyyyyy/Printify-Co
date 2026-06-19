@@ -28,19 +28,36 @@ class Order extends Model
         'receipt_number',
         'receipt_sent_at',
         'delivery_method',
+        'delivery_fee',
         'delivery_address',
+        'delivery_latitude',
+        'delivery_longitude',
+        'delivery_notes',
         'delivery_booking_status',
         'delivery_tracking_number',
         'delivery_tracking_url',
         'delivery_booked_at',
+        'lalamove_quotation_id',
+        'lalamove_order_id',
+        'lalamove_status',
+        'lalamove_driver_id',
+        'lalamove_driver_name',
+        'lalamove_driver_phone',
+        'lalamove_plate_number',
+        'lalamove_share_link',
+        'lalamove_last_synced_at',
     ];
 
     protected $casts = [
         'checkout_details' => 'array',
         'total_price' => 'decimal:2',
+        'delivery_fee' => 'decimal:2',
+        'delivery_latitude' => 'decimal:7',
+        'delivery_longitude' => 'decimal:7',
         'paid_at' => 'datetime',
         'receipt_sent_at' => 'datetime',
         'delivery_booked_at' => 'datetime',
+        'lalamove_last_synced_at' => 'datetime',
     ];
 
     public function user()
@@ -65,7 +82,7 @@ class Order extends Model
 
     public function recomputeTotal(): void
     {
-        $total = $this->items()->sum('subtotal');
+        $total = $this->items()->sum('subtotal') + (float) $this->delivery_fee;
         $this->update(['total_price' => $total]);
     }
 

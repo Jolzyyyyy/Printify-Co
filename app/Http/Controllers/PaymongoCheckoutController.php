@@ -151,7 +151,7 @@ class PaymongoCheckoutController extends Controller
         session()->forget('cart');
         session()->forget('pending_order_id');
 
-        return redirect('/checkout?payment=success&ref=' . urlencode((string) $request->query('ref', '')));
+        return redirect()->route('co.place-order')->with('success', 'Payment confirmed. You can view your order details and tracking here.');
     }
 
     public function cancel(Request $request)
@@ -412,6 +412,8 @@ class PaymongoCheckoutController extends Controller
             'checkout.delivery' => ['required', 'array'],
             'checkout.delivery.type' => ['required', 'string', 'in:standard,express,lalamove,pickup'],
             'checkout.delivery.name' => ['required', 'string', 'max:80'],
+            'checkout.delivery.cost' => ['nullable', 'numeric', 'min:0'],
+            'checkout.delivery.quotationId' => ['nullable', 'string', 'max:120'],
             'checkout.shippingAddress' => ['required_unless:checkout.delivery.type,pickup', 'array'],
             'checkout.shippingAddress.street' => ['required_unless:checkout.delivery.type,pickup', 'nullable', 'string', 'max:255'],
             'checkout.shippingAddress.apartment' => ['required_unless:checkout.delivery.type,pickup', 'nullable', 'string', 'max:255'],
@@ -420,6 +422,9 @@ class PaymongoCheckoutController extends Controller
             'checkout.shippingAddress.barangay' => ['required_unless:checkout.delivery.type,pickup', 'nullable', 'string', 'max:120'],
             'checkout.shippingAddress.postal' => ['required_unless:checkout.delivery.type,pickup', 'nullable', 'string', 'max:20'],
             'checkout.shippingAddress.country' => ['required_unless:checkout.delivery.type,pickup', 'nullable', 'string', 'in:Philippines'],
+            'checkout.shippingAddress.lat' => ['nullable', 'numeric', 'between:-90,90'],
+            'checkout.shippingAddress.lng' => ['nullable', 'numeric', 'between:-180,180'],
+            'checkout.notes' => ['nullable', 'string', 'max:250'],
         ], [], [
             'checkout.customer.firstName' => 'first name',
             'checkout.customer.lastName' => 'last name',

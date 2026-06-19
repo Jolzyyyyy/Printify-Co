@@ -17,10 +17,11 @@ class OrderController extends Controller
     {
         $orders = Order::query()
             ->where('user_id', auth()->id())
+            ->with(['items.service'])
+            ->withCount('items')
             ->latest()
-            ->paginate(10);
+            ->paginate(6);
 
-        // Ito ang gagamitin nating file para sa Customer
         return view('customer-orders', compact('orders'));
     }
 
@@ -34,7 +35,17 @@ class OrderController extends Controller
         }
 
         $order->load(['items.service', 'files']);
-        return view('orders.show', compact('order'));
+        return view('customer-order-detail', compact('order'));
+    }
+
+    public function myTracking(Order $order)
+    {
+        if ((int) $order->user_id !== (int) auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $order->load(['items.service', 'files']);
+        return view('customer-order-tracking', compact('order'));
     }
 
     /*

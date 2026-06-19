@@ -157,11 +157,11 @@
                     <h2 class="hc-card-title"><i class="fa-solid fa-cube" style="color:var(--hc-orange);margin-right:8px"></i>Order Support Shortcuts</h2>
                     <p class="hc-card-desc">Quick actions to manage and get help with your orders.</p>
                     <div class="hc-shortcut-grid" style="margin-top:14px">
-                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('my-orders') }}'"><i class="fa-solid fa-truck hc-shortcut-icon track"></i><span><p class="hc-row-title">Track My Order</p><p class="hc-row-sub">Check delivery status</p></span><span></span></button>
+                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('co.place-order') }}'"><i class="fa-solid fa-truck hc-shortcut-icon track"></i><span><p class="hc-row-title">Track My Order</p><p class="hc-row-sub">Check delivery status</p></span><span></span></button>
                         <button class="hc-shortcut" type="button" onclick="openTicketModal('Change Request')"><i class="fa-solid fa-pen-to-square hc-shortcut-icon change"></i><span><p class="hc-row-title">Request a Change</p><p class="hc-row-sub">Modify order details</p></span><span></span></button>
                         <button class="hc-shortcut" type="button" onclick="openTicketModal('Report an Issue')"><i class="fa-solid fa-triangle-exclamation hc-shortcut-icon issue"></i><span><p class="hc-row-title">Report an Issue</p><p class="hc-row-sub">Something wrong?</p></span><span></span></button>
                         <button class="hc-shortcut" type="button" onclick="openTicketModal('Return Request')"><i class="fa-solid fa-rotate-left hc-shortcut-icon return"></i><span><p class="hc-row-title">Start a Return</p><p class="hc-row-sub">Initiate return process</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('my-orders') }}#history'"><i class="fa-regular fa-clock hc-shortcut-icon history"></i><span><p class="hc-row-title">View Order History</p><p class="hc-row-sub">See past orders</p></span><span></span></button>
+                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('co.place-order') }}#history'"><i class="fa-regular fa-clock hc-shortcut-icon history"></i><span><p class="hc-row-title">View Order History</p><p class="hc-row-sub">See past orders</p></span><span></span></button>
                     </div>
                 </div>
             </section>

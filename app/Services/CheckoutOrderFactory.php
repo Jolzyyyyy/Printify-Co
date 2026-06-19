@@ -37,9 +37,15 @@ class CheckoutOrderFactory
                 'payment_method' => $paymentMethod,
                 'payment_provider' => $paymentProvider,
                 'delivery_method' => $deliveryType,
+                'delivery_fee' => round((float) data_get($checkout, 'delivery.cost', 0), 2),
                 'delivery_address' => $deliveryType === 'pickup'
                     ? null
                     : $this->formatDeliveryAddress((array) data_get($checkout, 'shippingAddress', [])),
+                'delivery_latitude' => data_get($checkout, 'shippingAddress.lat'),
+                'delivery_longitude' => data_get($checkout, 'shippingAddress.lng'),
+                'delivery_notes' => data_get($checkout, 'notes'),
+                'lalamove_quotation_id' => data_get($checkout, 'delivery.quotationId'),
+                'lalamove_status' => $deliveryType === 'lalamove' ? 'PENDING_PAYMENT' : null,
                 'delivery_booking_status' => 'waiting_for_payment',
             ]);
 

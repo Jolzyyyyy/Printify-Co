@@ -63,6 +63,14 @@ return [
         'api_key' => env('LALAMOVE_API_KEY'),
         'api_secret' => env('LALAMOVE_API_SECRET'),
         'base_url' => env('LALAMOVE_BASE_URL', 'https://rest.sandbox.lalamove.com'),
+        'market' => env('LALAMOVE_MARKET', 'PH'),
+        'language' => env('LALAMOVE_LANGUAGE', 'en_PH'),
+        'service_type' => env('LALAMOVE_SERVICE_TYPE', 'MOTORCYCLE'),
+        'pickup_name' => env('LALAMOVE_PICKUP_NAME', 'Printify & Co.'),
+        'pickup_phone' => env('LALAMOVE_PICKUP_PHONE', '+639000000000'),
+        'pickup_address' => env('LALAMOVE_PICKUP_ADDRESS', 'Makati City, Metro Manila, Philippines'),
+        'pickup_lat' => env('LALAMOVE_PICKUP_LAT', '14.554729'),
+        'pickup_lng' => env('LALAMOVE_PICKUP_LNG', '121.024445'),
     ],
 
 ];
