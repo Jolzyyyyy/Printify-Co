@@ -45,6 +45,9 @@ Route::get('/contact', [FrontPageController::class, 'contact'])->name('landing.c
 Route::get('/contactus', [FrontPageController::class, 'contact'])->name('landing.contactus');
 Route::post('/contact', [FrontPageController::class, 'submitContact'])->name('landing.contact.submit');
 Route::post('/contactus', [FrontPageController::class, 'submitContact'])->name('landing.contactus.submit');
+Route::view('/privacy-policy', 'legal.privacy-policy')->name('legal.privacy');
+Route::view('/terms-of-service', 'legal.terms-of-service')->name('legal.terms');
+Route::get('/support', fn () => redirect()->route('landing.contactus'))->name('support');
 Route::get('/service-detail', [FrontPageController::class, 'serviceDetail'])->name('landing.service-detail');
 Route::get('/service-details', [FrontPageController::class, 'serviceDetail'])->name('landing.service-details');
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {

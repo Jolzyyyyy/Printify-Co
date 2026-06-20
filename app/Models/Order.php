@@ -26,6 +26,7 @@ class Order extends Model
         'payment_reference',
         'paid_at',
         'receipt_number',
+        'receipt_pdf_path',
         'receipt_sent_at',
         'delivery_method',
         'delivery_address',
