@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ServiceOrderingAccessTest extends TestCase
@@ -231,6 +232,7 @@ class ServiceOrderingAccessTest extends TestCase
     public function test_paymongo_paid_webhook_sends_receipt_and_prepares_delivery_booking(): void
     {
         Mail::fake();
+        Storage::fake('local');
         Http::fake([
             'api.paymongo.com/*' => Http::response([
                 'data' => [
@@ -285,8 +287,11 @@ class ServiceOrderingAccessTest extends TestCase
         $this->assertSame('pay_test_123', $order->payment_reference);
         $this->assertNotNull($order->paid_at);
         $this->assertNotNull($order->receipt_number);
+        $this->assertNotNull($order->receipt_pdf_path);
         $this->assertNotNull($order->receipt_sent_at);
         $this->assertSame('pending_lalamove_configuration', $order->delivery_booking_status);
+        Storage::disk('local')->assertExists($order->receipt_pdf_path);
+        $this->assertStringStartsWith('%PDF', Storage::disk('local')->get($order->receipt_pdf_path));
 
         Mail::assertSent(OrderReceiptMail::class, function (OrderReceiptMail $mail) {
             return $mail->hasTo('julieannecalusa@gmail.com');

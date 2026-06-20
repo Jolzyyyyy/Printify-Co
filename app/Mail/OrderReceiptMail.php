@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -33,6 +34,14 @@ class OrderReceiptMail extends Mailable
 
     public function attachments(): array
     {
-        return [];
+        if (blank($this->order->receipt_pdf_path)) {
+            return [];
+        }
+
+        return [
+            Attachment::fromStorageDisk('local', $this->order->receipt_pdf_path)
+                ->as(($this->order->receipt_number ?: 'printify-receipt') . '.pdf')
+                ->withMime('application/pdf'),
+        ];
     }
 }
