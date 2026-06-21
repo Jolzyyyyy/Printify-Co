@@ -1,36 +1,32 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use App\Models\Order;
-
-// --- CUSTOMER CONTROLLERS ---
-use App\Http\Controllers\FrontPageController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PaymongoCheckoutController;
-use App\Http\Controllers\SupportTicketController;
-use App\Http\Controllers\LalamoveDeliveryController;
-
-// --- CUSTOMER AUTH CONTROLLERS ---
-use App\Http\Controllers\Auth\AuthenticatedSessionController; 
-
-// --- ADMIN CONTROLLERS ---
-use App\Http\Controllers\Admin\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\Auth\AdminPasswordResetLinkController;
 use App\Http\Controllers\Admin\AdminClientInvitationController;
 use App\Http\Controllers\Admin\AdminClientProfileController;
-use App\Http\Controllers\Admin\DeveloperAdminClientController;
-use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\AdminController;
+// --- CUSTOMER CONTROLLERS ---
+use App\Http\Controllers\Admin\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\Auth\AdminPasswordResetLinkController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DeveloperAdminClientController;
 use App\Http\Controllers\Admin\SectionController as AdminSectionController;
-
-// --- THIRD PARTY AUTH CONTROLLERS ---
+use App\Http\Controllers\Admin\SecurityController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+// --- CUSTOMER AUTH CONTROLLERS ---
+use App\Http\Controllers\FrontPageController;
+// --- ADMIN CONTROLLERS ---
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\LalamoveDeliveryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymongoCheckoutController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SupportTicketController;
+use App\Models\Order;
+use Illuminate\Http\Request;
+// --- THIRD PARTY AUTH CONTROLLERS ---
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,10 +91,10 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
-    
+
     // FIXED: Ngayon, kapag kinlick ang HOME sa sidebar, babalik ito sa main landing page ('welcome')
     Route::get('/customer-home', function () {
-        return redirect()->route('home'); 
+        return redirect()->route('home');
     })->name('customer.home');
 
     Route::get('/dashboard', function (Request $request) {
@@ -111,7 +107,7 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
                 $firstItem = $order->items->first();
                 $status = strtolower((string) ($order->status ?: 'pending'));
 
-                $order->order_number = $order->order_reference ?: 'ORD-' . str_pad((string) $order->id, 6, '0', STR_PAD_LEFT);
+                $order->order_number = $order->order_reference ?: 'ORD-'.str_pad((string) $order->id, 6, '0', STR_PAD_LEFT);
                 $order->product_name = $firstItem?->service_name ?: $firstItem?->service?->name ?: 'Print Job';
                 $order->project_name = $order->product_name;
                 $order->total_amount = (float) ($order->total_price ?? 0);
@@ -149,15 +145,15 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     Route::get('/orders/my/{order}', [OrderController::class, 'portalMyShow'])->name('orders.my.show');
 
     // 2. NOTIFICATIONS
-    Route::get('/notifications', function() {
-        return view('notifications'); 
+    Route::get('/notifications', function () {
+        return view('notifications');
     })->name('notifications');
 
     // 3. SETTINGS
-    Route::get('/settings', function() {
-        return view('settings'); 
+    Route::get('/settings', function () {
+        return view('settings');
     })->name('settings');
-    Route::post('/settings/save', function(Request $request) {
+    Route::post('/settings/save', function (Request $request) {
         $data = $request->validate([
             'key' => ['required', 'string', 'max:120'],
             'value' => ['nullable'],
@@ -177,13 +173,13 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     })->name('settings.save');
 
     // 4. SECURITY
-    Route::get('/security', function() {
-        return view('security'); 
+    Route::get('/security', function () {
+        return view('security');
     })->name('security');
 
     // 5. HELP CENTER
-    Route::get('/help-center', function() {
-        return view('help-center'); 
+    Route::get('/help-center', function () {
+        return view('help-center');
     })->name('help-center');
     Route::post('/help-center/tickets', [SupportTicketController::class, 'store'])->name('help-center.tickets.store');
 
@@ -202,7 +198,7 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
 
 // Admin Login Guest Routes
 Route::get('/p-co-2026', function () {
-    if (!auth()->check() || !auth()->user()->canAccessAdminPortal()) {
+    if (! auth()->check() || ! auth()->user()->canAccessAdminPortal()) {
         return redirect()->route('admin.login');
     }
 
@@ -213,7 +209,9 @@ Route::get('/p-co-2026', function () {
 
 Route::middleware('guest')->prefix('p-co-2026')->group(function () {
     Route::get('/login-7b5e93-adm-key', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::get('/register-7b5e93-adm-key', fn () => abort(404))->name('admin.register');
     Route::post('/login-7b5e93-adm-key', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+    Route::post('/register-7b5e93-adm-key', fn () => abort(404))->name('admin.register.submit');
     Route::get('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'create'])->name('admin.password.request');
     Route::post('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'store'])->name('admin.password.email');
     Route::get('/admin-client-invite/{token}', [AdminClientInvitationController::class, 'show'])->name('admin-client-invitations.show');
@@ -222,15 +220,15 @@ Route::middleware('guest')->prefix('p-co-2026')->group(function () {
 
 // Admin Authenticated Routes
 Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
-    
+
     // Phase 1: Email OTP
     Route::get('/verify-access', [AdminAuthController::class, 'showOtpForm'])->name('admin.otp.verify');
     Route::post('/verify-otp-submit', [AdminAuthController::class, 'verifyOtp'])->name('admin.otp.submit');
     Route::post('/resend-otp', [AdminAuthController::class, 'resendOtp'])->name('admin.otp.resend');
-    
+
     // Admin Dashboard & Resources
     Route::middleware(['role:admin_client,developer', 'staff.portal', 'admin.client.profile'])->group(function () {
-        
+
         // 1. DASHBOARD
         Route::get('/dashboard', AdminDashboardController::class)->name('admin.dashboard');
 
@@ -240,7 +238,7 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
 
         // 2. CUSTOMER/USER
         Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers');
-        
+
         // 3. ORDERS
         Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
         Route::get('/orders-database', [OrderController::class, 'index'])->name('admin.orders.index');
@@ -252,7 +250,7 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
             Route::put('/orders-database/{order}', [OrderController::class, 'update'])->name('admin.orders.update');
             Route::delete('/orders-database/{order}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
         });
-        
+
         // 4. PRODUCTS
         Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
         Route::get('/services', [ServiceController::class, 'adminIndex'])->name('admin.services.index');
@@ -264,16 +262,16 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
             Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('admin.services.destroy');
             Route::patch('/services/{service}/toggle', [ServiceController::class, 'toggleActive'])->name('admin.services.toggle');
         });
-        
+
         // 5. RATES
         Route::get('/rates', [AdminController::class, 'rates'])->name('admin.rates');
-        
+
         // 6. ANALYTICS
         Route::get('/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
-        
+
         // 7. REPORTS
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
-        
+
         // 8. SETTINGS
         Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
 
@@ -309,8 +307,8 @@ Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026
     Route::patch('/admin-clients/{user}/assign-customer', [DeveloperAdminClientController::class, 'assignCustomer'])->name('admin-clients.assign-customer');
 });
 
-if (file_exists(__DIR__ . '/auth.php')) {
-    require __DIR__ . '/auth.php';
+if (file_exists(__DIR__.'/auth.php')) {
+    require __DIR__.'/auth.php';
 }
 
 // Routes para sa CRUD operations ng Customers
