@@ -229,6 +229,174 @@ class ServiceOrderingAccessTest extends TestCase
         $this->assertSame('DOC-TXT-BW-A4-001', $order->items()->first()?->service_item_id);
     }
 
+    public function test_customer_order_tracking_uses_real_order_checkout_and_item_details(): void
+    {
+        $service = $this->serviceWithVariation();
+        $variation = $service->activeVariations()->firstOrFail();
+        $customer = User::factory()->create([
+            'role' => 'customer',
+            'email_verified_at' => now(),
+            'name' => 'Sonny Quinton',
+        ]);
+
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'order_reference' => 'PFY-TRACK-REAL',
+            'customer_name' => 'Sonny Quinton',
+            'customer_email' => 'sonny@example.com',
+            'customer_phone' => '+639451751414',
+            'status' => 'paid',
+            'total_price' => 299,
+            'checkout_details' => [
+                'delivery' => [
+                    'type' => 'lalamove',
+                    'name' => 'Lalamove On-demand',
+                ],
+                'shippingAddress' => [
+                    'street' => "Jenny's Ave",
+                    'apartment' => '88',
+                    'barangay' => 'Bagong Katipunan',
+                    'city' => 'Pasig City',
+                    'province' => 'Metro Manila',
+                    'postal' => '1600',
+                    'country' => 'Philippines',
+                ],
+            ],
+            'payment_method' => 'gcash',
+            'payment_reference' => 'pay_real_123',
+            'paid_at' => now(),
+            'delivery_method' => 'lalamove',
+            'delivery_fee' => 284,
+            'delivery_address' => "Jenny's Ave, 88, Bagong Katipunan, Pasig City, Metro Manila, 1600, Philippines",
+            'delivery_notes' => 'Leave at front desk',
+            'lalamove_status' => 'ASSIGNING_DRIVER',
+        ]);
+
+        $order->items()->create([
+            'service_id' => $service->id,
+            'service_variation_id' => $variation->id,
+            'service_item_id' => 'DOC-TXT-BW-A4-001',
+            'service_name' => 'Document Printing',
+            'variation_label' => 'Text Only / B&W / A4 / Standard / Package A',
+            'price_type' => 'retail',
+            'unit_price' => 15,
+            'quantity' => 1,
+            'subtotal' => 15,
+        ]);
+
+        $order->files()->create([
+            'original_name' => 'Shaping the Filipino to be heroes.docx',
+            'path' => 'order-files/1/heroes.docx',
+            'mime' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'size' => 12345,
+        ]);
+
+        $this
+            ->actingAs($customer)
+            ->withSession(['customer_otp_passed' => true])
+            ->get(route('co.place-order.tracking', $order))
+            ->assertOk()
+            ->assertSee('PFY-TRACK-REAL')
+            ->assertSee('Document Printing')
+            ->assertSee('DOC-TXT-BW-A4-001')
+            ->assertSee('Text Only')
+            ->assertSee('B&amp;W', false)
+            ->assertSee('GCash')
+            ->assertSee('pay_real_123')
+            ->assertSee("Jenny&#039;s Ave", false)
+            ->assertSee('Leave at front desk')
+            ->assertSee('Shaping the Filipino to be heroes.docx')
+            ->assertDontSee('Text Only Printing')
+            ->assertDontSee('80gsm White')
+            ->assertDontSee('Back to Order Details');
+
+        $this
+            ->actingAs($customer)
+            ->withSession(['customer_otp_passed' => true])
+            ->get(route('co.place-order.show', $order))
+            ->assertRedirect(route('co.place-order.tracking', $order, absolute: false));
+    }
+
+    public function test_customer_can_retry_lalamove_booking_and_store_real_tracking_fields(): void
+    {
+        Http::fake([
+            'rest.sandbox.lalamove.com/v3/quotations' => Http::response([
+                'data' => [
+                    'quotationId' => 'quote_real_123',
+                    'stops' => [
+                        ['stopId' => 'pickup-stop'],
+                        ['stopId' => 'dropoff-stop'],
+                    ],
+                ],
+            ]),
+            'rest.sandbox.lalamove.com/v3/orders' => Http::response([
+                'data' => [
+                    'orderId' => 'LALA-ORDER-123',
+                    'status' => 'ASSIGNING_DRIVER',
+                    'driverId' => null,
+                    'shareLink' => 'https://share.lalamove.test/LALA-ORDER-123',
+                ],
+            ]),
+        ]);
+
+        config()->set('services.lalamove.api_key', 'pk_test_lalamove');
+        config()->set('services.lalamove.api_secret', 'sk_test_lalamove');
+
+        $service = $this->serviceWithVariation();
+        $variation = $service->activeVariations()->firstOrFail();
+        $customer = User::factory()->create([
+            'role' => 'customer',
+            'email_verified_at' => now(),
+        ]);
+
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'order_reference' => 'PFY-LALA-REAL',
+            'customer_name' => 'Sonny Quinton',
+            'customer_email' => 'sonny@example.com',
+            'customer_phone' => '+639451751414',
+            'status' => 'paid',
+            'total_price' => 299,
+            'payment_method' => 'gcash',
+            'paid_at' => now(),
+            'delivery_method' => 'lalamove',
+            'delivery_fee' => 284,
+            'delivery_address' => "Jenny's Ave, Pasig City, Metro Manila, Philippines",
+            'delivery_latitude' => 14.5764,
+            'delivery_longitude' => 121.0851,
+            'delivery_booking_status' => 'lalamove_booking_failed',
+            'lalamove_status' => 'BOOKING_FAILED',
+        ]);
+
+        $order->items()->create([
+            'service_id' => $service->id,
+            'service_variation_id' => $variation->id,
+            'service_item_id' => 'DOC-TXT-BW-A4-001',
+            'service_name' => 'Document Printing',
+            'variation_label' => 'Text Only / B&W / A4 / Standard / Package A',
+            'price_type' => 'retail',
+            'unit_price' => 15,
+            'quantity' => 1,
+            'subtotal' => 15,
+        ]);
+
+        $this
+            ->actingAs($customer)
+            ->withSession(['customer_otp_passed' => true])
+            ->from(route('co.place-order.tracking', $order))
+            ->post(route('orders.delivery.book', $order))
+            ->assertRedirect(route('co.place-order.tracking', $order, absolute: false));
+
+        $order->refresh();
+
+        $this->assertSame('booked_lalamove', $order->delivery_booking_status);
+        $this->assertSame('LALA-ORDER-123', $order->delivery_tracking_number);
+        $this->assertSame('https://share.lalamove.test/LALA-ORDER-123', $order->delivery_tracking_url);
+        $this->assertSame('LALA-ORDER-123', $order->lalamove_order_id);
+        $this->assertSame('ASSIGNING_DRIVER', $order->lalamove_status);
+        $this->assertNotNull($order->delivery_booked_at);
+    }
+
     public function test_paymongo_paid_webhook_sends_receipt_and_prepares_delivery_booking(): void
     {
         Mail::fake();

@@ -108,7 +108,7 @@
     <div class="od-body">
       <div class="od-note">Tracking details are available after opening this order, just like a shop order history flow.</div>
       <div class="od-actions" style="margin-top:14px">
-        <a class="od-btn primary" href="{{ route('co.place-order.tracking', $order) }}"><i class="fa-solid fa-location-dot"></i>View Tracking</a>
+        <a class="od-btn primary" href="{{ route('co.place-order.tracking', $order) }}"><i class="fa-solid fa-location-dot"></i>View &amp; Track</a>
         <a class="od-btn" href="{{ route('help-center') }}"><i class="fa-solid fa-headset"></i>Contact Support</a>
       </div>
     </div>

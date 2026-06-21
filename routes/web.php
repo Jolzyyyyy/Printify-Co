@@ -101,8 +101,30 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
         return redirect()->route('home'); 
     })->name('customer.home');
 
-    Route::get('/dashboard', function () {
-        return view('dashboard'); 
+    Route::get('/dashboard', function (Request $request) {
+        $orders = Order::query()
+            ->where('user_id', $request->user()->id)
+            ->with(['items.service', 'items.serviceVariation', 'files'])
+            ->latest()
+            ->get()
+            ->map(function (Order $order) {
+                $firstItem = $order->items->first();
+                $status = strtolower((string) ($order->status ?: 'pending'));
+
+                $order->order_number = $order->order_reference ?: 'ORD-' . str_pad((string) $order->id, 6, '0', STR_PAD_LEFT);
+                $order->product_name = $firstItem?->service_name ?: $firstItem?->service?->name ?: 'Print Job';
+                $order->project_name = $order->product_name;
+                $order->total_amount = (float) ($order->total_price ?? 0);
+                $order->total = $order->total_amount;
+                $order->payment_status = $order->paid_at || in_array($status, ['paid', 'completed', 'delivered'], true) ? 'paid' : ($status === 'payment_setup_failed' ? 'failed' : 'pending');
+
+                return $order;
+            });
+
+        $activeOrders = $orders->filter(fn ($order) => ! in_array(strtolower((string) $order->status), ['completed', 'delivered', 'cancelled'], true));
+        $readyOrders = $orders->filter(fn ($order) => in_array(strtolower((string) ($order->lalamove_status ?: $order->status)), ['ready', 'ready_for_pickup', 'shipped', 'out_for_delivery', 'assigning_driver', 'on_going', 'picked_up'], true));
+
+        return view('dashboard', compact('orders', 'activeOrders', 'readyOrders'));
     })->name('dashboard');
 
     // ROUTES PARA SA CUSTOMER PROFILE
@@ -117,10 +139,14 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     Route::get('/co/place-order', [OrderController::class, 'myOrders'])->name('co.place-order');
     Route::get('/co/place-order/{order}', [OrderController::class, 'myShow'])->name('co.place-order.show');
     Route::get('/co/place-order/{order}/tracking', [OrderController::class, 'myTracking'])->name('co.place-order.tracking');
-    Route::get('/my-orders', fn () => redirect()->route('co.place-order'))->name('my-orders');
-    Route::get('/my-orders/{order}', fn (Order $order) => redirect()->route('co.place-order.show', $order))->name('my-orders.show');
-    
-    Route::get('/orders', [OrderController::class, 'myOrders'])->name('orders.index');
+
+    Route::get('/my-orders', [OrderController::class, 'portalMyOrders'])->name('my-orders');
+    Route::get('/my-orders/{order}', [OrderController::class, 'portalMyShow'])->name('my-orders.show');
+    Route::get('/customer/orders', [OrderController::class, 'portalMyOrders'])->name('customer.orders.index');
+    Route::get('/customer/orders/{order}', [OrderController::class, 'portalMyShow'])->name('customer.orders.show');
+    Route::get('/orders', [OrderController::class, 'portalMyOrders'])->name('orders.index');
+    Route::get('/orders/my', [OrderController::class, 'portalMyOrders'])->name('orders.my.index');
+    Route::get('/orders/my/{order}', [OrderController::class, 'portalMyShow'])->name('orders.my.show');
 
     // 2. NOTIFICATIONS
     Route::get('/notifications', function() {
@@ -174,7 +200,7 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
 |--------------------------------------------------------------------------
 */
 
-// Admin Login/Register Guest Routes
+// Admin Login Guest Routes
 Route::get('/p-co-2026', function () {
     if (!auth()->check() || !auth()->user()->canAccessAdminPortal()) {
         return redirect()->route('admin.login');
@@ -187,9 +213,7 @@ Route::get('/p-co-2026', function () {
 
 Route::middleware('guest')->prefix('p-co-2026')->group(function () {
     Route::get('/login-7b5e93-adm-key', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-    Route::get('/register-7b5e93-adm-key', [AdminAuthController::class, 'showRegisterForm'])->name('admin.register');
     Route::post('/login-7b5e93-adm-key', [AdminAuthController::class, 'login'])->name('admin.login.submit');
-    Route::post('/register-7b5e93-adm-key', [AdminAuthController::class, 'register'])->name('admin.register.submit');
     Route::get('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'create'])->name('admin.password.request');
     Route::post('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'store'])->name('admin.password.email');
     Route::get('/admin-client-invite/{token}', [AdminClientInvitationController::class, 'show'])->name('admin-client-invitations.show');

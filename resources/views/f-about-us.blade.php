@@ -1,4 +1,4 @@
-<style>
+﻿<style>
 #about.about-premium-page {
   display:block;
   background:#fff;
@@ -170,10 +170,10 @@
 }
 #about .mini-stat {
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   gap:8px;
-  min-height:46px;
-  padding:7px 8px;
+  min-height:58px;
+  padding:8px 9px;
   border-radius:10px;
   background:#fff8f4
 }
@@ -191,16 +191,16 @@
 #about .stat-number {
   display:block;
   color:#111;
-  font-size:15px;
+  font-size:12px;
   font-weight:700;
-  line-height:1
+  line-height:1.15
 }
 #about .stat-label {
   display:block;
   margin-top:3px;
   color:#666;
-  font-size:9px;
-  line-height:1.1
+  font-size:9.5px;
+  line-height:1.25
 }
 #about .about-cta {
   margin-top:8px;
@@ -766,10 +766,10 @@
 <div class="about-layout">
 <div class="mission-card">
 <p class="section-label">ABOUT US</p>
-<h2 class="about-heading">Mission, Vision &amp; Service Direction</h2>
+<h2 class="about-heading">Mission, Vision &amp; Process</h2>
 <div class="orange-line">
 </div>
-<p>We keep our printing service clear, dependable, and customer-friendly from first inquiry up to final release.</p>
+<p>Printify &amp; Co. provides independent printing shops with a secure, multi-business platform for ordering, payment validation, and delivery coordination.</p>
 <div class="mv-tabs">
 <button type="button" class="mv-tab active" data-type="mission">MISSION</button>
 <button type="button" class="mv-tab" data-type="vision">VISION</button>
@@ -778,77 +778,26 @@
 <div class="mv-content">
 <h3 id="mvTitle">Our Mission</h3>
 <div id="mvText">
-<p>To deliver high-quality, affordable, and reliable printing services that help customers turn ideas, designs, and business materials into professional printed outputs.</p>
-<p>We aim to make every transaction simple and stress-free through clear assistance, organized production, and consistent quality checked before release.</p>
+<p>Printify &amp; Co. provides independent printing shops with a secure, multi-business platform that automates order management, payment validation, and delivery coordination, enabling reliable and efficient service delivery to their customers.</p>
 </div>
 </div>
-<div class="check-grid">
-<div class="check-item">
-<i class="fa-solid fa-check">
-</i>Modern printing equipment</div>
-<div class="check-item">
-<i class="fa-solid fa-check">
-</i>Clear customer assistance</div>
-<div class="check-item">
-<i class="fa-solid fa-check">
-</i>Quality checking before release</div>
-<div class="check-item">
-<i class="fa-solid fa-check">
-</i>Fast and organized turnaround</div>
-<div class="check-item">
-<i class="fa-solid fa-check">
-</i>Fair and transparent pricing</div>
-<div class="check-item">
-<i class="fa-solid fa-check">
-</i>Printing solutions for every need</div>
+<div class="story-card about-story-inline">
+<p class="section-label">OUR STORY</p>
+<div class="orange-line">
 </div>
-<div class="stat-cta-box">
-<div class="mini-stats">
-<div class="mini-stat">
-<div class="mini-icon">
-<i class="fa-regular fa-calendar-check">
-</i>
-</div>
+<p class="story-text">
+<span class="brand-font">Printify &amp; Co.</span> was built for printing shops still running on manual processes - orders scattered across messaging apps, payments confirmed through screenshots, deliveries arranged outside any real system. As demand grew, these gaps made it harder to track orders, verify payments, and deliver consistent service.
+</p>
+<p class="story-text">
+We built a shared platform instead. Multiple printing businesses now operate securely under one infrastructure, each with its own protected workspace, without the cost of running separate systems.
+</p>
+<p class="story-text">
+One platform for ordering, payment validation, and delivery coordination - turning scattered operations into traceable, scalable workflows.
+</p>
+</div><div class="about-cta">
 <div>
-<span class="stat-number about-counter" data-value="10" data-suffix="+">10+</span>
-<span class="stat-label">Years of Experience</span>
-</div>
-</div>
-<div class="mini-stat">
-<div class="mini-icon">
-<i class="fa-solid fa-star">
-</i>
-</div>
-<div>
-<span class="stat-number about-counter" data-value="25000" data-suffix="+">25,000+</span>
-<span class="stat-label">Clients Completed</span>
-</div>
-</div>
-<div class="mini-stat">
-<div class="mini-icon">
-<i class="fa-solid fa-user">
-</i>
-</div>
-<div>
-<span class="stat-number about-counter" data-value="5000" data-suffix="+">5,000+</span>
-<span class="stat-label">Happy Clients</span>
-</div>
-</div>
-<div class="mini-stat">
-<div class="mini-icon">
-<i class="fa-solid fa-award">
-</i>
-</div>
-<div>
-<span class="stat-number about-counter" data-value="98" data-suffix="%">98%</span>
-<span class="stat-label">On-Time Delivery Rate</span>
-</div>
-</div>
-</div>
-<div class="about-cta">
-<div>
-<h3>Ready to print your next project?</h3>
-<p>Choose a solution, see your details, and our team will help you prepare your order smoothly.</p>
+<h3>Ready to manage printing orders in one platform?</h3>
+<p>Submit files, validate payments, track status, and coordinate delivery through a secure workflow.</p>
 </div>
 <button type="button" class="about-cta-btn" onclick="aboutGoToContact()">
 CONTACT US <i class="fa-solid fa-arrow-right">
@@ -861,35 +810,35 @@ CONTACT US <i class="fa-solid fa-arrow-right">
 <div class="values-grid">
 <div class="value-card is-active" tabindex="0">
 <div class="value-icon orange">
-<i class="fa-solid fa-star">
+<i class="fa-solid fa-lock">
 </i>
 </div>
-<h3>Premium Quality</h3>
-<p>Crisp details, vibrant colors, and durable materials in every print.</p>
+<h3>Secure Platform</h3>
+<p>Tenant-isolated data and role-based access keep every business's records protected.</p>
 </div>
 <div class="value-card" tabindex="0">
 <div class="value-icon blue">
-<i class="fa-solid fa-gauge-high">
+<i class="fa-solid fa-location-dot">
 </i>
 </div>
-<h3>Fast Turnaround</h3>
-<p>On-time or even ahead schedules with a focused process built to meet your deadlines.</p>
+<h3>Real-Time Tracking</h3>
+<p>Know exactly where your order stands, from submission to delivery.</p>
 </div>
 <div class="value-card" tabindex="0">
 <div class="value-icon green">
-<i class="fa-solid fa-thumbs-up">
+<i class="fa-solid fa-credit-card">
 </i>
 </div>
-<h3>Affordable Pricing</h3>
-<p>Competitive rates without compromising on quality, crafted to add value.</p>
+<h3>Verified Payments</h3>
+<p>GCash, Maya, and cash transactions are validated and logged for full transparency.</p>
 </div>
 <div class="value-card" tabindex="0">
 <div class="value-icon purple">
-<i class="fa-solid fa-users">
+<i class="fa-solid fa-truck-fast">
 </i>
 </div>
-<h3>Customer First</h3>
-<p>We listen, care, and go the extra mile for our clients.</p>
+<h3>Coordinated Delivery</h3>
+<p>Trusted couriers like Lalamove and J&amp;T Express, tracked to completion.</p>
 </div>
 </div>
 <div class="top-gallery">
@@ -903,56 +852,41 @@ CONTACT US <i class="fa-solid fa-arrow-right">
 <img src="{{ asset('images/Homesld3.jpg') }}" alt="Printed materials" loading="eager" decoding="sync" fetchpriority="high">
 </div>
 <div class="commit-badge">
-<i class="fa-solid fa-award">
+<i class="fa-solid fa-shield-halved">
 </i>
-<strong>Committed to Excellence</strong>
-<small>Every project is handled with care, precision, and attention to detail.</small>
+<strong>Secure Multi-Business Platform</strong>
+<small>Multiple printing businesses operate under one protected infrastructure.</small>
 </div>
 </div>
 <div class="about-process-strip">
 <div class="process-step">
 <span class="process-num">01</span>
-<i class="fa-solid fa-comments">
+<i class="fa-solid fa-file-arrow-up">
 </i>
-<h3>Consultation</h3>
-<p>We listen to your needs and provide the best solution.</p>
+<h3>Secure File Upload</h3>
+<p>Customers submit print files through the platform for organized processing.</p>
 </div>
 <div class="process-step">
 <span class="process-num">02</span>
-<i class="fa-solid fa-gear">
+<i class="fa-solid fa-receipt">
 </i>
-<h3>Production</h3>
-<p>We print with precision using top-quality materials.</p>
+<h3>Payment Validation</h3>
+<p>GCash, Maya, and cash payments are verified and logged transparently.</p>
 </div>
 <div class="process-step">
 <span class="process-num">03</span>
-<i class="fa-solid fa-shield-halved">
+<i class="fa-solid fa-route">
 </i>
-<h3>Quality Check</h3>
-<p>Every item is inspected for perfect results.</p>
+<h3>Status Tracking</h3>
+<p>Orders stay traceable from submission until completion.</p>
 </div>
 <div class="process-step">
 <span class="process-num">04</span>
 <i class="fa-solid fa-truck">
 </i>
-<h3>Delivery</h3>
-<p>On-time delivery, ready to impress.</p>
+<h3>Delivery Coordination</h3>
+<p>Delivery is coordinated through couriers like Lalamove and J&amp;T Express.</p>
 </div>
-</div>
-<div class="story-card">
-<p class="section-label">OUR STORY</p>
-<h2 class="about-heading">Built on Passion. Driven by Quality.</h2>
-<div class="orange-line">
-</div>
-<p class="story-text">
-At <span class="brand-font">Printify &amp; Co.</span>, we are a leading provider of high-quality printing solutions, dedicated to helping businesses and individuals bring their ideas to life with precision and care. Established with a passion for printing, we continue to grow through reliable service, modern production standards, and a strong commitment to customer satisfaction.
-</p>
-<button type="button" class="about-outline-btn" id="aboutLearnBtn">
-LEARN MORE ABOUT US <i class="fa-solid fa-arrow-right">
-</i>
-</button>
-<div class="about-more" id="aboutMoreText">
-We focus on quality printing, clear communication, and fast customer support from inquiry to final output. Our process helps customers understand available services, turnaround time, and production requirements before placing an order.
 </div>
 </div>
 </div>
@@ -1015,15 +949,6 @@ document.addEventListener('DOMContentLoaded',function(){
     observer.observe(about);
   }else{
     setTimeout(runCounters,500);
-  } const learnBtn=document.getElementById('aboutLearnBtn');
-  const moreText=document.getElementById('aboutMoreText');
-  if(learnBtn && moreText){
-    learnBtn.addEventListener('click',function(){
-      moreText.classList.toggle('show');
-      const isOpen=moreText.classList.contains('show');
-      learnBtn.innerHTML=isOpen ? 'SHOW LESS <i class="fa-solid fa-arrow-up"></i>' : 'LEARN MORE ABOUT US <i class="fa-solid fa-arrow-right"></i>';
-      showAboutFeedback(isOpen ? 'More about us opened.' : 'About details closed.');
-    });
   } const cards=document.querySelectorAll('#about .value-card');
   cards.forEach(card=>{
     const activate=()=>{
@@ -1039,13 +964,11 @@ document.addEventListener('DOMContentLoaded',function(){
   });
   const content={
     mission:{
-      title:'Our Mission', text:[ 'To deliver high-quality, affordable, and reliable printing services that help customers turn ideas, designs, and business materials into professional printed outputs.',
-'We aim to make every transaction simple and stress-free through clear assistance, organized production, and consistent quality checked before release.' ]
+      title:'Our Mission', text:[ 'Printify & Co. provides independent printing shops with a secure, multi-business platform that automates order management, payment validation, and delivery coordination, enabling reliable and efficient service delivery to their customers.' ]
     }, vision:{
-      title:'Our Vision', text:[ 'To become a trusted local printing partner known for consistent quality, fast turnaround, modern production, and excellent customer experience.',
-'We envision Printify & Co. as a reliable creative service provider that supports students, professionals, businesses, and organizations with accessible printing solutions.' ]
+      title:'Our Vision', text:[ 'To be the leading multi-business platform for printing shop operations, empowering small and medium enterprises with centralized, secure, and scalable digital infrastructure for sustained growth.' ]
     }, process:{
-      title:'Our Process', text:[ 'We guide customers through service selection, file checking, order confirmation, production scheduling, quality inspection, and safe order release or delivery.' ]
+      title:'Our Process', text:[ 'We connect you with the right printing shop and guide your order from submission to delivery - secure file upload, transparent payment validation, real-time status tracking, and coordinated delivery, all in one platform.' ]
     }
   };
   const tabs=document.querySelectorAll('#about .mv-tab');

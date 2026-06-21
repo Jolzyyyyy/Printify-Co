@@ -2758,7 +2758,7 @@ image:"{{ asset('images/Photo ID (cover).png') }}"
 image:"{{ asset('images/Photo ID (cover).png') }}"
   },{
     slug:"single-photo-print",name:"Single Photo Print",desc:"Single photo print output.",price:"from <b>₱5.00/print</b>",icon:"fa-solid fa-image",serviceId:"IDP-SP-2R-BW-BC",retailPrice:5,bulkPrice:4,
-image:"{{ asset('images/Photo ID (cover).png') }}"
+image:"{{ asset('images/Single Photo Print.png') }}"
   }]
 },{
   title:"Lamination & Binding",desc:"Durable lamination and clean document binding solutions.",icon:"fa-solid fa-book-open",img:"{{ asset('images/Lamination & BindingS.png') }}",time:"next-day",express:false,order:4,

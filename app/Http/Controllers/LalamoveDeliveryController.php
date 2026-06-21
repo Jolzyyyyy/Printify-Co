@@ -72,6 +72,7 @@ class LalamoveDeliveryController extends Controller
                 'lalamove_driver_phone' => data_get($driver, 'data.phone'),
                 'lalamove_plate_number' => data_get($driver, 'data.plateNumber'),
                 'lalamove_share_link' => data_get($details, 'data.shareLink') ?: $order->lalamove_share_link,
+                'delivery_tracking_url' => data_get($details, 'data.shareLink') ?: $order->delivery_tracking_url,
                 'lalamove_last_synced_at' => now(),
             ]);
 
@@ -94,6 +95,15 @@ class LalamoveDeliveryController extends Controller
             return back()->with('error', 'This order is already booked with Lalamove.');
         }
 
+        if (!$order->delivery_latitude || !$order->delivery_longitude) {
+            $order->update([
+                'delivery_booking_status' => 'pending_lalamove_coordinates',
+                'lalamove_status' => 'PENDING_COORDINATES',
+            ]);
+
+            return back()->with('error', 'Lalamove booking needs drop-off map coordinates for this order.');
+        }
+
         try {
             $quotation = $lalamove->quotation([
                 'address' => $order->delivery_address,
@@ -108,6 +118,10 @@ class LalamoveDeliveryController extends Controller
             ]);
 
             $order->update([
+                'delivery_booking_status' => 'booked_lalamove',
+                'delivery_tracking_number' => data_get($shipment, 'data.orderId'),
+                'delivery_tracking_url' => data_get($shipment, 'data.shareLink'),
+                'delivery_booked_at' => now(),
                 'lalamove_quotation_id' => data_get($quotation, 'data.quotationId'),
                 'lalamove_order_id' => data_get($shipment, 'data.orderId'),
                 'lalamove_status' => data_get($shipment, 'data.status'),
@@ -119,7 +133,10 @@ class LalamoveDeliveryController extends Controller
             return back()->with('success', 'Lalamove booking created.');
         } catch (\Throwable $exception) {
             report($exception);
-            $order->update(['lalamove_status' => 'BOOKING_FAILED']);
+            $order->update([
+                'delivery_booking_status' => 'lalamove_booking_failed',
+                'lalamove_status' => 'BOOKING_FAILED',
+            ]);
 
             return back()->with('error', $exception->getMessage());
         }
