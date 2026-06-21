@@ -114,6 +114,10 @@
                                     </div>
 
                                     <div class="flex flex-col gap-2 xl:min-w-[180px]">
+                                        <a href="{{ route('developer.admin-clients.show', $pendingUser) }}"
+                                           class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-center text-sm font-black uppercase tracking-[0.12em] text-slate-700 transition hover:bg-slate-50">
+                                            View Details
+                                        </a>
                                         <form method="POST" action="{{ route('developer.admin-clients.approve', $pendingUser) }}">
                                             @csrf
                                             @method('PATCH')
@@ -167,13 +171,19 @@
                                             </button>
                                         </form>
                                     </div>
-                                    <form method="POST" action="{{ route('developer.admin-clients.suspend', $approvedUser) }}">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-black uppercase tracking-[0.12em] text-rose-600 transition hover:bg-rose-50">
-                                            Suspend
-                                        </button>
-                                    </form>
+                                    <div class="flex flex-col gap-2">
+                                        <a href="{{ route('developer.admin-clients.show', $approvedUser) }}"
+                                           class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-center text-sm font-black uppercase tracking-[0.12em] text-slate-700 transition hover:bg-slate-50">
+                                            View
+                                        </a>
+                                        <form method="POST" action="{{ route('developer.admin-clients.suspend', $approvedUser) }}">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="w-full rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-black uppercase tracking-[0.12em] text-rose-600 transition hover:bg-rose-50">
+                                                Suspend
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         @empty
