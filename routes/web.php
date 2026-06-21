@@ -279,6 +279,7 @@ Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026
     Route::get('/settings', [AdminSectionController::class, 'settings'])->name('settings.index');
     Route::get('/admin-clients', [DeveloperAdminClientController::class, 'index'])->name('admin-clients.index');
     Route::post('/admin-clients', [DeveloperAdminClientController::class, 'store'])->name('admin-clients.store');
+    Route::get('/admin-clients/{user}', [DeveloperAdminClientController::class, 'show'])->name('admin-clients.show');
     Route::patch('/admin-clients/{user}/approve', [DeveloperAdminClientController::class, 'approve'])->name('admin-clients.approve');
     Route::patch('/admin-clients/{user}/suspend', [DeveloperAdminClientController::class, 'suspend'])->name('admin-clients.suspend');
     Route::patch('/admin-clients/{user}/assign-customer', [DeveloperAdminClientController::class, 'assignCustomer'])->name('admin-clients.assign-customer');
