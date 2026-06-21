@@ -111,6 +111,16 @@ class AdminAuthController extends Controller
         );
     }
 
+    public function showRegisterForm()
+    {
+        abort(404);
+    }
+
+    public function register(Request $request)
+    {
+        abort(404);
+    }
+
     public function showOtpForm()
     {
         if (session('staff_otp_passed')) {

@@ -1,4 +1,4 @@
-﻿<x-guest-layout>
+<x-guest-layout>
     <style>
         :root {
             --primary-blue: #3158ff;
@@ -105,6 +105,23 @@
         }
 
         .sign-in-container { left: 0; z-index: 2; opacity: 1; }
+        .sign-up-container { left: 0; opacity: 0; z-index: 1; }
+
+        .auth-container.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+            opacity: 0;
+            z-index: 1;
+            filter: blur(1.2px);
+        }
+
+        .auth-container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            filter: blur(0);
+            animation: show var(--slide-time) var(--slide-ease);
+        }
+
         @keyframes show {
             0%, 45% { opacity: 0; z-index: 1; }
             46%, 100% { opacity: 1; z-index: 5; }
@@ -127,6 +144,11 @@
             transform-style: preserve-3d;
         }
 
+        .auth-container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+            border-radius: 0 82px 82px 0 !important;
+        }
+
         .overlay {
             background: linear-gradient(145deg, #5d72ff 0%, #4f46e5 48%, #241f9f 100%) !important;
             color: #fff;
@@ -140,6 +162,8 @@
             backface-visibility: hidden;
             transform-style: preserve-3d;
         }
+
+        .auth-container.right-panel-active .overlay { transform: translateX(50%); }
 
         .overlay-panel {
             position: absolute;
@@ -180,12 +204,21 @@
             z-index: 3;
         }
 
+        .overlay-left {
+            transform: translateX(-20%);
+            transition: transform var(--slide-time) var(--slide-ease);
+            background-position: -54px -50px, 28px 20px, center bottom -6px;
+        }
+
         .overlay-right {
             right: 0;
             transform: translateX(0);
             transition: transform var(--slide-time) var(--slide-ease);
             background-position: calc(100% + 48px) -48px, calc(100% - 25px) 20px, center bottom -6px;
         }
+
+        .auth-container.right-panel-active .overlay-left { transform: translateX(0); }
+        .auth-container.right-panel-active .overlay-right { transform: translateX(20%); }
 
         .overlay-panel h1 {
             font-size: 26px !important;
@@ -217,9 +250,46 @@
             backface-visibility: hidden;
         }
 
+        .sign-up-container .form-content { padding: 18px 38px !important; }
+
         .overlay-panel > * {
             will-change: transform, opacity, filter;
             backface-visibility: hidden;
+        }
+
+        .auth-container.is-sliding .form-content,
+        .auth-container.is-sliding .ghost-btn { pointer-events: none; }
+
+        .auth-container.slide-to-register .sign-in-container .form-content {
+            animation: authSlideOutLeft var(--content-time) var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-register .sign-up-container .form-content {
+            animation: authSlideInRight var(--content-time) var(--slide-ease) .12s both;
+        }
+
+        .auth-container.slide-to-login .sign-up-container .form-content {
+            animation: authSlideOutRight var(--content-time) var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-login .sign-in-container .form-content {
+            animation: authSlideInLeft var(--content-time) var(--slide-ease) .12s both;
+        }
+
+        .auth-container.slide-to-register .overlay-right > * {
+            animation: overlaySlideOutLeft .62s var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-register .overlay-left > * {
+            animation: overlaySlideInRight .72s var(--slide-ease) .12s both;
+        }
+
+        .auth-container.slide-to-login .overlay-left > * {
+            animation: overlaySlideOutRight .62s var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-login .overlay-right > * {
+            animation: overlaySlideInLeft .72s var(--slide-ease) .12s both;
         }
 
         @keyframes authSlideInRight {
@@ -415,6 +485,101 @@
             transform: none !important;
         }
 
+        .ghost-btn {
+            min-width: 158px !important;
+            height: 45px !important;
+            margin-top: 0 !important;
+            border-radius: 999px !important;
+            border: 2px solid #fff !important;
+            background: transparent !important;
+            color: #fff !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: none !important;
+            position: relative;
+            z-index: 3;
+            transition: all .3s ease;
+        }
+
+        .overlay-right .ghost-btn {
+            background: #fff !important;
+            color: var(--primary-blue) !important;
+            border-color: #fff !important;
+        }
+
+        .ghost-btn:hover {
+            background: #111827 !important;
+            border-color: #111827 !important;
+            color: #fff !important;
+        }
+
+        .auth-switch-text {
+            margin-top: 10px !important;
+            text-align: center;
+            color: #8b94a7;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .auth-switch-text button {
+            border: 0;
+            background: transparent;
+            padding: 0;
+            color: var(--primary-blue);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .auth-switch-text button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-blue) !important;
+            line-height: 1.15 !important;
+            text-decoration: none !important;
+        }
+
+        .auth-switch-text button::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform .18s ease;
+        }
+
+        .auth-switch-text button:hover::after,
+        .auth-switch-text button:focus-visible::after {
+            transform: scaleX(1);
+        }
+
+        .form-content > .auth-switch-text:first-child {
+            margin: 0 0 13px !important;
+            text-align: center !important;
+        }
+
+        .form-content > form + .auth-switch-text {
+            display: none !important;
+        }
+
+        .overlay-panel .ghost-btn {
+            border: 2px solid rgba(255,255,255,.98) !important;
+            background: rgba(255,255,255,.03) !important;
+            color: #fff !important;
+        }
+
+        .overlay-panel .ghost-btn:hover {
+            background: #111 !important;
+            border-color: #111 !important;
+            color: #fff !important;
+        }
+
         .error-text {
             color: #dc2626;
             font-size: 10px;
@@ -462,14 +627,113 @@
                 min-height: 620px !important;
             }
             .form-content { padding: 24px !important; }
+            .sign-up-container .form-content { padding: 22px !important; }
             .overlay-panel { padding: 0 22px !important; }
         }
     </style>
 
     <div class="auth-container" id="auth-container">
+        {{-- ADMIN/DEVELOPER REGISTER FORM --}}
+        <div class="form-container sign-up-container">
+            <div class="form-content">
+                <p class="auth-switch-text">Already have a staff account? <button type="button" data-auth-switch="login">Sign in</button></p>
+                <h1 class="auth-title">Create Account</h1>
+                <p class="auth-subtitle">Create staff access for the admin portal</p>
+
+                @if ($errors->any())
+                    <div class="auth-feedback" role="alert">
+                        <strong>Sign-in notice</strong>
+                        {{ $errors->first() }}
+                    </div>
+                @elseif (($loginCooldownSeconds ?? 0) > 0)
+                    <div class="auth-feedback" role="alert">
+                        <strong>Login cooldown active</strong>
+                        Please wait <span class="cooldown-timer" data-cooldown="{{ $loginCooldownSeconds }}">{{ $loginCooldownSeconds }}</span> seconds before trying again.
+                    </div>
+                @elseif (session('status'))
+                    <div class="auth-feedback" role="status">
+                        <strong>Notice</strong>
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('admin.register.submit') }}" class="w-full">
+                    @csrf
+
+                    <div class="input-group">
+                        <label class="input-label">Name</label>
+                        <div class="field-wrapper">
+                            <span class="field-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </span>
+                            <input type="text" name="name" placeholder="Full Name" class="custom-input" value="{{ old('name') }}" required />
+                        </div>
+                        @error('name') <p class="error-text">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Email Address</label>
+                        <div class="field-wrapper">
+                            <span class="field-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </span>
+                            <input type="email" name="email" placeholder="name@example.com" class="custom-input" value="{{ old('email') }}" required />
+                        </div>
+                        @error('email') <p class="error-text">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">System Role</label>
+                        <div class="field-wrapper">
+                            <span class="field-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 0 1 7.04 4.3l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.28.61.86 1 1.51 1H21a2 2 0 0 1 0 4h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
+                                </svg>
+                            </span>
+                            <select name="role" class="custom-input" required>
+                                <option value="{{ \App\Models\User::ROLE_ADMIN_CLIENT }}" @selected(old('role') === \App\Models\User::ROLE_ADMIN_CLIENT)>Admin Client</option>
+                                <option value="{{ \App\Models\User::ROLE_DEVELOPER }}" @selected(old('role') === \App\Models\User::ROLE_DEVELOPER)>Developer</option>
+                            </select>
+                        </div>
+                        @error('role') <p class="error-text">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Password</label>
+                        <div class="field-wrapper">
+                            <span class="field-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </span>
+                            <input type="password" id="reg_password" name="password" placeholder="Password" class="custom-input custom-input-pass" required />
+                            <button type="button" class="eye-icon-btn" onclick="togglePassword('reg_password', 'eye-reg-1')">
+                                <svg id="eye-reg-1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        @error('password') <p class="error-text">{{ $message }}</p> @enderror
+                    </div>
+
+                    <button type="submit" class="auth-btn">Sign Up</button>
+                </form>
+            </div>
+        </div>
+
         {{-- ADMIN/DEVELOPER LOGIN FORM --}}
         <div class="form-container sign-in-container">
             <div class="form-content">
+                <p class="auth-switch-text">Need staff access? <button type="button" data-auth-switch="register">Sign up</button></p>
                 <h1 class="auth-title">Sign In</h1>
                 <p class="auth-subtitle">Welcome back! Please sign in</p>
 
@@ -541,46 +805,164 @@
             </div>
         </div>
 
-        {{-- BLUE OVERLAY PANEL --}}
+        {{-- BLUE OVERLAY PANELS --}}
         <div class="overlay-container">
             <div class="overlay">
-                <div class="overlay-panel overlay-right">
+                <div class="overlay-panel overlay-left">
                     <h1>Staff Portal</h1>
-                    <p>Sign in with your approved admin client or developer account to access the protected dashboard.</p>
+                    <p>Already have an admin client or developer account? Sign in to manage the system.</p>
+                    <button class="ghost-btn" id="signIn">Sign In</button>
+                </div>
+
+                <div class="overlay-panel overlay-right">
+                    <h1>New Staff?</h1>
+                    <p>Create an admin client or developer account to access the correct dashboard.</p>
+                    <button class="ghost-btn" id="signUp">Sign Up</button>
                 </div>
             </div>
         </div>
     </div>
-    <style id="staff-auth-signin-only-lock">
-        .auth-container {
-            width: 835px !important;
-            max-width: 95vw !important;
-            min-height: 540px !important;
+
+    <style id="staff-auth-smooth-slide-final-0615">
+        :root {
+            --slide-ease: cubic-bezier(.22, 1, .36, 1) !important;
+            --slide-time: .72s !important;
+            --content-time: .46s !important;
         }
-        .auth-container .sign-in-container {
-            left: 0 !important;
-            z-index: 5 !important;
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
+        .auth-container,
+        .form-container,
+        .overlay-container,
+        .overlay,
+        .overlay-panel,
+        .form-content {
+            backface-visibility: hidden !important;
+            transform-style: flat !important;
         }
-        .auth-container .overlay {
-            left: 0 !important;
-            width: 100% !important;
-            transform: none !important;
+        .auth-container.is-sliding .form-content,
+        .auth-container.is-sliding .overlay-panel > * {
+            will-change: transform, opacity !important;
         }
-        .auth-container .overlay-panel {
-            width: 100% !important;
+        .auth-container.slide-to-register .sign-in-container .form-content {
+            animation: authSmoothOutLeft var(--content-time) var(--slide-ease) both !important;
         }
-        .auth-container .overlay-right {
-            left: 0 !important;
-            right: auto !important;
-            transform: none !important;
-            background-position: calc(100% + 48px) -48px, calc(100% - 25px) 20px, center bottom -6px !important;
+        .auth-container.slide-to-register .sign-up-container .form-content {
+            animation: authSmoothInRight var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .sign-up-container .form-content {
+            animation: authSmoothOutRight var(--content-time) var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .sign-in-container .form-content {
+            animation: authSmoothInLeft var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-register .overlay-right > * {
+            animation: authOverlayOutLeft .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-register .overlay-left > * {
+            animation: authOverlayInRight .48s var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .overlay-left > * {
+            animation: authOverlayOutRight .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .overlay-right > * {
+            animation: authOverlayInLeft .48s var(--slide-ease) .08s both !important;
+        }
+        @keyframes authSmoothInRight {
+            from { opacity: 0; transform: translate3d(26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothInLeft {
+            from { opacity: 0; transform: translate3d(-26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-26px,0,0); }
+        }
+        @keyframes authSmoothOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(26px,0,0); }
+        }
+        @keyframes authOverlayInRight {
+            from { opacity: 0; transform: translate3d(18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayInLeft {
+            from { opacity: 0; transform: translate3d(-18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-18px,0,0); }
+        }
+        @keyframes authOverlayOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(18px,0,0); }
         }
     </style>
 
     <script>
+        const container = document.getElementById('auth-container');
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const authSlideDuration = 760;
+
+        const loginUrl = "/p-co-2026/login-7b5e93-adm-key";
+        const registerUrl = "/p-co-2026/register-7b5e93-adm-key";
+
+        function playAuthSlide(direction) {
+            if (container.classList.contains('is-sliding')) return;
+
+            container.classList.remove('slide-to-register', 'slide-to-login');
+            void container.offsetWidth;
+            container.classList.add('is-sliding', direction);
+
+            window.setTimeout(() => {
+                container.classList.remove('is-sliding', direction);
+            }, authSlideDuration);
+        }
+
+        function updateUrl(path, title) {
+            window.history.pushState({}, title, path);
+        }
+
+        signUpButton.addEventListener('click', () => {
+            if (container.classList.contains('right-panel-active')) return;
+            container.classList.add('right-panel-active');
+            playAuthSlide('slide-to-register');
+            updateUrl(registerUrl, 'Admin Register');
+        });
+
+        signInButton.addEventListener('click', () => {
+            if (!container.classList.contains('right-panel-active')) return;
+            container.classList.remove('right-panel-active');
+            playAuthSlide('slide-to-login');
+            updateUrl(loginUrl, 'Admin Login');
+        });
+
+        document.querySelectorAll('[data-auth-switch]').forEach((button) => {
+            button.addEventListener('click', () => {
+                if (button.dataset.authSwitch === 'register') signUpButton.click();
+                if (button.dataset.authSwitch === 'login') signInButton.click();
+            });
+        });
+
+        window.addEventListener('load', () => {
+            const isRegisterPath = window.location.pathname.includes('register-7b5e93-adm-key');
+            const hasRegErrors = @json($errors->has('name') || $errors->has('role') || ($errors->has('email') && old('name')));
+
+            if (hasRegErrors || isRegisterPath) {
+                container.classList.add('right-panel-active');
+            }
+        });
+
+        window.addEventListener('popstate', () => {
+            if (window.location.pathname.includes('register-7b5e93-adm-key')) {
+                container.classList.add('right-panel-active');
+            } else {
+                container.classList.remove('right-panel-active');
+            }
+        });
+
         document.querySelectorAll('[data-cooldown]').forEach((timer) => {
             let remaining = Number(timer.dataset.cooldown || 0);
             const render = () => {
@@ -604,8 +986,6 @@
         function togglePassword(inputId, svgId) {
             const input = document.getElementById(inputId);
             const svg = document.getElementById(svgId);
-
-            if (!input || !svg) return;
 
             if (input.type === 'password') {
                 input.type = 'text';
