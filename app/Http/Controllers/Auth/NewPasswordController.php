@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -121,6 +122,8 @@ class NewPasswordController extends Controller
         // Trigger Laravel internal event
         event(new PasswordReset($user));
 
+        $this->clearLoginCooldowns($request, $user->email);
+
         // 5. Cleanup session markers after successful reset
         $request->session()->forget([
             'password_reset_token',
@@ -130,6 +133,8 @@ class NewPasswordController extends Controller
             'is_forgot_password',
             'auth_type',
             'otp_passed',
+            'customer_login_throttle_email',
+            'staff_login_throttle_email',
         ]);
 
         /**
@@ -163,5 +168,13 @@ class NewPasswordController extends Controller
         return redirect()->route($resetPortal === 'staff' ? 'admin.login' : 'login')->with('status', 
             'Your password has been updated! Please login with your new credentials.'
         );
+    }
+
+    private function clearLoginCooldowns(Request $request, string $email): void
+    {
+        $context = Str::transliterate(Str::lower(trim($email) . '|' . $request->ip()));
+
+        RateLimiter::clear('customer-login:' . $context);
+        RateLimiter::clear('staff-login:' . $context);
     }
 }

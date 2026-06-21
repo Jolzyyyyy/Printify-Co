@@ -90,6 +90,11 @@
 </div>
 <div class="footer-bottom">
 <p>&copy; 2025 <span>Printify &amp; Co.</span> All rights reserved.</p>
+<nav class="footer-legal-links" aria-label="Footer legal links">
+<a href="{{ route('legal.privacy') }}">Privacy Policy</a>
+<a href="{{ route('legal.terms') }}">Terms of Service</a>
+<a href="{{ route('support') }}">Contact / Support</a>
+</nav>
 </div>
 </footer>
 <style id="front-footer-component-style">
@@ -284,7 +289,8 @@
   padding:0 34px!important;
   display:flex!important;
   align-items:center!important;
-  justify-content:center!important;
+  justify-content:space-between!important;
+  gap:18px!important;
   border-top:1px solid rgba(255,255,255,.12)!important;
   background:#050505!important;
   text-align:center!important
@@ -299,6 +305,27 @@
 }
 .printify-footer .footer-bottom span {
   color:#ff7900!important
+}
+.printify-footer .footer-legal-links {
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex-wrap:wrap!important;
+  gap:14px!important;
+  margin:0!important
+}
+.printify-footer .footer-legal-links a {
+  color:#f4f4f4!important;
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  line-height:1!important;
+  text-decoration:none!important;
+  transition:color .16s ease!important
+}
+.printify-footer .footer-legal-links a:hover,.printify-footer .footer-legal-links a:focus {
+  color:#ff7900!important;
+  outline:0!important
 }
 @media(max-width:1180px) {
   .printify-footer {
@@ -342,6 +369,10 @@
     height:auto!important;
     min-height:40px!important;
     padding:12px 22px!important
+  }
+  .printify-footer .footer-bottom {
+    flex-direction:column!important;
+    gap:9px!important
   }
 }
 </style>
