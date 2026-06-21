@@ -19,22 +19,22 @@
     --head:'Playfair Display',Georgia,serif;--title:'Poppins',system-ui,sans-serif;
 }
 *{box-sizing:border-box}
-.profile-page{min-height:calc(100vh - 70px);padding:0 0 34px;background:var(--p-bg);color:var(--p-ink);font-family:var(--font);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.profile-page{min-height:calc(100vh - 70px);padding:0 24px 0 34px;background:var(--p-bg);color:var(--p-ink);font-family:var(--font);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 .profile-page button,.profile-page input{font-family:var(--font)}
-.profile-shell{max-width:1490px;margin:0 auto;padding:0}
+.profile-shell{max-width:1700px;margin:0 auto;padding:0 24px}
 .profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:0 0 16px}
 .profile-title-wrap{display:flex;align-items:flex-start;gap:10px}
 .profile-title-wrap:before{content:'';width:18px;height:4px;margin-top:8px;border-radius:999px;background:var(--p-orange);flex:0 0 auto}
 .profile-title{margin:0 0 3px;font-family:var(--head);font-size:40px;font-weight:700;line-height:1.2;color:#111827;letter-spacing:-.02em}
 .profile-sub{margin:0;color:var(--p-muted);font-size:12px;font-weight:400;line-height:1.45}
-.profile-date{height:42px;min-width:178px;padding:0 15px;border:1px solid #111827;border-radius:8px;background:#fff;color:#111827;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;line-height:1;white-space:nowrap}
+.profile-date{height:42px;min-width:178px;padding:0 24px 15px;border:1px solid #111827;border-radius:8px;background:#fff;color:#111827;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;line-height:1;white-space:nowrap}
 .profile-date svg{color:#111827}
-.profile-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+.profile-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
 .profile-left,.profile-right{display:grid;gap:18px;align-content:start}
 .profile-left{border:1px solid #111827;border-radius:8px;background:#fff;padding:18px;gap:0}
 .prof-card{background:var(--p-card);border:1px solid #111827;border-radius:8px;box-shadow:none;transition:background .18s ease,border-color .18s ease,transform .18s ease}
 .prof-card:hover{background:#fff;border-color:#111827;transform:none}
-.prof-hero{min-height:138px;padding:0 0 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;border:0;border-radius:0;border-bottom:1px solid #111827}
+.prof-hero{min-height:138px;padding:0 24px 0 18px;display:flex;align-items:center;justify-content:space-between;gap:18px;border:0;border-radius:0;border-bottom:1px solid #111827}
 .prof-main{display:flex;align-items:center;gap:18px;min-width:0}
 .prof-avatar-wrap{width:108px;height:108px;position:relative;flex:0 0 auto}
 .prof-avatar{width:108px;height:108px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:radial-gradient(circle at 32% 25%,#ff9a37,#ff5a00 54%,#e04800);border:4px solid #fff;outline:3px solid #ff6a14;box-shadow:0 18px 34px rgba(255,122,0,.22);color:#fff;font-size:44px;font-weight:800;letter-spacing:-.08em}
@@ -49,7 +49,7 @@
 .prof-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .prof-chip{display:inline-flex;align-items:center;gap:6px;min-height:27px;padding:5px 11px;border-radius:999px;background:var(--p-green-soft);color:var(--p-green);font-size:12px;font-weight:700}
 .prof-actions{width:184px;display:grid;gap:10px;flex:0 0 auto}
-.prof-btn,.prof-mini,.prof-link{height:var(--btn-h);min-width:132px;padding:0 17px;border:0!important;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#000!important;font-size:12px;font-weight:600;letter-spacing:0;line-height:1;white-space:nowrap;cursor:pointer;box-shadow:none!important;transition:background .18s ease,color .18s ease;transform:none!important}
+.prof-btn,.prof-mini,.prof-link{height:var(--btn-h);min-width:132px;padding:0 24px 17px;border:0!important;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#000!important;font-size:12px;font-weight:600;letter-spacing:0;line-height:1;white-space:nowrap;cursor:pointer;box-shadow:none!important;transition:background .18s ease,color .18s ease;transform:none!important}
 .prof-btn svg,.prof-mini svg,.prof-link svg{flex:0 0 auto}
 .prof-primary{background:var(--p-orange)!important;color:#111827!important}
 .prof-link-primary{background:var(--p-orange)!important;color:#111827!important}
@@ -64,7 +64,7 @@
 .prof-info,.prof-widget{padding:18px;background:#fff}
 .profile-left .prof-info{border:0;border-radius:0;padding:18px 0 0;box-shadow:none}
 .profile-left .prof-info:hover,.profile-left .prof-hero:hover{background:#fff}
-.profile-right .prof-widget{border:0;border-radius:0;background:transparent;padding:0;box-shadow:none}
+.profile-right .prof-widget{border:0;border-radius:0;background:transparent;padding:0 24px;box-shadow:none}
 .profile-right .prof-widget:hover{background:transparent}
 .profile-right .prof-complete,.profile-right .prof-progress,.profile-right .prof-suggest{display:none!important}
 .profile-right .prof-widget:first-child{display:none!important}
@@ -85,7 +85,7 @@
 .prof-field:nth-last-child(-n+2){border-bottom-color:transparent}
 .prof-label{color:#111827;font-family:var(--font);font-size:12px;font-weight:600;letter-spacing:.003em}
 .prof-value{color:#263244;font-size:13px;font-weight:400;line-height:1.35;word-break:break-word}
-.prof-input{width:100%;height:36px;border:1px solid #d9dee8;border-radius:9px;background:#fff;color:#111827;padding:0 11px;font-size:13px;font-weight:500;outline:0;transition:.18s ease}
+.prof-input{width:100%;height:36px;border:1px solid #d9dee8;border-radius:9px;background:#fff;color:#111827;padding:0 24px 11px;font-size:13px;font-weight:500;outline:0;transition:.18s ease}
 .prof-input:focus{border-color:var(--p-orange);box-shadow:0 0 0 4px rgba(255,122,0,.11)}
 .prof-badge{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:4px 10px;border-radius:999px;background:var(--p-green-soft);color:var(--p-green);font-size:11px;font-weight:700}
 .prof-savebar{position:sticky;bottom:18px;z-index:10;margin-top:10px;padding:12px;border:1px solid #111827;border-radius:8px;background:rgba(255,255,255,.94);box-shadow:none;backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -152,7 +152,7 @@
 .prof-crop-help span{display:block;margin-top:3px;color:#6b7280;font-size:11px;font-weight:400;line-height:1.35}
 .prof-zoom-pct{min-width:48px;text-align:right;color:#111827;font-size:12px;font-weight:700}
 .prof-zoom-row{display:grid;grid-template-columns:38px minmax(0,1fr) 38px;align-items:center;gap:10px}
-.prof-icon-btn{width:38px;height:38px;min-width:0;padding:0;border:1px solid var(--p-line2);border-radius:11px;background:#fff;color:#111827;display:grid;place-items:center;cursor:pointer;font-size:18px;font-weight:700;box-shadow:0 6px 16px rgba(15,23,42,.04);transition:background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
+.prof-icon-btn{width:38px;height:38px;min-width:0;padding:0 24px;border:1px solid var(--p-line2);border-radius:11px;background:#fff;color:#111827;display:grid;place-items:center;cursor:pointer;font-size:18px;font-weight:700;box-shadow:0 6px 16px rgba(15,23,42,.04);transition:background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
 .prof-icon-btn:hover,.prof-icon-btn:focus{background:#111827;border-color:#111827;color:#fff;box-shadow:0 12px 24px rgba(17,24,39,.20)}
 .prof-range-wrap{min-width:0}
 .prof-range-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px}
@@ -162,7 +162,7 @@
 @media(max-width:1180px){.profile-grid{grid-template-columns:1fr}
 .profile-right{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media(max-width:760px){.profile-shell{padding:0 12px 18px}
+@media(max-width:760px){.profile-shell{padding:0 24px 12px 18px}
 .profile-head{display:grid}.profile-date{width:100%}
 .prof-hero,.prof-main{flex-direction:column;align-items:flex-start}
 .prof-actions{width:100%;grid-template-columns:1fr 1fr}
@@ -179,11 +179,11 @@
 .profile-page .profile-grid{align-items:stretch!important}
 .profile-page .profile-left{border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;padding:18px!important;gap:0!important}
 .profile-page .profile-left>.prof-card{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-.profile-page .profile-left>.prof-hero{padding:0 0 18px!important;border-bottom:1px solid #111827!important}
+.profile-page .profile-left>.prof-hero{padding:0 24px 0 18px!important;border-bottom:1px solid #111827!important}
 .profile-page .profile-left>.prof-info{padding:18px 0 0!important}
 .profile-page .profile-left>.prof-card:hover{background:transparent!important;box-shadow:none!important}
 .profile-page .profile-right{border:0!important;background:transparent!important;box-shadow:none!important;align-content:start!important}
-.profile-page .profile-right>.prof-widget{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:0!important}
+.profile-page .profile-right>.prof-widget{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:0 24px!important}
 .profile-page .profile-right>.prof-widget:hover{border:0!important;background:transparent!important;box-shadow:none!important}
 .profile-page .profile-right>.prof-widget:first-child,.profile-page .profile-right>.prof-widget:nth-child(3){display:none!important}
 .profile-page .profile-right .prof-pref,.profile-page .profile-right .prof-act{border-bottom:1px solid #eef1f5!important}
@@ -193,9 +193,9 @@
 
 /* FINAL PROFILE CLEANUP: consistent buttons, subtle layout, calendar, and spacing */
 .profile-page{background:#fff!important;}
-.profile-page .profile-left{border:0!important;border-radius:0!important;background:transparent!important;padding:0!important;gap:0!important;box-shadow:none!important;}
+.profile-page .profile-left{border:0!important;border-radius:0!important;background:transparent!important;padding:0 24px!important;gap:0!important;box-shadow:none!important;}
 .profile-page .profile-left>.prof-card{border:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important;}
-.profile-page .profile-left>.prof-hero{padding:0 0 16px!important;border-bottom:1px solid rgba(17,24,39,.18)!important;}
+.profile-page .profile-left>.prof-hero{padding:0 24px 0 16px!important;border-bottom:1px solid rgba(17,24,39,.18)!important;}
 .profile-page .profile-left>.prof-info{padding:14px 0 0!important;background:#fff!important;}
 .profile-page .prof-title-wrap:before{display:none!important;}
 .profile-page .prof-head{min-height:auto!important;margin-bottom:6px!important;}
@@ -207,10 +207,10 @@
 .profile-page .prof-label{font-size:11.5px!important;}
 .profile-page .prof-value{font-size:12.5px!important;}
 .profile-page .prof-input{height:34px!important;border-radius:8px!important;}
-.profile-page .profile-date{height:38px!important;min-width:164px!important;padding:0 13px!important;border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;color:#111827!important;font-size:11.5px!important;font-weight:500!important;box-shadow:none!important;cursor:pointer!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important;}
+.profile-page .profile-date{height:38px!important;min-width:164px!important;padding:0 24px 13px!important;border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;color:#111827!important;font-size:11.5px!important;font-weight:500!important;box-shadow:none!important;cursor:pointer!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important;}
 .profile-page .profile-date:hover,.profile-page .profile-date:focus{background:#111827!important;color:#fff!important;border-color:#111827!important;outline:0!important;}
 .profile-page .profile-date:hover svg,.profile-page .profile-date:focus svg{color:#fff!important;}
-.profile-page .prof-btn,.profile-page .prof-mini,.profile-page .prof-link{height:38px!important;min-width:112px!important;padding:0 14px!important;border:1px solid #111827!important;border-radius:999px!important;background:#fff!important;color:#111827!important;font-size:11px!important;font-weight:600!important;box-shadow:none!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important;}
+.profile-page .prof-btn,.profile-page .prof-mini,.profile-page .prof-link{height:38px!important;min-width:112px!important;padding:0 24px 14px!important;border:1px solid #111827!important;border-radius:999px!important;background:#fff!important;color:#111827!important;font-size:11px!important;font-weight:600!important;box-shadow:none!important;transition:background .18s ease,color .18s ease,border-color .18s ease!important;}
 .profile-page .prof-btn:hover,.profile-page .prof-btn:focus,.profile-page .prof-mini:hover,.profile-page .prof-mini:focus,.profile-page .prof-link:hover,.profile-page .prof-link:focus{background:#111827!important;border-color:#111827!important;color:#fff!important;outline:0!important;}
 .profile-page .prof-btn:hover svg,.profile-page .prof-btn:focus svg,.profile-page .prof-mini:hover svg,.profile-page .prof-mini:focus svg,.profile-page .prof-link:hover svg,.profile-page .prof-link:focus svg{color:#fff!important;}
 .profile-page .prof-primary,.profile-page .prof-link-primary{border-color:transparent!important;background:linear-gradient(90deg,var(--p-orange),#ffab0a)!important;color:#111827!important;}
@@ -246,10 +246,10 @@
 .profile-calendar-x{width:34px;height:34px;border:0;border-radius:9px;background:#fff;color:#111827;font-size:22px;line-height:1;cursor:pointer;transition:.18s;}
 .profile-calendar-x:hover,.profile-calendar-x:focus{background:#111827;color:#fff;outline:0;}
 .profile-calendar-body{padding:18px;}
-.profile-calendar-input{width:100%;height:42px;border:1px solid #111827;border-radius:8px;background:#fff;color:#111827;padding:0 12px;font-family:var(--font);font-size:12px;font-weight:600;outline:0;}
+.profile-calendar-input{width:100%;height:42px;border:1px solid #111827;border-radius:8px;background:#fff;color:#111827;padding:0 24px 12px;font-family:var(--font);font-size:12px;font-weight:600;outline:0;}
 .profile-calendar-input:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.08);}
 .profile-calendar-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:15px 18px;border-top:1px solid #eef0f4;}
-@media(max-width:760px){.profile-page .profile-left{padding:0!important}.profile-page .prof-field{grid-template-columns:1fr!important}.profile-page .prof-actions{width:100%!important}.profile-page .prof-link{width:100%!important;max-width:none!important}.profile-calendar-actions{display:grid;grid-template-columns:1fr 1fr}.profile-calendar-actions .prof-btn{width:100%!important;}}
+@media(max-width:760px){.profile-page .profile-left{padding:0 24px!important}.profile-page .prof-field{grid-template-columns:1fr!important}.profile-page .prof-actions{width:100%!important}.profile-page .prof-link{width:100%!important;max-width:none!important}.profile-calendar-actions{display:grid;grid-template-columns:1fr 1fr}.profile-calendar-actions .prof-btn{width:100%!important;}}
 
 
 /* FINAL USER FIX: upload hover black, centered right-side buttons, green upload crop button */
@@ -262,7 +262,7 @@
     border-radius:999px!important;
     height:38px!important;
     min-width:112px!important;
-    padding:0 14px!important;
+    padding:0 24px 14px!important;
     box-shadow:none!important;
 }
 .profile-page .prof-actions .prof-light:hover,
@@ -294,7 +294,7 @@
     min-width:190px!important;
     height:38px!important;
     margin:12px auto 0!important;
-    padding:0 16px!important;
+    padding:0 24px 16px!important;
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
@@ -319,7 +319,7 @@
     border-radius:999px!important;
     height:38px!important;
     min-width:112px!important;
-    padding:0 18px!important;
+    padding:0 24px 18px!important;
     box-shadow:none!important;
 }
 .profile-page .prof-success:hover,
@@ -354,7 +354,7 @@
     width:120px!important;
     min-width:120px!important;
     max-width:120px!important;
-    padding:0 18px!important;
+    padding:0 24px 18px!important;
     box-shadow:none!important;
 }
 .profile-page .prof-crop-actions .prof-success:hover,
@@ -380,7 +380,7 @@
     max-width:190px!important;
     height:38px!important;
     margin:12px auto 0!important;
-    padding:0 16px!important;
+    padding:0 24px 16px!important;
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
@@ -463,7 +463,7 @@
     box-shadow:none!important;
 }
 .profile-page .profile-left>.prof-hero{
-    padding:0 0 16px!important;
+    padding:0 24px 0 16px!important;
     border-bottom:1px solid rgba(17,24,39,.18)!important;
 }
 .profile-page .profile-left>.prof-info{
@@ -481,7 +481,7 @@
 .profile-page .prof-avatar:hover,.profile-page .prof-avatar:focus{filter:brightness(.96);outline:0;transform:none!important;}
 .profile-page .prof-photo-menu{position:absolute;left:0;top:calc(100% + 10px);z-index:70;width:190px;border:1px solid #111827;border-radius:12px;background:#fff;box-shadow:0 18px 42px rgba(15,23,42,.14);padding:7px;}
 .profile-page .prof-photo-menu:before{content:'';position:absolute;left:18px;top:-7px;width:12px;height:12px;background:#fff;border-left:1px solid #111827;border-top:1px solid #111827;transform:rotate(45deg);}
-.profile-page .prof-photo-option{position:relative;z-index:1;width:100%;height:36px;border:0;border-radius:9px;background:#fff;color:#111827;display:flex;align-items:center;gap:9px;padding:0 10px;font-size:11.5px;font-weight:600;text-align:left;cursor:pointer;transition:background .18s ease,color .18s ease;}
+.profile-page .prof-photo-option{position:relative;z-index:1;width:100%;height:36px;border:0;border-radius:9px;background:#fff;color:#111827;display:flex;align-items:center;gap:9px;padding:0 24px 10px;font-size:11.5px;font-weight:600;text-align:left;cursor:pointer;transition:background .18s ease,color .18s ease;}
 .profile-page .prof-photo-option svg{flex:0 0 auto;color:currentColor;}
 .profile-page .prof-photo-option:hover,.profile-page .prof-photo-option:focus{background:#111827;color:#fff;outline:0;}
 .profile-page .prof-photo-view-modal{width:min(680px,100%);border:1px solid #111827;border-radius:14px;background:#fff;box-shadow:0 26px 80px rgba(15,23,42,.22);overflow:hidden;}
@@ -697,109 +697,7 @@
         </section>
 </main>
 
-        <aside class="profile-right">
-<section class="prof-card prof-widget">
-<div class="prof-complete">
-<div class="prof-ring">
-<span>88%</span>
-</div>
-<div>
-<h3 class="prof-widget-title" style="margin-bottom:4px">Profile Completion</h3>
-<p class="prof-widget-copy">Great job! Complete your profile to get the most out of your account.</p>
-</div>
-</div>
-<div class="prof-progress">
-<span>
-</span>
-</div>
-<button class="prof-link" type="button" @click="suggest = !suggest">
-<span>View Suggestions</span>
-<span>›</span>
-</button>
-<div class="prof-suggest" x-show="suggest" x-transition x-cloak>Add alternate contact number and verify your address to reach 100% completion.</div>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" stroke="currentColor" stroke-width="2"/>
-</svg>Communication Preferences</h3>
-<template x-for="pr in prefs" :key="pr.k">
-<div class="prof-pref">
-<span class="prof-pref-label" x-text="pr.l">
-</span>
-<div class="prof-pref-side">
-<button type="button" class="prof-toggle" :class="pr.on ? 'is-on' : 'is-off'" :aria-pressed="pr.on.toString()" @click="togglePref(pr)">
-<span class="prof-toggle-knob">
-<template x-if="pr.on">
-<svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-<path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</template>
-<template x-if="!pr.on">
-<svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-<path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-</svg>
-</template>
-</span>
-</button>
-<span class="prof-pref-state" :class="pr.on ? 'on' : 'off'" x-text="pr.on ? 'On' : 'Off'">
-</span>
-</div>
-</div>
-</template>
-<button class="prof-link prof-link-primary" type="button" @click="toastMsg('Preferences can be edited here. Click Save Changes after toggling.')">
-<span>Manage Preferences</span>
-<span>›</span>
-</button>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-</svg>Quick Stats</h3>
-<div class="prof-stats">
-<template x-for="s in stats" :key="s.l">
-<div class="prof-stat">
-<span class="prof-ico" :class="s.c" x-html="s.i">
-</span>
-<span>
-<span class="prof-num" x-text="s.n">
-</span>
-<span class="prof-small" x-text="s.l">
-</span>
-</span>
-</div>
-</template>
-</div>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-<path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2"/>
-</svg>Recent Activity</h3>
-<template x-for="a in shownActs" :key="a.t">
-<div class="prof-act">
-<div class="prof-act-main">
-<span class="prof-dot2">
-</span>
-<span class="prof-act-text" x-text="a.t">
-</span>
-</div>
-<span class="prof-time" x-text="a.d">
-</span>
-</div>
-</template>
-<button class="prof-link prof-link-primary" type="button" @click="allActs = true" x-show="!allActs" x-transition>
-<span>View All Activity</span>
-<span>›</span>
-</button>
-<button class="prof-link" type="button" @click="allActs = false" x-show="allActs" x-transition x-cloak>
-<span>Show Less Activity</span>
-<span>›</span>
-</button>
-</section>
-</aside>
+
     </div>
 </div>
 

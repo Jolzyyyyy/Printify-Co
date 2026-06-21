@@ -99,7 +99,7 @@ Send Message
 </i>
 <div class="contact-info-copy">
 <b>Call Us</b>
-<span>+63 912 345 6789</span>
+<span>+63 9204334130</span>
 <small>Mon-Fri, 8:00 AM - 6:00 PM</small>
 </div>
 </div>

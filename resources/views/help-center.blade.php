@@ -7,12 +7,12 @@
 <style>
 :root{--hc-orange:#FE7B09;--hc-orange2:#FFAB0A;--hc-ink:#111827;--hc-muted:#6b7280;--hc-line:#111827;--hc-soft:#fff;--hc-hover:rgba(17,24,39,.075);--hc-shadow:none;--hc-shadow2:none;--hc-radius:8px;--hc-green:#16a34a;--hc-blue:#2563eb;--hc-purple:#7c3aed;--hc-red:#ef4444}
 .hc-page{min-height:calc(100vh - 70px);background:#fff;color:var(--hc-ink);font-family:'Inter',system-ui,sans-serif;font-weight:400;letter-spacing:0}
-.hc-wrap{max-width:1490px;margin:0 auto;background:#fff}
+.hc-wrap{width:100%;max-width:none;margin:0 auto;background:#fff}
 .hc-title{margin:0;font-family:'Playfair Display',Georgia,serif;font-size:40px;font-weight:700;line-height:1.2;letter-spacing:-.02em;color:#111827}.hc-sub{margin:4px 0 0;color:var(--hc-muted);font-size:12px;line-height:1.45}
-.hc-grid{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;align-items:start}.hc-stack{display:grid;gap:18px}.hc-main-stack{display:grid;gap:12px}
+.hc-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}.hc-stack{display:grid;gap:18px}.hc-main-stack{display:grid;gap:12px}
 .hc-card{background:#fff;border:1px solid #e4e7ec;border-radius:var(--hc-radius);box-shadow:none;transition:background .18s ease,border-color .18s ease;overflow:hidden}.hc-card:hover{background:#fff;box-shadow:none;border-color:#d7dce3}.hc-body{padding:13px 16px}.hc-card-title{margin:0;font-family:'Poppins',system-ui,sans-serif;font-size:14.5px;font-weight:600;letter-spacing:.022em;line-height:1.35;color:#111827}.hc-card-desc{margin:5px 0 0;color:var(--hc-muted);font-size:11.5px;line-height:1.5}
 .hc-hero{display:grid;grid-template-columns:44px minmax(0,1fr);gap:13px;align-items:start}.hc-hero-icon,.hc-icon{width:34px;height:34px;border-radius:0;background:transparent;color:var(--hc-orange);display:grid;place-items:center;flex:0 0 auto}.hc-icon{width:32px;height:32px}.hc-icon.green{background:transparent;color:var(--hc-green)}.hc-icon.purple{background:transparent;color:var(--hc-purple)}.hc-icon.blue{background:transparent;color:var(--hc-blue)}
-.hc-search-row{position:relative;margin-top:12px;margin-bottom:18px;width:min(100%,650px);background:transparent!important;border:0!important;padding:0!important;overflow:visible}.hc-search-row:focus-within{box-shadow:none!important}.hc-search-left-icon{pointer-events:none;position:absolute;inset-block:0;left:0;display:flex;align-items:center;padding-left:24px;color:#9ca3af;z-index:2}.hc-search-left-icon svg{width:16px;height:16px;display:block}.hc-search-left-icon svg path{fill:#9ca3af}.hc-search-input{width:100%;height:42px;border:1px solid #000!important;border-radius:999px!important;background:#fff!important;color:#000!important;padding:8px 24px 8px 64px!important;font-size:16px!important;font-weight:500;line-height:1.2;outline:0;box-shadow:none!important}.hc-search-input::placeholder{color:#6b7280!important}.hc-search-input:focus{border-color:#000!important;background:#fff!important;color:#000!important}.hc-search-icon{display:none!important}.hc-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.hc-chip{height:34px;border:0;border-radius:999px;background:linear-gradient(90deg,var(--hc-orange),var(--hc-orange2));color:#111827;padding:0 15px;font-size:11px;font-weight:500;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease}.hc-chip:hover,.hc-chip:focus{background:#111827!important;color:#fff!important;outline:0;box-shadow:0 12px 24px rgba(17,24,39,.16)}
+.hc-search-row{position:relative;margin-top:12px;margin-bottom:18px;width:100%;background:transparent!important;border:0!important;padding:0!important;overflow:visible}.hc-search-row:focus-within{box-shadow:none!important}.hc-search-left-icon{pointer-events:none;position:absolute;inset-block:0;left:0;display:flex;align-items:center;padding-left:24px;color:#9ca3af;z-index:2}.hc-search-left-icon svg{width:16px;height:16px;display:block}.hc-search-left-icon svg path{fill:#9ca3af}.hc-search-input{width:100%;height:42px;border:1px solid #000!important;border-radius:999px!important;background:#fff!important;color:#000!important;padding:8px 24px 8px 64px!important;font-size:16px!important;font-weight:500;line-height:1.2;outline:0;box-shadow:none!important}.hc-search-input::placeholder{color:#6b7280!important}.hc-search-input:focus{border-color:#000!important;background:#fff!important;color:#000!important}.hc-search-icon{display:none!important}.hc-chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.hc-chip{height:34px;border:0;border-radius:999px;background:linear-gradient(90deg,var(--hc-orange),var(--hc-orange2));color:#111827;padding:0 15px;font-size:11px;font-weight:500;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease}.hc-chip:hover,.hc-chip:focus{background:#111827!important;color:#fff!important;outline:0;box-shadow:0 12px 24px rgba(17,24,39,.16)}
 .hc-category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.hc-category{min-height:88px;border:1px solid #dfe3ea;border-radius:8px;background:#fff;padding:12px;display:grid;grid-template-columns:34px minmax(0,1fr) 14px;gap:10px;align-items:center;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}.hc-category:hover,.hc-category:focus{background:var(--hc-hover);border-color:#cfd5dd;box-shadow:inset 0 0 0 1px rgba(17,24,39,.02);outline:0}.hc-category strong{display:block;font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:600;color:#111827}.hc-category small{display:block;margin-top:3px;color:#6b7280;font-size:10.5px;line-height:1.35}.hc-category em{display:block;margin-top:8px;color:#111827;font-style:normal;font-size:10px;font-weight:700}
 .hc-list{display:grid;gap:0}.hc-article,.hc-support,.hc-announcement,.hc-shortcut,.hc-ticket{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;border-bottom:1px solid #f0f1f3;padding:10px 0;transition:background .18s ease,border-color .18s ease}.hc-article:hover,.hc-support:hover,.hc-announcement:hover,.hc-shortcut:hover,.hc-ticket:hover{background:var(--hc-hover)}.hc-article:last-child,.hc-support:last-child,.hc-announcement:last-child,.hc-shortcut:last-child,.hc-ticket:last-child{border-bottom:0}.hc-article button,.hc-support button,.hc-announcement button,.hc-shortcut button{border:0;background:transparent;color:#111827;cursor:pointer;padding:0;text-align:left}.hc-row-title{margin:0;font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:600;color:#111827}.hc-row-sub{margin:3px 0 0;color:#6b7280;font-size:10.5px;line-height:1.35}.hc-tag{display:inline-flex;align-items:center;justify-content:center;min-width:auto;border-radius:0;background:transparent!important;color:var(--hc-orange);padding:0;font-size:10px;font-weight:700}.hc-tag.green,.hc-tag.purple{background:transparent!important;color:var(--hc-orange)}
 .hc-btn{height:34px;min-width:112px;border:0;border-radius:999px;background:linear-gradient(90deg,var(--hc-orange),var(--hc-orange2));color:#111827!important;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:0;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;text-decoration:none}.hc-btn:hover,.hc-btn:focus{background:#111827!important;border-color:#111827!important;color:#fff!important;box-shadow:0 12px 24px rgba(17,24,39,.18);outline:0}.hc-btn.full{width:100%}.hc-btn.plain{background:#fff!important;color:#111827!important;border:1px solid #111827!important}.hc-btn.plain:hover,.hc-btn.plain:focus{background:#111827!important;border-color:#111827!important;color:#fff!important}
@@ -68,6 +68,15 @@
 .hc-link:hover,.hc-link:focus{background:#111827!important;color:#fff!important;box-shadow:0 12px 24px rgba(17,24,39,.18)!important;outline:0!important;}
 @media(max-width:900px){.hc-main-stack>.hc-card{border:0!important;border-radius:0!important}.hc-main-stack>.hc-card>.hc-body{padding:10px 0!important}}
 
+/* ===== FINAL REQUEST UPDATE: removed right-side sections and widened main Help Center content ===== */
+.hc-wrap{width:100%!important;max-width:none!important;}
+.hc-grid{grid-template-columns:minmax(0,1fr)!important;width:100%!important;}
+.hc-main-stack{width:100%!important;}
+.hc-main-stack>.hc-card:nth-child(1) .hc-body{padding-right:16px!important;}
+.hc-article,.hc-ticket{grid-template-columns:auto minmax(0,620px) 145px!important;justify-content:start!important;}
+.hc-article .hc-tag,.hc-ticket .hc-tag{justify-self:start!important;text-align:left!important;}
+@media(max-width:900px){.hc-article,.hc-ticket{grid-template-columns:auto minmax(0,1fr) auto!important;justify-content:stretch!important;}.hc-wrap{padding-right:0!important;}}
+
 </style>
 
 <div class="hc-page">
@@ -98,11 +107,6 @@
                                     </svg>
                                 </div>
                                 <input id="helpSearch" class="hc-search-input" type="search" placeholder="Search" onkeydown="if(event.key==='Enter') runHelpSearch()">
-                            </div>
-                            <div class="hc-chip-row">
-                                @foreach(['track order','refund','payment failed','change address','return policy'] as $term)
-                                <button type="button" class="hc-chip" onclick="quickHelpSearch('{{ $term }}')">{{ $term }}</button>
-                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -148,57 +152,6 @@
                         </div>
                         @endforeach
                     </div>
-                    <div style="display:flex;justify-content:center;margin-top:12px"><button class="hc-link" type="button" onclick="showAllArticles()">View all articles <i class="fa-solid fa-chevron-right"></i></button></div>
-                </div>
-            </section>
-
-            <section class="hc-card">
-                <div class="hc-body">
-                    <h2 class="hc-card-title"><i class="fa-solid fa-cube" style="color:var(--hc-orange);margin-right:8px"></i>Order Support Shortcuts</h2>
-                    <p class="hc-card-desc">Quick actions to manage and get help with your orders.</p>
-                    <div class="hc-shortcut-grid" style="margin-top:14px">
-                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('my-orders') }}'"><i class="fa-solid fa-truck hc-shortcut-icon track"></i><span><p class="hc-row-title">Track My Order</p><p class="hc-row-sub">Check delivery status</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="openTicketModal('Change Request')"><i class="fa-solid fa-pen-to-square hc-shortcut-icon change"></i><span><p class="hc-row-title">Request a Change</p><p class="hc-row-sub">Modify order details</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="openTicketModal('Report an Issue')"><i class="fa-solid fa-triangle-exclamation hc-shortcut-icon issue"></i><span><p class="hc-row-title">Report an Issue</p><p class="hc-row-sub">Something wrong?</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="openTicketModal('Return Request')"><i class="fa-solid fa-rotate-left hc-shortcut-icon return"></i><span><p class="hc-row-title">Start a Return</p><p class="hc-row-sub">Initiate return process</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('my-orders') }}#history'"><i class="fa-regular fa-clock hc-shortcut-icon history"></i><span><p class="hc-row-title">View Order History</p><p class="hc-row-sub">See past orders</p></span><span></span></button>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <aside class="hc-stack">
-            <section class="hc-card">
-                <div class="hc-body">
-                    <h2 class="hc-card-title"><i class="fa-solid fa-headset" style="color:var(--hc-orange);margin-right:8px"></i>Get Support</h2>
-                    <p class="hc-card-desc">Choose the best way to reach our support team.</p>
-                    <div class="hc-list" style="margin-top:12px">
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-comment-dots"></i></span><button type="button" onclick="startLiveChat()"><p class="hc-row-title">Live Chat</p><p class="hc-row-sub">Chat with our support team in real-time.</p></button><span class="hc-status"><span class="hc-dot"></span>Online <i class="fa-solid fa-chevron-right"></i></span></div>
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-ticket"></i></span><button type="button" onclick="openTicketModal('Order Concern')"><p class="hc-row-title">Submit a Ticket</p><p class="hc-row-sub">Submit a request and we'll get back to you.</p></button><i class="fa-solid fa-chevron-right"></i></div>
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-envelope"></i></span><a href="mailto:support@printifyco.com" style="text-decoration:none"><p class="hc-row-title">Email Support</p><p class="hc-row-sub">support@printifyco.com<br>We usually reply within 24h.</p></a><i class="fa-solid fa-chevron-right"></i></div>
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-phone"></i></span><a href="tel:+639123456789" style="text-decoration:none"><p class="hc-row-title">Call Support</p><p class="hc-row-sub">+63 912 345 6789<br>Mon - Fri, 9:00 AM - 6:00 PM PHT</p></a><i class="fa-solid fa-chevron-right"></i></div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="hc-card">
-                <div class="hc-body">
-                    <h2 class="hc-card-title"><i class="fa-solid fa-bullhorn" style="margin-right:8px"></i>Recent Announcements</h2>
-                    <p class="hc-card-desc">Stay updated with the latest news.</p>
-                    <div class="hc-list" style="margin-top:12px">
-                        @foreach([
-                            ['New Design Editor Update','Try our improved editor with faster performance and new features.','May 29, 2026'],
-                            ['Shipping Updates','Updated delivery times for certain areas. Check your orders.','May 27, 2026'],
-                            ['Payment System Maintenance','Scheduled maintenance on June 5, 2026 from 1:00 AM - 3:00 AM PHT.','May 25, 2026'],
-                        ] as $news)
-                        <div class="hc-announcement">
-                            <span></span>
-                            <button type="button" onclick="openAnnouncement('{{ $news[0] }}')"><p class="hc-row-title">{{ $news[0] }}</p><p class="hc-row-sub">{{ $news[1] }}</p></button>
-                            <small style="color:#6b7280;font-size:10px">{{ $news[2] }}</small>
-                        </div>
-                        @endforeach
-                    </div>
-                    <div style="display:flex;justify-content:center;margin-top:12px"><button class="hc-link" type="button" onclick="openAnnouncement('All Announcements')">View all announcements <i class="fa-solid fa-chevron-right"></i></button></div>
                 </div>
             </section>
 
@@ -209,7 +162,7 @@
                     <div class="hc-list" id="ticketList" style="margin-top:10px"></div>
                 </div>
             </section>
-        </aside>
+        </main>
     </div>
 
 </div>
