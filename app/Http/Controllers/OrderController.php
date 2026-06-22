@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class OrderController extends Controller
 {
@@ -13,28 +15,57 @@ class OrderController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function myOrders()
+    public function myOrders(): View
     {
         $orders = Order::query()
             ->where('user_id', auth()->id())
+            ->with(['items.service', 'items.serviceVariation', 'files'])
+            ->withCount('items')
             ->latest()
-            ->paginate(10);
+            ->get();
 
-        // Ito ang gagamitin nating file para sa Customer
         return view('customer-orders', compact('orders'));
+    }
+
+    public function portalMyOrders(Request $request): View
+    {
+        $orders = Order::query()
+            ->where('user_id', $request->user()->id)
+            ->with(['items.service', 'items.serviceVariation', 'files'])
+            ->withCount('items')
+            ->latest()
+            ->get();
+
+        return view('orders.my_index', [
+            'orders' => $orders,
+            'selectedStatus' => (string) $request->query('status', 'all'),
+            'searchTerm' => trim((string) $request->query('q', '')),
+        ]);
     }
 
     /**
      * Show a specific order that belongs to the logged-in user.
      */
-    public function myShow(Order $order)
+    public function myShow(Order $order): RedirectResponse
     {
-        if ((int) $order->user_id !== (int) auth()->id()) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorizeCustomerOrder($order);
 
-        $order->load(['items.service', 'files']);
-        return view('orders.show', compact('order'));
+        return redirect()->route('co.place-order.tracking', $order);
+    }
+
+    public function portalMyShow(Order $order): RedirectResponse
+    {
+        $this->authorizeCustomerOrder($order);
+
+        return redirect()->route('co.place-order.tracking', $order);
+    }
+
+    public function myTracking(Order $order): View
+    {
+        $this->authorizeCustomerOrder($order);
+
+        $order->load(['items.service', 'items.serviceVariation', 'files']);
+        return view('customer-order-tracking', compact('order'));
     }
 
     /*
@@ -98,5 +129,10 @@ class OrderController extends Controller
         $user = request()->user();
 
         abort_unless($user && $order->loadMissing('user')->isVisibleToPortalUser($user), 403);
+    }
+
+    private function authorizeCustomerOrder(Order $order): void
+    {
+        abort_unless((int) $order->user_id === (int) auth()->id(), 403, 'Unauthorized');
     }
 }

@@ -1,3 +1,117 @@
+@php
+    $portalOrders = \App\Models\Order::query()
+        ->visibleToPortalUser(auth()->user())
+        ->with(['user', 'items'])
+        ->latest()
+        ->get();
+
+    $normalizeOrderStatus = static function (?string $status): string {
+        $value = strtolower(trim((string) $status));
+
+        return match (true) {
+            str_contains($value, 'cancel') => 'Cancelled',
+            str_contains($value, 'complete'), str_contains($value, 'deliver') => 'Completed',
+            str_contains($value, 'ship'), str_contains($value, 'out for delivery') => 'Shipped',
+            str_contains($value, 'ready') => 'Ready for Pickup',
+            str_contains($value, 'process'), str_contains($value, 'production'), str_contains($value, 'verification') => 'Processing',
+            default => 'Pending',
+        };
+    };
+
+    $orderCounts = collect(['Pending', 'Processing', 'Completed', 'Cancelled'])
+        ->mapWithKeys(fn (string $status) => [
+            $status => $portalOrders->filter(fn ($order) => $normalizeOrderStatus($order->status) === $status)->count(),
+        ]);
+    $orderTotal = $portalOrders->count();
+    $percentage = static fn (int $count): string => $orderTotal > 0
+        ? number_format(($count / $orderTotal) * 100, 1).'% ('.$count.')'
+        : '0.0% (0)';
+    $lalamoveCount = $portalOrders->where('delivery_method', 'lalamove')->count();
+    $pickupCount = $orderTotal - $lalamoveCount;
+
+    $adminOrderPayload = $portalOrders->map(function ($order) use ($normalizeOrderStatus) {
+        $status = $normalizeOrderStatus($order->status);
+        $isLalamove = $order->delivery_method === 'lalamove';
+        $subtotal = max(0, (float) $order->total_price - (float) $order->delivery_fee);
+        $payment = str_contains(strtolower((string) $order->status), 'cash on delivery')
+            ? 'Cash on Delivery'
+            : ($status === 'Completed' ? 'Paid' : 'Unpaid');
+
+        return [
+            'id' => 'ORD-'.str_pad((string) $order->id, 5, '0', STR_PAD_LEFT),
+            'databaseId' => $order->id,
+            'customer' => $order->customer_name ?: ($order->user?->name ?? 'Customer'),
+            'service' => $order->items->pluck('service_name')->filter()->unique()->join(', ') ?: 'Print order',
+            'date' => optional($order->created_at)->format('M j, Y') ?? '',
+            'dateIso' => optional($order->created_at)->format('Y-m-d') ?? '',
+            'payment' => $payment,
+            'status' => $status,
+            'rawStatus' => $order->status ?: 'Pending',
+            'total' => 'PHP '.number_format((float) $order->total_price, 2),
+            'email' => $order->customer_email ?: ($order->user?->email ?? 'Not provided'),
+            'phone' => $order->customer_phone ?: ($order->user?->phone ?? 'Not provided'),
+            'customerId' => 'Customer ID: '.($order->user_id ?: 'Guest'),
+            'address' => $order->delivery_address ?: 'Store pickup',
+            'orderDateTime' => optional($order->created_at)->format('M j, Y h:i A') ?? '',
+            'fulfillmentType' => $isLalamove ? 'Lalamove' : 'Pickup',
+            'estimatedDelivery' => $isLalamove ? 'See Lalamove status' : 'Store pickup',
+            'tracking' => $order->lalamove_order_id ?: ($order->lalamove_status ?: 'Not booked yet'),
+            'deliveryStatus' => $order->lalamove_status ?: ($isLalamove ? 'Pending booking' : 'Store pickup'),
+            'subtotal' => 'PHP '.number_format($subtotal, 2),
+            'shippingFee' => 'PHP '.number_format((float) $order->delivery_fee, 2),
+            'modalTotal' => 'PHP '.number_format((float) $order->total_price, 2),
+            'notes' => $order->delivery_notes ?: 'No special instructions.',
+            'items' => $order->items->map(fn ($item) => [
+                'name' => $item->service_name ?: 'Print item',
+                'desc' => $item->variation_label ?: 'Custom print service',
+                'qty' => (int) $item->quantity,
+                'unit' => 'PHP '.number_format((float) $item->unit_price, 2),
+                'total' => 'PHP '.number_format((float) $item->subtotal, 2),
+            ])->values(),
+            'timeline' => collect([
+                ['title' => 'Order Placed', 'date' => optional($order->created_at)->format('M j, Y h:i A') ?? '', 'done' => true],
+                ['title' => $order->status ?: 'Pending', 'date' => optional($order->updated_at)->format('M j, Y h:i A') ?? '', 'done' => $status === 'Completed'],
+                ...($isLalamove ? [[
+                    'title' => 'Lalamove: '.($order->lalamove_status ?: 'Pending booking'),
+                    'date' => optional($order->lalamove_last_synced_at)->format('M j, Y h:i A') ?? 'Not synced yet',
+                    'done' => !in_array($order->lalamove_status, [null, 'BOOKING_FAILED'], true),
+                ]] : []),
+            ]),
+        ];
+    })->values();
+
+    $adminMetricCards = [
+        ['key' => 'total', 'label' => 'TOTAL ORDERS', 'value' => (string) $orderTotal, 'caption' => 'All recorded orders', 'icon' => 'shopping-cart', 'iconClass' => 'blue-soft', 'dotClass' => 'blue-dot', 'tab' => 'all'],
+        ['key' => 'pending', 'label' => 'PENDING', 'value' => (string) $orderCounts['Pending'], 'caption' => 'Awaiting action', 'icon' => 'clock', 'iconClass' => 'orange-soft', 'dotClass' => 'orange-dot', 'tab' => 'Pending'],
+        ['key' => 'processing', 'label' => 'PROCESSING', 'value' => (string) $orderCounts['Processing'], 'caption' => 'In progress', 'icon' => 'settings', 'iconClass' => 'cyan-soft', 'dotClass' => 'blue-dot', 'tab' => 'Processing'],
+        ['key' => 'completed', 'label' => 'COMPLETED', 'value' => (string) $orderCounts['Completed'], 'caption' => 'Successfully completed', 'icon' => 'circle-check', 'iconClass' => 'green-soft', 'dotClass' => 'green-dot', 'tab' => 'Completed'],
+        ['key' => 'cancelled', 'label' => 'CANCELLED', 'value' => (string) $orderCounts['Cancelled'], 'caption' => 'Cancelled orders', 'icon' => 'circle-x', 'iconClass' => 'red-soft', 'dotClass' => 'red-dot', 'tab' => 'Cancelled'],
+    ];
+    $adminOrderTabs = [
+        ['key' => 'all', 'label' => 'All Orders', 'count' => $orderTotal],
+        ['key' => 'Pending', 'label' => 'Pending', 'count' => $orderCounts['Pending']],
+        ['key' => 'Processing', 'label' => 'Processing', 'count' => $orderCounts['Processing']],
+        ['key' => 'Completed', 'label' => 'Completed', 'count' => $orderCounts['Completed']],
+        ['key' => 'Cancelled', 'label' => 'Cancelled', 'count' => $orderCounts['Cancelled']],
+    ];
+    $adminStatusBreakdown = [
+        ['label' => 'Completed', 'value' => $percentage($orderCounts['Completed']), 'dot' => 'green-dot'],
+        ['label' => 'Processing', 'value' => $percentage($orderCounts['Processing']), 'dot' => 'blue-dot'],
+        ['label' => 'Pending', 'value' => $percentage($orderCounts['Pending']), 'dot' => 'yellow-dot'],
+        ['label' => 'Cancelled', 'value' => $percentage($orderCounts['Cancelled']), 'dot' => 'red-dot'],
+    ];
+    $adminFulfillmentBreakdown = [
+        ['label' => 'Lalamove Delivery', 'value' => $percentage($lalamoveCount), 'dot' => 'orange-dot'],
+        ['label' => 'Store Pickup', 'value' => $percentage($pickupCount), 'dot' => 'blue-dot'],
+    ];
+    $adminOrderSummary = [
+        ['label' => "Today's Orders", 'value' => $portalOrders->where('created_at', '>=', now()->startOfDay())->count(), 'icon' => 'calendar-days', 'color' => 'blue-soft'],
+        ['label' => 'Awaiting Action', 'value' => $orderCounts['Pending'], 'icon' => 'wallet', 'color' => 'orange-soft'],
+        ['label' => 'Ready for Pickup', 'value' => $portalOrders->filter(fn ($order) => $normalizeOrderStatus($order->status) === 'Ready for Pickup')->count(), 'icon' => 'shopping-bag', 'color' => 'purple-soft'],
+        ['label' => 'For Delivery', 'value' => $lalamoveCount, 'icon' => 'truck', 'color' => 'green-soft'],
+    ];
+@endphp
+
 <!-- FINAL ORDERS OVERVIEW UI - Alpine.js Admin Portal Section -->
 <!-- Required: Alpine.js must be loaded once in your layout. Example: <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -113,8 +227,8 @@
             </div>
             <p class="card-kicker">Total Revenue</p>
             <div class="revenue-row">
-                <strong>PHP 128,450.00</strong>
-                <div class="growth-text"><i data-lucide="arrow-up"></i> 12.4%<small>vs last 7 days</small></div>
+                <strong>PHP {{ number_format((float) $portalOrders->sum('total_price'), 2) }}</strong>
+                <div class="growth-text"><i data-lucide="database"></i> Live<small>from recorded orders</small></div>
             </div>
             <div class="line-chart-wrap">
                 <svg viewBox="0 0 520 160" preserveAspectRatio="none" aria-label="Order performance chart">
@@ -140,7 +254,7 @@
         <article class="admin-main-box donut-card">
             <h2>Order Status Breakdown</h2>
             <div class="donut-content">
-                <div class="donut donut-status"><div><strong>248</strong><span>Orders</span></div></div>
+                <div class="donut donut-status"><div><strong>{{ $orderTotal }}</strong><span>Orders</span></div></div>
                 <div class="legend-list">
                     <template x-for="row in statusBreakdown" :key="row.label">
                         <div class="legend-row"><span><b class="dot" :class="row.dot"></b><span x-text="row.label"></span></span><strong x-text="row.value"></strong></div>
@@ -152,7 +266,7 @@
         <article class="admin-main-box donut-card">
             <h2>Fulfillment Overview</h2>
             <div class="donut-content">
-                <div class="donut donut-fulfillment"><div><strong>248</strong><span>Orders</span></div></div>
+                <div class="donut donut-fulfillment"><div><strong>{{ $orderTotal }}</strong><span>Orders</span></div></div>
                 <div class="legend-list">
                     <template x-for="row in fulfillmentBreakdown" :key="row.label">
                         <div class="legend-row"><span><b class="dot" :class="row.dot"></b><span x-text="row.label"></span></span><strong x-text="row.value"></strong></div>
@@ -177,10 +291,10 @@
     </section>
 
     <section class="filter-row" x-show="showFilters" x-transition>
-        <label class="filter-control"><span>Date Range</span><i data-lucide="calendar"></i><select x-model="dateFilter" @change="page=1"><option value="all">May 31 – Jun 6, 2026</option><option value="today">Today</option><option value="yesterday">Yesterday</option></select></label>
+        <label class="filter-control"><span>Date Range</span><i data-lucide="calendar"></i><select x-model="dateFilter" @change="page=1"><option value="all">All Dates</option><option value="today">Today</option><option value="yesterday">Yesterday</option></select></label>
         <label class="filter-control"><span>Status</span><select x-model="statusFilter" @change="page=1"><option value="all">All Statuses</option><option>Pending</option><option>Processing</option><option>Completed</option><option>Cancelled</option><option>Shipped</option><option>Ready for Pickup</option></select></label>
-        <label class="filter-control"><span>Payment Method</span><select x-model="paymentFilter" @change="page=1"><option value="all">All Payments</option><option>Paid</option><option>Partial</option><option>Unpaid</option></select></label>
-        <label class="filter-control"><span>Fulfillment Type</span><select x-model="fulfillmentFilter" @change="page=1"><option value="all">All Types</option><option>Pickup</option><option>Shipping</option></select></label>
+        <label class="filter-control"><span>Payment Method</span><select x-model="paymentFilter" @change="page=1"><option value="all">All Payments</option><option>Cash on Delivery</option><option>Paid</option><option>Partial</option><option>Unpaid</option></select></label>
+        <label class="filter-control"><span>Fulfillment Type</span><select x-model="fulfillmentFilter" @change="page=1"><option value="all">All Types</option><option>Pickup</option><option>Lalamove</option></select></label>
     </section>
 
     <section class="orders-layout-grid">
@@ -212,11 +326,11 @@
                 </table>
             </div>
             <div class="table-footer">
-                <span>Showing <b x-text="rangeStart"></b> to <b x-text="rangeEnd"></b> of 248 orders</span>
+                <span>Showing <b x-text="rangeStart"></b> to <b x-text="rangeEnd"></b> of <b x-text="filteredOrders.length"></b> orders</span>
                 <div class="pagination-row">
                     <button @click="prevPage()"><i data-lucide="chevron-left"></i></button>
                     <template x-for="p in visiblePages" :key="p"><button :class="page === p ? 'active' : ''" @click="page = p" x-text="p"></button></template>
-                    <span>...</span><button @click="page = 31">31</button><button @click="nextPage()"><i data-lucide="chevron-right"></i></button>
+                    <button @click="nextPage()"><i data-lucide="chevron-right"></i></button>
                 </div>
             </div>
         </article>
@@ -255,33 +369,33 @@
                     <div class="customer-flex">
                         <div class="template-avatar"><i data-lucide="user"></i></div>
                         <div>
-                            <strong>—</strong>
-                            <small>—</small>
-                            <small>—</small>
+                            <strong x-text="selectedOrder?.customer"></strong>
+                            <small x-text="selectedOrder?.email"></small>
+                            <small x-text="selectedOrder?.phone"></small>
                         </div>
                     </div>
-                    <span class="customer-id">Customer ID: —</span>
+                    <span class="customer-id" x-text="selectedOrder?.customerId"></span>
                 </article>
 
                 <article class="modal-mini-card">
                     <h3>Shipping Address</h3>
-                    <p class="address-text"><i data-lucide="map-pin"></i><span>—<br>—<br>—</span></p>
+                    <p class="address-text"><i data-lucide="map-pin"></i><span x-text="selectedOrder?.address"></span></p>
                 </article>
 
                 <article class="modal-mini-card">
                     <h3>Payment Method</h3>
-                    <p class="card-brand"><span class="mc-dot red"></span><span class="mc-dot orange"></span><b>•••• •••• •••• —</b></p>
-                    <small class="template-muted">—</small>
-                    <span class="pill pill-paid template-pill">Paid</span>
+                    <p class="card-brand"><i data-lucide="wallet-cards"></i><b x-text="selectedOrder?.payment"></b></p>
+                    <small class="template-muted" x-text="selectedOrder?.rawStatus"></small>
+                    <span class="pill template-pill" :class="paymentClass(selectedOrder?.payment)" x-text="selectedOrder?.payment"></span>
                 </article>
             </div>
 
             <section class="modal-status-strip template-status-strip">
-                <div><span>Order Status</span><b>—</b></div>
-                <div><span>Order Date</span><b><i data-lucide="calendar-days"></i> —</b></div>
-                <div><span>Fulfillment Type</span><b><i data-lucide="package"></i> —</b></div>
-                <div><span>Estimated Delivery</span><b><i data-lucide="truck"></i> —</b></div>
-                <div><span>Tracking Number</span><b>—</b></div>
+                <div><span>Order Status</span><b x-text="selectedOrder?.status"></b></div>
+                <div><span>Order Date</span><b><i data-lucide="calendar-days"></i><em x-text="selectedOrder?.orderDateTime"></em></b></div>
+                <div><span>Fulfillment Type</span><b><i data-lucide="package"></i><em x-text="selectedOrder?.fulfillmentType"></em></b></div>
+                <div><span>Delivery Status</span><b><i data-lucide="truck"></i><em x-text="selectedOrder?.deliveryStatus"></em></b></div>
+                <div><span>Tracking Number</span><b x-text="selectedOrder?.tracking"></b></div>
             </section>
 
             <article class="modal-items-card template-items-card">
@@ -289,14 +403,14 @@
                 <table>
                     <thead><tr><th>Item</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
                     <tbody>
-                        <tr><td><span class="template-img"></span> —</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td><span class="template-img"></span> —</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td><span class="template-img"></span> —</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                        <template x-for="item in selectedOrder?.items || []" :key="item.name + item.qty">
+                            <tr><td><span class="template-img"></span><span x-text="item.name"></span></td><td x-text="item.desc"></td><td x-text="item.qty"></td><td x-text="item.unit"></td><td x-text="item.total"></td></tr>
+                        </template>
                     </tbody>
                     <tfoot>
-                        <tr><td colspan="4">Subtotal</td><td>—</td></tr>
-                        <tr><td colspan="4">Shipping Fee</td><td>—</td></tr>
-                        <tr class="modal-total-row"><td colspan="4">Total</td><td>—</td></tr>
+                        <tr><td colspan="4">Subtotal</td><td x-text="selectedOrder?.subtotal"></td></tr>
+                        <tr><td colspan="4">Delivery Fee</td><td x-text="selectedOrder?.shippingFee"></td></tr>
+                        <tr class="modal-total-row"><td colspan="4">Total</td><td x-text="selectedOrder?.modalTotal"></td></tr>
                     </tfoot>
                 </table>
             </article>
@@ -304,14 +418,13 @@
             <div class="modal-bottom-grid template-bottom-grid">
                 <article class="modal-mini-card">
                     <h3>Notes / Special Instructions</h3>
-                    <p>—</p>
+                    <p x-text="selectedOrder?.notes"></p>
                 </article>
                 <article class="modal-mini-card timeline-card">
                     <h3>Order Timeline</h3>
-                    <div class="timeline-row done"><span></span><div><b>Order Placed</b><small>—</small></div></div>
-                    <div class="timeline-row done"><span></span><div><b>Payment Confirmed</b><small>—</small></div></div>
-                    <div class="timeline-row"><span></span><div><b>Preparing</b><small>—</small></div></div>
-                    <div class="timeline-row"><span></span><div><b>Shipped</b><small>—</small></div></div>
+                    <template x-for="entry in selectedOrder?.timeline || []" :key="entry.title + entry.date">
+                        <div class="timeline-row" :class="entry.done ? 'done' : ''"><span></span><div><b x-text="entry.title"></b><small x-text="entry.date"></small></div></div>
+                    </template>
                 </article>
                 <article class="modal-mini-card modal-actions-card">
                     <h3>Actions</h3>
@@ -327,7 +440,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
 function ordersOverviewApp(){return{
-    activeTab:'all', search:'', page:1, perPage:8, showFilters:true, modalOpen:false, selectedOrder:null, calendarOpen:false, calendarMonthLabel:'June 2026', dateRangeLabel:'May 31 – Jun 6, 2026', selectedCalendarDate:'June 06, 2026', dateFilter:'all', statusFilter:'all', paymentFilter:'all', fulfillmentFilter:'all', toast:{show:false,message:''},
+    activeTab:'all', search:'', page:1, perPage:8, showFilters:true, modalOpen:false, selectedOrder:null, calendarOpen:false, calendarMonthLabel:'June 2026', dateRangeLabel:'{{ now()->subDays(6)->format('M j') }} – {{ now()->format('M j, Y') }}', selectedCalendarDate:'{{ now()->format('F d, Y') }}', dateFilter:'all', statusFilter:'all', paymentFilter:'all', fulfillmentFilter:'all', toast:{show:false,message:''},
     newCalendarEvent:{title:'', meta:'', note:''},
     calendarDays:[
         {key:'m31',number:31,label:'May 31, 2026',muted:true,today:false},{key:'j1',number:1,label:'June 01, 2026',muted:false,today:false},{key:'j2',number:2,label:'June 02, 2026',muted:false,today:false},{key:'j3',number:3,label:'June 03, 2026',muted:false,today:false},{key:'j4',number:4,label:'June 04, 2026',muted:false,today:false},{key:'j5',number:5,label:'June 05, 2026',muted:false,today:false},{key:'j6',number:6,label:'June 06, 2026',muted:false,today:false},
@@ -340,32 +453,17 @@ function ordersOverviewApp(){return{
         {id:1,date:'June 06, 2026',title:'Follow up pending orders',meta:'9:00 AM',note:'Check payment and artwork approvals.'},
         {id:2,date:'June 08, 2026',title:'Delivery status review',meta:'2:00 PM',note:'Review shipped and ready-for-pickup orders.'}
     ],
-    metricCards:[
-        {key:'total',label:'TOTAL ORDERS',value:'248',caption:'All time orders',icon:'shopping-cart',iconClass:'blue-soft',dotClass:'blue-dot',tab:'all'},
-        {key:'pending',label:'PENDING',value:'36',caption:'Awaiting action',icon:'clock',iconClass:'orange-soft',dotClass:'orange-dot',tab:'Pending'},
-        {key:'processing',label:'PROCESSING',value:'54',caption:'In progress',icon:'settings',iconClass:'cyan-soft',dotClass:'blue-dot',tab:'Processing'},
-        {key:'completed',label:'COMPLETED',value:'142',caption:'Successfully completed',icon:'circle-check',iconClass:'green-soft',dotClass:'green-dot',tab:'Completed'},
-        {key:'cancelled',label:'CANCELLED',value:'16',caption:'Cancelled orders',icon:'circle-x',iconClass:'red-soft',dotClass:'red-dot',tab:'Cancelled'}
-    ],
-    tabs:[{key:'all',label:'All Orders',count:248},{key:'Pending',label:'Pending',count:36},{key:'Processing',label:'Processing',count:54},{key:'Completed',label:'Completed',count:142},{key:'Cancelled',label:'Cancelled',count:16}],
-    statusBreakdown:[{label:'Completed',value:'57.3% (142)',dot:'green-dot'},{label:'Processing',value:'21.8% (54)',dot:'blue-dot'},{label:'Pending',value:'14.5% (36)',dot:'yellow-dot'},{label:'Cancelled',value:'6.5% (16)',dot:'red-dot'}],
-    fulfillmentBreakdown:[{label:'Packed',value:'32.3% (80)',dot:'blue-dot'},{label:'Shipped',value:'28.6% (71)',dot:'purple-dot'},{label:'Out for Delivery',value:'21.0% (52)',dot:'orange-dot'},{label:'Delivered',value:'18.1% (45)',dot:'green-dot'}],
-    orderSummary:[{label:"Today's Orders",value:18,icon:'calendar-days',color:'blue-soft'},{label:'Awaiting Payment',value:7,icon:'wallet',color:'orange-soft'},{label:'Ready for Pickup',value:5,icon:'shopping-bag',color:'purple-soft'},{label:'For Delivery',value:9,icon:'truck',color:'green-soft'}],
-    orders:[
-        {id:'ORD-1024',customer:'Maria Santos',service:'Document Printing',date:'Jun 6, 2026',payment:'Paid',status:'Completed',total:'PHP 350.00',email:'maria.santos@email.com',phone:'+63 917 100 1234',customerId:'Customer ID: CUS-03911',avatar:'https://i.pravatar.cc/80?img=47',address:'44 Mabini St. Barangay San Isidro Quezon City, Metro Manila 1100 Philippines',orderDateTime:'Jun 6, 2026 09:15 AM',fulfillmentType:'Pickup',estimatedDelivery:'Jun 6, 2026',tracking:'N/A',subtotal:'PHP 350.00',shippingFee:'PHP 0.00',modalTotal:'PHP 350.00',notes:'Please prepare documents for same-day pickup.',items:[{name:'Document Printing',desc:'A4 bond paper, black and white',qty:35,unit:'PHP 10.00',total:'PHP 350.00',img:'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 6, 2026 09:15 AM',done:true},{title:'Payment Confirmed',date:'Jun 6, 2026 09:16 AM',done:true},{title:'Completed',date:'Jun 6, 2026 11:30 AM',done:true}]},
-        {id:'ORD-1025',customer:'John Reyes',service:'Passport Photo Package',date:'Jun 6, 2026',payment:'Paid',status:'Processing',total:'PHP 900.00',email:'john.reyes@email.com',phone:'+63 918 223 4567',customerId:'Customer ID: CUS-04120',avatar:'https://i.pravatar.cc/80?img=12',address:'28 Luna Avenue Barangay Poblacion Mandaluyong City, Metro Manila 1550 Philippines',orderDateTime:'Jun 6, 2026 10:05 AM',fulfillmentType:'Pickup',estimatedDelivery:'Jun 7, 2026',tracking:'N/A',subtotal:'PHP 900.00',shippingFee:'PHP 0.00',modalTotal:'PHP 900.00',notes:'Use white background and matte finish.',items:[{name:'Passport Photo Package',desc:'Rush ID and passport photo set',qty:3,unit:'PHP 300.00',total:'PHP 900.00',img:'https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 6, 2026 10:05 AM',done:true},{title:'Payment Confirmed',date:'Jun 6, 2026 10:07 AM',done:true},{title:'Processing',date:'Jun 6, 2026 11:00 AM',done:false}]},
-        {id:'ORD-1026',customer:'Anna Cruz',service:'Tarpaulin Print',date:'Jun 5, 2026',payment:'Partial',status:'Pending',total:'PHP 1,800.00',email:'anna.cruz@email.com',phone:'+63 919 876 5555',customerId:'Customer ID: CUS-04407',avatar:'https://i.pravatar.cc/80?img=32',address:'Lot 3 Sampaloc Road Barangay Central Makati City, Metro Manila 1200 Philippines',orderDateTime:'Jun 5, 2026 03:20 PM',fulfillmentType:'Pickup',estimatedDelivery:'Jun 8, 2026',tracking:'N/A',subtotal:'PHP 1,800.00',shippingFee:'PHP 0.00',modalTotal:'PHP 1,800.00',notes:'Waiting for final artwork confirmation.',items:[{name:'Tarpaulin Print',desc:'Outdoor tarpaulin 6x4 ft',qty:1,unit:'PHP 1,800.00',total:'PHP 1,800.00',img:'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 5, 2026 03:20 PM',done:true},{title:'Awaiting Payment',date:'Jun 5, 2026 03:23 PM',done:false}]},
-        {id:'ORD-1027',customer:'David Lim',service:'Photocopy Bundle',date:'Jun 5, 2026',payment:'Paid',status:'Completed',total:'PHP 220.00',email:'david.lim@email.com',phone:'+63 916 222 4588',customerId:'Customer ID: CUS-04198',avatar:'https://i.pravatar.cc/80?img=53',address:'88 Katipunan Ave Quezon City, Metro Manila 1108 Philippines',orderDateTime:'Jun 5, 2026 11:40 AM',fulfillmentType:'Pickup',estimatedDelivery:'Jun 5, 2026',tracking:'N/A',subtotal:'PHP 220.00',shippingFee:'PHP 0.00',modalTotal:'PHP 220.00',notes:'Staple per set.',items:[{name:'Photocopy Bundle',desc:'Legal size copy bundle',qty:44,unit:'PHP 5.00',total:'PHP 220.00',img:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 5, 2026 11:40 AM',done:true},{title:'Completed',date:'Jun 5, 2026 12:30 PM',done:true}]},
-        {id:'ORD-1028',customer:'Carla Mendoza',service:'Laminating & Binding',date:'Jun 5, 2026',payment:'Unpaid',status:'Cancelled',total:'PHP 480.00',email:'carla.m@email.com',phone:'+63 915 300 4411',customerId:'Customer ID: CUS-04230',avatar:'https://i.pravatar.cc/80?img=44',address:'7 Greenhills Road San Juan City, Metro Manila 1502 Philippines',orderDateTime:'Jun 5, 2026 01:10 PM',fulfillmentType:'Pickup',estimatedDelivery:'Cancelled',tracking:'N/A',subtotal:'PHP 480.00',shippingFee:'PHP 0.00',modalTotal:'PHP 480.00',notes:'Customer cancelled before production.',items:[{name:'Laminating & Binding',desc:'Document laminating with ring bind',qty:4,unit:'PHP 120.00',total:'PHP 480.00',img:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 5, 2026 01:10 PM',done:true},{title:'Cancelled',date:'Jun 5, 2026 02:00 PM',done:false}]},
-        {id:'ORD-1029',customer:'Mark Villanueva',service:'Document Scanning',date:'Jun 4, 2026',payment:'Paid',status:'Shipped',total:'PHP 650.00',email:'mark.villanueva@email.com',phone:'+63 917 123 4567',customerId:'Customer ID: CUS-04518',avatar:'https://i.pravatar.cc/80?img=11',address:'1234 Sampaguita St. Barangay San Isidro Makati City, Metro Manila 1209 Philippines',orderDateTime:'Jun 4, 2026 10:24 AM',fulfillmentType:'Shipping',estimatedDelivery:'Jun 8, 2026',tracking:'TRK123456789PH',subtotal:'PHP 2,550.00',shippingFee:'PHP 150.00',modalTotal:'PHP 2,700.00',notes:'Please handle with care. This is a gift. Leave at the front desk if nobody is home.',items:[{name:'Custom Mug Print',desc:'11oz ceramic mug with full color print',qty:2,unit:'PHP 250.00',total:'PHP 500.00',img:'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=80&h=80&fit=crop'},{name:'Photobook – 8x8',desc:'Hardcover, 20 pages, matte finish',qty:1,unit:'PHP 1,200.00',total:'PHP 1,200.00',img:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=80&h=80&fit=crop'},{name:'Canvas Print 12x18',desc:'Premium canvas, gallery wrap',qty:1,unit:'PHP 850.00',total:'PHP 850.00',img:'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 4, 2026 10:24 AM',done:true},{title:'Payment Confirmed',date:'Jun 4, 2026 10:25 AM',done:true},{title:'Preparing',date:'Jun 4, 2026 02:15 PM',done:false},{title:'Shipped',date:'Jun 4, 2026 05:40 PM',done:false}]},
-        {id:'ORD-1030',customer:'Sofia Tan',service:'2x2 ID Photo Package',date:'Jun 4, 2026',payment:'Paid',status:'Ready for Pickup',total:'PHP 180.00',email:'sofia.tan@email.com',phone:'+63 917 700 6611',customerId:'Customer ID: CUS-04712',avatar:'https://i.pravatar.cc/80?img=25',address:'90 Aurora Blvd Quezon City, Metro Manila Philippines',orderDateTime:'Jun 4, 2026 09:12 AM',fulfillmentType:'Pickup',estimatedDelivery:'Ready Now',tracking:'N/A',subtotal:'PHP 180.00',shippingFee:'PHP 0.00',modalTotal:'PHP 180.00',notes:'Ready at front counter.',items:[{name:'2x2 ID Photo Package',desc:'Six-piece ID photo set',qty:1,unit:'PHP 180.00',total:'PHP 180.00',img:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 4, 2026 09:12 AM',done:true},{title:'Ready for Pickup',date:'Jun 4, 2026 10:02 AM',done:true}]},
-        {id:'ORD-1031',customer:'Kevin Dela Rosa',service:'Custom Mug Print',date:'Jun 3, 2026',payment:'Paid',status:'Processing',total:'PHP 1,250.00',email:'kevin.rosa@email.com',phone:'+63 912 900 1111',customerId:'Customer ID: CUS-04880',avatar:'https://i.pravatar.cc/80?img=59',address:'21 Taft Avenue Manila City, Metro Manila Philippines',orderDateTime:'Jun 3, 2026 04:50 PM',fulfillmentType:'Shipping',estimatedDelivery:'Jun 7, 2026',tracking:'TRK987654321PH',subtotal:'PHP 1,100.00',shippingFee:'PHP 150.00',modalTotal:'PHP 1,250.00',notes:'Use uploaded artwork version 2.',items:[{name:'Custom Mug Print',desc:'Personalized full color mug',qty:5,unit:'PHP 220.00',total:'PHP 1,100.00',img:'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=80&h=80&fit=crop'}],timeline:[{title:'Order Placed',date:'Jun 3, 2026 04:50 PM',done:true},{title:'Processing',date:'Jun 3, 2026 06:00 PM',done:false}]}
-    ],
+    metricCards:@json($adminMetricCards),
+    tabs:@json($adminOrderTabs),
+    statusBreakdown:@json($adminStatusBreakdown),
+    fulfillmentBreakdown:@json($adminFulfillmentBreakdown),
+    orderSummary:@json($adminOrderSummary),
+    orders:@json($adminOrderPayload),
     init(){this.refreshIcons();}, refreshIcons(){this.$nextTick(()=>{if(window.lucide) window.lucide.createIcons();});},
-    get filteredOrders(){let data=this.orders;if(this.activeTab!=='all')data=data.filter(o=>o.status===this.activeTab);if(this.statusFilter!=='all')data=data.filter(o=>o.status===this.statusFilter);if(this.paymentFilter!=='all')data=data.filter(o=>o.payment===this.paymentFilter);if(this.fulfillmentFilter!=='all')data=data.filter(o=>o.fulfillmentType===this.fulfillmentFilter);if(this.dateFilter==='today')data=data.filter(o=>o.date==='Jun 6, 2026');if(this.dateFilter==='yesterday')data=data.filter(o=>o.date==='Jun 5, 2026');if(this.search.trim()){const q=this.search.toLowerCase();data=data.filter(o=>[o.id,o.customer,o.service,o.status,o.payment,o.fulfillmentType].join(' ').toLowerCase().includes(q));}return data;},
-    get paginatedOrders(){return this.filteredOrders.slice((this.page-1)*this.perPage,this.page*this.perPage);}, get visiblePages(){return [1,2,3,4,5];}, get rangeStart(){return this.filteredOrders.length?((this.page-1)*this.perPage)+1:0;}, get rangeEnd(){return Math.min(this.page*this.perPage,this.filteredOrders.length);},
-    setTab(tab){this.activeTab=tab;this.page=1;this.refreshIcons();}, nextPage(){if(this.page<31)this.page++;this.refreshIcons();}, prevPage(){if(this.page>1)this.page--;this.refreshIcons();},
-    statusClass(status){return {'Completed':'pill-completed','Processing':'pill-processing','Pending':'pill-pending','Cancelled':'pill-cancelled','Shipped':'pill-shipped','Ready for Pickup':'pill-ready'}[status]||'pill-processing';}, paymentClass(payment){return {'Paid':'pill-paid','Partial':'pill-partial','Unpaid':'pill-unpaid'}[payment]||'pill-paid';},
+    get filteredOrders(){let data=this.orders;if(this.activeTab!=='all')data=data.filter(o=>o.status===this.activeTab);if(this.statusFilter!=='all')data=data.filter(o=>o.status===this.statusFilter);if(this.paymentFilter!=='all')data=data.filter(o=>o.payment===this.paymentFilter);if(this.fulfillmentFilter!=='all')data=data.filter(o=>o.fulfillmentType===this.fulfillmentFilter);const today=new Date().toISOString().slice(0,10);const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);if(this.dateFilter==='today')data=data.filter(o=>o.dateIso===today);if(this.dateFilter==='yesterday')data=data.filter(o=>o.dateIso===yesterday);if(this.search.trim()){const q=this.search.toLowerCase();data=data.filter(o=>[o.id,o.customer,o.service,o.status,o.rawStatus,o.payment,o.fulfillmentType,o.deliveryStatus].join(' ').toLowerCase().includes(q));}return data;},
+    get paginatedOrders(){return this.filteredOrders.slice((this.page-1)*this.perPage,this.page*this.perPage);}, get totalPages(){return Math.max(1,Math.ceil(this.filteredOrders.length/this.perPage));}, get visiblePages(){return Array.from({length:this.totalPages},(_,i)=>i+1).slice(0,5);}, get rangeStart(){return this.filteredOrders.length?((this.page-1)*this.perPage)+1:0;}, get rangeEnd(){return Math.min(this.page*this.perPage,this.filteredOrders.length);},
+    setTab(tab){this.activeTab=tab;this.page=1;this.refreshIcons();}, nextPage(){if(this.page<this.totalPages)this.page++;this.refreshIcons();}, prevPage(){if(this.page>1)this.page--;this.refreshIcons();},
+    statusClass(status){return {'Completed':'pill-completed','Processing':'pill-processing','Pending':'pill-pending','Cancelled':'pill-cancelled','Shipped':'pill-shipped','Ready for Pickup':'pill-ready'}[status]||'pill-processing';}, paymentClass(payment){return {'Paid':'pill-paid','Partial':'pill-partial','Unpaid':'pill-unpaid','Cash on Delivery':'pill-pending'}[payment]||'pill-paid';},
     openOrder(order){this.selectedOrder=JSON.parse(JSON.stringify(order));this.modalOpen=true;this.refreshIcons();}, closeModal(){this.modalOpen=false;}, editOrder(order){this.showToast('Edit mode opened for '+order.id);this.openOrder(order);},
     printInvoice(order){if(!order){this.showToast('Select an order first');return;} const w=window.open('','_blank','width=720,height=760');w.document.write(`<title>Invoice ${order.id}</title><style>body{font-family:Inter,Arial,sans-serif;padding:32px;color:#050816}h1{font-family:Playfair Display,serif}.row{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:10px 0}.total{font-weight:800;color:#0b63f6;font-size:20px}
 
@@ -3095,4 +3193,3 @@ function ordersOverviewApp(){return{
         }
     }
 </style>
-

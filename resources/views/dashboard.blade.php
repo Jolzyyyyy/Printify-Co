@@ -188,7 +188,7 @@
 .orders-table{width:100%;border-collapse:separate;border-spacing:0;font-size:11px;color:#374151}
 .orders-table thead th{height:34px;padding:0 10px;background:#fafafa;border-top:1px solid var(--dash-line);border-bottom:1px solid var(--dash-line);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.035em;color:#4b5563;text-align:left;white-space:nowrap}.orders-table thead th:first-child{border-left:1px solid var(--dash-line);border-radius:9px 0 0 9px}.orders-table thead th:last-child{border-right:1px solid var(--dash-line);border-radius:0 9px 9px 0;text-align:center}
 .orders-table tbody td{height:100px;padding:8px 10px;border-bottom:1px solid #f0f1f3;white-space:nowrap}.orders-table tbody tr{transition:background .18s ease}.orders-table tbody tr:hover{background:rgba(17,24,39,.10)}.orders-table tbody tr:active{background:rgba(17,24,39,.16)}.order-id{font-weight:700;letter-spacing:.016em;color:#111827}.product-name{max-width:150px;overflow:hidden;text-overflow:ellipsis}.amount-cell{font-weight:700;letter-spacing:.016em;color:#111827}.view-button{height:28px;min-width:54px;padding:0 10px;border:1px solid var(--dash-orange);border-radius:7px;background:var(--dash-orange);color:#fff;font-size:10px}.view-button:hover,.view-button:focus{border-color:#111827;background:#111827;color:#fff;transform:none}
-.status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:72px;height:24px;padding:0 10px;border-radius:999px;font-size:9.5px;font-weight:700;line-height:1.1}.status-pending{background:var(--dash-yellow-soft);color:#b7791f}.status-processing{background:var(--dash-purple-soft);color:var(--dash-purple)}.status-ready,.status-shipped{background:var(--dash-blue-soft);color:var(--dash-blue)}.status-delivered{background:var(--dash-green-soft);color:var(--dash-green)}.status-cancelled{background:var(--dash-red-soft);color:var(--dash-red)}
+.status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:72px;height:24px;padding:0 10px;border-radius:999px;font-size:9.5px;font-weight:700;line-height:1.1}.status-pending{background:var(--dash-yellow-soft);color:#b7791f}.status-processing{background:var(--dash-purple-soft);color:var(--dash-purple)}.status-ready,.status-shipped{background:var(--dash-blue-soft);color:var(--dash-blue)}.status-delivered{background:var(--dash-green-soft);color:var(--dash-green)}.status-cancelled{background:var(--dash-red-soft);color:var(--dash-red)}.status-refunded{background:var(--dash-purple-soft);color:var(--dash-purple)}
 .account-list,.notification-list{display:grid;gap:0;padding:10px 18px 18px}
 .account-row,.notification-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:10px;padding:10px 0;border-bottom:1px solid #f0f1f3;border-radius:10px;transition:background .18s ease,transform .18s ease}.account-row:hover,.account-row:focus,.notification-row:hover{background:rgba(17,24,39,.10);transform:none}.account-row:active,.notification-row:active{background:rgba(17,24,39,.16);transform:none}.account-row:last-child,.notification-row:last-child{border-bottom:0}.row-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:var(--row-soft);color:var(--row-color)}.account-text{display:flex;align-items:baseline;gap:12px;min-width:0;white-space:nowrap}.row-title{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.018em;color:#111827;line-height:1.3}.row-sub{display:inline-block;min-width:0;margin-top:0;font-size:10.2px;font-weight:400;color:#6b7280;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row-chevron{color:#9ca3af}.edit-profile-button{height:36px;margin-top:8px;border-radius:8px;background:var(--dash-orange);color:#111827;font-size:11px;font-weight:700;letter-spacing:.018em;display:flex;align-items:center;justify-content:center;transition:.18s}.edit-profile-button:hover{background:#111827;color:#fff;transform:none}
 .notification-row{grid-template-columns:34px minmax(0,1fr) 40px}.notification-time{font-size:9px;font-weight:600;letter-spacing:.018em;color:#9ca3af;text-align:right;white-space:nowrap}.empty-state{min-height:130px;display:grid;place-items:center;text-align:center;color:var(--dash-muted);padding:22px}.empty-state i{margin-bottom:8px}.empty-state .primary-button{height:36px;min-width:132px;padding:0 17px;border-radius:8px;background:var(--dash-orange);border-color:var(--dash-orange);color:#111827!important;font-size:11px;font-weight:700;letter-spacing:.018em;box-shadow:none}.empty-state .primary-button:hover,.empty-state .primary-button:focus,.empty-state .primary-button:active{background:#111827!important;border-color:#111827!important;color:#fff!important;box-shadow:none;transform:none}.empty-title{font-size:13px;font-weight:700;letter-spacing:.018em;color:#111827}.empty-text{font-size:11px;margin-top:4px}.is-hidden{display:none!important}.clear-filter-btn{height:28px;min-width:88px;padding:0 10px;border:1px solid var(--dash-orange);background:var(--dash-orange);color:#fff;font-size:10px;cursor:pointer}.clear-filter-btn:hover{background:#111827;border-color:#111827;color:#fff;transform:none}
@@ -2688,13 +2688,137 @@ body:has(.customer-dashboard-v2) .text-gray-900,
     display:none!important;
 }
 
+
+
+/* =========================================================
+   FINAL LAYOUT PATCH - requested spacing + wider boxes
+   - Right-side widgets remain removed/hidden
+   - Main dashboard starts with left spacing
+   - Content is pushed wider to the right with small right gap
+   - Same UI/design preserved
+========================================================= */
+body:has(.customer-dashboard-v2) .max-w-7xl,
+body:has(.customer-dashboard-v2) .mx-auto{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+}
+body:has(.customer-dashboard-v2) .sm\:px-6,
+body:has(.customer-dashboard-v2) .lg\:px-8,
+body:has(.customer-dashboard-v2) .p-6{
+    padding-left:0!important;
+    padding-right:0!important;
+}
+
+.customer-dashboard-v2{
+    width:100%!important;
+    max-width:none!important;
+    padding:0 26px 34px 58px!important; /* left spacing + small right spacing */
+    overflow-x:hidden!important;
+}
+
+.customer-dashboard-v2 .dashboard-shell{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+}
+
+.customer-dashboard-v2 .dashboard-header-row,
+.customer-dashboard-v2 .dashboard-board{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+}
+
+.customer-dashboard-v2 .dashboard-board{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:20px!important;
+    align-items:start!important;
+}
+
+.customer-dashboard-v2 .left-column{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    justify-self:stretch!important;
+}
+
+.customer-dashboard-v2 .right-column{
+    display:none!important;
+    width:0!important;
+    max-width:0!important;
+    overflow:hidden!important;
+}
+
+/* Make the boxes occupy the widened area cleanly. */
+.customer-dashboard-v2 .analytics-grid{
+    width:100%!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:20px!important;
+}
+
+.customer-dashboard-v2 .stats-grid{
+    width:100%!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:20px!important;
+    overflow:visible!important;
+}
+
+.customer-dashboard-v2 .content-grid{
+    width:100%!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:20px!important;
+}
+
+.customer-dashboard-v2 .chart-card,
+.customer-dashboard-v2 .stat-card,
+.customer-dashboard-v2 .latest-card,
+.customer-dashboard-v2 .recent-card{
+    width:100%!important;
+    max-width:none!important;
+}
+
+/* Keep latest/recent compact but allow them to stretch horizontally. */
+.customer-dashboard-v2 .latest-card,
+.customer-dashboard-v2 .recent-card{
+    min-width:0!important;
+}
+
+/* Responsive safety: keep clean layout on smaller screens. */
+@media(max-width:1120px){
+    .customer-dashboard-v2{
+        padding:16px 18px 30px 28px!important;
+    }
+    .customer-dashboard-v2 .analytics-grid,
+    .customer-dashboard-v2 .content-grid{
+        grid-template-columns:1fr!important;
+    }
+    .customer-dashboard-v2 .stats-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+}
+
+@media(max-width:720px){
+    .customer-dashboard-v2{
+        padding:16px 12px 28px 12px!important;
+    }
+    .customer-dashboard-v2 .stats-grid{
+        grid-template-columns:1fr!important;
+    }
+}
+
+
 </style>
 
 @php
     $customer = auth()->user();
     $orders = $orders ?? collect();
     $orders = $orders instanceof \Illuminate\Support\Collection ? $orders : collect($orders);
-    $activeOrders = $activeOrders ?? $orders->filter(fn($o) => ! in_array(strtolower($o->status ?? ''), ['completed','delivered','cancelled'], true));
+    $activeOrders = $activeOrders ?? $orders->filter(fn($o) => ! in_array(strtolower($o->status ?? ''), ['completed','delivered','cancelled','canceled','refunded'], true));
     $activeOrders = $activeOrders instanceof \Illuminate\Support\Collection ? $activeOrders : collect($activeOrders);
     $readyOrders = $readyOrders ?? $orders->filter(fn($o) => in_array(strtolower($o->status ?? ''), ['ready','ready_for_pickup','shipped','out_for_delivery'], true));
     $readyOrders = $readyOrders instanceof \Illuminate\Support\Collection ? $readyOrders : collect($readyOrders);
@@ -2741,6 +2865,10 @@ body:has(.customer-dashboard-v2) .text-gray-900,
         'completed'=>['label'=>'Delivered','class'=>'status-delivered'],
         'delivered'=>['label'=>'Delivered','class'=>'status-delivered'],
         'cancelled'=>['label'=>'Cancelled','class'=>'status-cancelled'],
+        'canceled'=>['label'=>'Cancelled','class'=>'status-cancelled'],
+        'refunded'=>['label'=>'Refunded','class'=>'status-refunded'],
+        'refund'=>['label'=>'Refunded','class'=>'status-refunded'],
+        'partially_refunded'=>['label'=>'Refunded','class'=>'status-refunded'],
     ];
 
     $ordersUrl = Route::has('customer.orders.index') ? route('customer.orders.index') : '#recentOrdersCard';
@@ -2762,7 +2890,8 @@ body:has(.customer-dashboard-v2) .text-gray-900,
         ['key'=>'processing','label'=>'Processing','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['approved','processing','in_production'], true))->count(),'color'=>'var(--dash-orange)'],
         ['key'=>'shipped','label'=>'Shipped','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['ready','ready_for_pickup','shipped','out_for_delivery'], true))->count(),'color'=>'var(--dash-blue)'],
         ['key'=>'delivered','label'=>'Delivered','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['completed','delivered'], true))->count(),'color'=>'var(--dash-green)'],
-        ['key'=>'cancelled','label'=>'Cancelled','count'=>$orders->filter(fn($o)=>strtolower($o->status ?? '')==='cancelled')->count(),'color'=>'var(--dash-red)'],
+        ['key'=>'cancelled','label'=>'Cancelled','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->count(),'color'=>'var(--dash-red)'],
+        ['key'=>'refunded','label'=>'Refunded','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->count(),'color'=>'var(--dash-purple)'],
     ]);
     $statusTotal = max(1, (float) $statusChartData->sum('count'));
     $donutCircumference = 100.5310;
@@ -2770,9 +2899,10 @@ body:has(.customer-dashboard-v2) .text-gray-900,
 
     $paymentChartData = collect([
         ['key'=>'paid','label'=>'Paid','count'=>$paymentSettledCount,'amount'=>$paymentSettledAmount,'color'=>'var(--dash-green)'],
-        ['key'=>'partial','label'=>'Partial','count'=>$orders->filter(fn($o)=>strtolower($o->payment_status ?? '')==='partial')->count(),'amount'=>$orders->filter(fn($o)=>strtolower($o->payment_status ?? '')==='partial')->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-blue)'],
         ['key'=>'pending','label'=>'Pending','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['pending','unpaid'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['pending','unpaid'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-yellow)'],
-        ['key'=>'failed','label'=>'Failed','count'=>$orders->filter(fn($o)=>strtolower($o->payment_status ?? '')==='failed')->count(),'amount'=>$orders->filter(fn($o)=>strtolower($o->payment_status ?? '')==='failed')->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-red)'],
+        ['key'=>'failed','label'=>'Failed','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['failed','declined'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['failed','declined'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-red)'],
+        ['key'=>'cancelled','label'=>'Cancelled','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['cancelled','canceled'], true) || in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['cancelled','canceled'], true) || in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-purple)'],
+        ['key'=>'refunded','label'=>'Refunded','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['refunded','refund','partially_refunded'], true) || in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['refunded','refund','partially_refunded'], true) || in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-blue)'],
     ]);
     $paymentMax = max(1, (float) $paymentChartData->max('amount'));
 
@@ -2791,6 +2921,8 @@ body:has(.customer-dashboard-v2) .text-gray-900,
         ];
     });
     $revenueMax = max(1, (float) $revenueChartData->max('amount'));
+    $spendingAxisMax = 3000;
+    $spendingAxisLabels = ['₱3K','₱1K','₱500','₱100','₱0'];
     $revenueTotal = $revenueChartData->sum('amount');
     $barColors = ['#5bc0de','#2563eb','#f59e0b','#16a34a','#2563eb','#14b8a6'];
 
@@ -2961,11 +3093,11 @@ body:has(.customer-dashboard-v2) .text-gray-900,
         <div class="dashboard-board">
             <main class="left-column" aria-label="Customer dashboard main content">
                 <section class="analytics-grid" aria-label="Account analytics">
-                    <article class="card chart-card reveal-card" style="--delay:60ms;--chart-color:var(--dash-orange);--chart-soft:var(--dash-orange-soft)" aria-label="Order Status Distribution">
+                    <article class="card chart-card reveal-card" style="--delay:60ms;--chart-color:var(--dash-orange);--chart-soft:var(--dash-orange-soft)" aria-label="Order Status Summary">
                         <div class="card-head">
                             <div class="card-title-group">
-                                <h3 class="card-title">Order Status Distribution</h3>
-                                <p class="card-subtitle">All current customer orders.</p>
+                                <h3 class="card-title">Order Status Summary</h3>
+                                <p class="card-subtitle">Breakdown of your orders by status.</p>
                             </div>
                         </div>
                         <div class="status-chart-layout">
@@ -3000,11 +3132,11 @@ body:has(.customer-dashboard-v2) .text-gray-900,
                         </div>
                     </article>
 
-                    <article class="card chart-card reveal-card" style="--delay:120ms;--chart-color:var(--dash-green);--chart-soft:var(--dash-green-soft)" aria-label="Payment Collection">
+                    <article class="card chart-card reveal-card" style="--delay:120ms;--chart-color:var(--dash-green);--chart-soft:var(--dash-green-soft)" aria-label="My Payments">
                         <div class="card-head">
                             <div class="card-title-group">
-                                <h3 class="card-title">Payment Collection</h3>
-                                <p class="card-subtitle">Collected and pending balances.</p>
+                                <h3 class="card-title">My Payments</h3>
+                                <p class="card-subtitle">Overview of your paid, pending, failed, cancelled, and refunded payments.</p>
                             </div>
                             <button type="button" class="select-chip js-filter-trigger" data-filter-type="payment" data-filter-value="paid">This Month</button>
                         </div>
@@ -3018,23 +3150,23 @@ body:has(.customer-dashboard-v2) .text-gray-900,
                                 </button>
                             @endforeach
                         </div>
-                        <div class="payment-total">Total Collected <strong>₱{{ number_format($paymentSettledAmount,2) }}</strong></div>
+                        <div class="payment-total">Total Paid <strong>₱{{ number_format($paymentSettledAmount,2) }}</strong></div>
                     </article>
 
-                    <article class="card chart-card reveal-card" style="--delay:180ms;--chart-color:var(--dash-blue);--chart-soft:var(--dash-blue-soft)" aria-label="Monthly Revenue">
+                    <article class="card chart-card reveal-card" style="--delay:180ms;--chart-color:var(--dash-blue);--chart-soft:var(--dash-blue-soft)" aria-label="Monthly Spending">
                         <div class="card-head">
                             <div class="card-title-group">
-                                <h3 class="card-title">Monthly Revenue</h3>
-                                <p class="card-subtitle">Revenue movement by month.</p>
+                                <h3 class="card-title">Monthly Spending</h3>
+                                <p class="card-subtitle">Your spending movement by month.</p>
                             </div>
                             <button type="button" class="select-chip js-filter-trigger" data-filter-type="month" data-filter-value="{{ now()->format('Y-m') }}">This Year</button>
                         </div>
                         <div class="revenue-chart">
-                            <div class="revenue-axis"><span>₱100K</span><span>₱80K</span><span>₱60K</span><span>₱40K</span><span>₱20K</span></div>
+                            <div class="revenue-axis">@foreach($spendingAxisLabels as $axisLabel)<span>{{ $axisLabel }}</span>@endforeach</div>
                             <div class="revenue-bars">
                                 @foreach($revenueChartData as $month)
                                     @php
-                                        $height = max(7, ((float) $month['amount'] / $revenueMax) * 100);
+                                        $height = max(7, min(100, ((float) $month['amount'] / $spendingAxisMax) * 100));
                                         $barColor = $barColors[$loop->index % count($barColors)];
                                     @endphp
                                     <button type="button" class="revenue-bar-button js-filter-trigger" data-filter-type="month" data-filter-value="{{ $month['key'] }}" style="--bar-height:{{ number_format($height,4,'.','') }}%">
@@ -3045,7 +3177,7 @@ body:has(.customer-dashboard-v2) .text-gray-900,
                             </div>
                         </div>
                         <div class="revenue-labels"><span class="revenue-label-spacer"></span><div class="month-labels">@foreach($revenueChartData as $month)<span>{{ $month['label'] }}</span>@endforeach</div></div>
-                        <div class="revenue-total">Total Revenue <strong>₱{{ number_format($revenueTotal,2) }}</strong></div>
+                        <div class="revenue-total">Total Spending <strong>₱{{ number_format($revenueTotal,2) }}</strong></div>
                     </article>
                 </section>
 
@@ -3152,6 +3284,8 @@ body:has(.customer-dashboard-v2) .text-gray-900,
                                                 'approved','processing','in_production'=>'processing',
                                                 'ready','ready_for_pickup','shipped','out_for_delivery'=>'shipped',
                                                 'completed','delivered'=>'delivered',
+                                                'cancelled','canceled'=>'cancelled',
+                                                'refunded','refund','partially_refunded'=>'refunded',
                                                 default=>$orderStatusKey,
                                             };
                                             $paymentStatusKey = strtolower($order->payment_status ?? 'pending');
@@ -3179,80 +3313,7 @@ body:has(.customer-dashboard-v2) .text-gray-900,
                 </section>
             </main>
 
-            <aside class="right-column" aria-label="Customer dashboard right panel">
-                <section class="card quick-actions-card reveal-card" id="quickActions" style="--delay:220ms" aria-label="Quick Actions">
-                    <div class="card-title-group">
-                        <h3 class="card-title">Quick Actions</h3>
-                        <p class="card-subtitle">Fast customer shortcuts.</p>
-                    </div>
-                    <div class="quick-grid">
-                        @foreach($quickActions as $action)
-                            <a href="{{ $action['url'] }}" class="quick-action" style="--quick-color:{{ $action['color'] }};--quick-soft:{{ $action['soft'] }}">
-                                <span class="quick-icon"><i data-lucide="{{ $action['icon'] }}" size="20"></i></span>
-                                <span class="quick-label">{{ $action['label'] }}</span>
-                            </a>
-                        @endforeach
-                    </div>
-                </section>
 
-                <section class="card account-card reveal-card" style="--delay:340ms" aria-label="Account Status">
-                    <div class="panel-head">
-                        <div>
-                            <h3 class="card-title">Account Status</h3>
-                            <p class="card-subtitle">Manage your account and preferences.</p>
-                        </div>
-                    </div>
-                    <div class="account-list">
-                        <a href="{{ $profileUrl }}" class="account-row">
-                            <span class="row-icon" style="--row-color:var(--dash-green);--row-soft:var(--dash-green-soft)"><i data-lucide="user" size="17"></i></span>
-                            <span class="account-text"><span class="row-title">Profile</span><span class="row-sub">{{ $customer->email ?? 'Email not available' }}</span></span>
-                            <i class="row-chevron" data-lucide="chevron-right" size="16"></i>
-                        </a>
-                        <a href="{{ $profileUrl }}" class="account-row">
-                            <span class="row-icon" style="--row-color:var(--dash-blue);--row-soft:var(--dash-blue-soft)"><i data-lucide="map-pin" size="17"></i></span>
-                            <span class="account-text"><span class="row-title">Address</span><span class="row-sub">{{ $customer->address ?? $customer->billing_address ?? 'Add delivery or pickup address' }}</span></span>
-                            <i class="row-chevron" data-lucide="chevron-right" size="16"></i>
-                        </a>
-                        <a href="{{ $paymentsUrl }}" class="account-row">
-                            <span class="row-icon" style="--row-color:var(--dash-blue);--row-soft:var(--dash-blue-soft)"><i data-lucide="credit-card" size="17"></i></span>
-                            <span class="account-text"><span class="row-title">Payment Methods</span><span class="row-sub">{{ $paymentMethodsCount > 0 ? $paymentMethodsCount.' saved payment method'.($paymentMethodsCount > 1 ? 's' : '') : 'View payment method' }}</span></span>
-                            <i class="row-chevron" data-lucide="chevron-right" size="16"></i>
-                        </a>
-                        <a href="{{ $profileUrl }}" class="edit-profile-button">Edit Profile</a>
-                    </div>
-                </section>
-
-                <section class="card notification-card reveal-card" id="notificationsCard" style="--delay:460ms" aria-label="Notifications">
-                    <div class="panel-head">
-                        <div>
-                            <h3 class="card-title">Notifications</h3>
-                            <p class="card-subtitle">Latest order and account updates.</p>
-                        </div>
-                        <a href="{{ $notificationsUrl }}" class="view-all-link">View All</a>
-                    </div>
-                    <div class="notification-list">
-                        @forelse($notifications->take(3) as $notification)
-                            @php
-                                $notificationData = is_array($notification->data ?? null) ? $notification->data : [];
-                                $notificationTitle = $notification->title ?? $notificationData['title'] ?? 'Notification';
-                                $notificationMessage = $notification->message ?? $notificationData['message'] ?? 'You have a new update.';
-                                $notificationTime = $getDate($notification->created_at ?? null, 'M d') ?? 'Now';
-                            @endphp
-                            <div class="notification-row">
-                                <span class="row-icon" style="--row-color:var(--dash-green);--row-soft:var(--dash-green-soft)"><i data-lucide="check" size="17"></i></span>
-                                <span><span class="row-title">{{ $notificationTitle }}</span><span class="row-sub">{{ $notificationMessage }}</span></span>
-                                <span class="notification-time">{{ $notificationTime }}</span>
-                            </div>
-                        @empty
-                            <div class="notification-row">
-                                <span class="row-icon" style="--row-color:var(--dash-green);--row-soft:var(--dash-green-soft)"><i data-lucide="check" size="17"></i></span>
-                                <span><span class="row-title">All caught up</span><span class="row-sub">No new notifications right now.</span></span>
-                                <span class="notification-time">Now</span>
-                            </div>
-                        @endforelse
-                    </div>
-                </section>
-            </aside>
         </div>
     </div>
 </div>
@@ -3540,18 +3601,20 @@ document.addEventListener('DOMContentLoaded', function () {
         processing:['processing','approved','in_production'],
         shipped:['shipped','ready','ready_for_pickup','out_for_delivery'],
         delivered:['delivered','completed'],
-        cancelled:['cancelled']
+        cancelled:['cancelled','canceled'],
+        refunded:['refunded','refund','partially_refunded']
     };
     const paymentGroups = {
         paid:['paid','settled','completed'],
         pending:['pending','unpaid'],
-        partial:['partial'],
-        failed:['failed']
+        failed:['failed','declined'],
+        cancelled:['cancelled','canceled'],
+        refunded:['refunded','refund','partially_refunded']
     };
 
     const labels = {
-        status:{pending:'Pending orders',processing:'Processing orders',shipped:'Shipped / transit orders',delivered:'Delivered orders',cancelled:'Cancelled orders'},
-        payment:{paid:'Paid orders',pending:'Pending payment orders',partial:'Partially paid orders',failed:'Failed payment orders'},
+        status:{pending:'Pending orders',processing:'Processing orders',shipped:'Shipped / transit orders',delivered:'Delivered orders',cancelled:'Cancelled orders',refunded:'Refunded orders'},
+        payment:{paid:'Paid payments',pending:'Pending payments',failed:'Failed payments',cancelled:'Cancelled payments',refunded:'Refunded payments'},
         month:{}
     };
 
@@ -3589,7 +3652,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (clearButton) clearButton.classList.toggle('is-hidden', !activeType);
         if (filterLabel) {
             if (!activeType) filterLabel.textContent = 'Showing all recent orders.';
-            else if (activeType === 'month') filterLabel.textContent = 'Filtered by selected month.';
+            else if (activeType === 'month') filterLabel.textContent = 'Filtered by selected spending month.';
             else filterLabel.textContent = labels[activeType]?.[activeValue] || 'Filtered recent orders.';
         }
         setActiveButtons();
