@@ -5,9 +5,50 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Models\ServiceVariation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CartController extends Controller
 {
+    public function state(Request $request)
+    {
+        $cart = session()->get('cart', []);
+
+        return response()->json([
+            'ok' => true,
+            'promo_code' => session()->get('cart_promo'),
+            'items' => collect($cart)->map(function (array $row, $cartKey) {
+                return [
+                    'id' => $row['cart_id'] ?? $cartKey,
+                    'name' => $row['name'] ?? 'Print Item',
+                    'qty' => (int) ($row['qty'] ?? 1),
+                    'unitPrice' => (float) ($row['price'] ?? 0),
+                    'price' => (float) ($row['price'] ?? 0),
+                    'priceType' => $row['price_type'] ?? 'retail',
+                    'selected' => (bool) ($row['selected'] ?? true),
+                    'image' => $row['image_path'] ?? null,
+                    'fileName' => $row['file_name'] ?? null,
+                    'fileMeta' => $row['file_meta'] ?? null,
+                    'meta' => $row['meta'] ?? [],
+                    'raw' => array_merge($row['raw'] ?? [], [
+                        'serviceName' => $row['name'] ?? 'Print Item',
+                        'serviceId' => $row['service_item_id'] ?? null,
+                        'serviceItemId' => $row['service_item_id'] ?? null,
+                        'category' => $row['category'] ?? null,
+                        'printingCategory' => data_get($row, 'raw.printingCategory') ?? ($row['category'] ?? null),
+                        'variationLabel' => $row['variation_label'] ?? null,
+                        'serviceOption' => data_get($row, 'raw.serviceOption') ?? ($row['variation_label'] ?? null),
+                        'quantity' => (int) ($row['qty'] ?? 1),
+                        'unit' => $row['unit'] ?? 'pcs',
+                        'fileName' => $row['file_name'] ?? null,
+                        'fileMeta' => $row['file_meta'] ?? null,
+                        'attachmentPath' => $row['attachment_path'] ?? null,
+                        'priceMode' => ucfirst($row['price_type'] ?? 'retail'),
+                    ]),
+                ];
+            })->values(),
+        ]);
+    }
+
     /**
      * View cart page.
      */
@@ -157,6 +198,10 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
 
+        if (!empty($cart[$cartKey]['attachment_path'])) {
+            Storage::disk('local')->delete($cart[$cartKey]['attachment_path']);
+        }
+
         unset($cart[$cartKey]);
 
         session()->put('cart', $cart);
@@ -170,7 +215,13 @@ class CartController extends Controller
      */
     public function clear()
     {
+        foreach (session()->get('cart', []) as $row) {
+            if (!empty($row['attachment_path'])) {
+                Storage::disk('local')->delete($row['attachment_path']);
+            }
+        }
         session()->forget('cart');
+        session()->forget('cart_promo');
 
         return redirect()->route('cart.index')->with('success', 'Cart cleared.');
     }
@@ -190,7 +241,8 @@ class CartController extends Controller
     public function syncCart(Request $request)
     {
         $validated = $request->validate([
-            'items' => ['required', 'array', 'min:1'],
+            'items' => ['required', 'array'],
+            'items.*.id' => ['nullable', 'string', 'max:160'],
             'items.*.name' => ['required', 'string'],
             'items.*.qty' => ['required', 'integer', 'min:1', 'max:999'],
             'items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
@@ -204,33 +256,125 @@ class CartController extends Controller
             'items.*.image_path' => ['nullable', 'string'],
             'items.*.service_code' => ['nullable', 'string'],
             'items.*.price_type' => ['nullable', 'in:retail,bulk'],
+            'items.*.selected' => ['nullable', 'boolean'],
+            'items.*.file_name' => ['nullable', 'string', 'max:255'],
+            'items.*.file_meta' => ['nullable', 'array'],
+            'items.*.meta' => ['nullable', 'array'],
+            'items.*.raw' => ['nullable', 'array'],
         ]);
 
+        $existing = session()->get('cart', []);
         $cart = [];
 
         foreach ($validated['items'] as $idx => $i) {
-            $key = !empty($i['service_code']) ? $i['service_code'] : ('LS-' . $idx . '-' . uniqid());
-            $unitPrice = (float) ($i['unit_price'] ?? $i['price'] ?? 0);
-
-            $cart[$key] = [
-                'service_id'      => (int) ($i['service_id'] ?? 0),
-                'variation_id'    => (int) ($i['variation_id'] ?? 0),
-                'service_item_id' => $i['service_item_id'] ?? $key,
-                'name'            => $i['name'],
-                'category'        => $i['category'] ?? null,
-                'variation_label' => $i['variation_label'] ?? null,
-                'unit'            => $i['unit'] ?? null,
+            $priceType = $i['price_type'] ?? 'retail';
+            $serviceItemId = trim((string) ($i['service_item_id'] ?? $i['service_code'] ?? ''));
+            $variation = $serviceItemId !== ''
+                ? ServiceVariation::with('service')
+                    ->where('service_item_id', $serviceItemId)
+                    ->where('is_active', true)
+                    ->first()
+                : null;
+            $service = $variation?->service;
+            $key = $variation
+                ? $service->id . '_' . $variation->id . '_' . $priceType
+                : ($i['id'] ?? ($serviceItemId !== '' ? $serviceItemId : ('LS-' . $idx . '-' . uniqid())));
+            $catalogPrice = $variation
+                ? (float) ($priceType === 'bulk' ? $variation->bulk_price : $variation->retail_price)
+                : null;
+            $doubleSidedFee = !empty($i['raw']['addons']['doubleSided']) ? 0.50 : 0;
+            $unitPrice = $catalogPrice !== null
+                ? $catalogPrice + $doubleSidedFee
+                : (float) ($i['unit_price'] ?? $i['price'] ?? 0);
+            $old = $existing[$key] ?? ($existing[$i['id'] ?? ''] ?? []);
+            $row = [
+                'cart_id'         => $key,
+                'service_id'      => (int) ($service?->id ?? $i['service_id'] ?? 0),
+                'variation_id'    => (int) ($variation?->id ?? $i['variation_id'] ?? 0),
+                'service_item_id' => $variation?->service_item_id ?? ($serviceItemId !== '' ? $serviceItemId : $key),
+                'name'            => $service?->name ?? $i['name'],
+                'category'        => $service?->category ?? $i['category'] ?? null,
+                'variation_label' => $variation?->variation_label ?? $i['variation_label'] ?? null,
+                'unit'            => $service?->unit ?? $i['unit'] ?? null,
                 'price'           => $unitPrice,
-                'price_type'      => $i['price_type'] ?? 'retail',
+                'price_type'      => $priceType,
                 'qty'             => (int) $i['qty'],
-                'image_path'      => $i['image_path'] ?? null,
+                'image_path'      => $service?->image_path ?? $i['image_path'] ?? null,
+                'selected'        => (bool) ($i['selected'] ?? true),
+                'file_name'       => $i['file_name'] ?? ($old['file_name'] ?? null),
+                'file_meta'       => $i['file_meta'] ?? ($old['file_meta'] ?? null),
+                'attachment_path' => $old['attachment_path'] ?? null,
+                'meta'            => $i['meta'] ?? [],
+                'raw'             => $i['raw'] ?? [],
             ];
+
+            if (isset($cart[$key])) {
+                $cart[$key]['qty'] += $row['qty'];
+                $cart[$key]['selected'] = $cart[$key]['selected'] || $row['selected'];
+                $cart[$key]['file_name'] ??= $row['file_name'];
+                $cart[$key]['file_meta'] ??= $row['file_meta'];
+                $cart[$key]['attachment_path'] ??= $row['attachment_path'];
+            } else {
+                $cart[$key] = $row;
+            }
+        }
+
+        foreach ($existing as $key => $row) {
+            if (!isset($cart[$key]) && !empty($row['attachment_path'])) {
+                Storage::disk('local')->delete($row['attachment_path']);
+            }
         }
 
         session()->put('cart', $cart);
         session()->forget('buy_now');
 
-        return response()->json(['ok' => true]);
+        return response()->json(['ok' => true, 'count' => count($cart)]);
+    }
+
+    public function attach(Request $request)
+    {
+        $validated = $request->validate([
+            'cart_id' => ['required', 'string', 'max:160'],
+            'file' => ['required', 'file', 'max:51200', 'mimes:pdf,doc,docx,txt,jpg,jpeg,png'],
+        ]);
+
+        $cart = session()->get('cart', []);
+        $cartId = $validated['cart_id'];
+        abort_unless(isset($cart[$cartId]), 404, 'Cart item not found.');
+
+        if (!empty($cart[$cartId]['attachment_path'])) {
+            Storage::disk('local')->delete($cart[$cartId]['attachment_path']);
+        }
+
+        $file = $request->file('file');
+        $path = $file->store('cart-uploads/' . $request->user()->id, 'local');
+        $cart[$cartId]['file_name'] = $file->getClientOriginalName();
+        $cart[$cartId]['file_meta'] = [
+            'name' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'type' => $file->getMimeType(),
+        ];
+        $cart[$cartId]['attachment_path'] = $path;
+        session()->put('cart', $cart);
+
+        return response()->json([
+            'ok' => true,
+            'file_name' => $cart[$cartId]['file_name'],
+            'file_meta' => $cart[$cartId]['file_meta'],
+        ]);
+    }
+
+    public function promo(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:40'],
+        ]);
+
+        $code = strtoupper(trim($validated['code']));
+        abort_unless(in_array($code, ['SAVE10', 'PRINTIFY50'], true), 422, 'Invalid promo code.');
+        session()->put('cart_promo', $code);
+
+        return response()->json(['ok' => true, 'code' => $code]);
     }
 
     /**

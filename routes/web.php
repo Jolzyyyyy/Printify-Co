@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Models\Order;
 
 // --- CUSTOMER CONTROLLERS ---
 use App\Http\Controllers\FrontPageController;
@@ -11,7 +12,10 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymongoCheckoutController;
+use App\Http\Controllers\EReceiptController;
 use App\Http\Controllers\SupportTicketController;
+use App\Http\Controllers\ServiceDetailController;
+use App\Http\Controllers\LalamoveDeliveryController;
 
 // --- CUSTOMER AUTH CONTROLLERS ---
 use App\Http\Controllers\Auth\AuthenticatedSessionController; 
@@ -45,10 +49,21 @@ Route::get('/contact', [FrontPageController::class, 'contact'])->name('landing.c
 Route::get('/contactus', [FrontPageController::class, 'contact'])->name('landing.contactus');
 Route::post('/contact', [FrontPageController::class, 'submitContact'])->name('landing.contact.submit');
 Route::post('/contactus', [FrontPageController::class, 'submitContact'])->name('landing.contactus.submit');
+Route::view('/privacy-policy', 'legal.privacy-policy')->name('legal.privacy');
+Route::view('/terms-of-service', 'legal.terms-of-service')->name('legal.terms');
+Route::get('/support', fn () => redirect()->route('landing.contactus'))->name('support');
+Route::get('/service-detail', [FrontPageController::class, 'serviceDetail'])->name('landing.service-detail');
+Route::get('/service-details', [FrontPageController::class, 'serviceDetail'])->name('landing.service-details');
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
-    Route::get('/service-detail', [FrontPageController::class, 'serviceDetail'])->name('landing.service-detail');
-    Route::get('/service-details', [FrontPageController::class, 'serviceDetail'])->name('landing.service-details');
     Route::get('/checkout', [FrontPageController::class, 'checkout'])->name('checkout.index');
+    Route::get('/e-receipt', [FrontPageController::class, 'eReceipt'])->name('e-receipt.index');
+    Route::get('/e-receipt/details', [EReceiptController::class, 'show'])->name('e-receipt.show');
+    Route::post('/e-receipt', [EReceiptController::class, 'store'])->name('e-receipt.store');
+    Route::get('/service-details/catalog', [ServiceDetailController::class, 'catalog'])->name('service-details.catalog');
+    Route::get('/service-details/state', [ServiceDetailController::class, 'state'])->name('service-details.state');
+    Route::post('/service-details/state', [ServiceDetailController::class, 'update'])->name('service-details.update');
+    Route::post('/service-details/upload', [ServiceDetailController::class, 'upload'])->name('service-details.upload');
+    Route::delete('/service-details/upload', [ServiceDetailController::class, 'removeUpload'])->name('service-details.upload.remove');
 });
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
@@ -56,18 +71,24 @@ Route::get('/services/{service}', [ServiceController::class, 'show'])->name('ser
 
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::get('/state', [CartController::class, 'state'])->name('state');
+    Route::post('/attachment', [CartController::class, 'attach'])->name('attachment');
+    Route::post('/promo', [CartController::class, 'promo'])->name('promo');
     Route::post('/add/{service}', [CartController::class, 'add'])->name('add');
     Route::post('/update/{cartKey}', [CartController::class, 'update'])->name('update');
-    Route::post('/remove/{service}', [CartController::class, 'remove'])->name('remove');
+    Route::post('/remove/{cartKey}', [CartController::class, 'remove'])->name('remove');
     Route::post('/clear', [CartController::class, 'clear'])->name('clear');
     Route::post('/sync', [CartController::class, 'syncCart'])->name('sync');
 });
 
-Route::get('/payment/checkout', [PaymongoCheckoutController::class, 'checkout'])->name('payment.checkout');
-Route::post('/payment/start', [PaymongoCheckoutController::class, 'start'])->name('payment.start');
-Route::post('/payment/pay', [PaymongoCheckoutController::class, 'pay'])->name('payment.pay');
-Route::get('/payment/success', [PaymongoCheckoutController::class, 'success'])->name('payment.success');
-Route::get('/payment/cancel', [PaymongoCheckoutController::class, 'cancel'])->name('payment.cancel');
+Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
+    Route::get('/payment/checkout', [PaymongoCheckoutController::class, 'checkout'])->name('payment.checkout');
+    Route::post('/payment/start', [PaymongoCheckoutController::class, 'start'])->name('payment.start');
+    Route::post('/payment/pay', [PaymongoCheckoutController::class, 'pay'])->name('payment.pay');
+    Route::get('/payment/success', [PaymongoCheckoutController::class, 'success'])->name('payment.success');
+    Route::get('/payment/cancel', [PaymongoCheckoutController::class, 'cancel'])->name('payment.cancel');
+});
+Route::post('/paymongo/webhook', [PaymongoCheckoutController::class, 'webhook'])->name('payment.paymongo.webhook');
 Route::get('/checkout.php', fn () => redirect('/checkout'));
 
 /*
@@ -106,10 +127,16 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     });
 
     // --- FIXED ORDERS SECTION PARA SA CUSTOMER ---
-    Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('my-orders');
-    Route::get('/my-orders/{order}', [OrderController::class, 'myShow'])->name('my-orders.show');
+    Route::get('/co/place-order', [OrderController::class, 'myOrders'])->name('co.place-order');
+    Route::get('/co/place-order/{order}', [OrderController::class, 'myShow'])->name('co.place-order.show');
+    Route::get('/co/place-order/{order}/tracking', [OrderController::class, 'myTracking'])->name('co.place-order.tracking');
+    Route::get('/my-orders', fn () => redirect()->route('co.place-order'))->name('my-orders');
+    Route::get('/my-orders/{order}', fn (Order $order) => redirect()->route('co.place-order.show', $order))->name('my-orders.show');
     
     Route::get('/orders', [OrderController::class, 'myOrders'])->name('orders.index');
+    Route::post('/delivery/lalamove/quote', [LalamoveDeliveryController::class, 'quote'])->name('delivery.lalamove.quote');
+    Route::post('/orders/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('orders.delivery.book');
+    Route::post('/orders/{order}/delivery/refresh', [LalamoveDeliveryController::class, 'refresh'])->name('orders.delivery.refresh');
 
     // 2. NOTIFICATIONS
     Route::get('/notifications', function() {
@@ -151,6 +178,7 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     Route::post('/help-center/tickets', [SupportTicketController::class, 'store'])->name('help-center.tickets.store');
 
     Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
+    Route::post('/checkout/finalize', [PaymongoCheckoutController::class, 'finalize'])->name('checkout.finalize');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('customer.logout');
 });
 
@@ -207,6 +235,8 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
         Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
         Route::get('/orders-database', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/orders-database/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+        Route::post('/orders-database/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('admin.orders.delivery.book');
+        Route::post('/orders-database/{order}/delivery/refresh', [LalamoveDeliveryController::class, 'refresh'])->name('admin.orders.delivery.refresh');
         Route::middleware('role:developer')->group(function () {
             Route::get('/orders-database/{order}/edit', [OrderController::class, 'edit'])->name('admin.orders.edit');
             Route::put('/orders-database/{order}', [OrderController::class, 'update'])->name('admin.orders.update');

@@ -12,6 +12,12 @@
                         <i class="fa-solid fa-key w-4"></i> Change Password
                     </button>
 
+                    <button @click="securityTab = 'recovery'"
+                        :class="securityTab === 'recovery' ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50'"
+                        class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase w-full transition-all text-left">
+                        <i class="fa-solid fa-shield-halved w-4"></i> Recovery Access
+                    </button>
+
                     <button @click="securityTab = 'activity'" 
                         :class="securityTab === 'activity' ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-slate-50'"
                         class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase w-full transition-all text-left">
@@ -51,6 +57,14 @@
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
                     <h2 class="text-xl font-black text-slate-800 uppercase tracking-tighter mb-6">Change Password</h2>
                     @include('profile.partials.update-password-form')
+                </div>
+            </div>
+
+            <div x-show="securityTab === 'recovery'" x-cloak x-transition>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <h2 class="text-xl font-black text-slate-800 uppercase tracking-tighter mb-2">Recovery Access</h2>
+                    <p class="text-sm text-slate-500 mb-6 font-bold">Keep an alternate email saved so password reset and account recovery remain available.</p>
+                    <a href="{{ route('profile.edit') }}" class="inline-flex bg-indigo-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase shadow-lg shadow-indigo-200">Update Alternate Email</a>
                 </div>
             </div>
 

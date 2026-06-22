@@ -614,6 +614,60 @@
             font-variant-numeric: tabular-nums;
         }
 
+        .staff-access-panel {
+            display: grid;
+            gap: 14px;
+            width: 100%;
+            margin-top: 18px;
+        }
+
+        .staff-access-card {
+            border: 1px solid rgba(49, 88, 255, .20);
+            background: rgba(49, 88, 255, .055);
+            border-radius: 12px;
+            padding: 16px;
+            color: #111827;
+        }
+
+        .staff-access-card strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--primary-blue);
+        }
+
+        .staff-access-card p {
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #4b5563;
+        }
+
+        .staff-access-list {
+            display: grid;
+            gap: 9px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .staff-access-list li {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            color: #111827;
+        }
+
+        .staff-access-list svg {
+            width: 16px;
+            height: 16px;
+            color: var(--primary-blue);
+            flex: 0 0 auto;
+        }
+
         @media (max-width: 860px) {
             .auth-container {
                 width: min(835px, calc(100vw - 28px)) !important;
@@ -633,12 +687,12 @@
     </style>
 
     <div class="auth-container" id="auth-container">
-        {{-- ADMIN/DEVELOPER REGISTER FORM --}}
+        {{-- ADMIN/DEVELOPER STAFF ACCESS PANEL --}}
         <div class="form-container sign-up-container">
             <div class="form-content">
                 <p class="auth-switch-text">Already have a staff account? <button type="button" data-auth-switch="login">Sign in</button></p>
-                <h1 class="auth-title">Create Account</h1>
-                <p class="auth-subtitle">Create staff access for the admin portal</p>
+                <h1 class="auth-title">Staff Access</h1>
+                <p class="auth-subtitle">Admin and developer accounts are created through secure invitation only.</p>
 
                 @if ($errors->any())
                     <div class="auth-feedback" role="alert">
@@ -657,76 +711,31 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.register.submit') }}" class="w-full">
-                    @csrf
-
-                    <div class="input-group">
-                        <label class="input-label">Name</label>
-                        <div class="field-wrapper">
-                            <span class="field-icon">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                            </span>
-                            <input type="text" name="name" placeholder="Full Name" class="custom-input" value="{{ old('name') }}" required />
-                        </div>
-                        @error('name') <p class="error-text">{{ $message }}</p> @enderror
+                <div class="staff-access-panel">
+                    <div class="staff-access-card">
+                        <strong>Invite required</strong>
+                        <p>Public staff registration is disabled. A developer must create or invite admin client accounts before portal access is allowed.</p>
                     </div>
 
-                    <div class="input-group">
-                        <label class="input-label">Email Address</label>
-                        <div class="field-wrapper">
-                            <span class="field-icon">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                    <polyline points="22,6 12,13 2,6"></polyline>
-                                </svg>
-                            </span>
-                            <input type="email" name="email" placeholder="name@example.com" class="custom-input" value="{{ old('email') }}" required />
-                        </div>
-                        @error('email') <p class="error-text">{{ $message }}</p> @enderror
-                    </div>
+                    <ul class="staff-access-list">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M9 12l2 2 4-4"></path>
+                                <circle cx="12" cy="12" r="9"></circle>
+                            </svg>
+                            Secure invite and approval flow stays active.
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                            Existing admin and developer accounts can sign in normally.
+                        </li>
+                    </ul>
 
-                    <div class="input-group">
-                        <label class="input-label">System Role</label>
-                        <div class="field-wrapper">
-                            <span class="field-icon">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 0 1 7.04 4.3l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.28.61.86 1 1.51 1H21a2 2 0 0 1 0 4h-.09A1.65 1.65 0 0 0 19.4 15z"></path>
-                                </svg>
-                            </span>
-                            <select name="role" class="custom-input" required>
-                                <option value="{{ \App\Models\User::ROLE_ADMIN_CLIENT }}" @selected(old('role') === \App\Models\User::ROLE_ADMIN_CLIENT)>Admin Client</option>
-                                <option value="{{ \App\Models\User::ROLE_DEVELOPER }}" @selected(old('role') === \App\Models\User::ROLE_DEVELOPER)>Developer</option>
-                            </select>
-                        </div>
-                        @error('role') <p class="error-text">{{ $message }}</p> @enderror
-                    </div>
+                    <button type="button" class="auth-btn" data-auth-switch="login">Back to Sign In</button>
+                </div>
 
-                    <div class="input-group">
-                        <label class="input-label">Password</label>
-                        <div class="field-wrapper">
-                            <span class="field-icon">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                </svg>
-                            </span>
-                            <input type="password" id="reg_password" name="password" placeholder="Password" class="custom-input custom-input-pass" required />
-                            <button type="button" class="eye-icon-btn" onclick="togglePassword('reg_password', 'eye-reg-1')">
-                                <svg id="eye-reg-1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                                </svg>
-                            </button>
-                        </div>
-                        @error('password') <p class="error-text">{{ $message }}</p> @enderror
-                    </div>
-
-                    <button type="submit" class="auth-btn">Sign Up</button>
-                </form>
             </div>
         </div>
 
@@ -815,8 +824,8 @@
                 </div>
 
                 <div class="overlay-panel overlay-right">
-                    <h1>New Staff?</h1>
-                    <p>Create an admin client or developer account to access the correct dashboard.</p>
+                    <h1>Need Staff Access?</h1>
+                    <p>Staff accounts are protected by invite and developer approval. Use sign in after your access is created.</p>
                     <button class="ghost-btn" id="signUp">Sign Up</button>
                 </div>
             </div>
@@ -907,7 +916,7 @@
         const authSlideDuration = 760;
 
         const loginUrl = "/p-co-2026/login-7b5e93-adm-key";
-        const registerUrl = "/p-co-2026/register-7b5e93-adm-key";
+        const accessInfoUrl = `${loginUrl}?panel=staff-access`;
 
         function playAuthSlide(direction) {
             if (container.classList.contains('is-sliding')) return;
@@ -929,7 +938,7 @@
             if (container.classList.contains('right-panel-active')) return;
             container.classList.add('right-panel-active');
             playAuthSlide('slide-to-register');
-            updateUrl(registerUrl, 'Admin Register');
+            updateUrl(accessInfoUrl, 'Staff Access');
         });
 
         signInButton.addEventListener('click', () => {
@@ -948,15 +957,17 @@
 
         window.addEventListener('load', () => {
             const isRegisterPath = window.location.pathname.includes('register-7b5e93-adm-key');
+            const isStaffAccessPanel = window.location.search.includes('panel=staff-access');
             const hasRegErrors = @json($errors->has('name') || $errors->has('role') || ($errors->has('email') && old('name')));
 
-            if (hasRegErrors || isRegisterPath) {
+            if (hasRegErrors || isRegisterPath || isStaffAccessPanel) {
                 container.classList.add('right-panel-active');
+                if (isRegisterPath) updateUrl(accessInfoUrl, 'Staff Access');
             }
         });
 
         window.addEventListener('popstate', () => {
-            if (window.location.pathname.includes('register-7b5e93-adm-key')) {
+            if (window.location.pathname.includes('register-7b5e93-adm-key') || window.location.search.includes('panel=staff-access')) {
                 container.classList.add('right-panel-active');
             } else {
                 container.classList.remove('right-panel-active');

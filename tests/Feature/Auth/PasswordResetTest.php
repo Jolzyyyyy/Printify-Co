@@ -182,6 +182,46 @@ class PasswordResetTest extends TestCase
         $this->assertTrue(Hash::check('NewPassword1!', $user->fresh()->password));
     }
 
+    public function test_manual_password_reset_clears_customer_login_cooldown(): void
+    {
+        $user = User::factory()->create();
+        $token = 'test-reset-token';
+        $throttleKey = 'customer-login:' . Str::transliterate(Str::lower($user->email . '|127.0.0.1'));
+
+        foreach (range(1, 3) as $_) {
+            RateLimiter::hit($throttleKey, 300);
+        }
+
+        $this->assertTrue(RateLimiter::tooManyAttempts($throttleKey, 3));
+
+        $response = $this
+            ->withSession([
+                'password_reset_token' => $token,
+                'password_reset_email' => $user->email,
+                'customer_login_throttle_email' => $user->email,
+            ])
+            ->post(route('password.store', absolute: false), [
+                'token' => $token,
+                'email' => $user->email,
+                'password' => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
+                'action_type' => 'manual_login',
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('login', absolute: false))
+            ->assertSessionMissing('customer_login_throttle_email');
+
+        $this->assertFalse(RateLimiter::tooManyAttempts($throttleKey, 3));
+
+        $this
+            ->followingRedirects()
+            ->get(route('login', absolute: false))
+            ->assertOk()
+            ->assertDontSee('Login cooldown active');
+    }
+
     public function test_forgot_password_otp_reset_flow_can_auto_login_user(): void
     {
         Notification::fake();
