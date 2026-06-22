@@ -15,10 +15,16 @@ class LalamoveClient
             'data' => [
                 'serviceType' => config('services.lalamove.service_type', 'MOTORCYCLE'),
                 'language' => config('services.lalamove.language', 'en_PH'),
-                'stops' => [$this->pickupStop(), [
-                    'coordinates' => ['lat' => (string) $dropoff['lat'], 'lng' => (string) $dropoff['lng']],
-                    'address' => $dropoff['address'],
-                ]],
+                'stops' => [
+                    $this->pickupStop(),
+                    [
+                        'coordinates' => [
+                            'lat' => (string) $dropoff['lat'],
+                            'lng' => (string) $dropoff['lng'],
+                        ],
+                        'address' => $dropoff['address'],
+                    ],
+                ],
                 'item' => array_filter([
                     'quantity' => (string) ($item['quantity'] ?? 1),
                     'weight' => $item['weight'] ?? 'LESS_THAN_3KG',
@@ -32,25 +38,28 @@ class LalamoveClient
     public function placeOrder(array $quotation, array $contact): array
     {
         $stops = data_get($quotation, 'data.stops', []);
+
         if (count($stops) < 2) {
             throw new RuntimeException('Lalamove quotation does not contain valid stops.');
         }
 
-        return $this->request('POST', '/v3/orders', ['data' => [
-            'quotationId' => data_get($quotation, 'data.quotationId'),
-            'sender' => [
-                'stopId' => data_get($stops, '0.stopId'),
-                'name' => config('services.lalamove.pickup_name', 'Printify & Co.'),
-                'phone' => config('services.lalamove.pickup_phone'),
+        return $this->request('POST', '/v3/orders', [
+            'data' => [
+                'quotationId' => data_get($quotation, 'data.quotationId'),
+                'sender' => [
+                    'stopId' => data_get($stops, '0.stopId'),
+                    'name' => config('services.lalamove.pickup_name', 'Printify & Co.'),
+                    'phone' => config('services.lalamove.pickup_phone'),
+                ],
+                'recipients' => [[
+                    'stopId' => data_get($stops, '1.stopId'),
+                    'name' => $contact['name'],
+                    'phone' => $contact['phone'],
+                    'remarks' => (string) ($contact['remarks'] ?? ''),
+                ]],
+                'isPODEnabled' => true,
             ],
-            'recipients' => [[
-                'stopId' => data_get($stops, '1.stopId'),
-                'name' => $contact['name'],
-                'phone' => $contact['phone'],
-                'remarks' => (string) ($contact['remarks'] ?? ''),
-            ]],
-            'isPODEnabled' => true,
-        ]], ['Request-ID' => (string) Str::uuid()]);
+        ], ['Request-ID' => (string) Str::uuid()]);
     }
 
     public function order(string $orderId): array
@@ -78,13 +87,16 @@ class LalamoveClient
     {
         $apiKey = trim((string) config('services.lalamove.api_key'));
         $secret = trim((string) config('services.lalamove.api_secret'));
+
         if ($apiKey === '' || $secret === '') {
             throw new RuntimeException('Lalamove test credentials are not configured.');
         }
 
         $body = $payload === [] ? '' : json_encode($payload, JSON_UNESCAPED_SLASHES);
         $timestamp = (string) round(microtime(true) * 1000);
-        $signature = hash_hmac('sha256', $timestamp . "\r\n" . strtoupper($method) . "\r\n" . $path . "\r\n\r\n" . $body, $secret);
+        $rawSignature = $timestamp . "\r\n" . strtoupper($method) . "\r\n" . $path . "\r\n\r\n" . $body;
+        $signature = hash_hmac('sha256', $rawSignature, $secret);
+
         $request = $this->http()->withHeaders(array_merge([
             'Authorization' => "hmac {$apiKey}:{$timestamp}:{$signature}",
             'Market' => config('services.lalamove.market', 'PH'),
@@ -102,6 +114,7 @@ class LalamoveClient
                 ?: data_get($response->json(), 'errors.0.detail')
                 ?: data_get($response->json(), 'errors.detail')
                 ?: $response->body();
+
             throw new RuntimeException('Lalamove API error: ' . $message);
         }
 
@@ -111,6 +124,8 @@ class LalamoveClient
     private function http(): PendingRequest
     {
         return Http::baseUrl(rtrim((string) config('services.lalamove.base_url'), '/'))
-            ->acceptJson()->timeout(30)->retry(2, 300);
+            ->acceptJson()
+            ->timeout(30)
+            ->retry(2, 300);
     }
 }

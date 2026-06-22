@@ -975,7 +975,7 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 <a href="javascript:void(0)" id="navHeart" class="nav-icon-link" onclick="toggleWishlist();return false;" aria-label="Wishlist" aria-pressed="false">
 <img src="{{ asset('images/Heart.svg') }}" alt="Heart" class="nav-svg-icon">
 </a>
-<a href="javascript:void(0)" onclick="if(typeof requireSignedInForOrder==='function'&&!requireSignedInForOrder())return false;if(typeof toggleCart==='function'){return toggleCart();}return false;" id="navCart" class="nav-icon-link" aria-label="Cart">
+<a href="javascript:void(0)" onclick="if(typeof requireSignedInForOrder==='function'&&!requireSignedInForOrder('/cart'))return false;if(typeof toggleCart==='function'){return toggleCart();}return false;" id="navCart" class="nav-icon-link" aria-label="Cart">
 <img src="{{ asset('images/Shopping cart.svg') }}" alt="Cart" class="nav-svg-icon">
 <span class="cart-badge" id="cartBadge">0</span>
 </a>
@@ -1279,10 +1279,13 @@ function normalizeSectionId(sectionId){
     heart.setAttribute('aria-pressed','false');
     heart.title='Wishlist';
   }
-} function requireSignedInForOrder(){
+} function requireSignedInForOrder(intendedPath='/checkout'){
   if(isSignedIn)return true;
-  sessionStorage.setItem('printifyIntendedUrl',window.location.href);
-  window.location.href=loginUrl;
+  const safePath=['/cart','/checkout','/payment/checkout'].includes(intendedPath)?intendedPath:'/checkout';
+  sessionStorage.setItem('printifyIntendedUrl',safePath);
+  const loginTarget=new URL(loginUrl,window.location.origin);
+  loginTarget.searchParams.set('intended',safePath);
+  window.location.href=loginTarget.toString();
   return false;
 } function animateHeroTitle(){
   const title=document.getElementById('kineticHeroTitle');

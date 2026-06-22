@@ -747,6 +747,43 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
         </div>
     </div>
 
+    <style id="notifications-clean-wide-layout-0621">
+        .nf-page .nf-layout{
+            grid-template-columns:minmax(620px,1fr) minmax(520px,620px)!important;
+            gap:28px!important;
+            align-items:start!important;
+        }
+        .nf-page .nf-list-card{
+            width:100%!important;
+        }
+        .nf-page .nf-workspace{
+            display:block!important;
+            width:100%!important;
+            max-width:620px!important;
+        }
+        .nf-page .nf-center{
+            display:block!important;
+            width:100%!important;
+        }
+        .nf-page .nf-detail{
+            width:100%!important;
+            max-width:620px!important;
+        }
+        .nf-page .nf-side,
+        .nf-page .nf-process-card{
+            display:none!important;
+        }
+        @media(max-width:1320px){
+            .nf-page .nf-layout{
+                grid-template-columns:1fr!important;
+            }
+            .nf-page .nf-workspace,
+            .nf-page .nf-detail{
+                max-width:none!important;
+            }
+        }
+    </style>
+
     <div class="nf-layout">
         <section class="nf-card nf-list-card" aria-label="Notification list">
             <div class="nf-scroll" id="notificationList">

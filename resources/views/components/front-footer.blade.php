@@ -56,6 +56,9 @@
 <button type="button" class="footer-link-button" data-policy="refund" onclick="footerCareAction('refund', this)">
 <i class="fa-solid fa-chevron-right">
 </i> Refund Policy</button>
+<button type="button" class="footer-link-button" data-policy="faq" onclick="footerCareAction('faq', this)">
+<i class="fa-solid fa-chevron-right">
+</i> FAQ</button>
 </div>
 </div>
 <div class="footer-col footer-follow">
@@ -71,8 +74,8 @@
 <i class="fa-brands fa-instagram">
 </i>
 </a>
-<a href="https://www.threads.net" target="_blank" rel="noopener" class="threads" aria-label="Threads">
-<i class="fa-brands fa-threads">
+<a href="https://www.tiktok.com" target="_blank" rel="noopener" class="tiktok" aria-label="TikTok">
+<i class="fa-brands fa-tiktok">
 </i>
 </a>
 </div>
@@ -252,7 +255,7 @@
 .printify-footer .footer-socials .instagram {
   background:#e4405f!important
 }
-.printify-footer .footer-socials .threads {
+.printify-footer .footer-socials .tiktok {
   background:#111111!important;
   border:1px solid rgba(255,255,255,.35)!important
 }
@@ -373,6 +376,10 @@
     height:auto!important;
     min-height:40px!important;
     padding:12px 22px!important
+  }
+  .printify-footer .footer-bottom {
+    flex-direction:column!important;
+    gap:9px!important
   }
 }
 </style>
@@ -1349,6 +1356,67 @@ const footerPolicyContent={
       "type": "p",
 "text": "This Refund Policy is drafted in compliance with Republic Act No. 7394 (Consumer Act of the Philippines), DTI Department Administrative Order No. 2, Series of 1993, and Joint DTI-DICT-NTC Circular No. 1-2022 on e-commerce consumer protection. This document is prepared for the Printify & Co. capstone project and should be reviewed by a qualified legal professional before deployment in a production environment."
     } ]
+  }, "faq": {
+    "title": "Frequently Asked Questions (FAQs)",
+    "blocks": `Frequently Asked Questions (FAQs)
+Printify & Co. - Capstone Project Prototype
+I. General & Platform Overview
+What is Printify & Co.?
+Printify & Co. is a web-based multi-business printing platform. We serve as a technology intermediary or software provider that allows independent print shops ("Tenants") to register, set up their digital storefronts, manage print orders, process payments, and coordinate deliveries with their customers.
+Are you a printing company? Do you fulfill the orders yourself?
+No. Printify & Co. is strictly a technology platform and does not produce, print, handle, or physically fulfill any print orders. All products are manufactured and fulfilled exclusively by the independent print shop (Tenant) you choose when placing your order through the web system.
+Who are the "Tenants" on the platform?
+Tenants are independent, third-party printing businesses, shops, or vendors who operate their individual stores using our system infrastructure. They are solely responsible for setting their own pricing, managing their production schedules, ensuring print quality, and fulfilling your orders.
+Does Printify & Co. set the rules for every tenant?
+No. Printify & Co. sets a set of minimum platform-wide standards - covering areas like data privacy, payment security, and baseline consumer protections - that every tenant agrees to when joining the platform. Beyond these minimums, each tenant independently sets their own pricing, file requirements, production timelines, quality tolerances, courier partners, and specific refund or reprint conditions. Because of this, several answers in this FAQ will direct you to check the specific tenant's storefront for details that may vary from shop to shop.
+II. Account Management & Privacy
+Do I need to create an account to place an order?
+Yes. To ensure accurate order tracking, secure file storage, and reliable delivery, you must register a Customer account with your full name, email address, contact number, and a secure password.
+How is my personal information protected?
+Printify & Co. is designed to comply with Republic Act No. 10173 (Data Privacy Act of 2012). The platform applies encryption and access controls to secure your data, and information is processed only to manage your account, fulfill platform transactions, and assist with order delivery. Your data will never be sold, rented, or traded to third parties.
+Can I delete or modify my data on the platform?
+Yes. Under the Data Privacy Act, you have the right to access, correct, or request the deletion of your personal data. You can manage your profile directly via your account settings or contact our Authorized Officer at hello@printify.co for formal data requests.
+III. Ordering, Design Uploads, & Intellectual Property
+What file formats are acceptable for upload?
+File format capabilities depend on the specific printing shop (Tenant) you are ordering from. Generally, high-resolution formats like PDF, PNG, or TIFF are recommended. Please check the specific Tenant's storefront instructions before uploading.
+Are there any restrictions on what I can upload and print?
+Yes. You are strictly prohibited from uploading or ordering prints of materials that are illegal, fraudulent, defamatory, obscene, pornographic, or infringing upon third-party intellectual property rights.
+Who owns the copyright of the files I upload?
+You retain full ownership and intellectual property rights of any artwork or files you upload. By uploading them, you grant the selected tenant a limited, non-exclusive license solely to view, process, and reproduce the design to fulfill your order. You warrant that you own or have the legal right to use all uploaded materials.
+IV. Payments & Financial Security
+What payment methods are available?
+Available payment options are configured by each individual tenant. They typically include online payment gateways such as credit/debit cards, GCash, Maya, PayMongo, or other secure local payment providers linked to the platform.
+Is my financial data safe? Does Printify & Co. store my card details?
+Your financial transactions are designed to be handled securely. Printify & Co. does not store, collect, or process your full credit/debit card numbers or e-wallet credentials. All payment processing is handled by PCI DSS-compliant, secure third-party payment gateway partners.
+V. Production, Color Accuracy, & Proofing
+Why does the color of my printed item look slightly different from my digital screen?
+Digital screens display colors using the RGB spectrum (Light), while industrial printers print using the CMYK spectrum (Ink). Minor color variations can also occur due to the texture, absorbency, and coating of the chosen paper or substrate.
+Can I complain about minor color shifting?
+Natural color variations that fall within standard printing tolerances are generally normal and not automatically grounds for a refund or free reprint. What counts as an acceptable tolerance, and whether a proofing step is offered, is set by each individual tenant - we recommend asking the tenant for a physical proof or sample print before booking a large production run.
+VI. Delivery, Logistics, & Transit
+How are printed items shipped to me?
+Deliveries are arranged through third-party logistics services (such as Lalamove or J&T Express) integrated or selected by the tenant during checkout. Available courier options and shipping arrangements can vary from tenant to tenant.
+What happens if my package arrives damaged or gets lost by the courier?
+If your items suffer physical damage while in transit, it qualifies as "Damage in Transit." You must report this issue directly to the tenant, with unboxing photos or video proof, so they can arrange a replacement or resolve it with their logistics provider. Exact claim windows and processes may vary by tenant, so check their storefront policy for specifics.
+VII. Reprints, Refunds, & Cancellations
+Can I cancel my order if I make a mistake or change my mind?
+No. Because all print orders are highly customized, personalized, and made-to-order according to your specific layout, "change-of-mind" cancellations, modifications, or returns are strictly prohibited once an order has been confirmed and production has been initiated. Always double-check your spelling, sizing, and design layouts before paying.
+Under what conditions can I request a refund or a reprint?
+Specific refund and reprint conditions - including claim windows, accepted evidence, and qualifying reasons - are set by each individual tenant and may differ from shop to shop. As a general guide, valid reasons commonly accepted across tenants include clear production defects, incorrect fulfillment (wrong product, size, or quantity), damage in transit, or a tenant-initiated cancellation after payment. Always check the specific tenant's storefront policy before placing your order to confirm their exact terms.
+How do I file a refund or reprint claim?
+Since the transactional agreement is directly between you and the print shop, you must submit your refund/reprint claim directly to the specific tenant via the platform interface, providing comprehensive photo/video evidence of the defect or issue.
+What is your stance on "No Return, No Exchange" policies?
+As a baseline standard that all tenants agree to when joining the platform, a "No Return, No Exchange" policy cannot be used to excuse a tenant from replacing defective items, fixing fulfillment mistakes, or resolving damaged goods. Custom goods remain non-returnable for simple buyer regret, consistent with Department of Trade and Industry (DTI) guidance, but tenants are still expected to honor legitimate defect, fulfillment, or damage claims.
+VIII. Support & Disputes
+What should I do if a tenant ignores my refund request or fails to deliver?
+While Printify & Co. does not directly process refunds, since these are transactions between you and the tenant, the platform maintains baseline standards tenants are expected to follow. If you have an unresolved dispute with a tenant, you may flag the transaction to our support team at hello@printify.co for platform-level review.
+How can I contact Printify & Co. directly?
+Email: hello@printify.co
+Phone: +63 912 345 6789
+Support Hours: Monday - Friday, 8:00 AM - 6:00 PM
+Address: 123 Printify Avenue, Makati City, Metro Manila
+Disclaimer
+This FAQ document was prepared for the Printify & Co. capstone research project and is intended strictly for academic and prototype purposes. Printify & Co. is a conceptual, proposed system developed as part of Capstone Research 1 and is not a live, operating commercial platform. References to specific laws (e.g., the Data Privacy Act of 2012, the Consumer Act of the Philippines, and DTI guidance) reflect the intended compliance design of the proposed system and are illustrative only - they have not been verified or certified by a qualified legal professional or a registered Data Protection Officer. All contact details (email, phone number, support hours, and address) listed in this document are placeholders for demonstration purposes and are not active channels. This document, including all policies, conditions, and figures described, must be reviewed, validated, and finalized by appropriate legal, technical, and business stakeholders prior to any real-world or production deployment.`.split(/\n+/).filter(Boolean).map(text=>({type:"p", text}))
   }, "privacy": {
     "title": "Privacy Policy", "blocks": [ {
       "type": "p", "text": "Printify & Co. — Web-Based Multi Business Printing Platform Effective Date: June 14, 2026 Last Updated: June 14, 2026"
@@ -1716,7 +1784,7 @@ window.footerCareAction=function(topic,button){
   const escapeHtml=value=>String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[ch]));
 const renderTextBlock=text=>{
   const value=String(text||"").trim();
-  const isHeading=/^(?:\d+(?:\.\d+)*\.?)\s+[A-Z]/.test(value);
+  const isHeading=/^(?:\d+(?:\.\d+)*\.?|[IVX]+\.)\s+/.test(value) || /^(?:Frequently Asked Questions \(FAQs\)|Disclaimer)$/.test(value) || /\?$/.test(value);
   return isHeading?`<h3>${escapeHtml(value)}</h3>`:`<p>${escapeHtml(value).replace(/\n/g,"<br>")}</p>`;
 };
 const renderTable=rows=>{

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Order;
+use App\Models\Service;
 use App\Models\User;
 use App\Notifications\AdminClientInvitation;
 use Illuminate\Http\RedirectResponse;
@@ -43,6 +44,66 @@ class DeveloperAdminClientController extends Controller
             ->get();
 
         return view('Admin.admin-clients.index', compact('pendingAdminClients', 'approvedAdminClients', 'recentAuditLogs'));
+    }
+
+    public function show(Request $request, User $user): View
+    {
+        abort_unless($user->isAdminClient(), 404);
+
+        $period = $request->query('period', 'month');
+        $start  = match ($period) {
+            'day'   => now()->startOfDay(),
+            'week'  => now()->startOfWeek(),
+            'year'  => now()->startOfYear(),
+            default => now()->startOfMonth(),
+        };
+
+        $user->load('adminClientProfile');
+
+        // Customers
+        $customersBase = User::where('role', User::ROLE_CUSTOMER)
+            ->where('admin_client_id', $user->id);
+
+        $allCustomers    = (clone $customersBase)->latest()->get();
+        $activeCustomers = (clone $customersBase)->whereNotNull('email_verified_at')->latest()->get();
+        $inactiveCustomers = (clone $customersBase)->whereNull('email_verified_at')->latest()->get();
+
+        // Orders
+        $ordersBase = Order::where('admin_client_id', $user->id);
+
+        $allOrders     = (clone $ordersBase)->with('user')->latest()->get();
+        $periodOrders  = (clone $ordersBase)->where('created_at', '>=', $start)->with('user')->latest()->get();
+
+        // Revenue
+        $revenueTotal  = (float) (clone $ordersBase)->sum('total_price');
+        $revenueDay    = (float) (clone $ordersBase)->where('created_at', '>=', now()->startOfDay())->sum('total_price');
+        $revenueWeek   = (float) (clone $ordersBase)->where('created_at', '>=', now()->startOfWeek())->sum('total_price');
+        $revenueMonth  = (float) (clone $ordersBase)->where('created_at', '>=', now()->startOfMonth())->sum('total_price');
+        $revenueYear   = (float) (clone $ordersBase)->where('created_at', '>=', now()->startOfYear())->sum('total_price');
+
+        // Orders by status
+        $orderStatusCounts = (clone $ordersBase)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // Services (all platform services — not yet scoped per admin client)
+        $services = Service::withCount('activeVariations')->orderBy('category')->orderBy('name')->get();
+
+        // Audit logs for this admin client
+        $auditLogs = AuditLog::with(['actor', 'targetUser'])
+            ->where(fn ($q) => $q->where('actor_id', $user->id)->orWhere('target_user_id', $user->id))
+            ->latest()
+            ->limit(15)
+            ->get();
+
+        return view('Admin.admin-clients.show', compact(
+            'user', 'period', 'start',
+            'allCustomers', 'activeCustomers', 'inactiveCustomers',
+            'allOrders', 'periodOrders',
+            'revenueTotal', 'revenueDay', 'revenueWeek', 'revenueMonth', 'revenueYear',
+            'orderStatusCounts', 'services', 'auditLogs'
+        ));
     }
 
     public function store(Request $request): RedirectResponse

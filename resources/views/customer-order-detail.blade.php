@@ -29,12 +29,7 @@
 @include('components.customer-front-header')
 
 <main class="od-page">
-  <nav class="od-crumb" aria-label="Breadcrumb">
-    <a href="{{ route('home') }}">Back to Home</a><i class="fa-solid fa-chevron-right"></i>
-    <a href="{{ route('dashboard') }}">Dashboard</a><i class="fa-solid fa-chevron-right"></i>
-    <a href="{{ route('co.place-order') }}">My Orders</a><i class="fa-solid fa-chevron-right"></i>
-    <a class="active" href="{{ route('co.place-order.show', $order) }}" aria-current="page">Order Details</a>
-  </nav>
+  <nav class="od-crumb" aria-label="Breadcrumb"><a href="{{ route('home') }}">Back to Home</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('dashboard') }}">Dashboard</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('co.place-order') }}">My Orders</a><i class="fa-solid fa-chevron-right"></i><a class="active" href="{{ route('co.place-order.show', $order) }}">Order Details</a></nav>
   <div class="od-head">
     <h1 class="od-title">Order Details</h1>
     <a class="od-back" href="{{ route('co.place-order') }}"><i class="fa-solid fa-arrow-left"></i>Back to My Orders</a>
@@ -98,7 +93,7 @@
     <div class="od-body">
       <div class="od-note">Tracking details are available after opening this order, just like a shop order history flow.</div>
       <div class="od-actions" style="margin-top:14px">
-        <a class="od-btn primary" href="{{ route('co.place-order.tracking', $order) }}"><i class="fa-solid fa-location-dot"></i>View Tracking</a>
+        <a class="od-btn primary" href="{{ route('co.place-order.tracking', $order) }}"><i class="fa-solid fa-location-dot"></i>View &amp; Track</a>
         <a class="od-btn" href="{{ route('help-center') }}"><i class="fa-solid fa-headset"></i>Contact Support</a>
       </div>
     </div>
