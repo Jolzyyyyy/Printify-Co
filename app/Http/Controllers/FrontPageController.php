@@ -86,6 +86,15 @@ class FrontPageController extends Controller
         return $this->page('checkout');
     }
 
+    public function eReceipt()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please sign in or create an account to request an e-receipt.');
+        }
+
+        return $this->page('checkout');
+    }
+
     private function page(string $activeSection)
     {
         $services = Schema::hasTable('services')

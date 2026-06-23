@@ -64,6 +64,15 @@ class CartFeatureTest extends TestCase
         $this->assertSame('Document Printing', $cart[$cartKey]['name']);
         $this->assertSame('Text Only / B&W / Short (8.5 x 11)', $cart[$cartKey]['variation_label']);
         $this->assertSame(5.0, $cart[$cartKey]['price']);
+
+        $this
+            ->getJson(route('cart.state', absolute: false))
+            ->assertOk()
+            ->assertJsonPath('items.0.raw.serviceName', 'Document Printing')
+            ->assertJsonPath('items.0.raw.printingCategory', 'Printing')
+            ->assertJsonPath('items.0.raw.serviceOption', 'Text Only / B&W / Short (8.5 x 11)')
+            ->assertJsonPath('items.0.raw.quantity', 5)
+            ->assertJsonPath('items.0.raw.priceMode', 'Retail');
     }
 
     public function test_homepage_cart_sync_uses_bulk_database_price_for_service_item_id(): void

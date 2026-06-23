@@ -190,7 +190,9 @@
 
     <div class="ot-crumb">
       <button class="ot-backline" type="button" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='{{ route('co.place-order') }}'; }"><i class="fa-solid fa-arrow-left"></i> Back</button>
-      <a href="{{ route('home') }}">Home</a>
+      <a href="{{ route('home') }}">Back to Home</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <a href="{{ route('dashboard') }}">Dashboard</a>
       <i class="fa-solid fa-chevron-right"></i>
       <a href="{{ route('co.place-order') }}">My Orders</a>
       <i class="fa-solid fa-chevron-right"></i>

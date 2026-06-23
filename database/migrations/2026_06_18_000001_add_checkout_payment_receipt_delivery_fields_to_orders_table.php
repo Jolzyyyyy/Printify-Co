@@ -77,31 +77,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $columns = [
-                'order_reference',
-                'customer_phone',
-                'checkout_details',
-                'payment_method',
-                'payment_provider',
-                'payment_checkout_id',
-                'payment_reference',
-                'paid_at',
-                'receipt_number',
-                'receipt_sent_at',
-                'delivery_method',
-                'delivery_address',
-                'delivery_booking_status',
-                'delivery_tracking_number',
-                'delivery_tracking_url',
-                'delivery_booked_at',
-            ];
-
-            foreach ($columns as $column) {
-                if (Schema::hasColumn('orders', $column)) {
-                    $table->dropColumn($column);
-                }
-            }
-        });
+        // This compatibility migration overlaps the consolidated current schema.
+        // A rollback must not remove columns owned by another migration.
     }
 };

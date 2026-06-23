@@ -13,6 +13,7 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'admin_client_id',
+        'admin_client_id',
         'order_reference',
         'customer_name',
         'customer_email',
@@ -55,10 +56,10 @@ class Order extends Model
         'delivery_fee' => 'decimal:2',
         'delivery_latitude' => 'decimal:7',
         'delivery_longitude' => 'decimal:7',
+        'lalamove_last_synced_at' => 'datetime',
         'paid_at' => 'datetime',
         'receipt_sent_at' => 'datetime',
         'delivery_booked_at' => 'datetime',
-        'lalamove_last_synced_at' => 'datetime',
     ];
 
     public function user()
@@ -83,7 +84,7 @@ class Order extends Model
 
     public function recomputeTotal(): void
     {
-        $total = $this->items()->sum('subtotal') + (float) $this->delivery_fee;
+        $total = $this->items()->sum('subtotal') + (float) ($this->delivery_fee ?? 0);
         $this->update(['total_price' => $total]);
     }
 
