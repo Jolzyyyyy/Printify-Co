@@ -26,25 +26,10 @@
 </style>
 </head>
 <body>
-<header class="co-topbar">
-  <a class="co-brand" href="{{ route('home') }}"><strong>PRINTIFY &amp; CO.</strong><span>PRINTING SERVICES</span></a>
-  <nav class="co-nav" aria-label="Primary navigation">
-    <a href="{{ route('dashboard') }}">Dashboard</a>
-    <a class="active" href="{{ route('co.place-order') }}">My Orders</a>
-    <a href="{{ route('landing.service-detail') }}">My Templates</a>
-    <a href="{{ route('services.index') }}">Add-ons</a>
-    <a href="{{ route('settings') }}">Settings</a>
-  </nav>
-  <div class="co-top-actions">
-    <input class="co-search" type="search" placeholder="Search orders...">
-    <a class="co-icon" href="{{ route('help-center') }}" aria-label="Support"><i class="fa-regular fa-heart"></i></a>
-    <a class="co-icon" href="{{ route('cart.index') }}" aria-label="Cart"><i class="fa-solid fa-cart-shopping"></i><span class="co-cart-dot"></span></a>
-    <a class="co-user" href="{{ route('profile.edit') }}"><span class="co-avatar">{{ strtoupper(substr($user?->name ?? 'C', 0, 1)) }}</span><span>{{ strtoupper($user?->name ?? 'Customer') }}</span><i class="fa-solid fa-chevron-down" style="font-size:9px"></i></a>
-  </div>
-</header>
+@include('components.customer-front-header')
 
 <main class="od-page">
-  <div class="od-crumb">Home <i class="fa-solid fa-chevron-right"></i> My Orders <i class="fa-solid fa-chevron-right"></i> Order Details</div>
+  <nav class="od-crumb" aria-label="Breadcrumb"><a href="{{ route('home') }}">Back to Home</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('dashboard') }}">Dashboard</a><i class="fa-solid fa-chevron-right"></i><a href="{{ route('co.place-order') }}">My Orders</a><i class="fa-solid fa-chevron-right"></i><a class="active" href="{{ route('co.place-order.show', $order) }}">Order Details</a></nav>
   <div class="od-head">
     <h1 class="od-title">Order Details</h1>
     <a class="od-back" href="{{ route('co.place-order') }}"><i class="fa-solid fa-arrow-left"></i>Back to My Orders</a>

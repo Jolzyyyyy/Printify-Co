@@ -12,7 +12,9 @@ use App\Http\Controllers\Admin\SectionController as AdminSectionController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\EReceiptController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ServiceDetailController;
 // --- CUSTOMER AUTH CONTROLLERS ---
 use App\Http\Controllers\FrontPageController;
 // --- ADMIN CONTROLLERS ---
@@ -50,6 +52,14 @@ Route::get('/service-detail', [FrontPageController::class, 'serviceDetail'])->na
 Route::get('/service-details', [FrontPageController::class, 'serviceDetail'])->name('landing.service-details');
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
     Route::get('/checkout', [FrontPageController::class, 'checkout'])->name('checkout.index');
+    Route::get('/e-receipt', [FrontPageController::class, 'eReceipt'])->name('e-receipt.index');
+    Route::get('/e-receipt/details', [EReceiptController::class, 'show'])->name('e-receipt.show');
+    Route::post('/e-receipt', [EReceiptController::class, 'store'])->name('e-receipt.store');
+    Route::get('/service-details/catalog', [ServiceDetailController::class, 'catalog'])->name('service-details.catalog');
+    Route::get('/service-details/state', [ServiceDetailController::class, 'state'])->name('service-details.state');
+    Route::post('/service-details/state', [ServiceDetailController::class, 'update'])->name('service-details.update');
+    Route::post('/service-details/upload', [ServiceDetailController::class, 'upload'])->name('service-details.upload');
+    Route::delete('/service-details/upload', [ServiceDetailController::class, 'removeUpload'])->name('service-details.upload.remove');
 });
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
@@ -57,9 +67,12 @@ Route::get('/services/{service}', [ServiceController::class, 'show'])->name('ser
 
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::get('/state', [CartController::class, 'state'])->name('state');
+    Route::post('/attachment', [CartController::class, 'attach'])->name('attachment');
+    Route::post('/promo', [CartController::class, 'promo'])->name('promo');
     Route::post('/add/{service}', [CartController::class, 'add'])->name('add');
     Route::post('/update/{cartKey}', [CartController::class, 'update'])->name('update');
-    Route::post('/remove/{service}', [CartController::class, 'remove'])->name('remove');
+    Route::post('/remove/{cartKey}', [CartController::class, 'remove'])->name('remove');
     Route::post('/clear', [CartController::class, 'clear'])->name('clear');
     Route::post('/sync', [CartController::class, 'syncCart'])->name('sync');
 });

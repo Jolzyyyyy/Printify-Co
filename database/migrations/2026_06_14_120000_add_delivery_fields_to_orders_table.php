@@ -62,18 +62,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $columns = array_filter([
-                'customer_phone', 'delivery_method', 'delivery_fee', 'delivery_address',
-                'delivery_latitude', 'delivery_longitude', 'delivery_notes',
-                'lalamove_quotation_id', 'lalamove_order_id', 'lalamove_status',
-                'lalamove_driver_id', 'lalamove_driver_name', 'lalamove_driver_phone',
-                'lalamove_plate_number', 'lalamove_share_link', 'lalamove_last_synced_at',
-            ], fn ($column) => Schema::hasColumn('orders', $column));
-
-            if ($columns !== []) {
-                $table->dropColumn($columns);
-            }
-        });
+        // These columns may already belong to the consolidated checkout/Lalamove migrations.
+        // Keep rollback non-destructive when this compatibility migration was a no-op.
     }
 };
