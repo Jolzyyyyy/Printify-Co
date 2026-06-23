@@ -564,6 +564,31 @@ body.front-route-service-details #pageWrapper,body.front-route-checkout #pageWra
 body.front-route-service-details #serviceDetail,body.service-detail-open #serviceDetail {
   display:block
 }
+/* Standalone sections are route-authoritative. A stale JS/open-state class must
+   never leak Service Details or Checkout below another public page/footer. */
+body:not(.front-route-service-details):not(.service-detail-open) #serviceDetail {
+  display:none!important
+}
+body:not(.front-route-checkout):not(.checkout-open) #checkout {
+  display:none!important
+}
+body.front-route-service-details:not(.service-detail-ready) #mainHeader,
+body.front-route-service-details:not(.service-detail-ready) #serviceDetail {
+  visibility:hidden!important
+}
+body.front-route-checkout:not(.checkout-ready) #mainHeader,
+body.front-route-checkout:not(.checkout-ready) #checkout {
+  visibility:hidden!important
+}
+body:not(.cart-ui-ready) #pfyCartPanel,
+body:not(.cart-ui-ready) #pfyCartBackdrop {
+  visibility:hidden!important;
+  pointer-events:none!important
+}
+body.cart-ui-ready #pfyCartPanel,
+body.cart-ui-ready #pfyCartBackdrop {
+  visibility:visible!important
+}
 body.checkout-open #serviceDetail {
   display:none!important
 }
@@ -906,6 +931,26 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
   }
 }
 </style>
+<style id="service-checkout-contact-typography-lock">
+@font-face{font-family:'LeagueSpartanFinal';src:url('/Fonts/LeagueSpartan-SemiBold.otf') format('opentype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'InterFinal';src:url('/Fonts/Inter.ttc') format('truetype-collection');font-weight:600;font-style:normal;font-display:swap}
+#serviceDetail,
+#checkout,
+#serviceDetail :where(p,span,a,li,small,td,th,input,textarea,select,option,button,div),
+#checkout :where(p,span,a,li,small,td,th,input,textarea,select,option,button,div){
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+  font-weight:600!important;
+}
+#serviceDetail :where(h1,h2,h3,h4,h5,h6,label,strong,b,.pdv-title,.pdv-card-title,.pdv-section-title,.service-title,.summary-title),
+#checkout :where(h1,h2,h3,h4,h5,h6,label,strong,b,.pfy-title,.pfy-card-title,.pfy-section-title,.checkout-title){
+  font-family:'LeagueSpartanFinal','League Spartan',Arial,sans-serif!important;
+  font-weight:600!important;
+}
+#serviceDetail :where(button,input,textarea,select,option),
+#checkout :where(button,input,textarea,select,option){
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+}
+</style>
 </head>
 @php($activeSection = $activeSection ?? 'home')
 <body class="front-route-{{ str_replace('_', '-', $activeSection) }} {{ auth()->check() ? 'auth-user' : 'guest-user' }}">
@@ -1009,7 +1054,7 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 let currentHeroIndex=0,heroTimer=null,isAutoScrolling=false,autoScrollTarget='{{ $activeSection }}',scrollSpyTick=null;
 const initialRouteSection=(()=>{
   const path=(window.location.pathname||'').toLowerCase();
-  if(/checkout|payment|confirmation/.test(path))return'checkout';
+  if(/checkout|payment|confirmation|e-receipt/.test(path))return'checkout';
   if(/service-detail|service_details|details|detail-info/.test(path))return'service-details';
   if(/service|product/.test(path))return'products';
   if(/about/.test(path))return'about';
@@ -1040,7 +1085,7 @@ function normalizeSectionId(sectionId){
   }return null;
 } function routeSectionFromPath(){
   const path=(window.location.pathname||'').toLowerCase();
-  if(/checkout|payment|confirmation/.test(path))return 'checkout';
+  if(/checkout|payment|confirmation|e-receipt/.test(path))return 'checkout';
   if(/cart/.test(path))return 'cart';
   if(/search/.test(path))return 'search';
   if(/service-detail|service_details|details|detail-info/.test(path))return 'service-details';
@@ -1358,11 +1403,19 @@ document.addEventListener('click',event=>{
   window.openCheckoutSection();
 });
 document.addEventListener('DOMContentLoaded',()=>{
+  if(initialRouteSection!=='service-details'){
+    document.body.classList.remove('service-detail-open');
+    document.getElementById('serviceDetail')?.classList.remove('pdv-is-open');
+  }
+  if(initialRouteSection!=='checkout'){
+    document.body.classList.remove('checkout-open');
+    document.getElementById('checkout')?.classList.remove('active');
+  }
   requestAnimationFrame(animateHeroTitle);
   startHeroSlider();
   setupSearch();
   if(typeof window.updateCartBadge==='function')window.updateCartBadge();
-  if(typeof window.renderPrintifyCart==='function')window.renderPrintifyCart();
+  if(typeof window.renderPrintifyCart==='function'&&!window.__pfyCartInitialRenderComplete)window.renderPrintifyCart();
   restoreWishlistState();
   syncSectionFromHash(true);
   setupScrollSpy();
@@ -1375,14 +1428,6 @@ document.addEventListener('DOMContentLoaded',()=>{
       instant:true,updateUrl:false
     });
   });
-  setTimeout(()=>{
-    if(initialRouteSection==='home')window.scrollTo({
-      top:0,left:0,behavior:'auto'
-    });
-    else jumpTo(initialRouteSection,{
-      instant:true,updateUrl:false
-    });
-  },80);
   setupHeaderObserver();
   setupArtisanNavScroll();
   window.addEventListener('popstate',()=>syncSectionFromHash(true));

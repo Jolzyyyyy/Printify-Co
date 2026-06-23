@@ -25,7 +25,7 @@
         $homeRoute = Route::has('customer.home') ? route('customer.home') : '#';
         $dashboardRoute = Route::has('dashboard') ? route('dashboard') : '#';
         $profileRoute = Route::has('profile.edit') ? route('profile.edit') : '#';
-        $ordersRoute = Route::has('my-orders') ? route('my-orders') : (Route::has('customer.orders.index') ? route('customer.orders.index') : (Route::has('orders.index') ? route('orders.index') : (Route::has('co.place-order') ? route('co.place-order') : '#')));
+        $ordersRoute = Route::has('co.place-order') ? route('co.place-order') : (Route::has('my-orders') ? route('my-orders') : (Route::has('customer.orders.index') ? route('customer.orders.index') : (Route::has('orders.index') ? route('orders.index') : '#')));
         $orderCreateRoute = Route::has('services.index') ? route('services.index') : (Route::has('customer.orders.create') ? route('customer.orders.create') : (Route::has('orders.create') ? route('orders.create') : '#'));
         $uploadRoute = Route::has('customer.uploads.create') ? route('customer.uploads.create') : '#';
         $supportRoute = Route::has('customer.support.index') ? route('customer.support.index') : (Route::has('help-center') ? route('help-center') : '#');

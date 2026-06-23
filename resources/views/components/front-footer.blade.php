@@ -349,6 +349,10 @@
   }
 }
 @media(max-width:760px) {
+  .printify-footer .footer-bottom {
+    flex-direction:column!important;
+    gap:9px!important
+  }
   .printify-footer .footer-main {
     grid-template-columns:1fr!important;
     padding:24px 22px 18px!important;
