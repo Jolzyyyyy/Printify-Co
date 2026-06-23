@@ -2812,6 +2812,991 @@ body:has(.customer-dashboard-v2) .p-6{
 }
 
 
+
+
+/* =========================================================
+   FINAL DASHBOARD REQUEST PATCH
+   - Nothing removed, functions/backend retained
+   - First 3 boxes equal height, content fitted, no overlap
+   - Dashboard content spacing matched to My Profile / Notifications / Help Center
+   - Calendar button matched to same 178px style
+========================================================= */
+body:has(.customer-dashboard-v2) .max-w-7xl,
+body:has(.customer-dashboard-v2) .mx-auto{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+}
+body:has(.customer-dashboard-v2) .sm\:px-6,
+body:has(.customer-dashboard-v2) .lg\:px-8,
+body:has(.customer-dashboard-v2) .p-6{
+    padding-left:0!important;
+    padding-right:0!important;
+}
+.customer-dashboard-v2{
+    width:100%!important;
+    max-width:none!important;
+    padding:0 0 34px!important;
+    background:#fff!important;
+    overflow-x:hidden!important;
+}
+.customer-dashboard-v2 .dashboard-shell{
+    width:auto!important;
+    max-width:1490px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    padding:0!important;
+    background:#fff!important;
+}
+.customer-dashboard-v2 .dashboard-header-row{
+    width:100%!important;
+    max-width:1490px!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    margin-bottom:16px!important;
+}
+.customer-dashboard-v2 .dashboard-board{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:1200px!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    gap:20px!important;
+    align-items:start!important;
+    background:#fff!important;
+}
+.customer-dashboard-v2 .left-column{
+    width:100%!important;
+    max-width:1200px!important;
+    min-width:0!important;
+    gap:20px!important;
+    justify-self:start!important;
+}
+.customer-dashboard-v2 .right-column{
+    display:none!important;
+    width:0!important;
+    max-width:0!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .date-pill,
+.customer-dashboard-v2 .date-pill.calendar-toggle{
+    width:178px!important;
+    min-width:178px!important;
+    max-width:178px!important;
+    height:42px!important;
+    min-height:42px!important;
+    padding:0 13px!important;
+    border:1px solid #111827!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    background-image:none!important;
+    color:#111827!important;
+    font-size:12px!important;
+    font-weight:600!important;
+    line-height:1!important;
+    box-shadow:none!important;
+    outline:none!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .date-pill.calendar-toggle:hover,
+.customer-dashboard-v2 .date-pill.calendar-toggle:focus,
+.customer-dashboard-v2 .date-pill.calendar-toggle:active{
+    background:#111827!important;
+    background-image:none!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    box-shadow:none!important;
+}
+.customer-dashboard-v2 .date-pill.calendar-toggle:hover i,
+.customer-dashboard-v2 .date-pill.calendar-toggle:focus i,
+.customer-dashboard-v2 .date-pill.calendar-toggle:active i,
+.customer-dashboard-v2 .date-pill.calendar-toggle:hover svg,
+.customer-dashboard-v2 .date-pill.calendar-toggle:focus svg,
+.customer-dashboard-v2 .date-pill.calendar-toggle:active svg{
+    color:#fff!important;
+    stroke:#fff!important;
+}
+.customer-dashboard-v2 .analytics-grid{
+    width:100%!important;
+    max-width:1200px!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:20px!important;
+    align-items:stretch!important;
+    overflow:visible!important;
+}
+.customer-dashboard-v2 .analytics-grid>.chart-card{
+    width:100%!important;
+    min-width:0!important;
+    height:238px!important;
+    min-height:238px!important;
+    max-height:238px!important;
+    padding:18px!important;
+    overflow:hidden!important;
+    border:1px solid #e7ebf0!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    box-shadow:none!important;
+    display:flex!important;
+    flex-direction:column!important;
+}
+.customer-dashboard-v2 .analytics-grid>.chart-card:hover,
+.customer-dashboard-v2 .analytics-grid>.chart-card:focus-within,
+.customer-dashboard-v2 .analytics-grid>.chart-card.is-active{
+    background:linear-gradient(180deg,rgba(17,24,39,.04),rgba(254,123,9,.02))!important;
+    border-color:#e7ebf0!important;
+    box-shadow:none!important;
+    transform:none!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-head{
+    min-height:52px!important;
+    margin-bottom:12px!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    flex:0 0 auto!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-title-group{
+    min-width:0!important;
+    max-width:calc(100% - 108px)!important;
+}
+.customer-dashboard-v2 .analytics-grid .chart-card:first-child .card-title-group{
+    max-width:100%!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-title{
+    font-size:14.5px!important;
+    line-height:1.25!important;
+    margin:0!important;
+    white-space:normal!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-subtitle{
+    margin-top:5px!important;
+    font-size:11px!important;
+    line-height:1.42!important;
+    max-height:32px!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .analytics-grid .select-chip{
+    width:96px!important;
+    min-width:96px!important;
+    max-width:96px!important;
+    height:34px!important;
+    min-height:34px!important;
+    padding:0 12px!important;
+    flex:0 0 96px!important;
+    font-size:11.5px!important;
+    font-weight:500!important;
+    border-radius:999px!important;
+}
+.customer-dashboard-v2 .status-chart-layout{
+    flex:1 1 auto!important;
+    display:grid!important;
+    grid-template-columns:142px minmax(0,1fr)!important;
+    gap:14px!important;
+    align-items:center!important;
+    min-height:146px!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .donut-wrap,
+.customer-dashboard-v2 .donut-svg{
+    width:116px!important;
+    height:116px!important;
+}
+.customer-dashboard-v2 .donut-wrap{
+    justify-self:center!important;
+}
+.customer-dashboard-v2 .donut-center{
+    width:60px!important;
+    height:60px!important;
+}
+.customer-dashboard-v2 .legend-list{
+    display:grid!important;
+    gap:6px!important;
+    min-width:0!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .legend-button{
+    min-height:18px!important;
+    display:grid!important;
+    grid-template-columns:9px minmax(0,1fr) 58px!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:1px 0!important;
+    font-size:10.8px!important;
+    line-height:1.2!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .legend-name{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .legend-meta{
+    text-align:right!important;
+    white-space:nowrap!important;
+    font-size:10px!important;
+}
+.customer-dashboard-v2 .payment-list{
+    flex:1 1 auto!important;
+    display:grid!important;
+    gap:9px!important;
+    margin-top:0!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .payment-row{
+    min-height:21px!important;
+    display:grid!important;
+    grid-template-columns:70px minmax(0,1fr) 82px!important;
+    gap:10px!important;
+    align-items:center!important;
+    padding:0!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .payment-label,
+.customer-dashboard-v2 .payment-value{
+    font-size:10.6px!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .payment-track{
+    height:7px!important;
+    min-width:0!important;
+}
+.customer-dashboard-v2 .payment-total{
+    flex:0 0 auto!important;
+    margin-top:9px!important;
+    font-size:11px!important;
+}
+.customer-dashboard-v2 .revenue-chart{
+    flex:1 1 auto!important;
+    height:110px!important;
+    display:grid!important;
+    grid-template-columns:30px minmax(0,1fr)!important;
+    gap:8px!important;
+    align-items:end!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .revenue-axis{
+    height:104px!important;
+    font-size:9px!important;
+    line-height:1.1!important;
+}
+.customer-dashboard-v2 .revenue-bars{
+    height:108px!important;
+    gap:10px!important;
+    padding:0 4px!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .revenue-fill{
+    width:22px!important;
+    border-radius:6px 6px 0 0!important;
+}
+.customer-dashboard-v2 .revenue-labels{
+    flex:0 0 auto!important;
+    margin-top:7px!important;
+}
+.customer-dashboard-v2 .month-labels{
+    gap:10px!important;
+    font-size:9.5px!important;
+}
+.customer-dashboard-v2 .revenue-total{
+    flex:0 0 auto!important;
+    margin-top:8px!important;
+    font-size:11px!important;
+}
+.customer-dashboard-v2 .stats-grid{
+    width:100%!important;
+    max-width:1200px!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:20px!important;
+    overflow:visible!important;
+}
+.customer-dashboard-v2 .content-grid{
+    width:100%!important;
+    max-width:1200px!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:20px!important;
+}
+.customer-dashboard-v2 .latest-card,
+.customer-dashboard-v2 .recent-card{
+    min-width:0!important;
+}
+@media(max-width:1320px){
+    .customer-dashboard-v2 .dashboard-shell{max-width:1490px!important;}
+    .customer-dashboard-v2 .dashboard-board,
+    .customer-dashboard-v2 .left-column,
+    .customer-dashboard-v2 .analytics-grid,
+    .customer-dashboard-v2 .stats-grid,
+    .customer-dashboard-v2 .content-grid{max-width:none!important;}
+}
+@media(max-width:1120px){
+    .customer-dashboard-v2{padding:16px 18px 30px!important;}
+    .customer-dashboard-v2 .analytics-grid,
+    .customer-dashboard-v2 .content-grid{grid-template-columns:1fr!important;}
+    .customer-dashboard-v2 .analytics-grid>.chart-card{height:auto!important;max-height:none!important;min-height:238px!important;}
+    .customer-dashboard-v2 .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+}
+@media(max-width:720px){
+    .customer-dashboard-v2{padding:16px 12px 28px!important;}
+    .customer-dashboard-v2 .dashboard-header-row{display:grid!important;}
+    .customer-dashboard-v2 .date-pill,.customer-dashboard-v2 .date-pill.calendar-toggle{width:100%!important;max-width:none!important;}
+    .customer-dashboard-v2 .stats-grid{grid-template-columns:1fr!important;}
+    .customer-dashboard-v2 .status-chart-layout{grid-template-columns:1fr!important;}
+    .customer-dashboard-v2 .analytics-grid .card-title-group{max-width:100%!important;}
+}
+
+
+/* =========================================================
+   FINAL ANALYTICS FIT PATCH
+   - Fixes the first 3 dashboard boxes only
+   - Removes excessive internal spacing
+   - Centers the donut/0 inside the left side of Order Status Summary
+   - Makes all analytics content visible and non-overlapping
+   - Keeps all backend/functions and other dashboard sections intact
+========================================================= */
+.customer-dashboard-v2 .analytics-grid{
+    align-items:stretch!important;
+}
+.customer-dashboard-v2 .analytics-grid>.chart-card{
+    height:218px!important;
+    min-height:218px!important;
+    max-height:218px!important;
+    padding:16px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-head{
+    min-height:0!important;
+    margin:0 0 6px!important;
+    flex:0 0 auto!important;
+    gap:10px!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-title-group{
+    min-width:0!important;
+    max-width:calc(100% - 104px)!important;
+}
+.customer-dashboard-v2 .analytics-grid .chart-card:first-child .card-title-group{
+    max-width:100%!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-title{
+    font-size:13.5px!important;
+    line-height:1.22!important;
+    margin:0!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-subtitle{
+    margin:4px 0 0!important;
+    font-size:10.5px!important;
+    line-height:1.3!important;
+    max-height:28px!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .analytics-grid .select-chip{
+    width:92px!important;
+    min-width:92px!important;
+    max-width:92px!important;
+    height:32px!important;
+    min-height:32px!important;
+    padding:0 12px!important;
+    flex:0 0 92px!important;
+    font-size:11px!important;
+}
+.customer-dashboard-v2 .status-chart-layout{
+    flex:1 1 auto!important;
+    display:grid!important;
+    grid-template-columns:132px minmax(0,1fr)!important;
+    gap:12px!important;
+    align-items:center!important;
+    min-height:0!important;
+    height:142px!important;
+    margin:0!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .donut-wrap{
+    width:108px!important;
+    height:108px!important;
+    justify-self:center!important;
+    align-self:center!important;
+    display:grid!important;
+    place-items:center!important;
+    margin:0!important;
+}
+.customer-dashboard-v2 .donut-svg{
+    width:108px!important;
+    height:108px!important;
+}
+.customer-dashboard-v2 .donut-base,
+.customer-dashboard-v2 .donut-slice{
+    stroke-width:18!important;
+}
+.customer-dashboard-v2 .donut-center{
+    width:54px!important;
+    height:54px!important;
+    border-width:6px!important;
+    top:50%!important;
+    left:50%!important;
+    transform:translate(-50%,-50%)!important;
+}
+.customer-dashboard-v2 .donut-number{
+    font-size:17px!important;
+}
+.customer-dashboard-v2 .donut-label{
+    font-size:7.5px!important;
+}
+.customer-dashboard-v2 .legend-list{
+    display:grid!important;
+    gap:4px!important;
+    min-width:0!important;
+    align-content:center!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .legend-button{
+    min-height:17px!important;
+    height:17px!important;
+    display:grid!important;
+    grid-template-columns:8px minmax(0,1fr) 54px!important;
+    gap:7px!important;
+    align-items:center!important;
+    padding:0!important;
+    font-size:10px!important;
+    line-height:1!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .legend-dot{
+    width:8px!important;
+    height:8px!important;
+}
+.customer-dashboard-v2 .legend-name{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .legend-meta{
+    font-size:9.3px!important;
+    text-align:right!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .payment-list{
+    flex:1 1 auto!important;
+    display:grid!important;
+    gap:7px!important;
+    margin:0!important;
+    align-content:start!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .payment-row{
+    min-height:19px!important;
+    height:19px!important;
+    grid-template-columns:68px minmax(0,1fr) 78px!important;
+    gap:9px!important;
+    align-items:center!important;
+}
+.customer-dashboard-v2 .payment-label,
+.customer-dashboard-v2 .payment-value{
+    font-size:10px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .payment-track{
+    height:7px!important;
+}
+.customer-dashboard-v2 .payment-total{
+    flex:0 0 auto!important;
+    margin-top:7px!important;
+    font-size:10.5px!important;
+    line-height:1.2!important;
+}
+.customer-dashboard-v2 .revenue-chart{
+    flex:1 1 auto!important;
+    height:96px!important;
+    grid-template-columns:28px minmax(0,1fr)!important;
+    gap:7px!important;
+    align-items:end!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .revenue-axis{
+    height:92px!important;
+    font-size:8.5px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .revenue-bars{
+    height:94px!important;
+    gap:9px!important;
+    padding:0 4px!important;
+}
+.customer-dashboard-v2 .revenue-fill{
+    width:20px!important;
+    border-radius:6px 6px 0 0!important;
+}
+.customer-dashboard-v2 .revenue-labels{
+    flex:0 0 auto!important;
+    margin-top:6px!important;
+}
+.customer-dashboard-v2 .month-labels{
+    gap:9px!important;
+    font-size:9px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .revenue-total{
+    flex:0 0 auto!important;
+    margin-top:7px!important;
+    font-size:10.5px!important;
+    line-height:1.2!important;
+}
+@media(max-width:1120px){
+    .customer-dashboard-v2 .analytics-grid>.chart-card{
+        height:auto!important;
+        max-height:none!important;
+        min-height:218px!important;
+    }
+}
+
+
+/* =========================================================
+   FINAL ANALYTICS HEIGHT ALIGNMENT PATCH
+   - Top 3 boxes have equal taller height
+   - Inner contents are aligned and fully visible
+   - Donut/0 is centered inside the left side of Order Status Summary
+   - No other dashboard section/function changed
+========================================================= */
+.customer-dashboard-v2 .analytics-grid{
+    align-items:stretch!important;
+}
+.customer-dashboard-v2 .analytics-grid>.chart-card{
+    height:260px!important;
+    min-height:260px!important;
+    max-height:260px!important;
+    padding:18px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-start!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-head{
+    min-height:54px!important;
+    height:54px!important;
+    margin:0 0 10px!important;
+    flex:0 0 54px!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-title{
+    font-size:14px!important;
+    line-height:1.25!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-subtitle{
+    margin-top:5px!important;
+    font-size:10.8px!important;
+    line-height:1.35!important;
+    max-height:34px!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-title-group{
+    min-width:0!important;
+    max-width:calc(100% - 104px)!important;
+}
+.customer-dashboard-v2 .analytics-grid .chart-card:first-child .card-title-group{
+    max-width:100%!important;
+}
+.customer-dashboard-v2 .analytics-grid .select-chip{
+    width:96px!important;
+    min-width:96px!important;
+    max-width:96px!important;
+    height:34px!important;
+    min-height:34px!important;
+    flex:0 0 96px!important;
+    padding:0 14px!important;
+    font-size:11.5px!important;
+    font-weight:500!important;
+}
+.customer-dashboard-v2 .status-chart-layout{
+    flex:1 1 auto!important;
+    height:160px!important;
+    min-height:160px!important;
+    display:grid!important;
+    grid-template-columns:142px minmax(0,1fr)!important;
+    gap:14px!important;
+    align-items:center!important;
+    overflow:hidden!important;
+    margin:0!important;
+}
+.customer-dashboard-v2 .donut-wrap{
+    width:116px!important;
+    height:116px!important;
+    justify-self:center!important;
+    align-self:center!important;
+    display:grid!important;
+    place-items:center!important;
+    margin:0!important;
+}
+.customer-dashboard-v2 .donut-svg{
+    width:116px!important;
+    height:116px!important;
+}
+.customer-dashboard-v2 .donut-base,
+.customer-dashboard-v2 .donut-slice{
+    stroke-width:19!important;
+}
+.customer-dashboard-v2 .donut-center{
+    width:58px!important;
+    height:58px!important;
+    border-width:6px!important;
+    inset:50% auto auto 50%!important;
+    transform:translate(-50%,-50%)!important;
+}
+.customer-dashboard-v2 .donut-number{
+    font-size:17px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .donut-label{
+    font-size:7.7px!important;
+    line-height:1.1!important;
+}
+.customer-dashboard-v2 .legend-list{
+    height:142px!important;
+    display:grid!important;
+    gap:6px!important;
+    align-content:center!important;
+    min-width:0!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .legend-button{
+    height:18px!important;
+    min-height:18px!important;
+    grid-template-columns:8px minmax(0,1fr) 58px!important;
+    gap:8px!important;
+    padding:0!important;
+    font-size:10.3px!important;
+    line-height:1!important;
+    align-items:center!important;
+}
+.customer-dashboard-v2 .legend-name{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .legend-meta{
+    font-size:9.5px!important;
+    white-space:nowrap!important;
+    text-align:right!important;
+}
+.customer-dashboard-v2 .payment-list{
+    flex:0 0 auto!important;
+    height:122px!important;
+    display:grid!important;
+    gap:8px!important;
+    margin:0!important;
+    align-content:start!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .payment-row{
+    height:18px!important;
+    min-height:18px!important;
+    grid-template-columns:70px minmax(0,1fr) 82px!important;
+    gap:10px!important;
+    align-items:center!important;
+}
+.customer-dashboard-v2 .payment-label,
+.customer-dashboard-v2 .payment-value{
+    font-size:10.3px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .payment-track{
+    height:7px!important;
+}
+.customer-dashboard-v2 .payment-total{
+    flex:0 0 auto!important;
+    margin-top:9px!important;
+    font-size:10.8px!important;
+    line-height:1.2!important;
+}
+.customer-dashboard-v2 .revenue-chart{
+    flex:0 0 auto!important;
+    height:122px!important;
+    display:grid!important;
+    grid-template-columns:30px minmax(0,1fr)!important;
+    gap:8px!important;
+    align-items:end!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .revenue-axis{
+    height:114px!important;
+    font-size:8.8px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .revenue-bars{
+    height:116px!important;
+    gap:10px!important;
+    padding:0 4px!important;
+}
+.customer-dashboard-v2 .revenue-fill{
+    width:22px!important;
+    border-radius:6px 6px 0 0!important;
+}
+.customer-dashboard-v2 .revenue-labels{
+    flex:0 0 auto!important;
+    margin-top:7px!important;
+}
+.customer-dashboard-v2 .month-labels{
+    gap:10px!important;
+    font-size:9.3px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .revenue-total{
+    flex:0 0 auto!important;
+    margin-top:8px!important;
+    font-size:10.8px!important;
+    line-height:1.2!important;
+}
+@media(max-width:1120px){
+    .customer-dashboard-v2 .analytics-grid>.chart-card{
+        height:auto!important;
+        max-height:none!important;
+        min-height:260px!important;
+    }
+}
+
+
+/* =========================================================
+   FINAL VISIBLE ORDER STATUS + CALENDAR MATCH PATCH
+   - Adds more height to all 3 analytics boxes equally
+   - Makes Order Status Summary fully visible
+   - Centers donut/0 on the left side
+   - Calendar button matches My Profile / Notifications / Help Center
+   - Other sections remain unchanged
+========================================================= */
+.customer-dashboard-v2 .analytics-grid>.chart-card{
+    height:305px!important;
+    min-height:305px!important;
+    max-height:305px!important;
+    padding:18px!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-head{
+    height:auto!important;
+    min-height:52px!important;
+    flex:0 0 auto!important;
+    margin:0 0 12px!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-title{
+    font-size:14px!important;
+    line-height:1.25!important;
+    margin:0!important;
+}
+.customer-dashboard-v2 .analytics-grid .card-subtitle{
+    margin:5px 0 0!important;
+    font-size:10.8px!important;
+    line-height:1.35!important;
+    max-height:36px!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .analytics-grid .select-chip{
+    width:96px!important;
+    min-width:96px!important;
+    max-width:96px!important;
+    height:34px!important;
+    min-height:34px!important;
+    flex:0 0 96px!important;
+}
+.customer-dashboard-v2 .status-chart-layout{
+    flex:1 1 auto!important;
+    height:214px!important;
+    min-height:214px!important;
+    display:grid!important;
+    grid-template-columns:150px minmax(0,1fr)!important;
+    gap:16px!important;
+    align-items:center!important;
+    overflow:hidden!important;
+    margin:0!important;
+}
+.customer-dashboard-v2 .donut-wrap{
+    width:124px!important;
+    height:124px!important;
+    justify-self:center!important;
+    align-self:center!important;
+    display:grid!important;
+    place-items:center!important;
+    margin:0!important;
+}
+.customer-dashboard-v2 .donut-svg{
+    width:124px!important;
+    height:124px!important;
+}
+.customer-dashboard-v2 .donut-base,
+.customer-dashboard-v2 .donut-slice{
+    stroke-width:18!important;
+}
+.customer-dashboard-v2 .donut-center{
+    width:60px!important;
+    height:60px!important;
+    border-width:6px!important;
+    inset:50% auto auto 50%!important;
+    transform:translate(-50%,-50%)!important;
+}
+.customer-dashboard-v2 .donut-number{
+    font-size:18px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .donut-label{
+    font-size:8px!important;
+    line-height:1.1!important;
+}
+.customer-dashboard-v2 .legend-list{
+    height:auto!important;
+    min-height:0!important;
+    display:grid!important;
+    gap:8px!important;
+    align-content:center!important;
+    overflow:visible!important;
+}
+.customer-dashboard-v2 .legend-button{
+    height:22px!important;
+    min-height:22px!important;
+    display:grid!important;
+    grid-template-columns:9px minmax(0,1fr) 62px!important;
+    gap:8px!important;
+    align-items:center!important;
+    padding:0 4px!important;
+    font-size:10.8px!important;
+    line-height:1!important;
+    overflow:visible!important;
+}
+.customer-dashboard-v2 .legend-dot{
+    width:9px!important;
+    height:9px!important;
+}
+.customer-dashboard-v2 .legend-name{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .legend-meta{
+    font-size:9.8px!important;
+    white-space:nowrap!important;
+    text-align:right!important;
+}
+.customer-dashboard-v2 .payment-list{
+    flex:0 0 auto!important;
+    height:148px!important;
+    display:grid!important;
+    gap:10px!important;
+    margin:0!important;
+    align-content:start!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .payment-row{
+    height:22px!important;
+    min-height:22px!important;
+    grid-template-columns:72px minmax(0,1fr) 84px!important;
+    gap:10px!important;
+    align-items:center!important;
+}
+.customer-dashboard-v2 .payment-label,
+.customer-dashboard-v2 .payment-value{
+    font-size:10.8px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+}
+.customer-dashboard-v2 .payment-total{
+    margin-top:11px!important;
+    font-size:11px!important;
+    line-height:1.2!important;
+}
+.customer-dashboard-v2 .revenue-chart{
+    flex:0 0 auto!important;
+    height:150px!important;
+    display:grid!important;
+    grid-template-columns:30px minmax(0,1fr)!important;
+    gap:8px!important;
+    align-items:end!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .revenue-axis{
+    height:140px!important;
+    font-size:9px!important;
+    line-height:1!important;
+}
+.customer-dashboard-v2 .revenue-bars{
+    height:142px!important;
+    gap:10px!important;
+    padding:0 4px!important;
+}
+.customer-dashboard-v2 .revenue-labels{
+    margin-top:8px!important;
+}
+.customer-dashboard-v2 .revenue-total{
+    margin-top:10px!important;
+    font-size:11px!important;
+    line-height:1.2!important;
+}
+.customer-dashboard-v2 .date-pill,
+.customer-dashboard-v2 .date-pill.calendar-toggle{
+    width:178px!important;
+    min-width:178px!important;
+    max-width:178px!important;
+    height:42px!important;
+    min-height:42px!important;
+    padding:0 13px!important;
+    border:1px solid #111827!important;
+    border-radius:8px!important;
+    background:#ffffff!important;
+    background-image:none!important;
+    color:#111827!important;
+    font-size:12px!important;
+    font-weight:600!important;
+    line-height:1!important;
+    box-shadow:none!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+}
+.customer-dashboard-v2 .date-pill.calendar-toggle:hover,
+.customer-dashboard-v2 .date-pill.calendar-toggle:focus,
+.customer-dashboard-v2 .date-pill.calendar-toggle:active{
+    background:#111827!important;
+    background-image:none!important;
+    color:#ffffff!important;
+    border-color:#111827!important;
+    box-shadow:none!important;
+}
+.customer-dashboard-v2 .date-pill.calendar-toggle:hover i,
+.customer-dashboard-v2 .date-pill.calendar-toggle:focus i,
+.customer-dashboard-v2 .date-pill.calendar-toggle:active i,
+.customer-dashboard-v2 .date-pill.calendar-toggle:hover svg,
+.customer-dashboard-v2 .date-pill.calendar-toggle:focus svg,
+.customer-dashboard-v2 .date-pill.calendar-toggle:active svg{
+    color:#ffffff!important;
+    stroke:#ffffff!important;
+}
+@media(max-width:1120px){
+    .customer-dashboard-v2 .analytics-grid>.chart-card{
+        height:auto!important;
+        max-height:none!important;
+        min-height:305px!important;
+    }
+}
 </style>
 
 @php

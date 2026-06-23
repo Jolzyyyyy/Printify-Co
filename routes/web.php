@@ -59,6 +59,7 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     Route::get('/e-receipt', [FrontPageController::class, 'eReceipt'])->name('e-receipt.index');
     Route::get('/e-receipt/details', [EReceiptController::class, 'show'])->name('e-receipt.show');
     Route::post('/e-receipt', [EReceiptController::class, 'store'])->name('e-receipt.store');
+    Route::post('/e-receipt/upload', [EReceiptController::class, 'upload'])->name('e-receipt.upload');
     Route::get('/service-details/catalog', [ServiceDetailController::class, 'catalog'])->name('service-details.catalog');
     Route::get('/service-details/state', [ServiceDetailController::class, 'state'])->name('service-details.state');
     Route::post('/service-details/state', [ServiceDetailController::class, 'update'])->name('service-details.update');
@@ -127,13 +128,17 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     });
 
     // --- FIXED ORDERS SECTION PARA SA CUSTOMER ---
-    Route::get('/co/place-order', [OrderController::class, 'myOrders'])->name('co.place-order');
+    Route::get('/myorders', [OrderController::class, 'myOrders'])->name('myorders');
+    Route::get('/myorders/{order}', [OrderController::class, 'myShow'])->name('myorders.show');
+    Route::get('/myorder', fn () => redirect()->route('myorders'))->name('myorder');
+    Route::get('/my-orders', fn () => redirect()->route('myorders'))->name('my-orders');
+    Route::get('/my-orders/{order}', fn (Order $order) => redirect()->route('myorders.show', $order))->name('my-orders.show');
+    Route::get('/orders', [OrderController::class, 'myOrders'])->name('orders.index');
+
+    Route::get('/co/place-order', [OrderController::class, 'placeOrderIndex'])->name('co.place-order');
     Route::get('/co/place-order/{order}', [OrderController::class, 'myShow'])->name('co.place-order.show');
     Route::get('/co/place-order/{order}/tracking', [OrderController::class, 'myTracking'])->name('co.place-order.tracking');
-    Route::get('/my-orders', fn () => redirect()->route('co.place-order'))->name('my-orders');
-    Route::get('/my-orders/{order}', fn (Order $order) => redirect()->route('co.place-order.show', $order))->name('my-orders.show');
-    
-    Route::get('/orders', [OrderController::class, 'myOrders'])->name('orders.index');
+
     Route::post('/delivery/lalamove/quote', [LalamoveDeliveryController::class, 'quote'])->name('delivery.lalamove.quote');
     Route::post('/orders/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('orders.delivery.book');
     Route::post('/orders/{order}/delivery/refresh', [LalamoveDeliveryController::class, 'refresh'])->name('orders.delivery.refresh');

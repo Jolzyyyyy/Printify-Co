@@ -12,11 +12,17 @@ class CartController extends Controller
     public function state(Request $request)
     {
         $cart = session()->get('cart', []);
+        $variations = ServiceVariation::query()
+            ->whereIn('id', collect($cart)->pluck('variation_id')->filter()->unique()->values())
+            ->get()
+            ->keyBy('id');
 
         return response()->json([
             'ok' => true,
             'promo_code' => session()->get('cart_promo'),
-            'items' => collect($cart)->map(function (array $row, $cartKey) {
+            'items' => collect($cart)->map(function (array $row, $cartKey) use ($variations) {
+                $variation = $variations->get($row['variation_id'] ?? null);
+
                 return [
                     'id' => $row['cart_id'] ?? $cartKey,
                     'name' => $row['name'] ?? 'Print Item',
@@ -34,9 +40,14 @@ class CartController extends Controller
                         'serviceId' => $row['service_item_id'] ?? null,
                         'serviceItemId' => $row['service_item_id'] ?? null,
                         'category' => $row['category'] ?? null,
+                        'categoryTitle' => data_get($row, 'raw.categoryTitle') ?? ($row['category'] ?? null),
                         'printingCategory' => data_get($row, 'raw.printingCategory') ?? ($row['category'] ?? null),
+                        'variationPrintingCategory' => data_get($row, 'raw.variationPrintingCategory') ?? $variation?->printing_category,
+                        'productSize' => data_get($row, 'raw.productSize') ?? data_get($row, 'raw.paperSize') ?? $variation?->product_size,
+                        'colorMode' => data_get($row, 'raw.colorMode') ?? data_get($row, 'raw.colorVariation') ?? $variation?->color_mode,
+                        'finishType' => data_get($row, 'raw.finishType') ?? $variation?->finish_type,
                         'variationLabel' => $row['variation_label'] ?? null,
-                        'serviceOption' => data_get($row, 'raw.serviceOption') ?? ($row['variation_label'] ?? null),
+                        'serviceOption' => data_get($row, 'raw.serviceOption') ?? $variation?->finish_type ?? ($row['variation_label'] ?? null),
                         'quantity' => (int) ($row['qty'] ?? 1),
                         'unit' => $row['unit'] ?? 'pcs',
                         'fileName' => $row['file_name'] ?? null,
@@ -241,7 +252,7 @@ class CartController extends Controller
     public function syncCart(Request $request)
     {
         $validated = $request->validate([
-            'items' => ['required', 'array'],
+            'items' => ['present', 'array'],
             'items.*.id' => ['nullable', 'string', 'max:160'],
             'items.*.name' => ['required', 'string'],
             'items.*.qty' => ['required', 'integer', 'min:1', 'max:999'],

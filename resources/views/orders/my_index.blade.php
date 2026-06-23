@@ -121,7 +121,7 @@
                 ['key' => 'toreceive', 'title' => 'To Receive', 'note' => 'Delivery movement', 'color' => 'var(--dash-blue)', 'soft' => 'var(--dash-blue-soft)'],
                 ['key' => 'cancelled', 'title' => 'Cancelled', 'note' => 'Needs attention', 'color' => 'var(--dash-red)', 'soft' => 'var(--dash-red-soft)'],
             ] as $card)
-                <a href="{{ route('my-orders', array_filter(['status' => $card['key'] === 'all' ? null : $card['key'], 'q' => $searchTerm ?: null])) }}" class="stat-card" style="--stat-color:{{ $card['color'] }};--stat-soft:{{ $card['soft'] }}">
+                <a href="{{ route('myorders', array_filter(['status' => $card['key'] === 'all' ? null : $card['key'], 'q' => $searchTerm ?: null])) }}" class="stat-card" style="--stat-color:{{ $card['color'] }};--stat-soft:{{ $card['soft'] }}">
                     <div class="stat-title">{{ $card['title'] }}</div>
                     <div class="stat-value">{{ $counts[$card['key']] ?? 0 }}</div>
                     <div class="stat-note">{{ $card['note'] }}</div>
@@ -139,12 +139,12 @@
             <div class="portal-filter-row">
                 <div class="portal-tabs" role="tablist" aria-label="Order filters">
                     @foreach($tabs as $key => $label)
-                        <a class="portal-tab {{ $selectedStatus === $key ? 'is-active' : '' }}" href="{{ route('my-orders', array_filter(['status' => $key === 'all' ? null : $key, 'q' => $searchTerm ?: null])) }}">
+                        <a class="portal-tab {{ $selectedStatus === $key ? 'is-active' : '' }}" href="{{ route('myorders', array_filter(['status' => $key === 'all' ? null : $key, 'q' => $searchTerm ?: null])) }}">
                             {{ $label }} <span class="count">{{ $counts[$key] ?? 0 }}</span>
                         </a>
                     @endforeach
                 </div>
-                <form class="portal-search" method="GET" action="{{ route('my-orders') }}">
+                <form class="portal-search" method="GET" action="{{ route('myorders') }}">
                     @if($selectedStatus !== 'all')<input type="hidden" name="status" value="{{ $selectedStatus }}">@endif
                     <i data-lucide="search" size="15"></i>
                     <input type="search" name="q" value="{{ $searchTerm }}" placeholder="Search order, service, payment...">
@@ -179,7 +179,7 @@
                                 <td class="product-name">{{ $serviceName($order) }}</td>
                                 <td>{{ $deliveryMethod }}</td>
                                 <td class="amount-cell">{{ $money($order->total_price) }}</td>
-                                <td style="text-align:center"><a href="{{ route('my-orders.show', $order) }}" class="view-button"><i data-lucide="map-pin" size="13"></i>View</a></td>
+                                <td style="text-align:center"><a href="{{ route('myorders.show', $order) }}" class="view-button"><i data-lucide="map-pin" size="13"></i>View</a></td>
                             </tr>
                         @empty
                             <tr>

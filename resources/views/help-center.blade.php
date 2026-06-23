@@ -68,6 +68,519 @@
 .hc-link:hover,.hc-link:focus{background:#111827!important;color:#fff!important;box-shadow:0 12px 24px rgba(17,24,39,.18)!important;outline:0!important;}
 @media(max-width:900px){.hc-main-stack>.hc-card{border:0!important;border-radius:0!important}.hc-main-stack>.hc-card>.hc-body{padding:10px 0!important}}
 
+
+
+/* === FINAL IMAGE UI PATCH: Help Center matches screenshot + My Profile/Notifications spacing === */
+.hc-page{
+    background:#fff!important;
+}
+.hc-wrap{
+    max-width:1490px!important;
+    width:auto!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    padding:0 0 26px!important;
+    background:#fff!important;
+}
+.hc-head{
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:18px!important;
+    margin:0 0 16px!important;
+    width:100%!important;
+}
+.hc-date{
+    width:178px!important;
+    min-width:178px!important;
+    max-width:178px!important;
+    height:42px!important;
+    padding:0 13px!important;
+    border:1px solid #111827!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    color:#111827!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    font-size:12px!important;
+    font-weight:600!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+    box-shadow:none!important;
+}
+.hc-date:hover,.hc-date:focus{
+    background:#111827!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    outline:0!important;
+}
+.hc-grid{
+    display:block!important;
+    width:100%!important;
+    max-width:1200px!important;
+    background:#fff!important;
+}
+.hc-main-stack{
+    display:block!important;
+    width:100%!important;
+    max-width:1200px!important;
+    background:#fff!important;
+}
+.hc-main-stack>.hc-card,
+.hc-main-stack>.hc-card:nth-child(1),
+.hc-main-stack>.hc-card:nth-child(2),
+.hc-main-stack>.hc-card:nth-child(3),
+.hc-main-stack>.hc-card:nth-child(4){
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    background:#fff!important;
+    margin:0!important;
+    overflow:visible!important;
+}
+.hc-main-stack>.hc-card:hover{
+    background:#fff!important;
+    box-shadow:none!important;
+}
+.hc-main-stack>.hc-card>.hc-body{
+    padding:0!important;
+}
+.hc-main-stack>.hc-card:nth-child(1)>.hc-body{
+    padding:0 0 18px!important;
+}
+.hc-main-stack>.hc-card:nth-child(2)>.hc-body{
+    padding:0 0 22px!important;
+}
+.hc-main-stack>.hc-card:nth-child(3)>.hc-body{
+    padding:0 0 34px!important;
+}
+.hc-main-stack>.hc-ticket-activity-card>.hc-body{
+    padding:0!important;
+}
+.hc-hero{
+    display:grid!important;
+    grid-template-columns:24px minmax(0,1fr)!important;
+    gap:12px!important;
+    align-items:start!important;
+    max-width:760px!important;
+}
+.hc-hero-icon{
+    width:18px!important;
+    height:18px!important;
+    margin-top:1px!important;
+    color:var(--hc-orange)!important;
+    background:transparent!important;
+}
+.hc-card-title{
+    font-family:'Poppins',system-ui,sans-serif!important;
+    font-size:14px!important;
+    font-weight:600!important;
+    letter-spacing:.018em!important;
+    color:#111827!important;
+}
+.hc-card-desc{
+    font-size:11.5px!important;
+    color:#6b7280!important;
+    line-height:1.45!important;
+}
+.hc-search-row{
+    width:650px!important;
+    max-width:100%!important;
+    margin-top:14px!important;
+    margin-bottom:0!important;
+}
+.hc-search-input{
+    height:42px!important;
+    border:1px solid #d1d5db!important;
+    border-radius:999px!important;
+    background:#fff!important;
+    color:#111827!important;
+    padding:8px 24px 8px 64px!important;
+    font-size:16px!important;
+    font-weight:500!important;
+    box-shadow:none!important;
+}
+.hc-search-input:hover,.hc-search-input:focus{
+    border-color:#9ca3af!important;
+    box-shadow:none!important;
+    outline:0!important;
+}
+.hc-chip-row,
+.hc-shortcut-grid,
+.hc-stack{
+    display:none!important;
+}
+.hc-category-grid{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:18px!important;
+    width:100%!important;
+}
+.hc-category{
+    min-height:100px!important;
+    border:1px solid #dfe3ea!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    padding:15px 20px!important;
+    display:grid!important;
+    grid-template-columns:34px minmax(0,1fr) 16px!important;
+    gap:14px!important;
+    align-items:center!important;
+    box-shadow:none!important;
+}
+.hc-category:hover,.hc-category:focus{
+    background:rgba(17,24,39,.055)!important;
+    border-color:#cfd5dd!important;
+    box-shadow:none!important;
+    outline:0!important;
+}
+.hc-category strong{
+    font-size:12px!important;
+    font-weight:600!important;
+}
+.hc-category small{
+    font-size:10.5px!important;
+    line-height:1.35!important;
+}
+.hc-category em{
+    margin-top:8px!important;
+    font-size:10.5px!important;
+    font-weight:700!important;
+}
+.hc-list{
+    width:100%!important;
+}
+.hc-article,
+.hc-ticket{
+    min-height:36px!important;
+    padding:7px 0!important;
+    border-bottom:1px solid #f0f1f3!important;
+    background:#fff!important;
+}
+.hc-article:hover,
+.hc-ticket:hover{
+    background:rgba(17,24,39,.055)!important;
+}
+.hc-row-title{
+    font-size:12px!important;
+    font-weight:600!important;
+}
+.hc-tag{
+    color:var(--hc-orange)!important;
+    font-size:10px!important;
+    font-weight:700!important;
+}
+.hc-link,
+.hc-main-stack .hc-link{
+    display:none!important;
+}
+.hc-ticket-activity-card{
+    margin-top:20px!important;
+}
+@media(max-width:1320px){
+    .hc-grid,.hc-main-stack{max-width:none!important;}
+}
+@media(max-width:940px){
+    .hc-category-grid{grid-template-columns:1fr!important;}
+    .hc-search-row{width:100%!important;}
+}
+@media(max-width:620px){
+    .hc-head{display:grid!important;}
+    .hc-date{width:100%!important;max-width:none!important;}
+}
+
+
+/* === FINAL CALENDAR + INNER UI MATCH: same button, modal, and spacing style as Notifications === */
+.hc-date,
+.hc-calendar-trigger{
+    width:178px!important;
+    min-width:178px!important;
+    max-width:178px!important;
+    height:42px!important;
+    padding:0 13px!important;
+    border:1px solid #111827!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    color:#111827!important;
+    box-shadow:none!important;
+    font-size:12px!important;
+    font-weight:600!important;
+    line-height:1!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    white-space:nowrap!important;
+    cursor:pointer!important;
+    transition:background .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease!important;
+}
+.hc-date:hover,
+.hc-date:focus,
+.hc-calendar-trigger:hover,
+.hc-calendar-trigger:focus{
+    background:#111827!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    box-shadow:none!important;
+    outline:0!important;
+}
+.hc-date svg,
+.hc-calendar-trigger svg{
+    width:16px!important;
+    height:16px!important;
+    flex:0 0 auto!important;
+}
+.hc-date i{display:none!important;}
+.hc-calendar-overlay{
+    position:fixed!important;
+    inset:0!important;
+    z-index:9998!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:18px!important;
+    background:rgba(17,24,39,.36)!important;
+    backdrop-filter:blur(9px)!important;
+    opacity:0!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+    transition:opacity .2s ease,visibility .2s ease!important;
+}
+.hc-calendar-overlay.open{
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+}
+.hc-calendar-card{
+    width:min(920px,100%)!important;
+    max-height:calc(100vh - 36px)!important;
+    overflow:hidden!important;
+    border:1px solid #111827!important;
+    border-radius:18px!important;
+    background:#fff!important;
+    box-shadow:0 26px 80px rgba(15,23,42,.22)!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1.1fr) 310px!important;
+}
+.hc-calendar-main{
+    padding:18px!important;
+    border-right:1px solid #eceff3!important;
+    min-width:0!important;
+    background:#fff!important;
+}
+.hc-calendar-side{
+    padding:18px!important;
+    background:#fff!important;
+    min-width:0!important;
+}
+.hc-calendar-top{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    margin-bottom:14px!important;
+}
+.hc-calendar-title{
+    margin:0!important;
+    font-family:'Poppins',system-ui,sans-serif!important;
+    font-size:16px!important;
+    font-weight:700!important;
+    color:#111827!important;
+}
+.hc-calendar-sub{
+    margin:3px 0 0!important;
+    font-size:11px!important;
+    font-weight:400!important;
+    color:#6b7280!important;
+    line-height:1.45!important;
+}
+.hc-calendar-actions{
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+}
+.hc-calendar-actions button,
+#hcCalUse,
+#hcCalClear{
+    height:34px!important;
+    border:1px solid #111827!important;
+    border-radius:999px!important;
+    background:#fff!important;
+    color:#111827!important;
+    font-size:11px!important;
+    font-weight:500!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    cursor:pointer!important;
+    transition:.18s!important;
+    box-shadow:none!important;
+}
+.hc-calendar-actions button{
+    min-width:42px!important;
+    padding:0!important;
+}
+#hcCalUse{
+    min-width:92px!important;
+    padding:0 13px!important;
+}
+#hcCalClear{
+    min-width:76px!important;
+    padding:0 13px!important;
+}
+.hc-calendar-actions button:hover,
+.hc-calendar-actions button:focus,
+#hcCalUse:hover,
+#hcCalUse:focus,
+#hcCalClear:hover,
+#hcCalClear:focus{
+    background:#111827!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    outline:0!important;
+}
+#hcCalSave{
+    height:34px!important;
+    min-width:118px!important;
+    padding:0 14px!important;
+    border:0!important;
+    border-radius:999px!important;
+    background:#16a34a!important;
+    color:#fff!important;
+    font-size:11px!important;
+    font-weight:500!important;
+    cursor:pointer!important;
+    transition:.18s!important;
+}
+#hcCalSave:hover,
+#hcCalSave:focus{
+    background:#111827!important;
+    color:#fff!important;
+    outline:0!important;
+}
+.hc-weekdays,
+.hc-days{
+    display:grid!important;
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    gap:7px!important;
+}
+.hc-weekdays{
+    margin-bottom:7px!important;
+}
+.hc-weekdays span{
+    text-align:center!important;
+    font-size:9.5px!important;
+    font-weight:800!important;
+    color:#6b7280!important;
+    letter-spacing:.08em!important;
+    text-transform:uppercase!important;
+}
+.hc-day{
+    position:relative!important;
+    min-height:78px!important;
+    border:1px solid #eceff3!important;
+    border-radius:12px!important;
+    background:#fff!important;
+    padding:8px!important;
+    text-align:left!important;
+    color:#111827!important;
+    cursor:pointer!important;
+    transition:.18s!important;
+    overflow:hidden!important;
+}
+.hc-day:hover,
+.hc-day:focus{
+    border-color:#111827!important;
+    background:rgba(17,24,39,.14)!important;
+    box-shadow:0 10px 24px rgba(17,24,39,.08)!important;
+    backdrop-filter:blur(7px)!important;
+    outline:0!important;
+}
+.hc-day.muted{
+    background:#fafafa!important;
+    color:#a1a1aa!important;
+    cursor:default!important;
+}
+.hc-day.today{
+    border-color:var(--hc-orange)!important;
+    background:#fff3e6!important;
+}
+.hc-day.selected{
+    border-color:#111827!important;
+    background:rgba(17,24,39,.16)!important;
+    box-shadow:inset 0 0 0 1px #111827!important;
+}
+.hc-calendar-side h4,
+#hcCalSelected{
+    margin:0 0 12px!important;
+    font-family:'Poppins',system-ui,sans-serif!important;
+    font-size:15px!important;
+    font-weight:700!important;
+    color:#111827!important;
+}
+.hc-calendar-empty{
+    min-height:74px!important;
+    border:1px dashed #e2e5ea!important;
+    border-radius:12px!important;
+    display:grid!important;
+    place-items:center!important;
+    text-align:center!important;
+    color:#6b7280!important;
+    font-size:11px!important;
+    font-weight:500!important;
+    line-height:1.45!important;
+    padding:12px!important;
+    background:#fff!important;
+    margin-bottom:13px!important;
+}
+.hc-calendar-side label{
+    display:grid!important;
+    gap:5px!important;
+    margin-top:9px!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    text-transform:uppercase!important;
+    letter-spacing:.05em!important;
+    color:#4b5563!important;
+}
+.hc-calendar-side input,
+.hc-calendar-side textarea{
+    width:100%!important;
+    border:1px solid #eceff3!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    padding:10px 11px!important;
+    color:#111827!important;
+    font-family:'Inter',system-ui,sans-serif!important;
+    font-size:12px!important;
+    font-weight:500!important;
+    outline:none!important;
+    transition:.18s!important;
+}
+.hc-calendar-side textarea{
+    min-height:68px!important;
+    resize:vertical!important;
+}
+.hc-calendar-side input:focus,
+.hc-calendar-side textarea:focus{
+    border-color:var(--hc-orange)!important;
+    box-shadow:0 0 0 3px rgba(255,122,0,.10)!important;
+}
+.hc-cal-form-actions{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+    margin-top:10px!important;
+}
+@media(max-width:820px){
+    .hc-calendar-card{grid-template-columns:1fr!important;overflow:auto!important;}
+    .hc-calendar-main{border-right:0!important;border-bottom:1px solid #eceff3!important;}
+    .hc-day{min-height:62px!important;}
+}
 </style>
 
 <div class="hc-page">
@@ -79,7 +592,13 @@
                 <p class="hc-sub">Find answers, get support, and manage your orders with ease.</p>
             </div>
         </div>
-        <button type="button" class="hc-date" id="hcCalendarToggle" aria-haspopup="dialog" aria-controls="hcCalendarOverlay"><i class="fa-regular fa-calendar-days"></i><span id="hcDateText">Today is {{ now()->format('M d, Y') }}</span></button>
+        <button type="button" class="hc-date" id="hcCalendarToggle" aria-haspopup="dialog" aria-controls="hcCalendarOverlay">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M8 2v4M16 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M5 5h14a2 2 0 0 1 2 2v14H3V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            <span id="hcDateText">Today is {{ now()->format('M d, Y') }}</span>
+        </button>
     </div>
 
     <div class="hc-grid">
@@ -98,11 +617,6 @@
                                     </svg>
                                 </div>
                                 <input id="helpSearch" class="hc-search-input" type="search" placeholder="Search" onkeydown="if(event.key==='Enter') runHelpSearch()">
-                            </div>
-                            <div class="hc-chip-row">
-                                @foreach(['track order','refund','payment failed','change address','return policy'] as $term)
-                                <button type="button" class="hc-chip" onclick="quickHelpSearch('{{ $term }}')">{{ $term }}</button>
-                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -148,69 +662,19 @@
                         </div>
                         @endforeach
                     </div>
-                    <div style="display:flex;justify-content:center;margin-top:12px"><button class="hc-link" type="button" onclick="showAllArticles()">View all articles <i class="fa-solid fa-chevron-right"></i></button></div>
                 </div>
             </section>
 
-            <section class="hc-card">
-                <div class="hc-body">
-                    <h2 class="hc-card-title"><i class="fa-solid fa-cube" style="color:var(--hc-orange);margin-right:8px"></i>Order Support Shortcuts</h2>
-                    <p class="hc-card-desc">Quick actions to manage and get help with your orders.</p>
-                    <div class="hc-shortcut-grid" style="margin-top:14px">
-                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('co.place-order') }}'"><i class="fa-solid fa-truck hc-shortcut-icon track"></i><span><p class="hc-row-title">Track My Order</p><p class="hc-row-sub">Check delivery status</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="openTicketModal('Change Request')"><i class="fa-solid fa-pen-to-square hc-shortcut-icon change"></i><span><p class="hc-row-title">Request a Change</p><p class="hc-row-sub">Modify order details</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="openTicketModal('Report an Issue')"><i class="fa-solid fa-triangle-exclamation hc-shortcut-icon issue"></i><span><p class="hc-row-title">Report an Issue</p><p class="hc-row-sub">Something wrong?</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="openTicketModal('Return Request')"><i class="fa-solid fa-rotate-left hc-shortcut-icon return"></i><span><p class="hc-row-title">Start a Return</p><p class="hc-row-sub">Initiate return process</p></span><span></span></button>
-                        <button class="hc-shortcut" type="button" onclick="location.href='{{ route('co.place-order') }}#history'"><i class="fa-regular fa-clock hc-shortcut-icon history"></i><span><p class="hc-row-title">View Order History</p><p class="hc-row-sub">See past orders</p></span><span></span></button>
-                    </div>
-                </div>
-            </section>
-        </main>
 
-        <aside class="hc-stack">
-            <section class="hc-card">
-                <div class="hc-body">
-                    <h2 class="hc-card-title"><i class="fa-solid fa-headset" style="color:var(--hc-orange);margin-right:8px"></i>Get Support</h2>
-                    <p class="hc-card-desc">Choose the best way to reach our support team.</p>
-                    <div class="hc-list" style="margin-top:12px">
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-comment-dots"></i></span><button type="button" onclick="startLiveChat()"><p class="hc-row-title">Live Chat</p><p class="hc-row-sub">Chat with our support team in real-time.</p></button><span class="hc-status"><span class="hc-dot"></span>Online <i class="fa-solid fa-chevron-right"></i></span></div>
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-ticket"></i></span><button type="button" onclick="openTicketModal('Order Concern')"><p class="hc-row-title">Submit a Ticket</p><p class="hc-row-sub">Submit a request and we'll get back to you.</p></button><i class="fa-solid fa-chevron-right"></i></div>
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-envelope"></i></span><a href="mailto:support@printifyco.com" style="text-decoration:none"><p class="hc-row-title">Email Support</p><p class="hc-row-sub">support@printifyco.com<br>We usually reply within 24h.</p></a><i class="fa-solid fa-chevron-right"></i></div>
-                        <div class="hc-support"><span class="hc-icon"><i class="fa-solid fa-phone"></i></span><a href="tel:+639123456789" style="text-decoration:none"><p class="hc-row-title">Call Support</p><p class="hc-row-sub">+63 912 345 6789<br>Mon - Fri, 9:00 AM - 6:00 PM PHT</p></a><i class="fa-solid fa-chevron-right"></i></div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="hc-card">
-                <div class="hc-body">
-                    <h2 class="hc-card-title"><i class="fa-solid fa-bullhorn" style="margin-right:8px"></i>Recent Announcements</h2>
-                    <p class="hc-card-desc">Stay updated with the latest news.</p>
-                    <div class="hc-list" style="margin-top:12px">
-                        @foreach([
-                            ['New Design Editor Update','Try our improved editor with faster performance and new features.','May 29, 2026'],
-                            ['Shipping Updates','Updated delivery times for certain areas. Check your orders.','May 27, 2026'],
-                            ['Payment System Maintenance','Scheduled maintenance on June 5, 2026 from 1:00 AM - 3:00 AM PHT.','May 25, 2026'],
-                        ] as $news)
-                        <div class="hc-announcement">
-                            <span></span>
-                            <button type="button" onclick="openAnnouncement('{{ $news[0] }}')"><p class="hc-row-title">{{ $news[0] }}</p><p class="hc-row-sub">{{ $news[1] }}</p></button>
-                            <small style="color:#6b7280;font-size:10px">{{ $news[2] }}</small>
-                        </div>
-                        @endforeach
-                    </div>
-                    <div style="display:flex;justify-content:center;margin-top:12px"><button class="hc-link" type="button" onclick="openAnnouncement('All Announcements')">View all announcements <i class="fa-solid fa-chevron-right"></i></button></div>
-                </div>
-            </section>
-
-            <section class="hc-card">
+            <section class="hc-card hc-ticket-activity-card">
                 <div class="hc-body">
                     <h2 class="hc-card-title">Ticket Activity</h2>
                     <p class="hc-card-desc">Recent support activity saved for this account.</p>
                     <div class="hc-list" id="ticketList" style="margin-top:10px"></div>
                 </div>
             </section>
-        </aside>
-    </div>
+        </main>
+</div>
 
 </div>
 
@@ -296,7 +760,7 @@ try{const d=JSON.parse(localStorage.getItem('printify_help_draft')||'null');if(d
  document.getElementById('hcCalPrev')?.addEventListener('click',()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()});
  document.getElementById('hcCalNext')?.addEventListener('click',()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()});
  document.getElementById('hcCalToday')?.addEventListener('click',()=>{today=new Date();selected=new Date(today.getFullYear(),today.getMonth(),today.getDate());view=new Date(selected.getFullYear(),selected.getMonth(),1);render()});
- document.getElementById('hcCalUse')?.addEventListener('click',()=>{if(dateText)dateText.textContent='Selected '+fmt(selected);close();helpToast('Date selected.')});
+ document.getElementById('hcCalUse')?.addEventListener('click',()=>{if(dateText)dateText.textContent='Today is '+selected.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});close();helpToast('Calendar date selected.')});
  document.getElementById('hcCalClear')?.addEventListener('click',()=>{['hcCalEvent','hcCalTime','hcCalNote'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''})});
  document.getElementById('hcCalSave')?.addEventListener('click',()=>{localStorage.setItem('printify_help_calendar_last',JSON.stringify({date:key(selected),event:document.getElementById('hcCalEvent')?.value||'',time:document.getElementById('hcCalTime')?.value||'',note:document.getElementById('hcCalNote')?.value||''}));helpToast('Calendar reminder saved.')});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close()});

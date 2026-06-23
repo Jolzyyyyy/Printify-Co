@@ -493,6 +493,32 @@
 .profile-page .prof-crop-actions .prof-success{background:var(--p-green)!important;border-color:var(--p-green)!important;color:#fff!important;}
 .profile-page .prof-crop-actions .prof-success:hover,.profile-page .prof-crop-actions .prof-success:focus{background:#111827!important;border-color:#111827!important;color:#fff!important;}
 
+
+
+/* FINAL USER REQUEST: remove right-side widgets, keep calendar/left spacing, and set My Profile box to 1200px */
+.profile-page .profile-shell{
+    max-width:1490px!important;
+}
+.profile-page .profile-grid{
+    grid-template-columns:minmax(0,1200px)!important;
+    justify-content:start!important;
+    gap:0!important;
+    width:100%!important;
+}
+.profile-page .profile-left{
+    width:100%!important;
+    max-width:1200px!important;
+}
+.profile-page .profile-right{
+    display:none!important;
+}
+.profile-page .profile-title-wrap .profile-sub{
+    max-width:620px!important;
+}
+@media(max-width:1180px){
+    .profile-page .profile-grid{grid-template-columns:minmax(0,1fr)!important;}
+    .profile-page .profile-left{max-width:none!important;}
+}
 </style>
 
 <div class="profile-page" x-data="printifyProfile()" x-init="init()">
@@ -501,7 +527,7 @@
 <div class="profile-title-wrap">
 <div>
 <h1 class="profile-title">My Profile</h1>
-<p class="profile-sub">Manage your customer account, photo, and communication preferences.</p>
+<p class="profile-sub">Manage your customer account, photo, and profile information.</p>
 </div>
 </div>
 <button type="button" class="profile-date" @click="openDatePicker()" aria-label="Open calendar date picker">
@@ -697,109 +723,7 @@
         </section>
 </main>
 
-        <aside class="profile-right">
-<section class="prof-card prof-widget">
-<div class="prof-complete">
-<div class="prof-ring">
-<span>88%</span>
-</div>
-<div>
-<h3 class="prof-widget-title" style="margin-bottom:4px">Profile Completion</h3>
-<p class="prof-widget-copy">Great job! Complete your profile to get the most out of your account.</p>
-</div>
-</div>
-<div class="prof-progress">
-<span>
-</span>
-</div>
-<button class="prof-link" type="button" @click="suggest = !suggest">
-<span>View Suggestions</span>
-<span>›</span>
-</button>
-<div class="prof-suggest" x-show="suggest" x-transition x-cloak>Add alternate contact number and verify your address to reach 100% completion.</div>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" stroke="currentColor" stroke-width="2"/>
-</svg>Communication Preferences</h3>
-<template x-for="pr in prefs" :key="pr.k">
-<div class="prof-pref">
-<span class="prof-pref-label" x-text="pr.l">
-</span>
-<div class="prof-pref-side">
-<button type="button" class="prof-toggle" :class="pr.on ? 'is-on' : 'is-off'" :aria-pressed="pr.on.toString()" @click="togglePref(pr)">
-<span class="prof-toggle-knob">
-<template x-if="pr.on">
-<svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-<path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</template>
-<template x-if="!pr.on">
-<svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-<path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-</svg>
-</template>
-</span>
-</button>
-<span class="prof-pref-state" :class="pr.on ? 'on' : 'off'" x-text="pr.on ? 'On' : 'Off'">
-</span>
-</div>
-</div>
-</template>
-<button class="prof-link prof-link-primary" type="button" @click="toastMsg('Preferences can be edited here. Click Save Changes after toggling.')">
-<span>Manage Preferences</span>
-<span>›</span>
-</button>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-</svg>Quick Stats</h3>
-<div class="prof-stats">
-<template x-for="s in stats" :key="s.l">
-<div class="prof-stat">
-<span class="prof-ico" :class="s.c" x-html="s.i">
-</span>
-<span>
-<span class="prof-num" x-text="s.n">
-</span>
-<span class="prof-small" x-text="s.l">
-</span>
-</span>
-</div>
-</template>
-</div>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-<path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2"/>
-</svg>Recent Activity</h3>
-<template x-for="a in shownActs" :key="a.t">
-<div class="prof-act">
-<div class="prof-act-main">
-<span class="prof-dot2">
-</span>
-<span class="prof-act-text" x-text="a.t">
-</span>
-</div>
-<span class="prof-time" x-text="a.d">
-</span>
-</div>
-</template>
-<button class="prof-link prof-link-primary" type="button" @click="allActs = true" x-show="!allActs" x-transition>
-<span>View All Activity</span>
-<span>›</span>
-</button>
-<button class="prof-link" type="button" @click="allActs = false" x-show="allActs" x-transition x-cloak>
-<span>Show Less Activity</span>
-<span>›</span>
-</button>
-</section>
-</aside>
+        <!-- Right-side widgets removed as requested: Communication Preferences and Recent Activity. Main My Profile box now uses the full available width. -->
     </div>
 </div>
 

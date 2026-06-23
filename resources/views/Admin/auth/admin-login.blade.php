@@ -687,62 +687,9 @@
     </style>
 
     <div class="auth-container" id="auth-container">
-        {{-- ADMIN/DEVELOPER STAFF ACCESS PANEL --}}
-        <div class="form-container sign-up-container">
-            <div class="form-content">
-                <p class="auth-switch-text">Already have a staff account? <button type="button" data-auth-switch="login">Sign in</button></p>
-                <h1 class="auth-title">Staff Access</h1>
-                <p class="auth-subtitle">Admin and developer accounts are created through secure invitation only.</p>
-
-                @if ($errors->any())
-                    <div class="auth-feedback" role="alert">
-                        <strong>Sign-in notice</strong>
-                        {{ $errors->first() }}
-                    </div>
-                @elseif (($loginCooldownSeconds ?? 0) > 0)
-                    <div class="auth-feedback" role="alert">
-                        <strong>Login cooldown active</strong>
-                        Please wait <span class="cooldown-timer" data-cooldown="{{ $loginCooldownSeconds }}">{{ $loginCooldownSeconds }}</span> seconds before trying again.
-                    </div>
-                @elseif (session('status'))
-                    <div class="auth-feedback" role="status">
-                        <strong>Notice</strong>
-                        {{ session('status') }}
-                    </div>
-                @endif
-
-                <div class="staff-access-panel">
-                    <div class="staff-access-card">
-                        <strong>Invite required</strong>
-                        <p>Public staff registration is disabled. A developer must create or invite admin client accounts before portal access is allowed.</p>
-                    </div>
-
-                    <ul class="staff-access-list">
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M9 12l2 2 4-4"></path>
-                                <circle cx="12" cy="12" r="9"></circle>
-                            </svg>
-                            Secure invite and approval flow stays active.
-                        </li>
-                        <li>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                            </svg>
-                            Existing admin and developer accounts can sign in normally.
-                        </li>
-                    </ul>
-
-                    <button type="button" class="auth-btn" data-auth-switch="login">Back to Sign In</button>
-                </div>
-
-            </div>
-        </div>
-
         {{-- ADMIN/DEVELOPER LOGIN FORM --}}
         <div class="form-container sign-in-container">
             <div class="form-content">
-                <p class="auth-switch-text">Need staff access? <button type="button" data-auth-switch="register">Sign up</button></p>
                 <h1 class="auth-title">Sign In</h1>
                 <p class="auth-subtitle">Welcome back! Please sign in</p>
 
@@ -814,19 +761,12 @@
             </div>
         </div>
 
-        {{-- BLUE OVERLAY PANELS --}}
+        {{-- BLUE OVERLAY PANEL --}}
         <div class="overlay-container">
             <div class="overlay">
-                <div class="overlay-panel overlay-left">
-                    <h1>Staff Portal</h1>
-                    <p>Already have an admin client or developer account? Sign in to manage the system.</p>
-                    <button class="ghost-btn" id="signIn">Sign In</button>
-                </div>
-
                 <div class="overlay-panel overlay-right">
-                    <h1>Need Staff Access?</h1>
-                    <p>Staff accounts are protected by invite and developer approval. Use sign in after your access is created.</p>
-                    <button class="ghost-btn" id="signUp">Sign Up</button>
+                    <h1>Staff Portal</h1>
+                    <p>Sign in with your approved admin client or developer account to access the protected dashboard.</p>
                 </div>
             </div>
         </div>
@@ -909,71 +849,36 @@
         }
     </style>
 
+    <style id="staff-auth-signin-only-lock">
+        .auth-container {
+            width: 835px !important;
+            max-width: 95vw !important;
+            min-height: 540px !important;
+        }
+        .auth-container .sign-in-container {
+            left: 0 !important;
+            z-index: 5 !important;
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+        }
+        .auth-container .overlay {
+            left: 0 !important;
+            width: 100% !important;
+            transform: none !important;
+        }
+        .auth-container .overlay-panel {
+            width: 100% !important;
+        }
+        .auth-container .overlay-right {
+            left: 0 !important;
+            right: auto !important;
+            transform: none !important;
+            background-position: calc(100% + 48px) -48px, calc(100% - 25px) 20px, center bottom -6px !important;
+        }
+    </style>
+
     <script>
-        const container = document.getElementById('auth-container');
-        const signUpButton = document.getElementById('signUp');
-        const signInButton = document.getElementById('signIn');
-        const authSlideDuration = 760;
-
-        const loginUrl = "/p-co-2026/login-7b5e93-adm-key";
-        const accessInfoUrl = `${loginUrl}?panel=staff-access`;
-
-        function playAuthSlide(direction) {
-            if (container.classList.contains('is-sliding')) return;
-
-            container.classList.remove('slide-to-register', 'slide-to-login');
-            void container.offsetWidth;
-            container.classList.add('is-sliding', direction);
-
-            window.setTimeout(() => {
-                container.classList.remove('is-sliding', direction);
-            }, authSlideDuration);
-        }
-
-        function updateUrl(path, title) {
-            window.history.pushState({}, title, path);
-        }
-
-        signUpButton.addEventListener('click', () => {
-            if (container.classList.contains('right-panel-active')) return;
-            container.classList.add('right-panel-active');
-            playAuthSlide('slide-to-register');
-            updateUrl(accessInfoUrl, 'Staff Access');
-        });
-
-        signInButton.addEventListener('click', () => {
-            if (!container.classList.contains('right-panel-active')) return;
-            container.classList.remove('right-panel-active');
-            playAuthSlide('slide-to-login');
-            updateUrl(loginUrl, 'Admin Login');
-        });
-
-        document.querySelectorAll('[data-auth-switch]').forEach((button) => {
-            button.addEventListener('click', () => {
-                if (button.dataset.authSwitch === 'register') signUpButton.click();
-                if (button.dataset.authSwitch === 'login') signInButton.click();
-            });
-        });
-
-        window.addEventListener('load', () => {
-            const isRegisterPath = window.location.pathname.includes('register-7b5e93-adm-key');
-            const isStaffAccessPanel = window.location.search.includes('panel=staff-access');
-            const hasRegErrors = @json($errors->has('name') || $errors->has('role') || ($errors->has('email') && old('name')));
-
-            if (hasRegErrors || isRegisterPath || isStaffAccessPanel) {
-                container.classList.add('right-panel-active');
-                if (isRegisterPath) updateUrl(accessInfoUrl, 'Staff Access');
-            }
-        });
-
-        window.addEventListener('popstate', () => {
-            if (window.location.pathname.includes('register-7b5e93-adm-key') || window.location.search.includes('panel=staff-access')) {
-                container.classList.add('right-panel-active');
-            } else {
-                container.classList.remove('right-panel-active');
-            }
-        });
-
         document.querySelectorAll('[data-cooldown]').forEach((timer) => {
             let remaining = Number(timer.dataset.cooldown || 0);
             const render = () => {

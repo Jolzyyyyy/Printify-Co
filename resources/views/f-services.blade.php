@@ -96,11 +96,8 @@
 <h3>Bulk Order or Regular Printing Needs?</h3>
 <p>Get support for business and bulk printing orders.</p>
 </div>
-<a class="pfsvc-btn" href="/contactus">
-<span>CONTACT US</span>
-<i class="fa-solid fa-arrow-right">
-</i>
-</a>
+
+
 </div>
 <section class="pfsvc-detail" id="pfsvcDetail" hidden>
 <div class="pfsvc-detail-icon" id="pfsvcDetailIcon">
@@ -3443,7 +3440,7 @@ pfsvcRenderCards();
   }
 }
 </style>
-<style id="services-final-font-fix-contact-us-style">
+<style id="services-final-font-fix-style">
 .pfsvc,.pfsvc:where(p,span,a,li,small,td,th,input,textarea,select,option,button,strong,div,label),.pfsvc-deck,.pfsvc-deck:where(p,span,a,li,small,td,th,input,textarea,select,option,button,strong,div,label) {
   font-family:'Inter',sans-serif!important;
   font-weight:600!important
@@ -4391,6 +4388,49 @@ pfsvcRenderCards();
     display:flex!important;
     justify-content:flex-start!important;
     flex-wrap:wrap!important;
+  }
+}
+</style>
+<style id="pfsvc-final-request-clean-0622">
+/* Requested final adjustments only:
+   1. Removed the callout button from the HTML.
+   2. Browse Services sidebar width reduced.
+   3. Service boxes moved left by reducing sidebar column and layout gap.
+   4. Service cards spacing gap reduced slightly. */
+#products.pfsvc .pfsvc-wrap {
+  grid-template-columns:230px minmax(0,1fr)!important;
+  gap:22px!important;
+}
+#products.pfsvc .pfsvc-side {
+  width:230px!important;
+  max-width:230px!important;
+}
+#products.pfsvc .pfsvc-side .pfsvc-nav,
+#products.pfsvc .pfsvc-side .pfsvc-note {
+  width:100%!important;
+  max-width:230px!important;
+  margin-right:0!important;
+}
+#products.pfsvc {
+  --pfsvc-card-gap-final:20px;
+  --pfsvc-card-gap-last:20px;
+}
+#products.pfsvc .pfsvc-grid,
+#products.pfsvc .pfsvc-grid.list {
+  column-gap:20px!important;
+  gap:22px 20px!important;
+  justify-content:start!important;
+}
+@media(max-width:1180px) {
+  #products.pfsvc .pfsvc-wrap {
+    grid-template-columns:1fr!important;
+    gap:28px!important;
+  }
+  #products.pfsvc .pfsvc-side,
+  #products.pfsvc .pfsvc-side .pfsvc-nav,
+  #products.pfsvc .pfsvc-side .pfsvc-note {
+    width:100%!important;
+    max-width:100%!important;
   }
 }
 </style>

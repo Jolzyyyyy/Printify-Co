@@ -4824,3 +4824,677 @@ function openMap() {
   }
 }
 </style>
+<style id="contact-yellowline-space-adjust-final-0623">
+/* Final spacing adjustment based on the yellow-line reference only */
+#contact.contact-section {
+  padding-left:50px!important;
+  padding-right:50px!important
+}
+#contact .contact-grid {
+  grid-template-columns:410px minmax(0,1fr)!important;
+  column-gap:34px!important
+}
+#contact .contact-details {
+  gap:28px!important;
+  padding-top:8px!important
+}
+#contact .contact-details .info-card {
+  grid-template-columns:250px minmax(0,1fr)!important;
+  gap:28px!important
+}
+#contact .touch-box {
+  width:250px!important;
+  padding-right:22px!important
+}
+#contact .touch-box>h3,
+#contact .branch-card>h3,
+#contact .quick-answer-card>h3 {
+  margin-bottom:22px!important
+}
+#contact .contact-info-item {
+  grid-template-columns:22px minmax(0,1fr)!important;
+  gap:13px!important;
+  margin-bottom:20px!important
+}
+#contact .branch-list {
+  gap:28px!important
+}
+#contact .branch-item+.branch-item {
+  padding-left:28px!important
+}
+#contact .branch-address {
+  gap:12px!important;
+  margin-bottom:18px!important
+}
+#contact .branch-meta {
+  gap:10px!important;
+  margin-bottom:18px!important
+}
+#contact .quick-row {
+  grid-template-columns:310px minmax(0,1fr)!important;
+  gap:30px!important
+}
+#contact .branch-notes {
+  min-height:82px!important;
+  padding-left:26px!important;
+  gap:16px!important
+}
+#contact .branch-notes p {
+  gap:14px!important
+}
+@media(max-width:1320px) {
+  #contact.contact-section {
+    padding-left:40px!important;
+    padding-right:40px!important
+  }
+  #contact .contact-grid {
+    grid-template-columns:390px minmax(0,1fr)!important;
+    column-gap:28px!important
+  }
+  #contact .form-card {
+    width:390px!important;
+    max-width:390px!important
+  }
+  #contact .contact-details .info-card {
+    grid-template-columns:240px minmax(0,1fr)!important;
+    gap:24px!important
+  }
+  #contact .touch-box {
+    width:240px!important;
+    padding-right:20px!important
+  }
+  #contact .branch-list {
+    gap:22px!important
+  }
+  #contact .branch-item+.branch-item {
+    padding-left:22px!important
+  }
+  #contact .quick-row {
+    grid-template-columns:300px minmax(0,1fr)!important;
+    gap:26px!important
+  }
+  #contact .branch-notes {
+    padding-left:22px!important
+  }
+}
+@media(max-width:1080px) {
+  #contact.contact-section {
+    padding:32px 22px 48px!important
+  }
+  #contact .contact-grid,
+  #contact .contact-details .info-card,
+  #contact .branch-list,
+  #contact .quick-row {
+    grid-template-columns:1fr!important
+  }
+  #contact .form-card,
+  #contact .touch-box {
+    width:100%!important;
+    max-width:none!important
+  }
+  #contact .touch-box,
+  #contact .branch-item+.branch-item,
+  #contact .branch-notes {
+    border-left:0!important;
+    border-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important
+  }
+}
+</style>
+
+<style id="contact-yellowline-more-compact-final-0623">
+/* Mas binawasan pa ang highlighted yellow-line spaces only */
+#contact.contact-section {
+  padding-left:50px!important;
+  padding-right:32px!important
+}
+#contact .contact-grid {
+  grid-template-columns:410px minmax(0,1fr)!important;
+  column-gap:24px!important
+}
+#contact .contact-details {
+  gap:24px!important;
+  padding-top:6px!important
+}
+#contact .contact-details .info-card {
+  grid-template-columns:236px minmax(0,1fr)!important;
+  gap:18px!important
+}
+#contact .touch-box {
+  width:236px!important;
+  padding-right:16px!important;
+  border-right:1px solid #e2e7ef!important
+}
+#contact .contact-info-item {
+  grid-template-columns:20px minmax(0,1fr)!important;
+  gap:10px!important;
+  margin-bottom:18px!important
+}
+#contact .contact-info-item>i {
+  width:20px!important;
+  min-width:20px!important;
+  font-size:17px!important
+}
+#contact .touch-box>h3,
+#contact .branch-card>h3,
+#contact .quick-answer-card>h3 {
+  gap:10px!important;
+  margin-bottom:20px!important
+}
+#contact .touch-box>h3 i,
+#contact .branch-card>h3 i,
+#contact .quick-answer-card>h3 i {
+  width:22px!important;
+  min-width:22px!important;
+  font-size:22px!important
+}
+#contact .branch-list {
+  gap:14px!important
+}
+#contact .branch-item+.branch-item {
+  padding-left:14px!important;
+  border-left:1px solid #d7dee8!important
+}
+#contact .branch-item small {
+  margin-bottom:14px!important
+}
+#contact .branch-address {
+  gap:9px!important;
+  margin-bottom:14px!important;
+  padding-bottom:8px!important
+}
+#contact .branch-address i {
+  flex:0 0 16px!important;
+  width:16px!important
+}
+#contact .branch-meta {
+  gap:8px!important;
+  margin-bottom:14px!important;
+  padding-bottom:8px!important
+}
+#contact .branch-meta i {
+  flex:0 0 16px!important;
+  width:16px!important
+}
+#contact .quick-row {
+  grid-template-columns:295px minmax(0,1fr)!important;
+  gap:18px!important
+}
+#contact .quick-answer-card button {
+  height:31px!important;
+  grid-template-columns:22px minmax(0,1fr) 12px!important
+}
+#contact .branch-notes {
+  min-height:70px!important;
+  padding-left:18px!important;
+  gap:12px!important;
+  border-left:1px solid #d7dee8!important
+}
+#contact .branch-notes p {
+  grid-template-columns:20px max-content!important;
+  gap:10px!important;
+  line-height:1.25!important
+}
+#contact .branch-notes p i {
+  width:20px!important;
+  font-size:18px!important
+}
+@media(max-width:1320px) {
+  #contact.contact-section {
+    padding-left:36px!important;
+    padding-right:28px!important
+  }
+  #contact .contact-grid {
+    grid-template-columns:388px minmax(0,1fr)!important;
+    column-gap:20px!important
+  }
+  #contact .form-card {
+    width:388px!important;
+    max-width:388px!important
+  }
+  #contact .contact-details .info-card {
+    grid-template-columns:228px minmax(0,1fr)!important;
+    gap:16px!important
+  }
+  #contact .touch-box {
+    width:228px!important;
+    padding-right:14px!important
+  }
+  #contact .branch-list {
+    gap:12px!important
+  }
+  #contact .branch-item+.branch-item {
+    padding-left:12px!important
+  }
+  #contact .branch-address,
+  #contact .branch-meta {
+    gap:7px!important
+  }
+  #contact .quick-row {
+    grid-template-columns:290px minmax(0,1fr)!important;
+    gap:16px!important
+  }
+  #contact .branch-notes {
+    padding-left:16px!important
+  }
+}
+@media(max-width:1080px) {
+  #contact.contact-section {
+    padding:32px 22px 48px!important
+  }
+  #contact .contact-grid,
+  #contact .contact-details .info-card,
+  #contact .branch-list,
+  #contact .quick-row {
+    grid-template-columns:1fr!important
+  }
+  #contact .form-card,
+  #contact .touch-box {
+    width:100%!important;
+    max-width:none!important
+  }
+  #contact .touch-box,
+  #contact .branch-item+.branch-item,
+  #contact .branch-notes {
+    border-left:0!important;
+    border-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important
+  }
+}
+</style>
+
+<style id="contact-rightspace-more-compact-final-0623">
+/* Mas compact ang Contact Us right content para mas malaki ang rightspace ng section */
+#contact.contact-section {
+  padding-left:50px!important;
+  padding-right:70px!important
+}
+#contact .contact-grid {
+  grid-template-columns:410px max-content!important;
+  column-gap:24px!important;
+  justify-content:start!important
+}
+#contact .contact-details {
+  width:790px!important;
+  max-width:790px!important;
+  min-width:0!important;
+  gap:22px!important;
+  padding-top:6px!important
+}
+#contact .contact-details .info-card {
+  grid-template-columns:226px 540px!important;
+  gap:18px!important;
+  width:790px!important;
+  max-width:790px!important
+}
+#contact .touch-box {
+  width:226px!important;
+  padding-right:14px!important;
+  border-right:1px solid #e2e7ef!important
+}
+#contact .contact-info-item {
+  grid-template-columns:20px minmax(0,1fr)!important;
+  gap:9px!important;
+  margin-bottom:16px!important
+}
+#contact .contact-info-item>i {
+  width:20px!important;
+  min-width:20px!important;
+  font-size:16px!important
+}
+#contact .touch-box>h3,
+#contact .branch-card>h3,
+#contact .quick-answer-card>h3 {
+  gap:9px!important;
+  margin-bottom:18px!important
+}
+#contact .touch-box>h3 i,
+#contact .branch-card>h3 i,
+#contact .quick-answer-card>h3 i {
+  width:21px!important;
+  min-width:21px!important;
+  font-size:21px!important
+}
+#contact .branch-card {
+  width:540px!important;
+  max-width:540px!important
+}
+#contact .branch-list {
+  display:grid!important;
+  grid-template-columns:260px 260px!important;
+  gap:10px!important;
+  width:530px!important;
+  max-width:530px!important
+}
+#contact .branch-item+.branch-item {
+  padding-left:10px!important;
+  border-left:1px solid #d7dee8!important
+}
+#contact .branch-item small {
+  margin-bottom:12px!important
+}
+#contact .branch-address {
+  gap:7px!important;
+  margin-bottom:12px!important;
+  padding-bottom:7px!important
+}
+#contact .branch-address i {
+  flex:0 0 15px!important;
+  width:15px!important;
+  font-size:14px!important
+}
+#contact .branch-meta {
+  gap:6px!important;
+  margin-bottom:12px!important;
+  padding-bottom:7px!important
+}
+#contact .branch-meta i {
+  flex:0 0 15px!important;
+  width:15px!important;
+  font-size:13px!important
+}
+#contact .quick-row {
+  grid-template-columns:285px 380px!important;
+  gap:12px!important;
+  width:680px!important;
+  max-width:680px!important
+}
+#contact .quick-answer-card button {
+  height:30px!important;
+  grid-template-columns:21px minmax(0,1fr) 12px!important
+}
+#contact .quick-answer-card button span {
+  width:21px!important;
+  height:21px!important
+}
+#contact .branch-notes {
+  min-height:66px!important;
+  padding-left:12px!important;
+  gap:10px!important;
+  border-left:1px solid #d7dee8!important
+}
+#contact .branch-notes p {
+  grid-template-columns:18px max-content!important;
+  gap:8px!important;
+  line-height:1.2!important
+}
+#contact .branch-notes p i {
+  width:18px!important;
+  font-size:16px!important
+}
+@media(max-width:1320px) {
+  #contact.contact-section {
+    padding-left:36px!important;
+    padding-right:58px!important
+  }
+  #contact .contact-grid {
+    grid-template-columns:388px max-content!important;
+    column-gap:20px!important
+  }
+  #contact .form-card {
+    width:388px!important;
+    max-width:388px!important
+  }
+  #contact .contact-details {
+    width:740px!important;
+    max-width:740px!important
+  }
+  #contact .contact-details .info-card {
+    grid-template-columns:216px 504px!important;
+    gap:16px!important;
+    width:740px!important;
+    max-width:740px!important
+  }
+  #contact .touch-box {
+    width:216px!important;
+    padding-right:12px!important
+  }
+  #contact .branch-card {
+    width:504px!important;
+    max-width:504px!important
+  }
+  #contact .branch-list {
+    grid-template-columns:245px 245px!important;
+    gap:8px!important;
+    width:498px!important;
+    max-width:498px!important
+  }
+  #contact .branch-item+.branch-item {
+    padding-left:8px!important
+  }
+  #contact .quick-row {
+    grid-template-columns:280px 355px!important;
+    gap:10px!important;
+    width:645px!important;
+    max-width:645px!important
+  }
+  #contact .branch-notes {
+    padding-left:10px!important
+  }
+}
+@media(max-width:1080px) {
+  #contact.contact-section {
+    padding:32px 22px 48px!important
+  }
+  #contact .contact-grid,
+  #contact .contact-details .info-card,
+  #contact .branch-list,
+  #contact .quick-row {
+    grid-template-columns:1fr!important
+  }
+  #contact .contact-details,
+  #contact .contact-details .info-card,
+  #contact .form-card,
+  #contact .touch-box,
+  #contact .branch-card,
+  #contact .branch-list,
+  #contact .quick-row {
+    width:100%!important;
+    max-width:none!important
+  }
+  #contact .touch-box,
+  #contact .branch-item+.branch-item,
+  #contact .branch-notes {
+    border-left:0!important;
+    border-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important
+  }
+}
+</style>
+
+<style id="contact-balanced-spacing-final-0623">
+/* Balanced spacing: may space pa rin, pero hindi sobrang luwag at hindi sobrang dikit */
+#contact.contact-section {
+  padding-left:50px!important;
+  padding-right:50px!important
+}
+#contact .contact-grid {
+  grid-template-columns:410px minmax(0,850px)!important;
+  column-gap:28px!important;
+  justify-content:start!important
+}
+#contact .contact-details {
+  width:100%!important;
+  max-width:850px!important;
+  min-width:0!important;
+  gap:26px!important;
+  padding-top:6px!important
+}
+#contact .contact-details .info-card {
+  grid-template-columns:240px minmax(0,590px)!important;
+  gap:20px!important;
+  width:100%!important;
+  max-width:850px!important
+}
+#contact .touch-box {
+  width:240px!important;
+  padding-right:18px!important;
+  border-right:1px solid #e2e7ef!important
+}
+#contact .contact-info-item {
+  grid-template-columns:21px minmax(0,1fr)!important;
+  gap:11px!important;
+  margin-bottom:18px!important
+}
+#contact .contact-info-item>i {
+  width:21px!important;
+  min-width:21px!important;
+  font-size:17px!important
+}
+#contact .touch-box>h3,
+#contact .branch-card>h3,
+#contact .quick-answer-card>h3 {
+  gap:11px!important;
+  margin-bottom:21px!important
+}
+#contact .touch-box>h3 i,
+#contact .branch-card>h3 i,
+#contact .quick-answer-card>h3 i {
+  width:23px!important;
+  min-width:23px!important;
+  font-size:23px!important
+}
+#contact .branch-card {
+  width:100%!important;
+  max-width:590px!important
+}
+#contact .branch-list {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:24px!important;
+  width:100%!important;
+  max-width:590px!important
+}
+#contact .branch-item+.branch-item {
+  padding-left:24px!important;
+  border-left:1px solid #d7dee8!important
+}
+#contact .branch-item small {
+  margin-bottom:14px!important
+}
+#contact .branch-address {
+  gap:10px!important;
+  margin-bottom:15px!important;
+  padding-bottom:8px!important
+}
+#contact .branch-address i {
+  flex:0 0 16px!important;
+  width:16px!important;
+  font-size:15px!important
+}
+#contact .branch-meta {
+  gap:9px!important;
+  margin-bottom:15px!important;
+  padding-bottom:8px!important
+}
+#contact .branch-meta i {
+  flex:0 0 16px!important;
+  width:16px!important;
+  font-size:14px!important
+}
+#contact .quick-row {
+  grid-template-columns:300px minmax(0,440px)!important;
+  gap:24px!important;
+  width:100%!important;
+  max-width:764px!important
+}
+#contact .quick-answer-card button {
+  height:32px!important;
+  grid-template-columns:22px minmax(0,1fr) 12px!important
+}
+#contact .quick-answer-card button span {
+  width:22px!important;
+  height:22px!important
+}
+#contact .branch-notes {
+  min-height:72px!important;
+  padding-left:22px!important;
+  gap:14px!important;
+  border-left:1px solid #d7dee8!important
+}
+#contact .branch-notes p {
+  grid-template-columns:20px max-content!important;
+  gap:12px!important;
+  line-height:1.25!important
+}
+#contact .branch-notes p i {
+  width:20px!important;
+  font-size:18px!important
+}
+@media(max-width:1320px) {
+  #contact.contact-section {
+    padding-left:40px!important;
+    padding-right:40px!important
+  }
+  #contact .contact-grid {
+    grid-template-columns:390px minmax(0,760px)!important;
+    column-gap:24px!important
+  }
+  #contact .form-card {
+    width:390px!important;
+    max-width:390px!important
+  }
+  #contact .contact-details {
+    max-width:760px!important
+  }
+  #contact .contact-details .info-card {
+    grid-template-columns:230px minmax(0,510px)!important;
+    gap:18px!important;
+    max-width:760px!important
+  }
+  #contact .touch-box {
+    width:230px!important;
+    padding-right:16px!important
+  }
+  #contact .branch-card,
+  #contact .branch-list {
+    max-width:510px!important
+  }
+  #contact .branch-list {
+    gap:20px!important
+  }
+  #contact .branch-item+.branch-item {
+    padding-left:20px!important
+  }
+  #contact .quick-row {
+    grid-template-columns:295px minmax(0,405px)!important;
+    gap:20px!important;
+    max-width:720px!important
+  }
+  #contact .branch-notes {
+    padding-left:20px!important
+  }
+}
+@media(max-width:1080px) {
+  #contact.contact-section {
+    padding:32px 22px 48px!important
+  }
+  #contact .contact-grid,
+  #contact .contact-details .info-card,
+  #contact .branch-list,
+  #contact .quick-row {
+    grid-template-columns:1fr!important
+  }
+  #contact .contact-details,
+  #contact .contact-details .info-card,
+  #contact .form-card,
+  #contact .touch-box,
+  #contact .branch-card,
+  #contact .branch-list,
+  #contact .quick-row {
+    width:100%!important;
+    max-width:none!important
+  }
+  #contact .touch-box,
+  #contact .branch-item+.branch-item,
+  #contact .branch-notes {
+    border-left:0!important;
+    border-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important
+  }
+}
+</style>

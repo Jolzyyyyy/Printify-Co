@@ -596,7 +596,7 @@ html{scroll-behavior:smooth}
 }
 </style>
 
-<section id="checkout" class="section checkout-section" data-section-id="checkout" data-page="checkout">
+<section id="checkout" class="section checkout-section" data-section-id="checkout" data-page="checkout" data-location-source="data/ph-locations.json">
 <main class="pfy-page">
   <div class="pfy-breadcrumb">
     <a href="/" onclick="jumpTo('home');return false;">Home</a><i class="fa-solid fa-chevron-right"></i>
@@ -640,10 +640,10 @@ html{scroll-behavior:smooth}
           <div class="pfy-card-body">
             <input type="hidden" id="fullName" value="{{ old('fullName', Auth::check() ? Auth::user()->name : '') }}">
             <div class="pfy-field-grid">
-              <div class="pfy-field"><label for="firstName">First Name</label><input type="text" id="firstName" placeholder="First Name" autocomplete="given-name" required></div>
-              <div class="pfy-field"><label for="lastName">Last Name</label><input type="text" id="lastName" placeholder="Last Name" autocomplete="family-name" required></div>
+              <div class="pfy-field"><label for="firstName">First Name</label><input type="text" id="firstName" placeholder="First Name" value="{{ old('firstName', Auth::check() ? Auth::user()->first_name : '') }}" autocomplete="given-name" required></div>
+              <div class="pfy-field"><label for="lastName">Last Name</label><input type="text" id="lastName" placeholder="Last Name" value="{{ old('lastName', Auth::check() ? Auth::user()->last_name : '') }}" autocomplete="family-name" required></div>
               <div class="pfy-field"><label for="email">Email Address</label><input type="email" id="email" placeholder="Email Address" value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}" autocomplete="email" required></div>
-              <div class="pfy-field"><label for="phone">Phone Number</label><input type="tel" id="phone" placeholder="Phone Number" value="{{ old('phone', '') }}" autocomplete="tel" required></div>
+              <div class="pfy-field"><label for="phone">Phone Number</label><input type="tel" id="phone" placeholder="Phone Number" value="{{ old('phone', Auth::check() ? \App\Services\PhilippinePhoneNumber::normalize(Auth::user()->phone) : '') }}" autocomplete="tel" required></div>
             </div>
           </div>
         </section>
@@ -770,6 +770,12 @@ html{scroll-behavior:smooth}
           </ul>
           <label class="pfy-consent"><input type="checkbox" name="consent" value="1" required><span>I accept the <a href="javascript:void(0)" onclick="closeEReceiptModal();footerCareAction('terms',this)">Terms of Service</a> and <a href="javascript:void(0)" onclick="closeEReceiptModal();footerCareAction('privacy',this)">Privacy Policy</a>.</span></label>
         </div>
+        <section class="pfy-receipt-upload" id="pfyReceiptUploadWrap" @unless(session('checkout_payment_verified') === true) hidden @endunless>
+          <div><strong>Upload Received Receipt</strong><small>After successful payment, upload the receipt sent to your email (PDF, JPG, or PNG; max 10MB).</small></div>
+          <input id="pfyReceivedReceiptFile" type="file" accept=".pdf,.jpg,.jpeg,.png" hidden>
+          <button id="pfyReceivedReceiptChoose" type="button"><i class="fa-solid fa-paperclip"></i> Choose Receipt</button>
+          <p id="pfyReceivedReceiptStatus" role="status"></p>
+        </section>
         <p class="pfy-ereceipt-error" id="pfyEReceiptError" role="alert" hidden></p>
       </div>
       <footer class="pfy-ereceipt-footer"><button id="pfyEReceiptSubmit" type="submit">Submit Request</button></footer>
@@ -798,6 +804,23 @@ body.pfy-ereceipt-open{overflow:hidden!important}
 #checkout .pfy-ereceipt-disclaimer{margin-top:5px;color:#525966}#checkout .pfy-ereceipt-disclaimer h3{margin:0 0 5px;font-size:9.2px;color:#111827}#checkout .pfy-ereceipt-disclaimer ul{margin:0;padding-left:14px;font-size:7.8px;line-height:1.42}#checkout .pfy-ereceipt-disclaimer li+li{margin-top:3px}#checkout .pfy-consent{display:flex;align-items:flex-start;gap:6px;margin-top:9px;font-size:8px;line-height:1.35;cursor:pointer}#checkout .pfy-consent input{width:11px;height:11px;flex:0 0 11px;margin:0;accent-color:var(--pf-orange)}#checkout .pfy-consent a{color:var(--pf-orange);font-weight:700;text-decoration:underline}
 #checkout .pfy-ereceipt-error{margin:9px 0 0;padding:7px 8px;border-radius:5px;background:#fff0ed;color:#c52b18;font-size:8.5px;line-height:1.35}#checkout .pfy-ereceipt-footer{min-height:57px;display:grid;place-items:center;padding:10px 14px;border-top:1px solid #eceff3;background:#fff}#checkout .pfy-ereceipt-footer button{width:190px;height:36px;border:0;border-radius:999px;background:var(--pf-gradient);color:#111827;font-size:10px;font-weight:800;box-shadow:none}#checkout .pfy-ereceipt-footer button:hover{background:#111827;color:#fff}#checkout .pfy-ereceipt-footer button:disabled{cursor:wait;opacity:.62}
 #checkout .pfy-receipt-row:hover{border-color:#111827!important;background:#f7f7f7!important}#checkout .pfy-receipt-row:hover>i{color:var(--pf-orange)!important;transform:translateX(2px)}
+#checkout .pfy-ereceipt-title h2{font-size:15px!important}
+#checkout .pfy-ereceipt-notice p{font-size:11px!important;line-height:1.45!important}
+#checkout .pfy-ereceipt-types legend,#checkout .pfy-ereceipt-types label{font-size:11px!important}
+#checkout .pfy-ereceipt-field label,#checkout .pfy-ereceipt-section-label,#checkout .pfy-address-toggle,#checkout .pfy-default-toggle{font-size:10.8px!important}
+#checkout .pfy-ereceipt-field input{font-size:11px!important}
+#checkout .pfy-address-grid .pfy-ereceipt-field label{font-size:10px!important}
+#checkout .pfy-ereceipt-disclaimer h3{font-size:11px!important}
+#checkout .pfy-ereceipt-disclaimer ul,#checkout .pfy-consent{font-size:9.8px!important;line-height:1.45!important}
+#checkout .pfy-ereceipt-error{font-size:10.5px!important}
+#checkout .pfy-ereceipt-footer button{font-size:11px!important}
+#checkout .pfy-receipt-upload{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 10px;margin-top:12px;padding:11px;border:1px solid #b8ddc5;border-radius:8px;background:#f3fbf6}
+#checkout .pfy-receipt-upload[hidden]{display:none!important}
+#checkout .pfy-receipt-upload strong{display:block;font-size:11px;color:#111827}
+#checkout .pfy-receipt-upload small{display:block;margin-top:3px;font-size:9.5px;line-height:1.4;color:#52606d}
+#checkout .pfy-receipt-upload button{align-self:center;height:32px;padding:0 12px;border:1px solid #159447;border-radius:999px;background:#fff;color:#15803d;font-size:10px;font-weight:800;cursor:pointer}
+#checkout .pfy-receipt-upload button:hover{background:#15803d;color:#fff}
+#checkout .pfy-receipt-upload p{grid-column:1 / -1;margin:0;font-size:10px;color:#15803d}
 @media(max-width:480px){#checkout .pfy-ereceipt-overlay{padding:10px}#checkout .pfy-ereceipt-dialog{width:100%;height:min(560px,calc(100vh - 20px))}#checkout .pfy-address-grid{grid-template-columns:1fr}}
 </style>
 
@@ -811,6 +834,10 @@ body.pfy-ereceipt-open{overflow:hidden!important}
   var addressFields=document.getElementById('pfyReceiptAddressFields');
   var errorBox=document.getElementById('pfyEReceiptError');
   var submitButton=document.getElementById('pfyEReceiptSubmit');
+  var uploadWrap=document.getElementById('pfyReceiptUploadWrap');
+  var uploadInput=document.getElementById('pfyReceivedReceiptFile');
+  var uploadChoose=document.getElementById('pfyReceivedReceiptChoose');
+  var uploadStatus=document.getElementById('pfyReceivedReceiptStatus');
   var lastFocus=null;
 
   function setReceiptType(type){
@@ -863,10 +890,34 @@ body.pfy-ereceipt-open{overflow:hidden!important}
       var data=await response.json().catch(function(){return {}});
       if(!response.ok){var errors=data.errors?Object.values(data.errors).flat().join(' '):data.message;throw new Error(errors||'Unable to submit the e-receipt request.')}
       closeModal(true);
+      document.body.dataset.eReceiptRequested='true';
+      window.dispatchEvent(new CustomEvent('printify:e-receipt-submitted',{detail:{receipt:data.receipt||null}}));
       window.dispatchEvent(new CustomEvent('printify-front-feedback',{detail:{message:data.message||'E-receipt request submitted.'}}));
     }catch(error){if(errorBox){errorBox.textContent=error.message;errorBox.hidden=false}}
     finally{submitButton.disabled=false;submitButton.textContent='Submit Request'}
   });
+  if(uploadChoose&&uploadInput)uploadChoose.addEventListener('click',function(){uploadInput.click()});
+  if(uploadInput)uploadInput.addEventListener('change',async function(){
+    var file=uploadInput.files&&uploadInput.files[0];
+    if(!file)return;
+    if(uploadStatus)uploadStatus.textContent='Uploading '+file.name+'...';
+    if(uploadChoose)uploadChoose.disabled=true;
+    var body=new FormData();body.append('receipt_file',file);
+    try{
+      var response=await fetch('{{ route('e-receipt.upload') }}',{method:'POST',headers:{'Accept':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]')?.content||''},body:body});
+      var data=await response.json().catch(function(){return {}});
+      if(!response.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' ')||'Unable to upload the receipt.');
+      if(uploadStatus)uploadStatus.textContent='Uploaded: '+(data.receipt?.uploaded_receipt_name||file.name);
+      window.dispatchEvent(new CustomEvent('printify-front-feedback',{detail:{message:data.message||'Receipt uploaded successfully.'}}));
+    }catch(error){if(uploadStatus)uploadStatus.textContent=error.message}
+    finally{if(uploadChoose)uploadChoose.disabled=false}
+  });
+  fetch('{{ route('e-receipt.show') }}',{headers:{'Accept':'application/json'}}).then(function(response){return response.ok?response.json():null}).then(function(data){
+    if(!data)return;
+    if(data.request_complete){document.body.dataset.eReceiptRequested='true';window.dispatchEvent(new CustomEvent('printify:e-receipt-submitted',{detail:{receipt:data.receipt||null}}))}
+    if(uploadWrap)uploadWrap.hidden=!data.payment_verified;
+    if(data.receipt?.uploaded_receipt_name&&uploadStatus)uploadStatus.textContent='Uploaded: '+data.receipt.uploaded_receipt_name;
+  }).catch(function(){});
   setReceiptType(document.querySelector('#pfyEReceiptForm input[name="receipt_type"]:checked')?.value||'personal');
   if(window.location.pathname==='{{ route('e-receipt.index') }}')setTimeout(function(){openModal(false)},0);
 })();
@@ -879,7 +930,7 @@ const serverPaymentVerified=@json(session('checkout_payment_verified') === true)
 const serverPaymentMethod=@json(session('checkout_payment_method'));
 const serverPaymentReference=@json(session('checkout_payment_reference'));
 const serverCheckoutDetails=@json(session('checkout_details', []));
-const state={items:[],promoCode:"",paymentVerified:false,totals:{subtotal:0,discount:0,shipping:0,tax:0,total:0}};
+const state={items:[],promoCode:"",paymentVerified:false,receiptRequested:@json((bool) session('checkout_e_receipt_request_id')),totals:{subtotal:0,discount:0,shipping:0,tax:0,total:0}};
 const els={orderItems:document.getElementById("orderItems"),summaryItemCount:document.getElementById("summaryItemCount"),stageStatus:document.getElementById("checkoutStageStatus"),emptyState:document.getElementById("emptyState"),orderContent:document.getElementById("orderContent"),subtotal:document.getElementById("subtotal"),discount:document.getElementById("discount"),shippingCost:document.getElementById("shippingCost"),shippingLabel:document.getElementById("shippingLabel"),total:document.getElementById("total"),toast:document.getElementById("toast"),noteCount:document.getElementById("noteCount"),notes:document.getElementById("notes"),successBox:document.getElementById("successBox"),successRef:document.getElementById("successRef"),checkoutGrid:document.getElementById("checkoutGrid"),categoryCrumb:document.getElementById("checkoutCategoryCrumb"),categoryCrumbWrap:document.getElementById("checkoutCategoryCrumbWrap"),serviceCrumb:document.getElementById("checkoutServiceCrumb"),serviceCrumbWrap:document.getElementById("checkoutServiceCrumbWrap")};
 function safeJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||fallback)}catch(e){return JSON.parse(fallback)}}
 function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
@@ -912,7 +963,7 @@ function hasValues(ids){return ids.every(function(id){const input=document.getEl
 function customerInfoComplete(){return hasValues(["firstName","lastName","email","phone","street","barangay","city","province","postal"])}
 function deliveryComplete(){return Boolean(selectedShipping().type)}
 function setCheckoutCardLocked(selector,locked){const card=document.querySelector(selector);if(!card)return;card.classList.toggle("is-checkout-locked",locked);card.setAttribute("aria-disabled",locked?"true":"false");card.querySelectorAll('input[type="radio"]').forEach(function(input){input.disabled=locked})}
-function updateCheckoutState(){syncFullName();const customerDone=customerInfoComplete();const paymentChosen=Boolean(selectedPayment());const deliveryChosen=deliveryComplete();setCheckoutCardLocked("#checkout .pfy-card-payment",!customerDone||state.paymentVerified);setCheckoutCardLocked("#checkout .pfy-card-delivery",!state.paymentVerified);const button=document.getElementById("placeOrderBtn");if(!state.items.length){updateStep(1);if(button){button.disabled=true;button.innerHTML='Checkout Empty <i class="fa-solid fa-lock"></i>'}if(els.stageStatus)els.stageStatus.textContent="No checkout items";return}if(!customerDone){updateStep(1);if(button){button.disabled=true;button.innerHTML='Complete Customer Info <i class="fa-solid fa-lock"></i>'}if(els.stageStatus)els.stageStatus.textContent="Complete customer info";return}if(!state.paymentVerified){updateStep(paymentChosen?3:2);if(button){button.disabled=!paymentChosen;button.innerHTML=paymentChosen?'Pay Now <i class="fa-solid fa-lock"></i>':'Select Payment Method <i class="fa-solid fa-lock"></i>'}if(els.stageStatus)els.stageStatus.textContent=paymentChosen?"Ready for payment":"Customer info complete";return}updateStep(4);if(!deliveryChosen){if(button){button.disabled=true;button.innerHTML='Select Delivery Method <i class="fa-solid fa-truck"></i>'}if(els.stageStatus)els.stageStatus.textContent="Payment complete";return}if(button){button.disabled=false;button.innerHTML='Place Order <i class="fa-solid fa-box"></i>'}if(els.stageStatus)els.stageStatus.textContent="Ready to place order"}
+function updateCheckoutState(){syncFullName();const customerDone=customerInfoComplete();const paymentChosen=Boolean(selectedPayment());const deliveryChosen=deliveryComplete();setCheckoutCardLocked("#checkout .pfy-card-payment",!customerDone||state.paymentVerified);setCheckoutCardLocked("#checkout .pfy-card-delivery",!state.paymentVerified);const button=document.getElementById("placeOrderBtn");if(!state.items.length){updateStep(1);if(button){button.disabled=true;button.innerHTML='Checkout Empty <i class="fa-solid fa-lock"></i>'}if(els.stageStatus)els.stageStatus.textContent="No checkout items";return}if(!customerDone){updateStep(1);if(button){button.disabled=true;button.innerHTML='Complete Customer Info <i class="fa-solid fa-lock"></i>'}if(els.stageStatus)els.stageStatus.textContent="Complete customer info";return}if(!state.paymentVerified&&!state.receiptRequested){updateStep(2);if(button){button.disabled=true;button.innerHTML='Complete E-Invoice Request <i class="fa-solid fa-file-invoice"></i>'}if(els.stageStatus)els.stageStatus.textContent="Submit e-invoice details before payment";return}if(!state.paymentVerified){updateStep(paymentChosen?3:2);if(button){button.disabled=!paymentChosen;button.innerHTML=paymentChosen?'Pay Now <i class="fa-solid fa-lock"></i>':'Select Payment Method <i class="fa-solid fa-lock"></i>'}if(els.stageStatus)els.stageStatus.textContent=paymentChosen?"Ready for payment":"E-invoice request complete";return}updateStep(4);if(!deliveryChosen){if(button){button.disabled=true;button.innerHTML='Select Delivery Method <i class="fa-solid fa-truck"></i>'}if(els.stageStatus)els.stageStatus.textContent="Payment complete";return}if(button){button.disabled=false;button.innerHTML='Place Order <i class="fa-solid fa-box"></i>'}if(els.stageStatus)els.stageStatus.textContent="Ready to place order"}
 function syncCheckoutStep(){updateCheckoutState()}
 function updateRadioCards(){document.querySelectorAll("[data-radio-wrap]").forEach(function(label){const input=label.querySelector('input[type="radio"]');label.classList.toggle("is-selected",Boolean(input&&input.checked))})}
 function syncPickupAddressState(){const pickup=selectedShipping().type==="pickup";["street","barangay","city","province","postal"].forEach(function(id){const input=document.getElementById(id);if(input)input.required=!pickup})}
@@ -926,7 +977,7 @@ async function syncCheckoutSession(){if(typeof fetch!=="function")return;const r
 async function startPaymentCheckout(order){const response=await fetch("{{ route('payment.start') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({payment_method:selectedPayment(),checkout:order})});const data=await response.json().catch(function(){return {}});if(!response.ok||!data.redirect_url){const errors=data.errors?Object.values(data.errors).flat().join(" "):"";throw new Error(errors||data.message||"Payment provider did not return a checkout link.")}return data.redirect_url}
 async function finalizePaidOrder(order){const response=await fetch("{{ route('checkout.finalize') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({checkout:order})});const data=await response.json().catch(function(){return {}});if(!response.ok||!data.redirect_url)throw new Error(data.message||"Unable to place the paid order.");return data.redirect_url}
 window.applyPromo=function(){const code=document.getElementById("promoCode").value.trim().toUpperCase();if(!code){state.promoCode="";renderTotals();return}if(!["SAVE10","DISCOUNT10","PRINTIFY50"].includes(code)){showToast("Invalid promo code. Try SAVE10 or PRINTIFY50.","error");return}state.promoCode=code;localStorage.setItem("printifyPromoCode",code);renderTotals();showToast("Promo code applied.","success")};
-window.placeOrder=async function(){if(!validateCustomerInfo()){updateCheckoutState();return}if(!state.paymentVerified&&!selectedPayment()){showToast("Please select a payment method.","error");updateCheckoutState();return}if(state.paymentVerified&&!validateDelivery()){updateCheckoutState();return}calculateTotals();let order=buildCompletedOrder();const button=document.getElementById("placeOrderBtn");if(button){button.disabled=true;button.innerHTML='Processing <i class="fa-solid fa-spinner fa-spin"></i>'}try{if(!state.paymentVerified){const paymentOrder=JSON.parse(JSON.stringify(order));paymentOrder.delivery={name:"Pending delivery selection",type:"pickup",cost:0};paymentOrder.totals.shipping=0;paymentOrder.totals.total=paymentOrder.totals.subtotal-paymentOrder.totals.discount;saveCheckoutFormDraft();saveJson("printifyLastPlacedOrder",paymentOrder);await syncCheckoutSession();showToast("Opening secure payment checkout...");window.location.href=await startPaymentCheckout(paymentOrder);return}showToast("Creating your paid order...");const redirectUrl=await finalizePaidOrder(order);localStorage.removeItem("printifyCheckoutItems");localStorage.removeItem("printifyActiveCheckout");localStorage.removeItem("printifyCheckoutTotals");localStorage.removeItem("printifyCheckoutFormDraft");window.location.assign(redirectUrl)}catch(error){updateCheckoutState();showToast(error&&error.message?error.message:"Checkout failed. Please try again.","error");console.error("Checkout flow failed:",error)}};
+window.placeOrder=async function(){if(!validateCustomerInfo()){updateCheckoutState();return}if(!state.paymentVerified&&!state.receiptRequested){showToast("Complete and submit the e-invoice request before payment.","error");if(typeof window.openEReceiptModal==="function")window.openEReceiptModal();updateCheckoutState();return}if(!state.paymentVerified&&!selectedPayment()){showToast("Please select a payment method.","error");updateCheckoutState();return}if(state.paymentVerified&&!validateDelivery()){updateCheckoutState();return}calculateTotals();let order=buildCompletedOrder();const button=document.getElementById("placeOrderBtn");if(button){button.disabled=true;button.innerHTML='Processing <i class="fa-solid fa-spinner fa-spin"></i>'}try{if(!state.paymentVerified){const paymentOrder=JSON.parse(JSON.stringify(order));paymentOrder.delivery={name:"Pending delivery selection",type:"pickup",cost:0};paymentOrder.totals.shipping=0;paymentOrder.totals.total=paymentOrder.totals.subtotal-paymentOrder.totals.discount;saveCheckoutFormDraft();saveJson("printifyLastPlacedOrder",paymentOrder);await syncCheckoutSession();showToast("Opening secure payment checkout...");window.location.href=await startPaymentCheckout(paymentOrder);return}showToast("Creating your paid order...");const redirectUrl=await finalizePaidOrder(order);localStorage.removeItem("printifyCheckoutItems");localStorage.removeItem("printifyActiveCheckout");localStorage.removeItem("printifyCheckoutTotals");localStorage.removeItem("printifyCheckoutFormDraft");window.location.assign(redirectUrl)}catch(error){updateCheckoutState();showToast(error&&error.message?error.message:"Checkout failed. Please try again.","error");console.error("Checkout flow failed:",error)}};
 function renderAll(){updateRadioCards();syncPickupAddressState();renderItems();renderCheckoutBreadcrumb();renderTotals();updateCheckoutState()}
 let checkoutRenderFingerprint="";
 function currentCheckoutFingerprint(){return [window.location.pathname,window.location.search,localStorage.getItem("printifyCheckoutItems")||"",localStorage.getItem("printifyActiveCheckout")||"",localStorage.getItem("printifyPromoCode")||""].join("|")}
@@ -936,6 +987,7 @@ document.querySelectorAll('input[name="shipping"], input[name="payment"]').forEa
 ["firstName","lastName","email","phone","street","barangay","city","province","postal"].forEach(function(id){const node=document.getElementById(id);if(node){node.addEventListener("input",syncCheckoutStep);node.addEventListener("change",syncCheckoutStep)}});
 if(els.notes)els.notes.addEventListener("input",function(){els.noteCount.textContent=els.notes.value.length+"/250"});
 document.addEventListener("printify:checkout-opened",function(){window.refreshPrintifyCheckout()});
+window.addEventListener("printify:e-receipt-submitted",function(){state.receiptRequested=true;updateCheckoutState()});
 function openCheckoutFromHash(){if((location.hash||"").toLowerCase()!=="#checkout"&&!/\/checkout\/?$/.test(location.pathname.toLowerCase()))return;if(typeof window.jumpTo==="function")window.jumpTo("checkout");else{const section=document.getElementById("checkout");if(section){section.classList.add("active");section.style.display="block"}}window.refreshPrintifyCheckout()}
 window.addEventListener("hashchange",openCheckoutFromHash);if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",openCheckoutFromHash,{once:true});else openCheckoutFromHash();
 })();

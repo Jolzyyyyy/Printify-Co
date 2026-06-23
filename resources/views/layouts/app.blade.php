@@ -25,7 +25,7 @@
         $homeRoute = Route::has('customer.home') ? route('customer.home') : '#';
         $dashboardRoute = Route::has('dashboard') ? route('dashboard') : '#';
         $profileRoute = Route::has('profile.edit') ? route('profile.edit') : '#';
-        $ordersRoute = Route::has('co.place-order') ? route('co.place-order') : (Route::has('my-orders') ? route('my-orders') : (Route::has('customer.orders.index') ? route('customer.orders.index') : (Route::has('orders.index') ? route('orders.index') : '#')));
+        $ordersRoute = Route::has('myorders') ? route('myorders') : (Route::has('my-orders') ? route('my-orders') : (Route::has('customer.orders.index') ? route('customer.orders.index') : (Route::has('orders.index') ? route('orders.index') : '#')));
         $orderCreateRoute = Route::has('services.index') ? route('services.index') : (Route::has('customer.orders.create') ? route('customer.orders.create') : (Route::has('orders.create') ? route('orders.create') : '#'));
         $uploadRoute = Route::has('customer.uploads.create') ? route('customer.uploads.create') : '#';
         $supportRoute = Route::has('customer.support.index') ? route('customer.support.index') : (Route::has('help-center') ? route('help-center') : '#');
@@ -44,7 +44,7 @@
             ['label'=>'Home','icon'=>'home','route'=>$homeRoute,'active'=>request()->routeIs('customer.home')],
             ['label'=>'Dashboard','icon'=>'layout-dashboard','route'=>$dashboardRoute,'active'=>request()->routeIs('dashboard')],
             ['label'=>'My Profile','icon'=>'user','route'=>$profileRoute,'active'=>request()->routeIs('profile.edit')],
-            ['label'=>'My Orders','icon'=>'shopping-cart','route'=>$ordersRoute,'active'=>request()->routeIs('my-orders') || request()->routeIs('my-orders.*') || request()->routeIs('customer.orders.*')],
+            ['label'=>'My Orders','icon'=>'shopping-cart','route'=>$ordersRoute,'active'=>request()->routeIs('myorders') || request()->routeIs('myorders.*') || request()->routeIs('my-orders') || request()->routeIs('my-orders.*') || request()->routeIs('orders.index') || request()->routeIs('customer.orders.*')],
             ['label'=>'Security & Privacy','icon'=>'shield-check','route'=>$securityRoute,'active'=>request()->routeIs('security')],
             ['label'=>'Notification','icon'=>'bell','route'=>$notificationRoute,'active'=>request()->routeIs('notifications')],
             ['label'=>'Help Center','icon'=>'help-circle','route'=>$supportRoute,'active'=>request()->routeIs('help-center') || request()->routeIs('customer.support.*')],

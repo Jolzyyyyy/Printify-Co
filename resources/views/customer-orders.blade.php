@@ -121,7 +121,7 @@
       <i class="fa-solid fa-chevron-right"></i>
       <a href="{{ route('dashboard') }}">Dashboard</a>
       <i class="fa-solid fa-chevron-right"></i>
-      <a href="{{ route('co.place-order') }}" class="current">My Orders</a>
+      <a href="{{ route('co.place-order') }}" class="current">Order Tracking</a>
     </div>
     <h1 class="mo-title">My Orders</h1>
     <p class="mo-sub">Manage and track your recent orders</p>
@@ -151,7 +151,7 @@
           $subtotal = (float) ($order->items?->sum('subtotal') ?? 0);
           $delivery = (float) ($order->delivery_fee ?? 0);
           $step = $stepFor($order);
-          $trackingUrl = route('co.place-order.tracking', $order);
+          $detailUrl = route('co.place-order.show', $order);
           $serviceName = $item?->service_name ?: $item?->service?->name ?: 'Print Order';
           $variationLabel = $item?->variation_label ?: $variation?->variation_label;
           $color = $variation?->color_mode;
@@ -159,7 +159,7 @@
           $printOption = $variation?->finish_type ?: ($item?->price_type ? str($item->price_type)->title()->toString() : null);
           $fileType = $file?->original_name ? strtoupper(pathinfo($file->original_name, PATHINFO_EXTENSION) ?: 'FILE') : null;
         @endphp
-        <article class="mo-card" data-order-card data-status="{{ $statusKey($order) }}" data-href="{{ $trackingUrl }}" tabindex="0" role="link" aria-label="Track order {{ $orderNo($order) }}">
+        <article class="mo-card" data-order-card data-status="{{ $statusKey($order) }}" data-href="{{ $detailUrl }}" tabindex="0" role="link" aria-label="Track order {{ $orderNo($order) }}">
           <div class="mo-thumb">
             <div class="mo-paper" aria-hidden="true">
               <span></span><span></span><span class="short"></span><span></span><span></span><span class="short"></span><span></span><span></span><span></span>
@@ -195,7 +195,7 @@
               <span>Total Paid</span>
               <strong>{{ $money($order->total_price) }}</strong>
             </div>
-            <a class="mo-btn" href="{{ $trackingUrl }}" onclick="event.stopPropagation()"><i class="fa-solid fa-location-dot"></i>View &amp; Track</a>
+            <a class="mo-btn" href="{{ $detailUrl }}" onclick="event.stopPropagation()"><i class="fa-solid fa-location-dot"></i>View &amp; Track</a>
           </div>
         </article>
       @empty

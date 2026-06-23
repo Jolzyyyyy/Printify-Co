@@ -70,6 +70,8 @@ class CartFeatureTest extends TestCase
             ->assertOk()
             ->assertJsonPath('items.0.raw.serviceName', 'Document Printing')
             ->assertJsonPath('items.0.raw.printingCategory', 'Printing')
+            ->assertJsonPath('items.0.raw.productSize', 'Short (8.5 x 11)')
+            ->assertJsonPath('items.0.raw.colorMode', 'B&W')
             ->assertJsonPath('items.0.raw.serviceOption', 'Text Only / B&W / Short (8.5 x 11)')
             ->assertJsonPath('items.0.raw.quantity', 5)
             ->assertJsonPath('items.0.raw.priceMode', 'Retail');
@@ -107,6 +109,46 @@ class CartFeatureTest extends TestCase
 
         $this->assertSame(12.0, $cart[$cartKey]['price']);
         $this->assertSame('bulk', $cart[$cartKey]['price_type']);
+    }
+
+    public function test_cart_sync_preserves_individual_selection_and_can_clear_all_items(): void
+    {
+        [, $variation] = $this->createServiceWithVariation([], [
+            'service_item_id' => 'SELECT-A4-BW-001',
+        ]);
+        $customer = $this->verifiedCustomer();
+
+        $payload = fn (string $priceType, bool $selected) => [
+            'name' => 'Selectable print item',
+            'qty' => 1,
+            'service_item_id' => $variation->service_item_id,
+            'price_type' => $priceType,
+            'selected' => $selected,
+        ];
+
+        $this
+            ->actingAs($customer)
+            ->withSession(['customer_otp_passed' => true])
+            ->postJson(route('cart.sync', absolute: false), [
+                'items' => [
+                    $payload('retail', false),
+                    $payload('bulk', true),
+                ],
+            ])
+            ->assertOk();
+
+        $this
+            ->getJson(route('cart.state', absolute: false))
+            ->assertOk()
+            ->assertJsonPath('items.0.selected', false)
+            ->assertJsonPath('items.1.selected', true);
+
+        $this
+            ->postJson(route('cart.sync', absolute: false), ['items' => []])
+            ->assertOk()
+            ->assertJsonPath('count', 0);
+
+        $this->assertSame([], session('cart'));
     }
 
     /**

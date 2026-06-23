@@ -558,11 +558,19 @@ body.checkout-open {
 body.checkout-open #pageWrapper,body.service-detail-open #pageWrapper {
   display:none!important
 }
-body.front-route-service-details #pageWrapper,body.front-route-checkout #pageWrapper {
+body.front-route-service-details #pageWrapper,body.front-route-checkout #pageWrapper,
+body.front-route-service-details .printify-footer,body.front-route-checkout .printify-footer {
   display:none!important
 }
 body.front-route-service-details #serviceDetail,body.service-detail-open #serviceDetail {
   display:block
+}
+body.front-route-service-details #checkout,
+body.front-route-checkout #serviceDetail {
+  display:none!important
+}
+body.front-route-checkout #checkout {
+  display:block!important
 }
 /* Standalone sections are route-authoritative. A stale JS/open-state class must
    never leak Service Details or Checkout below another public page/footer. */
@@ -1002,6 +1010,8 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 </div>
 </div>
 </header>
+@php($isStandaloneFrontRoute = in_array($activeSection, ['service-details', 'checkout'], true))
+@unless($isStandaloneFrontRoute)
 <div class="main-content" id="pageWrapper">
 <section id="home" class="section active">
 <div class="home-premium-page">
@@ -1048,8 +1058,11 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 @include('f-about-us')
 @include('f-contact-us')
 </div>
+@endunless
 @include('f-service-details')
+@if($activeSection === 'checkout')
 @include('f-checkout')
+@endif
 <script>
 let currentHeroIndex=0,heroTimer=null,isAutoScrolling=false,autoScrollTarget='{{ $activeSection }}',scrollSpyTick=null;
 const initialRouteSection=(()=>{
@@ -1378,6 +1391,10 @@ fileName:fileName
     localStorage.setItem('printifyCheckoutItems',JSON.stringify([item]));
     localStorage.setItem('printifyCheckoutSource','direct');
   } else ensureCheckoutStorageFromVisibleOrder();
+  if(initialRouteSection!=='checkout'||!getSectionEl('checkout')){
+    window.location.assign('/checkout');
+    return false;
+  }
   if(window.location.pathname!=='/checkout'){
     window.location.href='/checkout';
     return false;

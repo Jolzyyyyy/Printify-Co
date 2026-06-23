@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\EReceiptRequest;
 use App\Rules\PhilippineMobileNumber;
 use App\Services\CheckoutOrderFactory;
 use App\Services\CheckoutReceiptService;
@@ -56,6 +57,11 @@ class PaymongoCheckoutController extends Controller
     private function createCheckoutUrl(Request $request): string
     {
         $validated = $this->validatedCheckoutRequest($request);
+        $receiptRequestId = (int) $request->session()->get('checkout_e_receipt_request_id', 0);
+        $hasReceiptRequest = $receiptRequestId > 0 && EReceiptRequest::where('user_id', $request->user()->id)->whereKey($receiptRequestId)->exists();
+        if (!$hasReceiptRequest) {
+            throw new \RuntimeException('Complete and submit the e-invoice request before payment.');
+        }
         $cartItems = $this->getCheckoutItems();
 
         if (empty($cartItems)) {
@@ -114,7 +120,9 @@ class PaymongoCheckoutController extends Controller
             ->post('https://api.paymongo.com/v1/checkout_sessions', [
                 'data' => [
                     'attributes' => [
-                        'send_email_receipt' => false,
+                        // PayMongo sends the successful payment receipt to the customer
+                        // before they return to Checkout to select the delivery method.
+                        'send_email_receipt' => true,
                         'show_description' => true,
                         'show_line_items' => true,
                         'line_items' => $lineItems,
@@ -222,9 +230,9 @@ class PaymongoCheckoutController extends Controller
                 report($receiptException);
             }
 
-            session()->forget(['buy_now','cart','checkout_details','checkout_payment_method','checkout_payment_provider','checkout_payment_reference','checkout_payment_total','checkout_payment_verified','checkout_provider_id']);
+            session()->forget(['buy_now','cart','checkout_details','checkout_payment_method','checkout_payment_provider','checkout_payment_reference','checkout_payment_total','checkout_payment_verified','checkout_provider_id','checkout_e_receipt_request_id']);
 
-            return response()->json(['ok' => true, 'redirect_url' => route('co.place-order.tracking', $order)]);
+            return response()->json(['ok' => true, 'redirect_url' => route('co.place-order')]);
         } catch (\Throwable $exception) {
             report($exception);
             return response()->json(['ok' => false, 'message' => $exception->getMessage()], 422);

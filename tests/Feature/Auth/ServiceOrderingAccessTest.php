@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Mail\OrderReceiptMail;
+use App\Models\EReceiptRequest;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServiceVariation;
@@ -109,7 +110,7 @@ class ServiceOrderingAccessTest extends TestCase
             ->assertSee('data/ph-locations.json');
     }
 
-    public function test_payment_start_requires_complete_customer_and_shipping_details(): void
+    public function test_payment_start_requires_a_submitted_e_invoice_request(): void
     {
         $customer = User::factory()->create([
             'role' => 'customer',
@@ -148,7 +149,7 @@ class ServiceOrderingAccessTest extends TestCase
             ]);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors('checkout.shippingAddress.apartment');
+            ->assertJsonPath('message', 'Complete and submit the e-invoice request before payment.');
     }
 
     public function test_payment_start_allows_pickup_without_shipping_address(): void
@@ -171,6 +172,7 @@ class ServiceOrderingAccessTest extends TestCase
             'role' => 'customer',
             'email_verified_at' => now(),
         ]);
+        $receipt = $this->receiptRequest($customer);
 
         $payload = $this->completeCheckoutPayload();
         $payload['delivery'] = [
@@ -184,6 +186,7 @@ class ServiceOrderingAccessTest extends TestCase
             ->withSession([
                 'customer_otp_passed' => true,
                 'cart' => $this->checkoutCart(),
+                'checkout_e_receipt_request_id' => $receipt->id,
             ])
             ->postJson(route('payment.start'), [
                 'payment_method' => 'gcash',
@@ -220,12 +223,14 @@ class ServiceOrderingAccessTest extends TestCase
             'role' => 'customer',
             'email_verified_at' => now(),
         ]);
+        $receipt = $this->receiptRequest($customer);
 
         $response = $this
             ->actingAs($customer)
             ->withSession([
                 'customer_otp_passed' => true,
                 'cart' => $this->checkoutCart(),
+                'checkout_e_receipt_request_id' => $receipt->id,
             ])
             ->postJson(route('payment.start'), [
                 'payment_method' => 'gcash',
@@ -249,6 +254,11 @@ class ServiceOrderingAccessTest extends TestCase
         $this->assertSame('lalamove', session('checkout_details.delivery.type'));
         $this->assertSame('Batasan Hills', session('checkout_details.shippingAddress.barangay'));
         $this->assertDatabaseCount('orders', 0);
+
+        Http::assertSent(fn ($request) =>
+            $request->url() === 'https://api.paymongo.com/v1/checkout_sessions'
+            && data_get($request->data(), 'data.attributes.send_email_receipt') === true
+        );
     }
 
     public function test_paymongo_paid_webhook_sends_receipt_and_prepares_delivery_booking(): void
@@ -414,6 +424,22 @@ class ServiceOrderingAccessTest extends TestCase
                 'qty' => 2,
             ],
         ];
+    }
+
+    private function receiptRequest(User $user): EReceiptRequest
+    {
+        return EReceiptRequest::create([
+            'user_id' => $user->id,
+            'receipt_type' => 'personal',
+            'full_name' => $user->name,
+            'region' => 'NCR',
+            'province' => 'Metro Manila',
+            'city' => 'Quezon City',
+            'barangay' => 'Batasan Hills',
+            'postal_code' => '1126',
+            'street_address' => 'Blk 6 Lot 8 Commonwealth Ave',
+            'status' => 'submitted',
+        ]);
     }
 
     private function completeCheckoutPayload(): array

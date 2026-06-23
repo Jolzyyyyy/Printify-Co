@@ -152,7 +152,7 @@
 </style>
 </head>
 <body>
-<header class="top-nav-bar premium-site-header header-dark" id="mainHeader">
+<header class="top-nav-bar premium-site-header header-dark" id="customerOriginalHeader">
   <div class="premium-main-navbar">
     <a href="{{ route('home') }}" class="brand-logo-block" aria-label="Printify and Co Home">
       <span class="brand-main-text">PRINTIFY &amp; CO.</span>
