@@ -141,7 +141,7 @@ class CartController extends Controller
                 'price'           => $price,
                 'price_type'      => $priceType,
                 'qty'             => $qty,
-                'image_path'      => $service->image_path,
+                'image_path'      => $variation->variation_image_path ?: $service->image_path,
             ];
         }
 

@@ -44,11 +44,18 @@ class LalamoveDeliveryController extends Controller
         }
     }
 
-    public function refresh(Request $request, Order $order, LalamoveClient $lalamove): RedirectResponse
+    public function refresh(Request $request, Order $order, LalamoveClient $lalamove): JsonResponse|RedirectResponse
     {
         abort_unless($order->isVisibleToPortalUser($request->user()) || (int) $order->user_id === (int) $request->user()->id, 403);
 
         if (!$order->lalamove_order_id) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'This order has no Lalamove delivery yet.',
+                ], 422);
+            }
+
             return back()->with('error', 'This order has no Lalamove delivery yet.');
         }
 
@@ -76,9 +83,35 @@ class LalamoveDeliveryController extends Controller
                 'lalamove_last_synced_at' => now(),
             ]);
 
+            if ($request->expectsJson()) {
+                $order->refresh();
+
+                return response()->json([
+                    'ok' => true,
+                    'message' => 'Lalamove tracking updated.',
+                    'status' => $order->status,
+                    'delivery_status' => $order->delivery_status,
+                    'delivery_booking_status' => $order->delivery_booking_status,
+                    'lalamove_status' => $order->lalamove_status,
+                    'tracking_url' => $order->delivery_tracking_url ?: $order->lalamove_share_link,
+                    'lalamove_last_synced_at' => optional($order->lalamove_last_synced_at)->toIso8601String(),
+                    'lalamove_last_synced_at_formatted' => optional($order->lalamove_last_synced_at)->format('M d, h:i A'),
+                    'driver_name' => $order->lalamove_driver_name,
+                    'driver_phone' => $order->lalamove_driver_phone,
+                    'plate_number' => $order->lalamove_plate_number,
+                ]);
+            }
+
             return back()->with('success', 'Lalamove tracking updated.');
         } catch (\Throwable $exception) {
             report($exception);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => $exception->getMessage(),
+                ], 422);
+            }
+
             return back()->with('error', $exception->getMessage());
         }
     }
