@@ -1,4 +1,9 @@
-<x-app-layout> @once <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700&display=swap"> @endonce @php $settingsUser = auth()->user(); $settingsPhoto = $settingsUser->profile_photo_url ?? $settingsUser->profile_photo ?? null; $settingsName = $settingsUser->name ?? ''; $settingsEmail = $settingsUser->email ?? ''; $settingsPhone = $settingsUser->phone ?? ''; $settingsBirthdate = $settingsUser->birthdate ?? ''; $settingsCompany = $settingsUser->company ?? ''; $settingsCustomerId = $settingsUser ? 'CUST-'.str_pad((string) $settingsUser->id, 5, '0', STR_PAD_LEFT) : 'Not set'; @endphp
+<x-app-layout> @once <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700&display=swap"> @endonce @php $settingsUser = auth()->user(); $settingsPhoto = $settingsUser->profile_photo_url ?? $settingsUser->profile_photo ?? null; $settingsName = $settingsUser->name ?? ''; $settingsEmail = $settingsUser->email ?? ''; $settingsPhone = $settingsUser->phone ?? ''; $settingsBirthdate = $settingsUser->birthdate ?? ''; $settingsCompany = $settingsUser->company ?? ''; $settingsCustomerId = $settingsUser ? 'CUST-'.str_pad((string) $settingsUser->id, 5, '0', STR_PAD_LEFT) : 'Not set';
+$settingsLanguage = $settingsUser->language ?? 'English';
+$settingsLanguageDisplay = strtolower((string) $settingsLanguage) === 'en' ? 'English' : $settingsLanguage;
+$settingsRegion = $settingsUser->region ?? 'Philippines';
+$settingsTimezone = $settingsUser->timezone ?? config('app.timezone', 'Asia/Manila');
+$settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Manila' : $settingsTimezone; @endphp
 <div class="st-page">
 <div class="st-wrap">
 <div class="st-top">
@@ -20,7 +25,6 @@
 <button class="st-tab" data-tab="security">Security</button>
 <button class="st-tab" data-tab="notifications">Notifications</button>
 <button class="st-tab" data-tab="payments">Payments</button>
-<button class="st-tab" data-tab="addresses">Addresses</button>
 <button class="st-tab" data-tab="preferences">Preferences</button>
 <button class="st-tab" data-tab="privacy">Privacy</button>
 </div>
@@ -36,113 +40,6 @@
 <section id="panel-overview" class="st-panel active">
 <div class="st-grid">
 <div class="st-stack overview-left-stack">
-<div class="st-card overview-profile-box">
-<div class="st-body">
-<div class="st-head">
-<h2 class="st-card-title">Profile Summary</h2>
-<button class="st-btn" type="button" data-modal-open="profileModal">Edit Profile</button>
-</div>
-<div class="st-profile">
-<div class="st-profile-left">
-<div class="st-avatar-wrap">
-<img class="st-avatar" src="{{ $settingsPhoto ?: 'https://i.pravatar.cc/220?img=47' }}" alt="Profile">
-<button class="st-camera" type="button" aria-label="Change photo" onclick="openPhotoPicker()">
-<i class="fa-solid fa-camera">
-</i>
-</button>
-<input id="settingsPhotoInput" type="file" accept="image/*" hidden>
-</div>
-<div>
-<div class="st-name-row">
-<h3 id="profileDisplayName" class="st-name">{{ $settingsName ?: 'Not set' }}</h3>
-<span class="st-badge green">
-<i class="fa-solid fa-check">
-</i> Verified</span>
-</div>
-<div id="profileDisplayEmail" class="st-info">{{ $settingsEmail ?: 'Not set' }}</div>
-<div class="st-info">Customer ID: <strong>{{ $settingsCustomerId }}</strong>
-<button class="st-copy" type="button" onclick="copySettingsText(@js($settingsCustomerId))">
-<i class="fa-regular fa-copy">
-</i>
-</button>
-</div>
-<div class="st-info">Member since {{ optional($settingsUser->created_at)->format('F j, Y') ?: 'Not set' }}</div>
-<span class="st-badge orange">Premium Member</span>
-</div>
-</div>
-<div class="st-profile-right">
-<div class="st-detail">
-<div class="st-detail-left">
-<span class="st-ico">
-<i class="fa-solid fa-phone">
-</i>
-</span>
-<div>
-<p class="st-label">Phone Number</p>
-<p id="profileDisplayPhone" class="st-value">{{ $settingsPhone ?: 'Not set' }}</p>
-</div>
-</div>
-<button class="st-link" type="button" data-modal-open="profileModal">Edit</button>
-</div>
-<div class="st-detail">
-<div class="st-detail-left">
-<span class="st-ico">
-<i class="fa-regular fa-calendar">
-</i>
-</span>
-<div>
-<p class="st-label">Date of Birth</p>
-<p id="profileDisplayBirth" class="st-value">{{ $settingsBirthdate ?: 'Not set' }}</p>
-</div>
-</div>
-<button class="st-link" type="button" data-modal-open="profileModal">Edit</button>
-</div>
-<div class="st-detail">
-<div class="st-detail-left">
-<span class="st-ico">
-<i class="fa-regular fa-building">
-</i>
-</span>
-<div>
-<p class="st-label">Company (Optional)</p>
-<p id="profileDisplayCompany" class="st-value">{{ $settingsCompany ?: 'Not set' }}</p>
-</div>
-</div>
-<button class="st-link" type="button" data-modal-open="profileModal">Edit</button>
-</div>
-</div>
-</div>
-</div>
-<div class="st-section-line">
-</div>
-<div class="st-head st-address-head-clean">
-<h2 class="st-card-title">Address Book</h2>
-</div>
-<div class="st-address-grid">
-<div class="st-box">
-<button class="st-kebab" type="button" onclick="openAddressActions('Home Address')" aria-label="Home address actions">
-<i class="fa-solid fa-ellipsis-vertical">
-</i>
-</button>
-<span class="st-mini orange">Primary</span>
-<h3 class="st-box-title">Home Address</h3>
-<p class="st-box-text">123 Printify Avenue<br>Makati City, Metro Manila 1200<br>Philippines<br>+63 912 345 6789</p>
-</div>
-<div class="st-box">
-<button class="st-kebab" type="button" onclick="openAddressActions('Work')" aria-label="Work address actions">
-<i class="fa-solid fa-ellipsis-vertical">
-</i>
-</button>
-<h3 class="st-box-title">Work</h3>
-<p class="st-box-text">45 Timog Avenue<br>Quezon City, Metro Manila 1103<br>Philippines<br>+63 912 345 6789</p>
-</div>
-<button class="st-add-box st-address-placeholder" type="button" onclick="openNewAddressModal()">
-<span class="st-add-circle">
-<i class="fa-solid fa-plus">
-</i>
-</span>Add New Address</button>
-</div>
-</div>
 <div class="st-card overview-plain-panel overview-notif-panel">
 <div class="st-body">
 <h2 class="st-card-title">Notification Preferences</h2>
@@ -566,7 +463,7 @@ min-width:112px!important; padding:0 14px!important; border:1px solid #111827!im
 border-radius:10px!important; background:#fff!important; } .st-input:focus, .st-textarea:focus{ border-color:#111827!important; box-shadow:0 0 0 3px rgba(17,24,39,.08)!important; } .st-modal-card{ border:1px solid #111827!important; border-radius:16px!important; } .st-modal .st-actions .st-btn:first-child{ background:#fff!important; border:1px solid #111827!important; color:#111827!important; } .st-modal .st-actions .st-btn:first-child:hover, .st-modal .st-actions .st-btn:first-child:focus-visible{ background:#111827!important; border-color:#111827!important; color:#fff!important; } .st-modal .st-actions .st-btn[type="submit"], #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn[onclick*="Save"], #panel-preferences .st-head .st-btn[onclick*="Save"]{ background:#16a34a!important; border-color:#16a34a!important; color:#fff!important; } .st-modal .st-actions .st-btn[type="submit"]:hover, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn[onclick*="Save"]:hover, #panel-preferences .st-head .st-btn[onclick*="Save"]:hover{ background:#111827!important; border-color:#111827!important; color:#fff!important; } /* Reduce visual redundancy in side panels */ .st-section-side .st-card-title, .st-setting-side .st-card-title, .st-notif-side .st-card-title, .st-pay-side .st-card-title{ font-size:12.5px!important; } .st-section-side .st-card-desc, .st-setting-side .st-card-desc, .st-notif-side .st-card-desc, .st-pay-side .st-card-desc{ font-size:9.5px!important; } .st-section-side .st-no-box-list, .st-setting-side .st-side-list, .st-notif-side .st-no-box-list, .st-pay-side .st-no-box-list{ gap:0!important; } /* Never move items on hover */ .st-page *, .st-page *:hover, .st-page *:focus, .st-page *:active{ transform:none!important; } @media(max-width:1260px){ #panel-overview>.st-grid, #panel-overview .overview-payment-box, .st-grid, .st-settings-grid, .st-section-layout, .st-profile, .st-two{ grid-template-columns:1fr!important; } #panel-overview .overview-payment-box>.st-card:first-child{ border-right:0!important; border-bottom:1px solid #e5e7eb!important; } } @media(max-width:860px){ .st-wrap{padding:0 12px 28px!important;} .st-tabs{gap:18px!important;} .st-privacy-grid, #panel-overview .overview-quick-panel .st-quick-grid, .st-address-grid, .st-form-grid, .st-summary-strip{ grid-template-columns:1fr!important; } .st-btn, .st-outline-btn, .st-date{width:100%!important;} } /* ========================================================= FINAL OVERVIEW REQUEST PATCH - 2026-06-08 Layout follows My Profile button/font/hover flow: left = Profile+Address boxed, Payment/Notifications plain, Quick/Activity plain; right = Privacy, Communication, Preferences plain. ========================================================= */ #panel-overview>.st-grid{ display:grid!important; grid-template-columns:minmax(0,1.08fr) minmax(360px,.72fr)!important; gap:22px!important; align-items:start!important; } #panel-overview .overview-left-stack, #panel-overview .overview-right-stack{ display:flex!important; flex-direction:column!important; gap:18px!important; min-width:0!important; width:100%!important; } #panel-overview .overview-right-stack{ max-width:520px!important; justify-self:stretch!important; } #panel-overview .overview-profile-box{ border:1.5px solid #111827!important; border-radius:14px!important; background:#fff!important; box-shadow:none!important; overflow:hidden!important; }
 #panel-overview .overview-profile-box:hover{ background:#fff!important; border-color:#111827!important; box-shadow:none!important; } #panel-overview .overview-profile-box>.st-body{ padding:16px!important; } #panel-overview .overview-profile-box .st-section-line{ height:1px!important; background:#111827!important; opacity:1!important; margin:16px 0!important; } #panel-overview .overview-profile-box .st-address-grid{ display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:12px!important; align-items:stretch!important; } #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{ border:1px solid #d9dee7!important; border-radius:12px!important; background:#fff!important; min-height:118px!important; padding:12px!important; box-shadow:none!important; } #panel-overview .overview-profile-box .st-box:hover, #panel-overview .overview-profile-box .st-add-box:hover{ border-color:#111827!important; background:#fff!important; } #panel-overview .overview-profile-box .st-box-text{ font-size:9.6px!important; line-height:1.42!important; color:#5f6673!important; word-break:break-word!important; } /* Plain overview panels: no outside box for payment/notification, quick, activity, privacy, communication, preferences */ #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; padding:0!important; } #panel-overview .overview-payment-box:hover, #panel-overview .overview-quick-panel:hover, #panel-overview .overview-activity-panel:hover, #panel-overview .overview-privacy-panel:hover, #panel-overview .overview-comm-panel:hover, #panel-overview .overview-prefs-panel:hover{ background:transparent!important; border-color:transparent!important; box-shadow:none!important; } #panel-overview .overview-payment-box>.st-card, #panel-overview .overview-quick-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel{ border:0!important; background:transparent!important; box-shadow:none!important; } #panel-overview .overview-payment-box>.st-card>.st-body, #panel-overview .overview-quick-panel>.st-body, #panel-overview .overview-activity-panel>.st-body, #panel-overview .overview-privacy-panel>.st-body, #panel-overview .overview-comm-panel>.st-body, #panel-overview .overview-prefs-panel>.st-body{ padding:0!important; } #panel-overview .overview-payment-box{ display:grid!important; grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; gap:18px!important; } #panel-overview .overview-payment-box>.st-card:first-child{ border-right:0!important; padding-right:0!important; } #panel-overview .overview-payment-box>.st-card:last-child{ padding-left:0!important; } #panel-overview .overview-payment-box .st-list, #panel-overview .overview-comm-panel .st-list{ margin-top:10px!important; } #panel-overview .st-notif-item, #panel-overview .st-comm-item, #panel-overview .st-pref-row, #panel-overview .st-activity-row{ border-bottom:1px solid #e8ebf0!important; padding:9px 0!important; margin:0!important; background:transparent!important; border-radius:0!important; }
 #panel-overview .st-notif-item:last-child, #panel-overview .st-comm-item:last-child, #panel-overview .st-pref-row:last-child, #panel-overview .st-activity-row:last-child{ border-bottom:0!important; } #panel-overview .st-notif-item:hover, #panel-overview .st-comm-item:hover, #panel-overview .st-pref-row:hover, #panel-overview .st-activity-row:hover{ background:transparent!important; padding-left:0!important; padding-right:0!important; } #panel-overview .overview-quick-panel .st-quick-grid{ display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:10px!important; } #panel-overview .overview-privacy-panel .st-privacy-grid{ display:grid!important; grid-template-columns:1fr!important; gap:8px!important; } #panel-overview .overview-quick-panel .st-quick, #panel-overview .overview-privacy-panel .st-privacy{ border:1px solid #e5e7eb!important; border-radius:10px!important; background:#fff!important; min-height:54px!important; padding:9px!important; box-shadow:none!important; } #panel-overview .overview-quick-panel .st-quick:hover, #panel-overview .overview-quick-panel .st-quick:focus-visible, #panel-overview .overview-privacy-panel .st-privacy:hover, #panel-overview .overview-privacy-panel .st-privacy:focus-visible{ background:#111827!important; border-color:#111827!important; color:#fff!important; } #panel-overview .overview-quick-panel .st-quick:hover .st-quick-title, #panel-overview .overview-quick-panel .st-quick:hover .st-quick-sub, #panel-overview .overview-quick-panel .st-quick:hover .st-chev, #panel-overview .overview-privacy-panel .st-privacy:hover .st-privacy-title, #panel-overview .overview-privacy-panel .st-privacy:hover .st-privacy-sub, #panel-overview .overview-privacy-panel .st-privacy:hover .st-chev{ color:#fff!important; } /* My Profile-like buttons and hover behavior */ .st-btn, .st-page .st-btn, .st-outline-btn, .st-page .st-outline-btn{ height:36px!important; min-width:118px!important; padding:0 16px!important; border-radius:10px!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:600!important; letter-spacing:.01em!important; box-shadow:none!important; transform:none!important; } .st-btn, .st-page .st-btn{ border:1px solid var(--st-orange)!important; background:var(--st-orange)!important; color:#111827!important; } .st-outline-btn, .st-page .st-outline-btn{ border:1px solid var(--st-orange)!important; background:#fff!important; color:var(--st-orange)!important; } .st-btn:hover, .st-btn:focus-visible, .st-btn:active, .st-outline-btn:hover, .st-outline-btn:focus-visible, .st-outline-btn:active, .st-link:hover, .st-link:focus-visible, .st-link:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:none!important; transform:none!important; } .st-link{ min-height:24px!important; padding:0 8px!important; border-radius:8px!important; color:var(--st-orange)!important; background:transparent!important; } /* Icons and toggles consistency */ #panel-overview .st-orange-ico, #panel-overview .st-ico{ color:var(--st-orange)!important; } #panel-overview .st-orange-ico{ background:#fff3e6!important; border:1px solid #f3dfcb!important; } #panel-overview .overview-quick-panel .st-quick:hover .st-orange-ico, #panel-overview .overview-privacy-panel .st-privacy:hover .st-ico, #panel-overview .overview-privacy-panel .st-privacy:hover .st-orange-ico{ background:#fff!important; border-color:#fff!important;
-color:#111827!important; } .st-switch input:checked+.st-slider{ background:#16a34a!important; } .st-slider{ background:#d1d5db!important; } /* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; } #panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; } #panel-profile .st-input, #panel-preferences .st-input, #panel-privacy select{ min-height:38px!important; font-size:10.5px!important; border-radius:10px!important; } @media(max-width:1260px){ #panel-overview>.st-grid, #panel-overview .overview-payment-box{ grid-template-columns:1fr!important; } #panel-overview .overview-right-stack{ max-width:none!important; } } @media(max-width:860px){ #panel-overview .overview-profile-box .st-address-grid, #panel-overview .overview-quick-panel .st-quick-grid{ grid-template-columns:1fr!important; } } /* ========================================================= USER REVISION V2: Right side width/endpoints + My Profile button/date shape, color, hover, and readable sizing ========================================================= */ :root{ --st-btn-height-final:38px; --st-btn-radius-final:999px; --st-right-width-final:420px; } /* Keep all Settings action buttons exactly aligned with My Profile button behavior */ .st-page .st-btn, .st-page button.st-btn{ height:var(--st-btn-height-final)!important; min-width:112px!important; padding:0 14px!important; border:1px solid transparent!important; border-radius:var(--st-btn-radius-final)!important; background:linear-gradient(90deg,var(--st-orange),#ffab0a)!important; color:#111827!important; font-family:'Inter',system-ui,sans-serif!important; font-size:11px!important; font-weight:600!important; line-height:1!important; letter-spacing:0!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:8px!important; white-space:nowrap!important; box-shadow:none!important; transform:none!important; transition:background .18s ease,color .18s ease,border-color .18s ease!important; } .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-btn.st-clickable-cover{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:0!important; box-shadow:none!important; transform:none!important; } .st-page .st-btn:hover i, .st-page .st-btn:focus-visible i, .st-page .st-btn:active i{ color:#fff!important; } /* Secondary / outline buttons: same My Profile shape, white default, black hover */ .st-page .st-outline-btn, .st-page button.st-outline-btn{ height:var(--st-btn-height-final)!important; min-width:112px!important; padding:0 14px!important; border:1px solid #111827!important; border-radius:var(--st-btn-radius-final)!important; background:#fff!important; color:#111827!important; font-family:'Inter',system-ui,sans-serif!important; font-size:11px!important; font-weight:600!important; line-height:1!important; display:inline-flex!important; align-items:center!important;
+color:#111827!important; } .st-switch input:checked+.st-slider{ background:#16a34a!important; } .st-slider{ background:#d1d5db!important; } /* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; } #panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; } #panel-profile .st-input, #panel-preferences .st-input, #panel-privacy select{ min-height:38px!important; font-size:10.5px!important; border-radius:10px!important; } @media(max-width:1260px){ #panel-overview>.st-grid, #panel-overview .overview-payment-box{ grid-template-columns:1fr!important; } #panel-overview .overview-right-stack{ max-width:none!important; } } @media(max-width:860px){ #panel-overview .overview-profile-box .st-address-grid, #panel-overview .overview-quick-panel .st-quick-grid{ grid-template-columns:1fr!important; } } /* ========================================================= USER REVISION V2: Right side width/endpoints + My Profile button/date shape, color, hover, and readable sizing ========================================================= */ :root{ --st-btn-height-final:38px; --st-btn-radius-final:999px; --st-right-width-final:420px; } /* Keep all Settings action buttons exactly aligned with My Profile button behavior */ .st-page .st-btn, .st-page button.st-btn{ height:var(--st-btn-height-final)!important; min-width:112px!important; padding:0 14px!important; border:1px solid transparent!important; border-radius:var(--st-btn-radius-final)!important; background:linear-gradient(90deg,var(--st-orange),#ffab0a)!important; color:#111827!important; font-family:'Inter',system-ui,sans-serif!important; font-size:11px!important; font-weight:600!important; line-height:1!important; letter-spacing:0!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:8px!important; white-space:nowrap!important; box-shadow:none!important; transform:none!important; transition:background .18s ease,color .18s ease,border-color .18s ease!important; } .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-btn.st-clickable-cover{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:0!important; box-shadow:none!important; transform:none!important; } .st-page .st-btn:hover i, .st-page .st-btn:focus-visible i, .st-page .st-btn:active i{ color:#fff!important; } /* Secondary / outline buttons: same My Profile shape, white default, black hover */ .st-page .st-outline-btn, .st-page button.st-outline-btn{ height:var(--st-btn-height-final)!important; min-width:112px!important; padding:0 14px!important; border:1px solid #111827!important; border-radius:var(--st-btn-radius-final)!important; background:#fff!important; color:#111827!important; font-family:'Inter',system-ui,sans-serif!important; font-size:11px!important; font-weight:600!important; line-height:1!important; display:inline-flex!important; align-items:center!important;
 justify-content:center!important; gap:8px!important; white-space:nowrap!important; box-shadow:none!important; transform:none!important; transition:background .18s ease,color .18s ease,border-color .18s ease!important; } .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-outline-btn.is-clicked{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:0!important; } .st-page .st-outline-btn:hover i, .st-page .st-outline-btn:focus-visible i{ color:#fff!important; } /* Calendar / date pill: same My Profile shape, height, hover behavior */ .st-page .st-date{ height:var(--st-btn-height-final)!important; min-width:164px!important; width:auto!important; padding:0 13px!important; border:1px solid #111827!important; border-radius:8px!important; background:#fff!important; color:#111827!important; font-family:'Inter',system-ui,sans-serif!important; font-size:11.5px!important; font-weight:500!important; line-height:1!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:8px!important; white-space:nowrap!important; box-shadow:none!important; transform:none!important; cursor:pointer!important; transition:background .18s ease,color .18s ease,border-color .18s ease!important; } .st-page .st-date i{ color:#111827!important; transition:color .18s ease!important; } .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-page .st-date:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:0!important; } .st-page .st-date:hover i, .st-page .st-date:focus-visible i, .st-page .st-date:active i{ color:#fff!important; } /* Overview: reduce the right-side column, but keep readable font/spacing */ @media(min-width:1261px){ #panel-overview>.st-grid{ display:grid!important; grid-template-columns:minmax(0,1fr) var(--st-right-width-final)!important; gap:22px!important; align-items:start!important; } #panel-overview>.st-grid>.st-stack:first-child{ grid-column:1!important; width:100%!important; min-width:0!important; } #panel-overview>.st-grid>.st-stack:nth-child(2){ grid-column:2!important; width:var(--st-right-width-final)!important; max-width:var(--st-right-width-final)!important; min-width:0!important; justify-self:end!important; align-self:start!important; } } /* Every right-side Overview section has the exact same endpoint/width */ #panel-overview>.st-grid>.st-stack:nth-child(2) > .st-card, #panel-overview .overview-quick-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel{ width:100%!important; max-width:100%!important; min-width:0!important; box-sizing:border-box!important; margin-left:0!important; margin-right:0!important; } /* Plain right-side panels should not look boxed, but their inner endpoints remain aligned */ #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-privacy-panel, #panel-overview .overview-activity-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; } #panel-overview .overview-comm-panel>.st-body, #panel-overview .overview-prefs-panel>.st-body, #panel-overview .overview-privacy-panel>.st-body, #panel-overview .overview-activity-panel>.st-body{ padding:0!important; }
 /* Keep Quick Settings as the first clean right-side block, with same endpoint */ #panel-overview .overview-quick-panel{ border:1px solid rgba(17,24,39,.18)!important; border-radius:12px!important; background:#fff!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; overflow:hidden!important; } #panel-overview .overview-quick-panel>.st-body{ padding:14px 15px!important; } /* Make right-side content readable, not tiny */ #panel-overview>.st-grid>.st-stack:nth-child(2) .st-card-title{ font-size:13.5px!important; line-height:1.35!important; } #panel-overview>.st-grid>.st-stack:nth-child(2) .st-card-desc{ font-size:10.5px!important; line-height:1.45!important; } #panel-overview>.st-grid>.st-stack:nth-child(2) .st-quick-title, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-comm-title, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-pref-label, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-act-label, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-privacy-title{ font-size:11.2px!important; line-height:1.25!important; } #panel-overview>.st-grid>.st-stack:nth-child(2) .st-quick-sub, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-comm-sub, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-privacy-sub{ font-size:9.8px!important; line-height:1.35!important; } #panel-overview>.st-grid>.st-stack:nth-child(2) .st-orange-ico{ width:30px!important; height:30px!important; border-radius:9px!important; flex:0 0 30px!important; } /* Right side rows must start/end cleanly and never shift on hover */ #panel-overview>.st-grid>.st-stack:nth-child(2) .st-comm-item, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-pref-row, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-activity-row, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-no-box-item, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-right-metric{ width:100%!important; box-sizing:border-box!important; padding:8px 0!important; margin:0!important; border-bottom:1px solid #e8ebf0!important; border-radius:0!important; background:transparent!important; } #panel-overview>.st-grid>.st-stack:nth-child(2) .st-comm-item:hover, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-pref-row:hover, #panel-overview>.st-grid>.st-stack:nth-child(2) .st-activity-row:hover{ padding-left:0!important; padding-right:0!important; margin-left:0!important; margin-right:0!important; background:transparent!important; transform:none!important; } /* Quick Settings cards: equal endpoints inside the right column */ #panel-overview .overview-quick-panel .st-quick-grid{ display:grid!important; grid-template-columns:1fr!important; gap:8px!important; } #panel-overview .overview-quick-panel .st-quick{ width:100%!important; min-height:58px!important; padding:10px!important; box-sizing:border-box!important; } /* Privacy Controls on right: reduce to one-column so endpoints stay even in the narrower column */ #panel-overview .overview-privacy-panel .st-privacy-grid{ display:grid!important; grid-template-columns:1fr!important; gap:8px!important; } #panel-overview .overview-privacy-panel .st-privacy{ width:100%!important; min-height:58px!important; padding:10px!important; box-sizing:border-box!important; } /* Saved Payment + Notification area stays under Profile/Address but is not too compressed */ #panel-overview .overview-payment-box{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; display:grid!important;
 grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; gap:18px!important; padding:0!important; overflow:visible!important; } #panel-overview .overview-payment-box>.st-card{ border:0!important; background:transparent!important; box-shadow:none!important; border-radius:0!important; overflow:visible!important; } #panel-overview .overview-payment-box>.st-card:first-child{ border-right:0!important; padding-right:0!important; } #panel-overview .overview-payment-box>.st-card:last-child{ padding-left:0!important; } #panel-overview .overview-payment-box>.st-card .st-body{ padding:0!important; } /* Keep font sizes balanced globally; not too small */ .st-page .st-card-title{font-size:13.5px!important;} .st-page .st-card-desc{font-size:10.5px!important;} .st-page .st-sec-title, .st-page .st-pay-title, .st-page .st-notif-title{font-size:11.2px!important;} .st-page .st-sec-sub, .st-page .st-pay-sub, .st-page .st-notif-sub{font-size:9.8px!important;line-height:1.35!important;} @media(max-width:1260px){ #panel-overview>.st-grid{ grid-template-columns:1fr!important; } #panel-overview>.st-grid>.st-stack:nth-child(2){ width:100%!important; max-width:100%!important; justify-self:stretch!important; } #panel-overview .overview-payment-box{ grid-template-columns:1fr!important; gap:16px!important; } } @media(max-width:860px){ .st-page .st-date, .st-page .st-btn, .st-page .st-outline-btn{ width:100%!important; min-width:0!important; } } /* ========================================================= USER REVISION V3: Exact Overview order + narrow right side Right order: Privacy Controls > Saved Payment Methods > Communication Preferences > Quick Settings > Preferences Left order: Profile/Address box > Notification Preferences > Account Activity ========================================================= */ :root{ --st-right-width-final:390px; --st-overview-gap-final:24px; --st-button-orange-final:#ff7a00; --st-button-orange-hover:#111827; } @media(min-width:1261px){ #panel-overview>.st-grid{ display:grid!important; grid-template-columns:minmax(0,1fr) var(--st-right-width-final)!important; gap:var(--st-overview-gap-final)!important; align-items:start!important; } #panel-overview .overview-left-stack{ width:100%!important; max-width:100%!important; min-width:0!important; justify-self:stretch!important; } #panel-overview .overview-right-stack{ width:var(--st-right-width-final)!important; max-width:var(--st-right-width-final)!important; min-width:0!important; justify-self:end!important; align-self:start!important; } } #panel-overview .overview-left-stack, #panel-overview .overview-right-stack{ display:flex!important; flex-direction:column!important; gap:18px!important; } #panel-overview .overview-right-stack > *, #panel-overview .overview-left-stack > *{ width:100%!important; max-width:100%!important; min-width:0!important; box-sizing:border-box!important; margin-left:0!important; margin-right:0!important; } #panel-overview .overview-right-stack .st-right-slim{ width:100%!important; max-width:100%!important; } /* Outer box rules: only Profile+Address remains boxed on Overview */ #panel-overview .overview-profile-box{ border:1.5px solid #111827!important; border-radius:14px!important; background:#fff!important; box-shadow:none!important; overflow:hidden!important; } #panel-overview .overview-profile-box:hover{ border-color:#111827!important; background:#fff!important; box-shadow:none!important; } #panel-overview .overview-profile-box>.st-body{
@@ -746,87 +643,7 @@ display:inline-flex!important; align-items:center!important; gap:4px!important; 
     color:#ff7a00!important;
 }
 
-/* Addresses panel: remove duplicate/delete and keep only Edit, aligned evenly. */
-#panel-addresses .st-row-actions .st-link{display:none!important;}
-#panel-addresses .st-address-row{
-    grid-template-columns:40px minmax(0,1fr) minmax(210px,260px)!important;
-    align-items:center!important;
-}
-#panel-addresses .st-row-actions{
-    justify-content:flex-end!important;
-    align-items:center!important;
-    gap:12px!important;
-}
-#panel-addresses .st-row-actions .st-outline-btn{
-    min-width:112px!important;
-    height:38px!important;
-}
-#panel-addresses .st-map-mini{
-    width:118px!important;
-    min-width:118px!important;
-    height:66px!important;
-}
-
-/* Profile Settings: compact My Profile-like flow; do not enlarge fonts. */
-#panel-profile .st-card-title,
-#panel-security .st-card-title,
-#panel-notifications .st-card-title,
-#panel-payments .st-card-title,
-#panel-addresses .st-card-title,
-#panel-preferences .st-card-title,
-#panel-privacy .st-card-title{
-    font-size:14px!important;
-    line-height:1.3!important;
-}
-#panel-profile .st-card-desc,
-#panel-security .st-card-desc,
-#panel-notifications .st-card-desc,
-#panel-payments .st-card-desc,
-#panel-addresses .st-card-desc,
-#panel-preferences .st-card-desc,
-#panel-privacy .st-card-desc{
-    font-size:10.5px!important;
-    line-height:1.35!important;
-}
-#panel-profile .st-input,
-#panel-profile .st-textarea,
-#panel-preferences .st-input,
-#panel-privacy select{
-    min-height:38px!important;
-    font-size:10.8px!important;
-    border-radius:10px!important;
-}
-
-/* On/off switches: consistent green when enabled. */
-.st-switch input:checked + .st-slider{background:#16a34a!important;}
-.st-slider{background:#cfd5dd!important;}
-
-/* Consistent semantic icon colors, icon only; no background shape. */
-.st-page .st-orange-ico,
-.st-page .st-ico{
-    background:transparent!important;
-    border:0!important;
-    border-radius:0!important;
-    box-shadow:none!important;
-    width:20px!important;
-    height:20px!important;
-    flex:0 0 20px!important;
-}
-.st-page .fa-envelope,.st-page .fa-message,.st-page .fa-comment-dots,.st-page .fa-bell,.st-page .fa-paper-plane,.st-page .fa-headset{color:#2563eb!important;}
-.st-page .fa-phone,.st-page .fa-mobile-screen,.st-page .fa-mobile-screen-button{color:#16a34a!important;}
-.st-page .fa-location-dot,.st-page .fa-house,.st-page .fa-building,.st-page .fa-store,.st-page .fa-truck-fast,.st-page .fa-route,.st-page .fa-box{color:#ff7a00!important;}
-.st-page .fa-credit-card,.st-page .fa-cc-visa,.st-page .fa-receipt,.st-page .fa-file-invoice,.st-page .fa-wallet,.st-page .fa-peso-sign{color:#7c3aed!important;}
-.st-page .fa-shield-halved,.st-page .fa-shield,.st-page .fa-user-shield,.st-page .fa-lock,.st-page .fa-circle-check,.st-page .fa-check{color:#16a34a!important;}
-.st-page .fa-bullhorn,.st-page .fa-percent,.st-page .fa-gift,.st-page .fa-triangle-exclamation{color:#ef4444!important;}
-.st-page .fa-download,.st-page .fa-folder-open{color:#0891b2!important;}
-.st-page .fa-calendar,.st-page .fa-calendar-days,.st-page .fa-clock{color:#64748b!important;}
-.st-page .fa-globe{color:#0ea5e9!important;}
-.st-page .fa-sun,.st-page .fa-palette{color:#f59e0b!important;}
-.st-page .fa-user,.st-page .fa-address-card,.st-page .fa-id-card{color:#ff7a00!important;}
-
-@media(max-width:860px){
-    #panel-addresses .st-address-row{grid-template-columns:1fr!important;}
-    #panel-addresses .st-row-actions{justify-content:center!important;}
+#panel-addresses .st-row-actions{justify-content:center!important;}
     #panel-addresses .st-map-mini{width:100%!important;}
 }
 </style>
@@ -1213,8 +1030,8 @@ document.addEventListener('DOMContentLoaded', function(){
 #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; }
 .st-modal .st-actions .st-btn[type="submit"], #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn[onclick*="Save"], #panel-preferences .st-head .st-btn[onclick*="Save"]{ background:#16a34a!important; border-color:#16a34a!important; color:#fff!important; }
 .st-modal .st-actions .st-btn[type="submit"]:hover, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn[onclick*="Save"]:hover, #panel-preferences .st-head .st-btn[onclick*="Save"]:hover{ background:#111827!important; border-color:#111827!important; color:#fff!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
+/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
+#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
 #panel-profile .st-input, #panel-preferences .st-input, #panel-privacy select{ min-height:38px!important; font-size:10.5px!important; border-radius:10px!important; }
 /* Buttons and Date: one consistent My Profile-style button system */ .st-page .st-btn, .st-page .st-outline-btn, .st-page .st-date, .st-modal .st-actions .st-btn, #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn, #panel-preferences .st-head .st-btn{ height:36px!important; min-width:120px!important; padding:0 16px!important; border-radius:999px!important; border:1px solid transparent!important; background:linear-gradient(90deg,var(--st-primary-orange),var(--st-primary-orange-2))!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; letter-spacing:.01em!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:7px!important; box-shadow:none!important; transform:none!important; white-space:nowrap!important; cursor:pointer!important; }
 .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-outline-btn.is-clicked, .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-modal .st-actions .st-btn:hover, .st-modal .st-actions .st-btn:focus-visible, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn:hover, #panel-preferences .st-head .st-btn:hover{ background:var(--st-action-hover)!important; border-color:var(--st-action-hover)!important; color:#fff!important; box-shadow:none!important; outline:none!important; transform:none!important; }
@@ -1529,8 +1346,8 @@ document.addEventListener('DOMContentLoaded', function(){
 #panel-profile .st-profile-side .st-card-desc, #panel-security .st-setting-side .st-card-desc, #panel-notifications .st-notif-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important}
 /* Box logic: main grouped boxes have subtle/black borders, requested plain sections have no outer box */ #panel-overview .overview-profile-box, #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-profile .st-card:first-child, #panel-security .st-setting-main>.st-card:first-child, #panel-notifications .st-card:first-child, #panel-payments .st-billing-box, .st-main-group{ border:1px solid rgba(17,24,39,.55)!important; border-radius:12px!important; background:#fff!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; overflow:hidden!important; }
 #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
+/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
+#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
 /* Unified Profile Completion / Security Score / Notification Summary rings */ .st-score-ring, #panel-profile .st-profile-side .st-score-ring, #panel-security .st-setting-side .st-score-ring, #panel-notifications .st-notif-side .st-score-ring, .st-section-layout .st-section-side .st-score-ring{ width:112px!important; height:112px!important; margin:10px auto 12px!important; border-radius:50%!important; background:conic-gradient(var(--st-primary-orange) 0 331deg,#f1f5f9 331deg 360deg)!important; display:grid!important; place-items:center!important; box-shadow:0 8px 22px rgba(255,122,0,.14)!important; }
 .st-score-inner, #panel-profile .st-profile-side .st-score-inner, #panel-security .st-setting-side .st-score-inner, #panel-notifications .st-notif-side .st-score-inner, .st-section-layout .st-section-side .st-score-inner{ width:82px!important; height:82px!important; border-radius:50%!important; background:#fff!important; display:grid!important; place-items:center!important; text-align:center!important; border:1px solid #fff3e6!important; }
 .st-score-inner strong, #panel-profile .st-profile-side .st-score-inner strong, #panel-security .st-setting-side .st-score-inner strong, #panel-notifications .st-notif-side .st-score-inner strong, .st-section-layout .st-section-side .st-score-inner strong{ font-family:'Poppins',system-ui,sans-serif!important; font-size:24px!important; line-height:1!important; color:#111827!important; font-weight:800!important; }
@@ -1743,8 +1560,8 @@ document.addEventListener('DOMContentLoaded', function(){
 #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; }
 .st-modal .st-actions .st-btn[type="submit"], #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn[onclick*="Save"], #panel-preferences .st-head .st-btn[onclick*="Save"]{ background:#16a34a!important; border-color:#16a34a!important; color:#fff!important; }
 .st-modal .st-actions .st-btn[type="submit"]:hover, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn[onclick*="Save"]:hover, #panel-preferences .st-head .st-btn[onclick*="Save"]:hover{ background:#111827!important; border-color:#111827!important; color:#fff!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
+/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
+#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
 /* Buttons and Date: one consistent My Profile-style button system */ .st-page .st-btn, .st-page .st-outline-btn, .st-page .st-date, .st-modal .st-actions .st-btn, #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn, #panel-preferences .st-head .st-btn{ height:36px!important; min-width:120px!important; padding:0 16px!important; border-radius:999px!important; border:1px solid transparent!important; background:linear-gradient(90deg,var(--st-primary-orange),var(--st-primary-orange-2))!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; letter-spacing:.01em!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:7px!important; box-shadow:none!important; transform:none!important; white-space:nowrap!important; cursor:pointer!important; }
 .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-outline-btn.is-clicked, .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-modal .st-actions .st-btn:hover, .st-modal .st-actions .st-btn:focus-visible, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn:hover, #panel-preferences .st-head .st-btn:hover{ background:var(--st-action-hover)!important; border-color:var(--st-action-hover)!important; color:#fff!important; box-shadow:none!important; outline:none!important; transform:none!important; }
 /* Unified Profile Completion / Security Score / Notification Summary rings */ .st-score-ring, #panel-profile .st-profile-side .st-score-ring, #panel-security .st-setting-side .st-score-ring, #panel-notifications .st-notif-side .st-score-ring, .st-section-layout .st-section-side .st-score-ring{ width:112px!important; height:112px!important; margin:10px auto 12px!important; border-radius:50%!important; background:conic-gradient(var(--st-primary-orange) 0 331deg,#f1f5f9 331deg 360deg)!important; display:grid!important; place-items:center!important; box-shadow:0 8px 22px rgba(255,122,0,.14)!important; }
@@ -2013,8 +1830,8 @@ document.addEventListener('DOMContentLoaded', function(){
 @media(max-width:1260px){.st-section-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr!important}
 /* Box logic: main grouped boxes have subtle/black borders, requested plain sections have no outer box */ #panel-overview .overview-profile-box, #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-profile .st-card:first-child, #panel-security .st-setting-main>.st-card:first-child, #panel-notifications .st-card:first-child, #panel-payments .st-billing-box, .st-main-group{ border:1px solid rgba(17,24,39,.55)!important; border-radius:12px!important; background:#fff!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; overflow:hidden!important; }
 #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
+/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
+#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
 #panel-payments .st-pay-side .st-action-list .st-setting-action{
 #panel-payments .st-pay-side .st-action-list .st-setting-action:hover{
 #panel-payments .st-card-title,
@@ -2027,191 +1844,6 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 
-
-{{-- =========================================================
-   //ADDRESSES//
-   HTML + CSS + JS CODES NG ADDRESSES
-   ========================================================= --}}
-
-{{-- ADDRESSES HTML --}}
-<section id="panel-addresses" class="st-panel">
-<div class="st-section-layout">
-<div class="st-section-main">
-<div class="st-card st-main-group">
-<div class="st-body">
-<div class="st-head">
-<div>
-<h2 class="st-card-title">Manage Your Addresses</h2>
-<p class="st-card-desc">Add, edit, and organize shipping, billing, and pickup addresses.</p>
-</div>
-<button class="st-btn" type="button" data-modal-open="addressModal">
-<i class="fa-solid fa-plus">
-</i> Add Address</button>
-</div>
-<div class="st-mini-tabs">
-<span class="active">Shipping Addresses <b class="st-mini">2</b>
-</span>
-<span>Billing Address <b class="st-mini">1</b>
-</span>
-<span>Pickup & Branch <b class="st-mini">1</b>
-</span>
-</div>
-<div class="st-line-row st-address-row">
-<span class="st-orange-ico" style="background:#eaf8ef;color:var(--st-green)">
-<i class="fa-solid fa-house">
-</i>
-</span>
-<div>
-<p class="st-sec-title">Eyra Mae Alla <span class="st-mini">Default</span>
-</p>
-<p class="st-sec-sub">
-<i class="fa-solid fa-phone">
-</i> +63 912 345 6789<br>Blk 6 Lot 8 Ninada St. Litex Rd.<br>Commonwealth, Quezon City, Metro Manila 1121<br>Estimated Delivery: 2-4 business days</p>
-</div>
-<div class="st-row-actions">
-<div class="st-map-mini">
-<i class="fa-solid fa-location-dot">
-</i>
-</div>
-<button class="st-outline-btn" type="button" data-modal-open="addressModal">
-<i class="fa-regular fa-pen-to-square">
-</i> Edit</button>
-<button class="st-link" type="button" onclick="showSettingsToast('Address duplicated.')">Duplicate</button>
-</div>
-</div>
-<div class="st-line-row st-address-row">
-<span class="st-orange-ico" style="background:#f4efff;color:#7c3aed">
-<i class="fa-solid fa-building">
-</i>
-</span>
-<div>
-<p class="st-sec-title">Mae Alla <span class="st-mini gray">Work</span>
-</p>
-<p class="st-sec-sub">
-<i class="fa-solid fa-phone">
-</i> +63 917 888 2345<br>14F Printify Tower, 32nd St. Corner 9th Ave.<br>Bonifacio Global City, Taguig City, Metro Manila 1634<br>Estimated Delivery: 1-3 business days</p>
-</div>
-<div class="st-row-actions">
-<div class="st-map-mini" style="color:#7c3aed;background:linear-gradient(135deg,#f4efff,#eef4ff)">
-<i class="fa-solid fa-location-dot">
-</i>
-</div>
-<button class="st-outline-btn" type="button" data-modal-open="addressModal">
-<i class="fa-regular fa-pen-to-square">
-</i> Edit</button>
-<button class="st-link" type="button" onclick="showSettingsToast('Work address duplicated.')">Duplicate</button>
-<button class="st-link" style="color:var(--st-danger)" type="button" onclick="showSettingsToast('Delete confirmation opened.')">Delete</button>
-</div>
-</div>
-<div class="st-line-row st-address-row">
-<span class="st-orange-ico">
-<i class="fa-solid fa-store">
-</i>
-</span>
-<div>
-<p class="st-sec-title">PrintifyCo. SM North EDSA Branch <span class="st-mini orange">Branch Pickup</span>
-</p>
-<p class="st-sec-sub">
-<i class="fa-solid fa-phone">
-</i> +63 2 8356 7890<br>SM City North EDSA, The Block, 2nd Level<br>Epifanio de los Santos Ave., Quezon City, 1105<br>Pick-up Hours: Mon-Sun, 10:00 AM - 9:00 PM</p>
-</div>
-<div class="st-row-actions">
-<div class="st-map-mini" style="color:var(--st-orange);background:linear-gradient(135deg,#fff3e6,#eef4ff)">
-<i class="fa-solid fa-location-dot">
-</i>
-</div>
-<button class="st-outline-btn" type="button" data-modal-open="addressModal">
-<i class="fa-regular fa-pen-to-square">
-</i> Edit</button>
-<button class="st-link" type="button" onclick="showSettingsToast('Branch duplicated.')">Duplicate</button>
-</div>
-</div>
-<div class="st-tip-inline">
-<i class="fa-solid fa-circle-info">
-</i> Tip: Set a default shipping address to save time during checkout. <button class="st-link" type="button" onclick="showSettingsToast('Address tips opened.')">Learn More</button>
-</div>
-</div>
-</div>
-</div>
-<div class="st-section-side">
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Address Summary</h2>
-<div class="st-no-box-list" style="margin-top:8px">
-<div class="st-right-metric">
-<span>Shipping Addresses</span>
-<strong>2</strong>
-</div>
-<div class="st-right-metric">
-<span>Billing Address</span>
-<strong>1</strong>
-</div>
-<div class="st-right-metric">
-<span>Pickup / Branch</span>
-<strong>1</strong>
-</div>
-<div class="st-right-metric">
-<span>Total Saved Addresses</span>
-<strong>4</strong>
-</div>
-</div>
-</div>
-</div>
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Delivery Preferences</h2>
-<div class="st-no-box-list" style="margin-top:8px">
-<div class="st-right-metric">
-<span>Preferred Courier</span>
-<strong style="color:var(--st-orange)">J&T Express</strong>
-</div>
-<div class="st-right-metric">
-<span>Delivery Speed</span>
-<span>Standard</span>
-</div>
-<div class="st-right-metric">
-<span>Weekend Delivery</span>
-<span class="st-status-pill">Enabled</span>
-</div>
-<div class="st-right-metric">
-<span>Leave at Door</span>
-<span class="st-status-pill">Enabled</span>
-</div>
-</div>
-<button class="st-btn" style="width:100%;margin-top:10px" type="button" onclick="showSettingsToast('Delivery preferences opened.')">Manage Preferences</button>
-</div>
-</div>
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Quick Tips</h2>
-<div class="st-action-list" style="margin-top:8px">
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Default address guide opened.')">
-<span>Set a default address<br>
-<small>Save time at checkout.</small>
-</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Address update guide opened.')">
-<span>Keep addresses updated<br>
-<small>Make sure delivery info is current.</small>
-</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Branch pickup guide opened.')">
-<span>Use branch pickup<br>
-<small>Pickup at a nearby branch.</small>
-</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
 
 <!-- ADDRESS MODAL HTML -->
 <div id="addressModal" class="st-modal">
@@ -2247,33 +1879,6 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 </div>
 
-{{-- ADDRESSES CSS --}}
-<style id="settings-addresses-css">
-/* ADDRESSES CSS: section-specific overrides/rules. */
-#panel-addresses .st-address-grid{grid-template-columns:1fr!important;gap:0!important}
-#panel-addresses .st-address-row{grid-template-columns:38px minmax(0,1fr) minmax(190px,auto)}
-.st-line-row,#panel-addresses .st-address-row{grid-template-columns:1fr}
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
-#panel-addresses .st-row-actions .st-link{display:none!important;}
-#panel-addresses .st-address-row{
-#panel-addresses .st-row-actions{
-#panel-addresses .st-row-actions .st-outline-btn{
-#panel-addresses .st-map-mini{
-#panel-addresses .st-card-title,
-#panel-addresses .st-card-desc,
-#panel-addresses .st-address-row{grid-template-columns:1fr!important;}
-#panel-addresses .st-row-actions{justify-content:center!important;}
-#panel-addresses .st-map-mini{width:100%!important;}
-</style>
-
-{{-- ADDRESSES JS --}}
-<script id="settings-addresses-js">
-/* ADDRESSES JS: uses global functions from OVERVIEW JS: openNewAddressModal(), fillAddressModal(), saveAddressModal(), openAddressActions(), setPrimaryAddress(), removeOverviewAddress(). */
-</script>
-
-
-
 {{-- =========================================================
    //PREFERENCES//
    HTML + CSS + JS CODES NG PREFERENCES
@@ -2288,38 +1893,22 @@ document.addEventListener('DOMContentLoaded', function(){
 <div class="st-head">
 <div>
 <h2 class="st-card-title">Region & Localization</h2>
-<p class="st-card-desc">Set your language, currency, time zone, and date format.</p>
+<p class="st-card-desc">Language, region, and time zone are synced automatically from the backend.</p>
 </div>
-<button class="st-btn" type="button" onclick="saveGenericSettings(event,'Localization preferences saved.')">Save Preferences</button>
+<span class="st-status-pill gray">Backend Managed</span>
 </div>
-<div class="st-form-grid">
-<div class="st-field">
+<div class="st-form-grid st-readonly-grid">
+<div class="st-field st-readonly-field">
 <label>Language</label>
-<select class="st-input" onchange="persistSettingsValue('preferences','language',this.value,'Language')">
-<option>English</option>
-<option>Filipino</option>
-</select>
+<div class="st-readonly-value">{{ $settingsLanguageDisplay ?: 'English' }}</div>
 </div>
-<div class="st-field">
-<label>Currency</label>
-<select class="st-input" onchange="persistSettingsValue('preferences','currency',this.value,'Currency')">
-<option>Philippine Peso (PHP)</option>
-<option>US Dollar (USD)</option>
-</select>
+<div class="st-field st-readonly-field">
+<label>Region</label>
+<div class="st-readonly-value">{{ $settingsRegion ?: 'Philippines' }}</div>
 </div>
-<div class="st-field">
+<div class="st-field st-readonly-field">
 <label>Time Zone</label>
-<select class="st-input" onchange="persistSettingsValue('preferences','timezone',this.value,'Time zone')">
-<option>(GMT+08:00) Manila</option>
-<option>(GMT+08:00) Singapore</option>
-</select>
-</div>
-<div class="st-field">
-<label>Date Format</label>
-<select class="st-input" onchange="persistSettingsValue('preferences','date_format',this.value,'Date format')">
-<option>MM/DD/YYYY</option>
-<option>DD/MM/YYYY</option>
-</select>
+<div class="st-readonly-value">{{ $settingsTimezoneDisplay ?: '(GMT+08:00) Manila' }}</div>
 </div>
 </div>
 <div class="st-section-line">
@@ -2357,197 +1946,54 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 </div>
 </div>
-<div class="st-card st-main-group">
-<div class="st-body">
-<div class="st-head">
-<div>
-<h2 class="st-card-title">Accessibility</h2>
-<p class="st-card-desc">Make controls easier to read and use.</p>
-</div>
-</div>
-<div class="st-line-row">
-<span class="st-orange-ico">
-<i class="fa-solid fa-eye">
-</i>
-</span>
-<div>
-<p class="st-sec-title">High Contrast Mode</p>
-<p class="st-sec-sub">Improve contrast for important controls.</p>
-</div>
-<label class="st-switch">
-<input type="checkbox" onchange="toggleSettingMessage(this,'High contrast mode')">
-<span class="st-slider">
-</span>
-</label>
-</div>
-<div class="st-line-row">
-<span class="st-orange-ico" style="background:#eaf8ef;color:var(--st-green)">
-<i class="fa-solid fa-keyboard">
-</i>
-</span>
-<div>
-<p class="st-sec-title">Keyboard Shortcuts</p>
-<p class="st-sec-sub">Enable shortcut keys across the portal.</p>
-</div>
-<label class="st-switch">
-<input type="checkbox" checked onchange="toggleSettingMessage(this,'Keyboard shortcuts')">
-<span class="st-slider">
-</span>
-</label>
-</div>
-<div class="st-section-line">
-</div>
-<div class="st-head" style="margin-bottom:8px">
-<div>
-<h2 class="st-card-title">Communication & Reminders</h2>
-<p class="st-card-desc">Control alerts and reminder behavior.</p>
-</div>
-</div>
-<div class="st-line-row">
-<span class="st-orange-ico">
-<i class="fa-solid fa-bell">
-</i>
-</span>
-<div>
-<p class="st-sec-title">Order Updates</p>
-<p class="st-sec-sub">Notify me about order and delivery progress.</p>
-</div>
-<label class="st-switch">
-<input type="checkbox" checked onchange="toggleSettingMessage(this,'Order reminders')">
-<span class="st-slider">
-</span>
-</label>
-</div>
-<div class="st-line-row">
-<span class="st-orange-ico" style="background:#eef4ff;color:#2563eb">
-<i class="fa-solid fa-comment-dots">
-</i>
-</span>
-<div>
-<p class="st-sec-title">Message Reminders</p>
-<p class="st-sec-sub">Remind me when support replies arrive.</p>
-</div>
-<label class="st-switch">
-<input type="checkbox" checked onchange="toggleSettingMessage(this,'Message reminders')">
-<span class="st-slider">
-</span>
-</label>
-</div>
-</div>
-</div>
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Dashboard Display</h2>
-<div class="st-action-list">
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Dashboard display opened.')">
-<span>Show revenue cards</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Dashboard widgets reordered.')">
-<span>Manage widgets</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-</div>
-</div>
-</div>
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Order & Design Workspace</h2>
-<div class="st-action-list">
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Order workspace opened.')">
-<span>Default order view</span>
-<span>Card View</span>
-</button>
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Design settings opened.')">
-<span>Design tools mode</span>
-<span>Advanced</span>
-</button>
-</div>
-</div>
-</div>
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Saved & Print</h2>
-<div class="st-action-list">
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Print output preferences opened.')">
-<span>Default paper size</span>
-<span>A4</span>
-</button>
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Saved files preferences opened.')">
-<span>Auto-save designs</span>
-<span class="st-status-pill">Enabled</span>
-</button>
-</div>
-</div>
-</div>
 </div>
 <div class="st-section-side">
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Your Preferences Summary</h2>
-<div class="st-no-box-list" style="margin-top:8px">
-<div class="st-right-metric">
-<span>Language</span>
-<strong>English</strong>
-</div>
-<div class="st-right-metric">
-<span>Currency</span>
-<strong>PHP</strong>
-</div>
-<div class="st-right-metric">
-<span>Time Zone</span>
-<strong>Manila</strong>
-</div>
-<div class="st-right-metric">
-<span>Theme</span>
-<strong>Light</strong>
-</div>
-</div>
-</div>
-</div>
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Quick Personalization</h2>
-<div class="st-action-list" style="margin-top:8px">
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Dashboard personalization opened.')">
-<span>Set your dashboard layout</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Color settings opened.')">
-<span>Choose accent color</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-<button class="st-setting-action" type="button" onclick="showSettingsToast('Theme guide opened.')">
-<span>Try dark mode</span>
-<i class="fa-solid fa-chevron-right">
-</i>
-</button>
-</div>
-</div>
-</div>
-<div class="st-card st-plain-panel">
-<div class="st-body">
-<h2 class="st-card-title">Need Help?</h2>
-<p class="st-card-desc">Quick access to preference support.</p>
-<button class="st-btn" style="width:100%;margin-top:10px" type="button" onclick="window.location.href='{{ Route::has('help-center') ? route('help-center') : '#' }}'">Visit Help Center</button>
-</div>
-</div>
 </div>
 </div>
 </section>
 
 {{-- PREFERENCES CSS --}}
 <style id="settings-preferences-css">
+/* Backend-managed Region & Localization: read-only display only. */
+#panel-preferences .st-readonly-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:12px!important;
+}
+#panel-preferences .st-readonly-field{
+    pointer-events:none!important;
+}
+#panel-preferences .st-readonly-value{
+    min-height:38px!important;
+    border:1px solid rgba(17,24,39,.16)!important;
+    border-radius:10px!important;
+    background:#f9fafb!important;
+    color:#111827!important;
+    padding:10px 11px!important;
+    font-size:10.8px!important;
+    font-weight:700!important;
+    display:flex!important;
+    align-items:center!important;
+}
+#panel-preferences .st-readonly-field label{
+    font-size:9.5px!important;
+    text-transform:uppercase!important;
+    letter-spacing:.05em!important;
+    color:#777!important;
+    font-weight:650!important;
+}
+@media(max-width:860px){
+    #panel-preferences .st-readonly-grid{grid-template-columns:1fr!important;}
+}
+
 /* PREFERENCES CSS: section-specific overrides/rules. */
+/* After requested removals, Preferences uses one column so there is no blank right-side space. */
+#panel-preferences .st-section-layout{grid-template-columns:1fr!important;}
+#panel-preferences .st-section-side{display:none!important;}
 #panel-preferences .st-section-main .st-plain-panel, #panel-privacy .st-section-main .st-plain-panel{border:0!important;background:transparent!important}
 .st-modal .st-actions .st-btn[type="submit"], #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn[onclick*="Save"], #panel-preferences .st-head .st-btn[onclick*="Save"]{ background:#16a34a!important; border-color:#16a34a!important; color:#fff!important; }
 .st-modal .st-actions .st-btn[type="submit"]:hover, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn[onclick*="Save"]:hover, #panel-preferences .st-head .st-btn[onclick*="Save"]:hover{ background:#111827!important; border-color:#111827!important; color:#fff!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
+/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
+#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
 #panel-profile .st-input, #panel-preferences .st-input, #panel-privacy select{ min-height:38px!important; font-size:10.5px!important; border-radius:10px!important; }
 /* Buttons and Date: one consistent My Profile-style button system */ .st-page .st-btn, .st-page .st-outline-btn, .st-page .st-date, .st-modal .st-actions .st-btn, #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn, #panel-preferences .st-head .st-btn{ height:36px!important; min-width:120px!important; padding:0 16px!important; border-radius:999px!important; border:1px solid transparent!important; background:linear-gradient(90deg,var(--st-primary-orange),var(--st-primary-orange-2))!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; letter-spacing:.01em!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:7px!important; box-shadow:none!important; transform:none!important; white-space:nowrap!important; cursor:pointer!important; }
 .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-outline-btn.is-clicked, .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-modal .st-actions .st-btn:hover, .st-modal .st-actions .st-btn:focus-visible, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn:hover, #panel-preferences .st-head .st-btn:hover{ background:var(--st-action-hover)!important; border-color:var(--st-action-hover)!important; color:#fff!important; box-shadow:none!important; outline:none!important; transform:none!important; }
@@ -2916,8 +2362,8 @@ document.addEventListener('DOMContentLoaded', function(){
 #panel-privacy .st-privacy-panel-row:first-child{padding-top:0!important}
 #panel-privacy .st-privacy-panel-row:last-child{padding-bottom:0!important}
 #panel-privacy .st-privacy-panel-row{grid-template-columns:1fr!important}
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-addresses .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-addresses .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
+/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
+#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
 #panel-profile .st-input, #panel-preferences .st-input, #panel-privacy select{ min-height:38px!important; font-size:10.5px!important; border-radius:10px!important; }
 #panel-privacy .st-card-title{
 #panel-privacy .st-card-desc{
