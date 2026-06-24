@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -15,19 +14,7 @@ class OrderController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function myOrders(): View
-    {
-        $orders = Order::query()
-            ->where('user_id', auth()->id())
-            ->with(['items.service', 'items.serviceVariation', 'files'])
-            ->withCount('items')
-            ->latest()
-            ->get();
-
-        return view('customer-orders', compact('orders'));
-    }
-
-    public function portalMyOrders(Request $request): View
+    public function myOrders(Request $request): View
     {
         $orders = Order::query()
             ->where('user_id', $request->user()->id)
@@ -36,7 +23,23 @@ class OrderController extends Controller
             ->latest()
             ->get();
 
-        return view('orders.my_index', [
+        return view('myorders', [
+            'orders' => $orders,
+            'selectedStatus' => (string) $request->query('status', 'all'),
+            'searchTerm' => trim((string) $request->query('q', '')),
+        ]);
+    }
+
+    public function placeOrderIndex(Request $request): View
+    {
+        $orders = Order::query()
+            ->where('user_id', $request->user()->id)
+            ->with(['items.service', 'items.serviceVariation', 'files'])
+            ->withCount('items')
+            ->latest()
+            ->get();
+
+        return view('co.order-tracking', [
             'orders' => $orders,
             'selectedStatus' => (string) $request->query('status', 'all'),
             'searchTerm' => trim((string) $request->query('q', '')),
@@ -46,18 +49,18 @@ class OrderController extends Controller
     /**
      * Show a specific order that belongs to the logged-in user.
      */
-    public function myShow(Order $order): RedirectResponse
+    public function myShow(Order $order): View
     {
         $this->authorizeCustomerOrder($order);
 
-        return redirect()->route('co.place-order.tracking', $order);
+        $order->load(['items.service', 'items.serviceVariation', 'files']);
+
+        return view('co.order-details', compact('order'));
     }
 
-    public function portalMyShow(Order $order): RedirectResponse
+    public function portalMyShow(Order $order): View
     {
-        $this->authorizeCustomerOrder($order);
-
-        return redirect()->route('co.place-order.tracking', $order);
+        return $this->myShow($order);
     }
 
     public function myTracking(Order $order): View
@@ -65,7 +68,7 @@ class OrderController extends Controller
         $this->authorizeCustomerOrder($order);
 
         $order->load(['items.service', 'items.serviceVariation', 'files']);
-        return view('customer-order-tracking', compact('order'));
+        return view('co.order-details', compact('order'));
     }
 
     /*

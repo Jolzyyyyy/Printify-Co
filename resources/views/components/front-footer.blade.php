@@ -30,7 +30,7 @@
 </div>
 </div>
 <div class="footer-policy-actions" aria-label="Customer care actions">
-<button type="button" class="footer-policy-got-it" onclick="footerClosePolicy()">Got it</button>
+<button type="button" class="footer-policy-got-it" onclick="footerAcknowledgePolicy()">Got it</button>
 </div>
 </section>
 <div class="footer-main">
@@ -70,11 +70,11 @@
 <i class="fa-brands fa-facebook-f">
 </i>
 </a>
-<a href="https://instagram.com" target="_blank" rel="noopener" class="instagram" aria-label="Instagram">
+<a href="https://www.instagram.com/co.printify?igsh=bzBhaTJzdzc1MnQ5" target="_blank" rel="noopener" class="instagram" aria-label="Instagram">
 <i class="fa-brands fa-instagram">
 </i>
 </a>
-<a href="https://www.tiktok.com" target="_blank" rel="noopener" class="tiktok" aria-label="TikTok">
+<a href="https://www.tiktok.com/@printifyco.ph?_r=1&_t=ZS-97SktvYyskv" target="_blank" rel="noopener" class="tiktok" aria-label="TikTok">
 <i class="fa-brands fa-tiktok">
 </i>
 </a>
@@ -1797,7 +1797,20 @@ const renderTable=rows=>{
     row.map(cell=>renderCell(cell,hasHeader&&index===0?"th":"td")).join("")
   }</tr>`).join("")}</table></div>`;
 };
-intro.innerHTML=blocks.map(block=>block?.type==="table"?renderTable(block.rows):renderTextBlock(block.text)).join("");
+const renderedBlocks=[];
+for(let index=0;index<blocks.length;index+=1){
+  const block=blocks[index];
+  const value=String(block?.text||"").trim();
+  if(block?.type!=="table"&&/^Disclaimer$/i.test(value)){
+    const next=blocks[index+1];
+    const nextValue=next?.type!=="table"?String(next?.text||"").trim():"";
+    renderedBlocks.push(`<section class="policy-disclaimer-block"><h3>${escapeHtml(value)}</h3>${nextValue?`<p>${escapeHtml(nextValue).replace(/\n/g,"<br>")}</p>`:""}</section>`);
+    if(nextValue)index+=1;
+    continue;
+  }
+  renderedBlocks.push(block?.type==="table"?renderTable(block.rows):renderTextBlock(block.text));
+}
+intro.innerHTML=renderedBlocks.join("");
 details.innerHTML="";
 popup.hidden=false;
 popup.classList.remove("footer-policy-animate");
@@ -2133,4 +2146,723 @@ body.footer-policy-open {
     width:100%!important;
   }
 }
+#footerPolicyPopover .policy-disclaimer-block {
+  margin:18px 0 10px!important;
+  padding:12px 14px!important;
+  border-left:4px solid #ff7a00!important;
+  border-radius:7px!important;
+  background:#fff3e8!important;
+  color:#111827!important;
+}
+#footerPolicyPopover .policy-disclaimer-block h3{
+  margin:0 0 8px!important;
+  color:#111827!important;
+}
+#footerPolicyPopover .policy-disclaimer-block p{
+  margin:0!important;
+  color:#4b5563!important;
+}
 </style>
+
+<!-- =========================================================
+  FINAL CUSTOMER CARE MODAL TEMPLATE PATCH
+  Applies one clean template to Privacy Policy, Terms & Conditions,
+  Refund Policy, and FAQ. Bottom action has no divider line, the
+  button stays inside the modal, top header remains compact with a
+  small border, and important notes are highlighted automatically.
+========================================================= -->
+<style id="front-footer-customer-care-final-template-0622">
+body.footer-policy-open {
+  overflow:auto!important;
+  padding-right:0!important;
+}
+#footerPolicyBackdrop[hidden],
+#footerPolicyPopover[hidden] {
+  display:none!important;
+}
+#footerPolicyBackdrop {
+  position:fixed!important;
+  inset:0!important;
+  z-index:9997!important;
+  background:rgba(8,13,24,.48)!important;
+  backdrop-filter:blur(2px)!important;
+  -webkit-backdrop-filter:blur(2px)!important;
+}
+#footerPolicyPopover {
+  position:fixed!important;
+  inset:auto!important;
+  left:50%!important;
+  top:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  z-index:9998!important;
+  width:min(900px,calc(100vw - 96px))!important;
+  height:min(76vh,650px)!important;
+  max-height:calc(100vh - 88px)!important;
+  transform:translate3d(-50%,-50%,0)!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  color:#111827!important;
+  border:1px solid rgba(15,23,42,.08)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.30)!important;
+  opacity:1!important;
+  animation:none!important;
+  overscroll-behavior:contain!important;
+  contain:layout paint!important;
+}
+#footerPolicyPopover.footer-policy-animate {
+  animation:footerPolicyFinalIn .22s cubic-bezier(.22,1,.36,1) both!important;
+}
+#footerPolicyPopover::before {
+  content:""!important;
+  position:absolute!important;
+  top:10px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  width:64px!important;
+  height:4px!important;
+  border-radius:999px!important;
+  background:#ff7900!important;
+  opacity:.92!important;
+  z-index:4!important;
+}
+#footerPolicyPopover .footer-policy-handle,
+#footerPolicyPopover .footer-policy-close {
+  display:none!important;
+}
+#footerPolicyPopover .footer-policy-head {
+  flex:0 0 auto!important;
+  position:relative!important;
+  top:auto!important;
+  z-index:3!important;
+  margin:0!important;
+  padding:24px 72px 12px 34px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  background:#fff!important;
+  border-bottom:1px solid #e9edf3!important;
+}
+#footerPolicyPopover .footer-policy-icon {
+  width:42px!important;
+  height:42px!important;
+  min-width:42px!important;
+  border-radius:999px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:#fff2e8!important;
+  color:#ff7900!important;
+  font-size:20px!important;
+}
+#footerPolicyPopover .footer-policy-head strong {
+  display:block!important;
+  margin:0 0 3px!important;
+  color:#111827!important;
+  font-family:'LeagueSpartanFinal','League Spartan',Arial,sans-serif!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:.08em!important;
+}
+#footerPolicyPopover .footer-policy-head p {
+  margin:0!important;
+  color:#4b5563!important;
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+  font-weight:500!important;
+}
+#footerPolicyPopover .footer-policy-content {
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  display:block!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:22px 34px 14px!important;
+  background:#fff!important;
+  scrollbar-gutter:stable!important;
+}
+#footerPolicyPopover .footer-policy-actions {
+  flex:0 0 62px!important;
+  height:62px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:12px!important;
+  padding:10px 34px 18px!important;
+  border-top:0!important;
+  background:#fff!important;
+}
+#footerPolicyPopover .footer-policy-got-it {
+  min-width:150px!important;
+  height:38px!important;
+  padding:0 28px!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:linear-gradient(90deg,#ff7900,#ff5a14)!important;
+  color:#fff!important;
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  cursor:pointer!important;
+  box-shadow:0 8px 18px rgba(255,121,0,.18)!important;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease!important;
+}
+#footerPolicyPopover .footer-policy-got-it:hover,
+#footerPolicyPopover .footer-policy-got-it:focus {
+  transform:translateY(-1px)!important;
+  background:linear-gradient(90deg,#ff8a18,#ff5a14)!important;
+  box-shadow:0 10px 22px rgba(255,121,0,.25)!important;
+  outline:0!important;
+}
+#footerPolicyPopover .footer-policy-got-it:disabled {
+  cursor:wait!important;
+  opacity:.72!important;
+  transform:none!important;
+}
+#footerPolicyPopover .footer-policy-primary,
+#footerPolicyPopover .footer-policy-primary p,
+#footerPolicyPopover .footer-policy-primary h2,
+#footerPolicyPopover .footer-policy-primary h3 {
+  max-width:100%!important;
+}
+#footerPolicyPopover .footer-policy-primary h2 {
+  margin:0 0 18px!important;
+  color:#111827!important;
+  font-family:'LeagueSpartanFinal','League Spartan',Arial,sans-serif!important;
+  font-size:31px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:.01em!important;
+}
+#footerPolicyPopover .footer-policy-primary h3 {
+  margin:18px 0 8px!important;
+  color:#111827!important;
+  font-family:'LeagueSpartanFinal','League Spartan',Arial,sans-serif!important;
+  font-size:16px!important;
+  line-height:1.22!important;
+  font-weight:900!important;
+}
+#footerPolicyPopover .footer-policy-primary p,
+#footerPolicyPopover .footer-policy-details p {
+  margin:0 0 14px!important;
+  color:#111827!important;
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+  font-size:13px!important;
+  line-height:1.55!important;
+  font-weight:400!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+#footerPolicyPopover .policy-highlight-note,
+#footerPolicyPopover .policy-disclaimer-block {
+  margin:14px 0!important;
+  padding:12px 14px!important;
+  border:1px solid rgba(255,121,0,.22)!important;
+  border-left:4px solid #ff7900!important;
+  border-radius:12px!important;
+  background:#fff4e8!important;
+  color:#111827!important;
+  box-shadow:0 8px 20px rgba(255,121,0,.06)!important;
+}
+#footerPolicyPopover .policy-highlight-note .policy-highlight-label {
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  margin:0 0 6px!important;
+  color:#e86100!important;
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+  font-size:11px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:.04em!important;
+  text-transform:uppercase!important;
+}
+#footerPolicyPopover .policy-highlight-note p,
+#footerPolicyPopover .policy-disclaimer-block p {
+  margin:0!important;
+  color:#374151!important;
+}
+#footerPolicyPopover .policy-disclaimer-block h3 {
+  margin:0 0 8px!important;
+  color:#111827!important;
+}
+#footerPolicyPopover .policy-table-wrap {
+  width:min(100%,820px)!important;
+  max-width:820px!important;
+  margin:14px auto 22px!important;
+  overflow-x:auto!important;
+  border:1px solid #dfe3ea!important;
+  border-radius:12px!important;
+  background:#fff!important;
+}
+#footerPolicyPopover .policy-doc-table {
+  width:100%!important;
+  min-width:0!important;
+  table-layout:fixed!important;
+  border-collapse:collapse!important;
+}
+#footerPolicyPopover .policy-doc-table th,
+#footerPolicyPopover .policy-doc-table td {
+  text-align:center!important;
+  vertical-align:middle!important;
+  overflow-wrap:anywhere!important;
+  border:1px solid #dfe3ea!important;
+  padding:10px 12px!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+}
+#footerPolicyPopover .policy-doc-table th {
+  background:#fff4ec!important;
+  color:#111827!important;
+  font-weight:900!important;
+}
+#footerPolicyPopover .footer-policy-content::-webkit-scrollbar {
+  width:9px!important;
+}
+#footerPolicyPopover .footer-policy-content::-webkit-scrollbar-track {
+  background:#f3f4f6!important;
+  border-radius:999px!important;
+}
+#footerPolicyPopover .footer-policy-content::-webkit-scrollbar-thumb {
+  background:#9ca3af!important;
+  border-radius:999px!important;
+  border:2px solid #f3f4f6!important;
+}
+@keyframes footerPolicyFinalIn {
+  from {
+    opacity:0;
+    transform:translate3d(-50%,calc(-50% + 12px),0) scale(.985);
+  }
+  to {
+    opacity:1;
+    transform:translate3d(-50%,-50%,0) scale(1);
+  }
+}
+@media(max-width:760px) {
+  #footerPolicyPopover {
+    width:calc(100vw - 28px)!important;
+    height:min(82vh,650px)!important;
+  }
+  #footerPolicyPopover .footer-policy-head {
+    padding:24px 24px 12px!important;
+  }
+  #footerPolicyPopover .footer-policy-content {
+    padding:20px 24px 12px!important;
+  }
+  #footerPolicyPopover .footer-policy-actions {
+    padding:10px 24px 16px!important;
+  }
+  #footerPolicyPopover .footer-policy-got-it {
+    width:100%!important;
+  }
+}
+</style>
+
+<script id="front-footer-customer-care-final-functions-0622">
+(function(){
+  const ACK_URL = "{{ route('customer-care.policy.acknowledge') }}";
+  const getCsrfToken = () => {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : "{{ csrf_token() }}";
+  };
+  const escapeHtml = value => String(value || "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#039;"
+  }[ch]));
+  const isHeadingText = value => /^(?:\d+(?:\.\d+)*\.?|[IVX]+\.)\s+/.test(value)
+    || /^(?:Frequently Asked Questions \(FAQs\)|Disclaimer|Overview and Important Notice)$/i.test(value)
+    || /\?$/.test(value);
+  const isImportantText = value => {
+    const text = String(value || "").trim();
+    if(!text || isHeadingText(text)) return false;
+    return [
+      /^note\s*:/i,
+      /^important/i,
+      /^disclaimer$/i,
+      /no return,?\s*no exchange/i,
+      /does not collect or store/i,
+      /does not sell|rent|trade/i,
+      /strictly prohibited|strictly non-refundable/i,
+      /must report|must provide|must contact|must be reviewed|must be resolved/i,
+      /required documentation|required by law|required to/i,
+      /within\s+(?:seven|7|seventy-two|72|five|5|two|2)/i,
+      /not liable|not responsible|not a party|does not process|does not produce/i,
+      /Data Privacy Act|Consumer Act|National Privacy Commission|DTI/i,
+      /qualified legal professional|prototype purposes|capstone project/i
+    ].some(pattern => pattern.test(text));
+  };
+  const renderTextBlock = text => {
+    const value = String(text || "").trim();
+    if(!value) return "";
+    if(isHeadingText(value)) return `<h3>${escapeHtml(value)}</h3>`;
+    if(isImportantText(value)) {
+      return `<div class="policy-highlight-note"><span class="policy-highlight-label"><i class="fa-solid fa-circle-info"></i> Important Note</span><p>${escapeHtml(value).replace(/\n/g,"<br>")}</p></div>`;
+    }
+    return `<p>${escapeHtml(value).replace(/\n/g,"<br>")}</p>`;
+  };
+  const renderTable = rows => {
+    const safeRows = (Array.isArray(rows) ? rows : []).filter(row => Array.isArray(row) && row.length);
+    if(!safeRows.length) return "";
+    const first = safeRows[0] || [];
+    const hasHeader = first.every(cell => String(cell || "").length < 40);
+    const renderCell = (cell, tag) => `<${tag}>${escapeHtml(cell).replace(/\n/g,"<br>")}</${tag}>`;
+    return `<div class="policy-table-wrap"><table class="policy-doc-table">${safeRows.map((row,index) => `<tr>${row.map(cell => renderCell(cell, hasHeader && index === 0 ? "th" : "td")).join("")}</tr>`).join("")}</table></div>`;
+  };
+  const renderPolicyBlocks = blocks => {
+    const renderedBlocks = [];
+    for(let index = 0; index < blocks.length; index += 1) {
+      const block = blocks[index];
+      const value = String(block?.text || "").trim();
+      if(block?.type !== "table" && /^Disclaimer$/i.test(value)) {
+        const next = blocks[index + 1];
+        const nextValue = next?.type !== "table" ? String(next?.text || "").trim() : "";
+        renderedBlocks.push(`<section class="policy-disclaimer-block"><h3>${escapeHtml(value)}</h3>${nextValue ? `<p>${escapeHtml(nextValue).replace(/\n/g,"<br>")}</p>` : ""}</section>`);
+        if(nextValue) index += 1;
+        continue;
+      }
+      renderedBlocks.push(block?.type === "table" ? renderTable(block.rows) : renderTextBlock(block.text));
+    }
+    return renderedBlocks.join("");
+  };
+  window.footerCareAction = function(topic, button) {
+    if(typeof footerPolicyContent === "undefined") return;
+    const key = footerPolicyContent[topic] ? topic : "terms";
+    const data = footerPolicyContent[key];
+    const popup = document.getElementById("footerPolicyPopover");
+    const title = document.getElementById("footerPolicyTitle");
+    const intro = document.getElementById("footerPolicyIntro");
+    const details = document.getElementById("footerPolicyDetails");
+    const backdrop = document.getElementById("footerPolicyBackdrop");
+    if(!popup || !title || !intro || !details) return;
+    window.footerPolicyCurrentTopic = key;
+    title.textContent = data.title || "Customer Care";
+    intro.innerHTML = renderPolicyBlocks(Array.isArray(data.blocks) ? data.blocks : []);
+    details.innerHTML = "";
+    popup.hidden = false;
+    popup.setAttribute("data-policy", key);
+    popup.classList.remove("footer-policy-animate");
+    popup.scrollTop = 0;
+    const contentScroller = popup.querySelector(".footer-policy-content");
+    if(contentScroller) contentScroller.scrollTop = 0;
+    void popup.offsetWidth;
+    popup.classList.add("footer-policy-animate");
+    if(backdrop) backdrop.hidden = false;
+    document.body.classList.add("footer-policy-open");
+    document.querySelectorAll(".printify-footer .footer-link-button.active").forEach(item => item.classList.remove("active"));
+    if(button) button.classList.add("active");
+    const gotIt = popup.querySelector(".footer-policy-got-it");
+    if(gotIt) gotIt.onclick = window.footerAcknowledgePolicy;
+  };
+  window.footerAcknowledgePolicy = async function() {
+    const topic = window.footerPolicyCurrentTopic || "unknown";
+    const button = document.querySelector("#footerPolicyPopover .footer-policy-got-it");
+    const originalText = button ? button.textContent : "Got it";
+    if(button) {
+      button.disabled = true;
+      button.textContent = "Saving...";
+    }
+    try {
+      await fetch(ACK_URL, {
+        method:"POST",
+        credentials:"same-origin",
+        headers:{
+          "Content-Type":"application/json",
+          "Accept":"application/json",
+          "X-CSRF-TOKEN":getCsrfToken()
+        },
+        body:JSON.stringify({ topic })
+      });
+    } catch(error) {
+      // Close the modal even if the backend endpoint is unavailable during local UI testing.
+      console.warn("Customer care acknowledgement was not saved.", error);
+    } finally {
+      if(button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+      if(typeof window.footerClosePolicy === "function") window.footerClosePolicy();
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function(){
+    const gotIt = document.querySelector("#footerPolicyPopover .footer-policy-got-it");
+    if(gotIt) gotIt.onclick = window.footerAcknowledgePolicy;
+  });
+})();
+</script>
+
+
+<!-- =========================================================
+  FINAL CUSTOMER CARE HOTFIX 0622B
+  - Smaller orange gradient button, no border
+  - Hover color becomes black
+  - Background page scroll locked when modal opens
+  - Only the modal content area scrolls
+========================================================= -->
+<style id="front-footer-customer-care-hotfix-0622b">
+html.footer-policy-open,
+body.footer-policy-open {
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+}
+body.footer-policy-open {
+  position:fixed!important;
+  width:100%!important;
+  left:0!important;
+  right:0!important;
+}
+#footerPolicyBackdrop {
+  touch-action:none!important;
+}
+#footerPolicyPopover {
+  overscroll-behavior:contain!important;
+}
+#footerPolicyPopover .footer-policy-content {
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+#footerPolicyPopover .footer-policy-actions {
+  padding:10px 34px 16px!important;
+  border-top:0!important;
+  background:#fff!important;
+}
+#footerPolicyPopover .footer-policy-got-it {
+  width:auto!important;
+  min-width:128px!important;
+  height:34px!important;
+  padding:0 20px!important;
+  border:none!important;
+  outline:none!important;
+  border-radius:999px!important;
+  background:linear-gradient(90deg,#ff7900 0%,#ff5a14 100%)!important;
+  color:#ffffff!important;
+  font-family:'InterFinal','Inter Local',Arial,sans-serif!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  line-height:1!important;
+  letter-spacing:.01em!important;
+  box-shadow:0 6px 14px rgba(255,121,0,.18)!important;
+  transition:background .16s ease, transform .16s ease, box-shadow .16s ease!important;
+}
+#footerPolicyPopover .footer-policy-got-it:hover,
+#footerPolicyPopover .footer-policy-got-it:focus {
+  background:#111111!important;
+  color:#ffffff!important;
+  border:none!important;
+  outline:none!important;
+  transform:translateY(-1px)!important;
+  box-shadow:0 8px 16px rgba(17,17,17,.18)!important;
+}
+#footerPolicyPopover .footer-policy-got-it:disabled {
+  background:linear-gradient(90deg,#ff7900 0%,#ff5a14 100%)!important;
+  opacity:.78!important;
+  box-shadow:none!important;
+}
+@media(max-width:760px){
+  #footerPolicyPopover .footer-policy-actions {
+    padding:10px 24px 14px!important;
+  }
+  #footerPolicyPopover .footer-policy-got-it {
+    min-width:118px!important;
+    height:33px!important;
+    padding:0 18px!important;
+  }
+}
+</style>
+
+<script id="front-footer-customer-care-scroll-lock-hotfix-0622b">
+(function(){
+  const originalOpen = window.footerCareAction;
+  const originalClose = window.footerClosePolicy;
+
+  function lockBackgroundScroll(){
+    const body = document.body;
+    const root = document.documentElement;
+    if(body.dataset.footerPolicyLocked === '1') return;
+    const scrollY = window.scrollY || window.pageYOffset || root.scrollTop || 0;
+    body.dataset.footerPolicyLocked = '1';
+    body.dataset.footerPolicyScrollY = String(scrollY);
+    body.style.top = `-${scrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.classList.add('footer-policy-open');
+    root.classList.add('footer-policy-open');
+  }
+
+  function unlockBackgroundScroll(){
+    const body = document.body;
+    const root = document.documentElement;
+    const scrollY = parseInt(body.dataset.footerPolicyScrollY || '0', 10) || 0;
+    body.classList.remove('footer-policy-open');
+    root.classList.remove('footer-policy-open');
+    body.style.top = '';
+    body.style.left = '';
+    body.style.right = '';
+    body.style.width = '';
+    delete body.dataset.footerPolicyLocked;
+    delete body.dataset.footerPolicyScrollY;
+    window.scrollTo(0, scrollY);
+  }
+
+  window.footerCareAction = function(topic, button){
+    if(typeof originalOpen === 'function') {
+      originalOpen(topic, button);
+    }
+    lockBackgroundScroll();
+  };
+
+  window.footerClosePolicy = function(){
+    if(typeof originalClose === 'function') {
+      originalClose();
+    }
+    unlockBackgroundScroll();
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const backdrop = document.getElementById('footerPolicyBackdrop');
+    if(backdrop){
+      backdrop.addEventListener('wheel', function(event){ event.preventDefault(); }, { passive:false });
+      backdrop.addEventListener('touchmove', function(event){ event.preventDefault(); }, { passive:false });
+    }
+  });
+})();
+</script>
+
+
+<!-- =========================================================
+  FINAL CUSTOMER CARE FOOTER BACKGROUND LOCK 0622C
+  When any Customer Care item in the footer is opened, the page
+  first anchors to the footer area, then locks the background there.
+  This keeps the outer/backdrop background steady on the footer section.
+========================================================= -->
+<script id="front-footer-customer-care-footer-anchor-lock-0622c">
+(function(){
+  const previousFooterCareAction = window.footerCareAction;
+
+  function getFooterScrollTarget(button){
+    const footerFromButton = button && typeof button.closest === 'function'
+      ? button.closest('.printify-footer')
+      : null;
+    return footerFromButton || document.querySelector('.printify-footer');
+  }
+
+  function keepFooterBehindModal(button){
+    const footer = getFooterScrollTarget(button);
+    if(!footer) return;
+
+    const footerRect = footer.getBoundingClientRect();
+    const footerHeight = Math.max(footerRect.height, 1);
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+    const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+
+    /*
+      Keep the footer section visible behind the modal:
+      - If footer is already visible, do not jump.
+      - If footer is not visible or only partly visible, move the page so the footer
+        area is steady behind the modal before the backdrop is shown.
+    */
+    const footerVisibleEnough = footerRect.top < viewportHeight * 0.72 && footerRect.bottom > viewportHeight * 0.28;
+
+    if(!footerVisibleEnough){
+      const footerTop = footerRect.top + currentScroll;
+      const targetScroll = Math.max(0, footerTop - Math.max(24, (viewportHeight - footerHeight) / 2));
+      window.scrollTo({ top: targetScroll, left: 0, behavior: 'auto' });
+    }
+  }
+
+  window.footerCareAction = function(topic, button){
+    keepFooterBehindModal(button);
+
+    /*
+      Use requestAnimationFrame so the browser finishes placing the footer in the
+      background before the existing modal template opens and locks scrolling.
+    */
+    window.requestAnimationFrame(function(){
+      if(typeof previousFooterCareAction === 'function'){
+        previousFooterCareAction(topic, button);
+      }
+    });
+  };
+})();
+</script>
+
+
+<!-- =========================================================
+  FINAL CUSTOMER CARE FOOTER ANCHOR FIX 0622D
+  This force-locks the modal background on the CONTACT US + FOOTER area.
+  It resets any previous modal scroll-lock, moves the page so the footer
+  is visible at the bottom of the viewport, then opens the modal and locks
+  the page in that exact position.
+========================================================= -->
+<script id="front-footer-customer-care-force-footer-bg-0622d">
+(function(){
+  const previousOpen = window.footerCareAction;
+
+  function resetPolicyScrollLockBeforeReposition(){
+    const body = document.body;
+    const root = document.documentElement;
+    body.classList.remove('footer-policy-open');
+    root.classList.remove('footer-policy-open');
+    body.style.position = '';
+    body.style.top = '';
+    body.style.left = '';
+    body.style.right = '';
+    body.style.width = '';
+    delete body.dataset.footerPolicyLocked;
+    delete body.dataset.footerPolicyScrollY;
+  }
+
+  function findFooter(button){
+    if(button && typeof button.closest === 'function'){
+      const footerFromButton = button.closest('.printify-footer');
+      if(footerFromButton) return footerFromButton;
+    }
+    return document.querySelector('.printify-footer');
+  }
+
+  function placeContactAndFooterBehindModal(button){
+    const footer = findFooter(button);
+    if(!footer) return;
+
+    resetPolicyScrollLockBeforeReposition();
+
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+    const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    const footerRect = footer.getBoundingClientRect();
+    const footerTop = footerRect.top + currentScroll;
+    const footerHeight = Math.max(footerRect.height, 1);
+
+    /*
+      Target layout:
+      - Contact area remains visible above.
+      - Footer stays visible at the bottom/background.
+      - When the modal opens, this viewport is locked and cannot scroll.
+    */
+    const visibleFooterHeight = Math.min(footerHeight, viewportHeight * 0.38);
+    const targetScroll = Math.max(0, footerTop - viewportHeight + visibleFooterHeight + 24);
+
+    window.scrollTo({ top: targetScroll, left: 0, behavior: 'auto' });
+  }
+
+  window.footerCareAction = function(topic, button){
+    placeContactAndFooterBehindModal(button);
+
+    window.requestAnimationFrame(function(){
+      window.requestAnimationFrame(function(){
+        if(typeof previousOpen === 'function'){
+          previousOpen(topic, button);
+        }
+      });
+    });
+  };
+})();
+</script>

@@ -31,7 +31,40 @@
                 ->where('admin_client_id', $portalUser->id))
             ->when(!$isDeveloperPortal && !$isAdminClientPortal, fn ($query) => $query
                 ->where('role', \App\Models\User::ROLE_CUSTOMER));
-        $dashboardServices = \App\Models\Service::query();
+        $dashboardServices = \App\Models\Service::query()->where('is_active', true);
+        $dashboardServiceAlerts = \App\Models\Service::query()
+            ->where('is_active', true)
+            ->withCount('activeVariations')
+            ->orderBy('category')
+            ->orderBy('name')
+            ->limit(3)
+            ->get()
+            ->map(function ($service) {
+                $category = strtolower((string) ($service->category ?? ''));
+                $icon = str_contains($category, 'photo') || str_contains($category, 'id')
+                    ? 'image'
+                    : (str_contains($category, 'lamination') || str_contains($category, 'binding')
+                        ? 'book-open'
+                        : (str_contains($category, 'large') || str_contains($category, 'custom')
+                            ? 'package'
+                            : (str_contains($category, 'copy') || str_contains($category, 'scan')
+                                ? 'copy'
+                                : 'printer')));
+                $variationCount = (int) $service->active_variations_count;
+
+                return [
+                    'name' => $service->name,
+                    'category' => $service->category ?: 'General Service',
+                    'icon' => $icon,
+                    'options' => $variationCount,
+                    'status' => $variationCount > 0 ? 'Live' : 'Needs setup',
+                    'status_class' => $variationCount > 0 ? 'completed' : 'low',
+                    'message' => $variationCount > 0
+                        ? "{$variationCount} live service option" . ($variationCount === 1 ? '' : 's') . ' synced from the customer catalog.'
+                        : 'No active options yet. Open the catalog to finish setup.',
+                ];
+            })
+            ->values();
         $dashboardStats = [
             'revenue' => (float) (clone $dashboardOrders)->sum('total_price'),
             'orders' => (clone $dashboardOrders)->count(),
@@ -42,6 +75,7 @@
             'completed' => (clone $dashboardOrders)->where('status', 'Completed')->count(),
             'cancelled' => (clone $dashboardOrders)->where('status', 'Cancelled')->count(),
         ];
+        $dashboardServiceAlertCount = $dashboardServiceAlerts->count();
         $dashboardActiveUsersLabel = $isDeveloperPortal
             ? 'Active Admin Clients'
             : ($isAdminClientPortal ? 'Active Customers' : 'Active Users');
@@ -909,7 +943,7 @@
         [x-cloak] { display: none !important; }
     </style>
 
-    <div x-data="{ 
+    <div class="staff-portal-shell {{ $isDeveloperPortal ? 'staff-portal-developer' : 'staff-portal-admin' }}" x-data="{
         sidebarOpen: true, 
         showDetail: false,
         searchOpen: false,
@@ -1043,9 +1077,10 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="{{ route('home') }}" class="sidebar-link">
-                    <i data-lucide="external-link"></i> 
-                    <span class="nav-text" x-show="sidebarOpen" x-transition>Go to Home</span>
+                <a href="{{ route('home') }}" class="sidebar-link staff-home-link">
+                    <i data-lucide="home"></i>
+                    <span style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Go to Home</span>
+                    <span class="nav-text" x-show="sidebarOpen" x-transition>Home</span>
                 </a>
                 <div class="my-4 border-t border-slate-50 mx-2" style="border-top: 1px solid #F1F5F9; margin: 15px 0;"></div>
 
@@ -1183,7 +1218,7 @@
                         
                         <div class="profile-area">
                             <div class="profile-pic">
-                                <img src="https://i.pravatar.cc/150?u={{ urlencode($portalDisplayName) }}" alt="{{ $portalDisplayName }}">
+                                <span>{{ $portalInitial }}</span>
                                 <div class="green-dot"></div>
                             </div>
                             <div style="display: flex; flex-direction: column;">
@@ -2829,21 +2864,23 @@
                                 <div class="dash-alert-area dash-system-alerts-panel">
                                     <h2 class="dash-card-title">System Alerts</h2>
                                     <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.orders') }}','Opening pending order checks...')"><span class="dash-alert-copy"><span class="dash-alert-icon red"><i data-lucide="triangle-alert" style="width:16px"></i></span><span><strong>Pending order checks</strong><br><small>Orders need verification</small></span></span><b class="dash-count-pill red">{{ number_format($dashboardStats['pending']) }}</b></button>
-                                    <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.products') }}','Opening low stock records...')"><span class="dash-alert-copy"><span class="dash-alert-icon orange"><i data-lucide="trophy" style="width:16px"></i></span><span><strong>Low stock records</strong><br><small>Items are running low</small></span></span><b class="dash-count-pill">{{ number_format(max(0, $dashboardStats['services'] - 3)) }}</b></button>
+                                    <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.products') }}','Opening synced service catalog records...')"><span class="dash-alert-copy"><span class="dash-alert-icon orange"><i data-lucide="trophy" style="width:16px"></i></span><span><strong>Synced service records</strong><br><small>Customer catalog items live in this portal</small></span></span><b class="dash-count-pill">{{ number_format($dashboardServiceAlertCount) }}</b></button>
                                     <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.orders') }}','Opening ready for release orders...')"><span class="dash-alert-copy"><span class="dash-alert-icon blue"><i data-lucide="package-check" style="width:16px"></i></span><span><strong>Ready for release</strong><br><small>Orders ready to dispatch</small></span></span><b class="dash-count-pill blue">{{ number_format($dashboardStats['ready']) }}</b></button>
                                     <a class="dash-link" href="{{ route('admin.orders') }}">View all alerts <i data-lucide="arrow-right" style="width:14px"></i></a>
                                 </div>
                                 <div class="dash-stock-area dash-low-stock-panel">
                                     <h2 class="dash-card-title">{{ $isDeveloperPortal ? 'Service Alerts' : 'Low Stock Alerts' }}</h2>
                                     <table class="dash-table dash-stock-table">
-                                        <thead><tr><th>{{ $isDeveloperPortal ? 'Service' : 'Product' }}</th><th>Stock Left</th><th>Status</th></tr></thead>
+                                        <thead><tr><th>Service</th><th>Options</th><th>Status</th></tr></thead>
                                         <tbody>
-                                            <tr @click="openInfo('Matte Black Mug','Stock left: 12. {{ $isDeveloperPortal ? 'Service' : 'Product' }} record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="cup-soda" style="width:14px"></i></span>Matte Black Mug</span></td><td>12</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
-                                            <tr @click="openInfo('Premium White Tee','Stock left: 18. {{ $isDeveloperPortal ? 'Service' : 'Product' }} record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="shirt" style="width:14px"></i></span>Premium White Tee</span></td><td>18</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
-                                            <tr @click="openInfo('Glossy Photo Paper','Stock left: 25. {{ $isDeveloperPortal ? 'Service' : 'Product' }} record opened.')"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="image" style="width:14px"></i></span>Glossy Photo Paper</span></td><td>25</td><td><span class="dash-pill low"><i class="dash-dot orange"></i>Low</span></td></tr>
+                                            @forelse($dashboardServiceAlerts as $serviceAlert)
+                                                <tr @click="openReal('{{ route('admin.products') }}', @js('Opening ' . $serviceAlert['name'] . ' service record...'))"><td><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="{{ $serviceAlert['icon'] }}" style="width:14px"></i></span>{{ $serviceAlert['name'] }}</span></td><td>{{ number_format($serviceAlert['options']) }}</td><td><span class="dash-pill {{ $serviceAlert['status_class'] }}"><i class="dash-dot {{ $serviceAlert['status_class'] === 'completed' ? 'green' : 'orange' }}"></i>{{ $serviceAlert['status'] }}</span></td></tr>
+                                            @empty
+                                                <tr><td colspan="3"><span class="dash-product-cell"><span class="dash-product-img"><i data-lucide="inbox" style="width:14px"></i></span>No active services yet</span></td></tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
-                                    <a class="dash-link" href="{{ route('admin.products') }}">View all low stock items <i data-lucide="arrow-right" style="width:14px"></i></a>
+                                    <a class="dash-link" href="{{ route('admin.products') }}">View all service items <i data-lucide="arrow-right" style="width:14px"></i></a>
                                 </div>
                             </div>
                         </article>
@@ -3971,6 +4008,7 @@
     </style>
 
 <style id="admin-developer-portal-final-cleanup">
+    .staff-portal-shell,
     .admin-main-shell{
         --portal-accent: {{ $isDeveloperPortal ? '#10B981' : '#2563EB' }};
         --portal-accent-soft: {{ $isDeveloperPortal ? '#ECFDF5' : '#EFF6FF' }};
@@ -4009,7 +4047,7 @@
     .admin-main-shell .action-circle-group{
         display:none!important;
     }
-    .admin-main-shell .sidebar{
+    .staff-portal-shell .sidebar{
         width:260px!important;
         background:#fff!important;
         border-right:1px solid #E2E8F0!important;
@@ -4017,13 +4055,13 @@
     }
     .admin-main-shell.expanded{margin-left:85px!important}
     .admin-main-shell:not(.expanded){margin-left:260px!important}
-    .admin-main-shell .sidebar.closed{width:85px!important}
-    .admin-main-shell .sidebar-header{
+    .staff-portal-shell .sidebar.closed{width:85px!important}
+    .staff-portal-shell .sidebar-header{
         min-height:96px!important;
         padding:1.5rem!important;
         border-bottom:1px solid #F1F5F9!important;
     }
-    .admin-main-shell .sidebar-link{
+    .staff-portal-shell .sidebar-link{
         min-height:46px!important;
         margin-bottom:5px!important;
         padding:11px 16px!important;
@@ -4037,8 +4075,8 @@
         text-transform:uppercase!important;
         transition:background .18s ease,color .18s ease,border-color .18s ease!important;
     }
-    .admin-main-shell .sidebar-link:not(.active):hover,
-    .admin-main-shell .sidebar-link:not(.active):focus-visible{
+    .staff-portal-shell .sidebar-link:not(.active):hover,
+    .staff-portal-shell .sidebar-link:not(.active):focus-visible{
         background:rgba(17,24,39,.10)!important;
         color:#334155!important;
         border:0!important;
@@ -4046,19 +4084,24 @@
         transform:none!important;
         outline:0!important;
     }
-    .admin-main-shell .sidebar-link.active{
+    .staff-portal-shell .sidebar-link.active{
         background:var(--portal-accent-soft)!important;
         color:var(--portal-accent)!important;
         box-shadow:none!important;
     }
-    .admin-main-shell .sidebar-link.active::before{
+    .staff-portal-shell .sidebar-link.active::before{
         background:var(--portal-accent)!important;
     }
-    .admin-main-shell .sidebar-link.active::after{
+    .staff-portal-shell .sidebar-link.active::after{
         color:var(--portal-accent)!important;
         background:transparent!important;
     }
-    .admin-main-shell .menu-toggle:hover{
+    .staff-portal-shell .sidebar-link.active i,
+    .staff-portal-shell .sidebar-link.active svg{
+        color:var(--portal-accent)!important;
+        stroke:var(--portal-accent)!important;
+    }
+    .staff-portal-shell .menu-toggle:hover{
         background:#F1F5F9!important;
         color:var(--portal-accent)!important;
     }
@@ -4098,6 +4141,104 @@
     .admin-main-shell .dot.active{
         background:var(--portal-accent)!important;
     }
+    .admin-main-shell .top-nav{
+        height:52px!important;
+        margin-top:10px!important;
+        gap:10px!important;
+        align-items:center!important;
+        justify-content:flex-end!important;
+    }
+    .admin-main-shell .header-search-wrap{
+        width:240px!important;
+        min-width:240px!important;
+        height:38px!important;
+    }
+    .admin-main-shell .header-search-box{
+        height:38px!important;
+        border-radius:999px!important;
+        border:1px solid rgba(15,23,42,.88)!important;
+        background:#fff!important;
+        color:#111827!important;
+        padding:0 44px 0 42px!important;
+        font-size:13px!important;
+        font-weight:600!important;
+        box-shadow:0 12px 26px rgba(15,23,42,.16)!important;
+    }
+    .admin-main-shell .header-search-box::placeholder{
+        color:#64748B!important;
+    }
+    .admin-main-shell .header-search-submit{
+        left:8px!important;
+        right:auto!important;
+        width:30px!important;
+        height:30px!important;
+        border-radius:999px!important;
+        background:transparent!important;
+        color:#64748B!important;
+        border:0!important;
+        box-shadow:none!important;
+    }
+    .admin-main-shell .header-search-submit:hover{
+        background:#F1F5F9!important;
+        color:var(--portal-accent)!important;
+    }
+    .admin-main-shell .header-icon-no-box{
+        width:34px!important;
+        height:34px!important;
+        border-radius:999px!important;
+        color:rgba(255,255,255,.86)!important;
+        border:0!important;
+        background:transparent!important;
+        box-shadow:none!important;
+    }
+    .admin-main-shell .header-icon-no-box:hover,
+    .admin-main-shell .header-icon-no-box.is-active{
+        background:rgba(255,255,255,.16)!important;
+        color:#fff!important;
+    }
+    .admin-main-shell .red-dot{
+        top:-4px!important;
+        right:-4px!important;
+        min-width:17px!important;
+        height:17px!important;
+        background:#FF7A00!important;
+        border:2px solid rgba(15,23,42,.82)!important;
+        font-size:9px!important;
+    }
+    .admin-main-shell .profile-area{
+        gap:8px!important;
+        min-width:0!important;
+        padding-left:4px!important;
+    }
+    .admin-main-shell .profile-pic{
+        width:48px!important;
+        height:48px!important;
+        background:#E5E7EB!important;
+        color:#111827!important;
+        border:2px solid rgba(255,255,255,.5)!important;
+        box-shadow:0 10px 24px rgba(15,23,42,.2)!important;
+    }
+    .admin-main-shell .profile-pic span{
+        display:grid!important;
+        place-items:center!important;
+        width:100%!important;
+        height:100%!important;
+        font-size:16px!important;
+        font-weight:900!important;
+    }
+    .admin-main-shell .green-dot{
+        bottom:2px!important;
+        right:1px!important;
+        width:10px!important;
+        height:10px!important;
+        border:2px solid rgba(15,23,42,.72)!important;
+        box-shadow:none!important;
+    }
+    .admin-main-shell .staff-home-link:hover,
+    .admin-main-shell .staff-home-link:focus-visible{
+        background:var(--portal-accent-soft)!important;
+        color:var(--portal-accent)!important;
+    }
     .admin-main-shell .content-container,
     .admin-main-shell .admin-section-content{
         padding:32px 70px 70px!important;
@@ -4112,11 +4253,11 @@
     @media(max-width:1024px){
         .admin-main-shell:not(.expanded),
         .admin-main-shell.expanded{margin-left:85px!important}
-        .admin-main-shell .sidebar{width:85px!important}
-        .admin-main-shell .brand-name,
-        .admin-main-shell .sidebar-link span,
-        .admin-main-shell .sidebar-link.active::after{display:none!important}
-        .admin-main-shell .sidebar-link{justify-content:center!important;padding-left:0!important;padding-right:0!important}
+        .staff-portal-shell .sidebar{width:85px!important}
+        .staff-portal-shell .brand-name,
+        .staff-portal-shell .sidebar-link span,
+        .staff-portal-shell .sidebar-link.active::after{display:none!important}
+        .staff-portal-shell .sidebar-link{justify-content:center!important;padding-left:0!important;padding-right:0!important}
         .admin-main-shell .hero-banner{padding:5px 28px!important}
         .admin-main-shell .content-container,
         .admin-main-shell .admin-section-content{padding:32px 40px 60px!important}

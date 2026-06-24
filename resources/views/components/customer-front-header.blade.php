@@ -1,5 +1,6 @@
 @php
     $frontCartCount = collect(session('cart', []))->sum(fn ($row) => max(1, (int) ($row['qty'] ?? 1)));
+    $frontActive = $frontActive ?? ($activeSection ?? '');
 @endphp
 <style id="customer-original-front-header-style">
 @font-face{font-family:'CustomerFrontLeague';src:url('/Fonts/LeagueSpartan-SemiBold.otf') format('opentype');font-weight:600;font-display:swap}
@@ -31,17 +32,17 @@
 @media(max-width:1180px){.customer-front-header__inner{grid-template-columns:auto 1fr auto;padding:0 26px;gap:20px}.customer-front-nav{gap:24px}.customer-front-search{width:190px}.customer-front-brand strong{font-size:21px}}
 @media(max-width:880px){.customer-front-header{height:auto;min-height:72px}.customer-front-header__inner{grid-template-columns:1fr auto;padding:12px 18px}.customer-front-nav{grid-column:1/-1;grid-row:2;height:42px;justify-content:flex-start;overflow-x:auto}.customer-front-nav a{height:42px}.customer-front-nav a:after{bottom:0}.customer-front-search{display:none}.customer-front-account span{display:none}}
 </style>
-<header class="customer-front-header" id="customerOriginalHeader">
+<header class="customer-front-header top-nav-bar premium-site-header header-dark" id="customerOriginalHeader">
   <div class="customer-front-header__inner">
     <a class="customer-front-brand" href="{{ route('home') }}" aria-label="Printify and Co Home">
       <strong>PRINTIFY &amp; CO.</strong>
       <small>CRAFTING YOUR VISION INTO REALITY</small>
     </a>
     <nav class="customer-front-nav" aria-label="Main navigation">
-      <a href="{{ route('home') }}">HOME</a>
-      <a href="{{ route('landing.aboutus') }}">ABOUT US</a>
-      <a class="active" href="{{ route('services.index') }}">SERVICES</a>
-      <a href="{{ route('landing.contactus') }}">CONTACT US</a>
+      <a class="{{ $frontActive === 'home' ? 'active' : '' }}" href="{{ route('home') }}">HOME</a>
+      <a class="{{ $frontActive === 'about' ? 'active' : '' }}" href="{{ route('landing.aboutus') }}">ABOUT US</a>
+      <a class="{{ in_array($frontActive, ['products', 'services'], true) ? 'active' : '' }}" href="{{ route('services.index') }}">SERVICES</a>
+      <a class="{{ $frontActive === 'contact' ? 'active' : '' }}" href="{{ route('landing.contactus') }}">CONTACT US</a>
     </nav>
     <div class="customer-front-actions">
       <input class="customer-front-search" type="search" placeholder="Search products or services..." aria-label="Search products or services">

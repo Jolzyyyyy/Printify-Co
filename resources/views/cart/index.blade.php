@@ -25,6 +25,7 @@
     <thead>
         <tr>
             <th>Service</th>
+            <th>Preview</th>
             <th>Price Type</th>
             <th>Price</th>
             <th>Qty</th>
@@ -41,7 +42,15 @@
             </td>
 
             <td>
-                <form method="POST" action="{{ route('cart.update', $item['service_id']) }}">
+                @if(!empty($item['image_path']))
+                    <img src="{{ asset('storage/'.$item['image_path']) }}" alt="{{ $item['name'] }}" width="64" height="48" style="object-fit:cover;border-radius:8px;" loading="eager" decoding="sync" fetchpriority="high">
+                @else
+                    <span style="color:#777;">No image</span>
+                @endif
+            </td>
+
+            <td>
+                <form method="POST" action="{{ route('cart.update', $item['cart_key']) }}">
                     @csrf
                     <select name="price_type">
                         <option value="retail" {{ $item['price_type']=='retail' ? 'selected' : '' }}>Retail</option>
@@ -61,7 +70,7 @@
                     <button type="submit">Update</button>
                 </form>
 
-                <form method="POST" action="{{ route('cart.remove', $item['service_id']) }}" style="margin-top:5px;">
+                <form method="POST" action="{{ route('cart.remove', $item['cart_key']) }}" style="margin-top:5px;">
                     @csrf
                     <button type="submit">Remove</button>
                 </form>

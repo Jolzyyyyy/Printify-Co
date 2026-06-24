@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Mail\OrderReceiptMail;
+use App\Models\EReceiptRequest;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServiceVariation;
@@ -30,6 +31,35 @@ class ServiceOrderingAccessTest extends TestCase
 
         $this->get(route('landing.service-details'))
             ->assertOk();
+    }
+
+    public function test_order_tracking_uses_the_original_customer_navigation_and_linked_breadcrumbs(): void
+    {
+        $customer = User::factory()->create([
+            'role' => 'customer',
+            'email_verified_at' => now(),
+        ]);
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'order_reference' => 'PFY-NAV-TEST',
+            'customer_name' => $customer->name,
+            'customer_email' => $customer->email,
+            'customer_phone' => '+639171234567',
+            'status' => 'paid',
+            'total_price' => 100,
+        ]);
+
+        $this
+            ->actingAs($customer)
+            ->withSession(['customer_otp_passed' => true])
+            ->get(route('co.place-order.tracking', $order))
+            ->assertOk()
+            ->assertSee('id="customerOriginalHeader"', false)
+            ->assertSeeInOrder(['HOME', 'ABOUT US', 'SERVICES', 'CONTACT US'])
+            ->assertSeeInOrder(['Back to Home', 'Dashboard', 'My Orders', 'Order Tracking'])
+            ->assertSee('href="'.route('dashboard').'"', false)
+            ->assertSee('href="'.route('co.place-order').'"', false)
+            ->assertDontSee('MY TEMPLATES');
     }
 
     public function test_guest_ordering_actions_redirect_to_customer_login(): void
@@ -80,7 +110,7 @@ class ServiceOrderingAccessTest extends TestCase
             ->assertSee('data/ph-locations.json');
     }
 
-    public function test_payment_start_requires_complete_customer_and_shipping_details(): void
+    public function test_payment_start_requires_a_submitted_e_invoice_request(): void
     {
         $customer = User::factory()->create([
             'role' => 'customer',
@@ -119,7 +149,7 @@ class ServiceOrderingAccessTest extends TestCase
             ]);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors('checkout.shippingAddress.apartment');
+            ->assertJsonPath('message', 'Complete and submit the e-invoice request before payment.');
     }
 
     public function test_payment_start_allows_pickup_without_shipping_address(): void
@@ -142,6 +172,7 @@ class ServiceOrderingAccessTest extends TestCase
             'role' => 'customer',
             'email_verified_at' => now(),
         ]);
+        $receipt = $this->receiptRequest($customer);
 
         $payload = $this->completeCheckoutPayload();
         $payload['delivery'] = [
@@ -155,6 +186,7 @@ class ServiceOrderingAccessTest extends TestCase
             ->withSession([
                 'customer_otp_passed' => true,
                 'cart' => $this->checkoutCart(),
+                'checkout_e_receipt_request_id' => $receipt->id,
             ])
             ->postJson(route('payment.start'), [
                 'payment_method' => 'gcash',
@@ -167,11 +199,8 @@ class ServiceOrderingAccessTest extends TestCase
         $this->assertSame('pickup', session('checkout_details.delivery.type'));
         $this->assertArrayNotHasKey('shippingAddress', session('checkout_details'));
 
-        $order = Order::firstOrFail();
-        $this->assertSame('pending_payment', $order->status);
-        $this->assertSame('pickup', $order->delivery_method);
-        $this->assertSame('cs_test_pickup', $order->payment_checkout_id);
-        $this->assertCount(1, $order->items);
+        $this->assertSame('cs_test_pickup', session('checkout_provider_id'));
+        $this->assertDatabaseCount('orders', 0);
     }
 
     public function test_payment_start_stores_complete_checkout_details_for_receipt_and_delivery(): void
@@ -194,12 +223,14 @@ class ServiceOrderingAccessTest extends TestCase
             'role' => 'customer',
             'email_verified_at' => now(),
         ]);
+        $receipt = $this->receiptRequest($customer);
 
         $response = $this
             ->actingAs($customer)
             ->withSession([
                 'customer_otp_passed' => true,
                 'cart' => $this->checkoutCart(),
+                'checkout_e_receipt_request_id' => $receipt->id,
             ])
             ->postJson(route('payment.start'), [
                 'payment_method' => 'gcash',
@@ -219,182 +250,15 @@ class ServiceOrderingAccessTest extends TestCase
             session('checkout_details.shippingAddress.barangay')
         );
 
-        $order = Order::firstOrFail();
-        $this->assertSame('pending_payment', $order->status);
-        $this->assertSame('PFY-', substr((string) $order->order_reference, 0, 4));
-        $this->assertSame('+639272902721', $order->customer_phone);
-        $this->assertSame('lalamove', $order->delivery_method);
-        $this->assertSame('cs_test_lalamove', $order->payment_checkout_id);
-        $this->assertStringContainsString('Batasan Hills', (string) $order->delivery_address);
-        $this->assertSame('DOC-TXT-BW-A4-001', $order->items()->first()?->service_item_id);
-    }
+        $this->assertSame('cs_test_lalamove', session('checkout_provider_id'));
+        $this->assertSame('lalamove', session('checkout_details.delivery.type'));
+        $this->assertSame('Batasan Hills', session('checkout_details.shippingAddress.barangay'));
+        $this->assertDatabaseCount('orders', 0);
 
-    public function test_customer_order_tracking_uses_real_order_checkout_and_item_details(): void
-    {
-        $service = $this->serviceWithVariation();
-        $variation = $service->activeVariations()->firstOrFail();
-        $customer = User::factory()->create([
-            'role' => 'customer',
-            'email_verified_at' => now(),
-            'name' => 'Sonny Quinton',
-        ]);
-
-        $order = Order::create([
-            'user_id' => $customer->id,
-            'order_reference' => 'PFY-TRACK-REAL',
-            'customer_name' => 'Sonny Quinton',
-            'customer_email' => 'sonny@example.com',
-            'customer_phone' => '+639451751414',
-            'status' => 'paid',
-            'total_price' => 299,
-            'checkout_details' => [
-                'delivery' => [
-                    'type' => 'lalamove',
-                    'name' => 'Lalamove On-demand',
-                ],
-                'shippingAddress' => [
-                    'street' => "Jenny's Ave",
-                    'apartment' => '88',
-                    'barangay' => 'Bagong Katipunan',
-                    'city' => 'Pasig City',
-                    'province' => 'Metro Manila',
-                    'postal' => '1600',
-                    'country' => 'Philippines',
-                ],
-            ],
-            'payment_method' => 'gcash',
-            'payment_reference' => 'pay_real_123',
-            'paid_at' => now(),
-            'delivery_method' => 'lalamove',
-            'delivery_fee' => 284,
-            'delivery_address' => "Jenny's Ave, 88, Bagong Katipunan, Pasig City, Metro Manila, 1600, Philippines",
-            'delivery_notes' => 'Leave at front desk',
-            'lalamove_status' => 'ASSIGNING_DRIVER',
-        ]);
-
-        $order->items()->create([
-            'service_id' => $service->id,
-            'service_variation_id' => $variation->id,
-            'service_item_id' => 'DOC-TXT-BW-A4-001',
-            'service_name' => 'Document Printing',
-            'variation_label' => 'Text Only / B&W / A4 / Standard / Package A',
-            'price_type' => 'retail',
-            'unit_price' => 15,
-            'quantity' => 1,
-            'subtotal' => 15,
-        ]);
-
-        $order->files()->create([
-            'original_name' => 'Shaping the Filipino to be heroes.docx',
-            'path' => 'order-files/1/heroes.docx',
-            'mime' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'size' => 12345,
-        ]);
-
-        $this
-            ->actingAs($customer)
-            ->withSession(['customer_otp_passed' => true])
-            ->get(route('co.place-order.tracking', $order))
-            ->assertOk()
-            ->assertSee('PFY-TRACK-REAL')
-            ->assertSee('Document Printing')
-            ->assertSee('DOC-TXT-BW-A4-001')
-            ->assertSee('Text Only')
-            ->assertSee('B&amp;W', false)
-            ->assertSee('GCash')
-            ->assertSee('pay_real_123')
-            ->assertSee("Jenny&#039;s Ave", false)
-            ->assertSee('Leave at front desk')
-            ->assertSee('Shaping the Filipino to be heroes.docx')
-            ->assertDontSee('Text Only Printing')
-            ->assertDontSee('80gsm White')
-            ->assertDontSee('Back to Order Details');
-
-        $this
-            ->actingAs($customer)
-            ->withSession(['customer_otp_passed' => true])
-            ->get(route('co.place-order.show', $order))
-            ->assertRedirect(route('co.place-order.tracking', $order, absolute: false));
-    }
-
-    public function test_customer_can_retry_lalamove_booking_and_store_real_tracking_fields(): void
-    {
-        Http::fake([
-            'rest.sandbox.lalamove.com/v3/quotations' => Http::response([
-                'data' => [
-                    'quotationId' => 'quote_real_123',
-                    'stops' => [
-                        ['stopId' => 'pickup-stop'],
-                        ['stopId' => 'dropoff-stop'],
-                    ],
-                ],
-            ]),
-            'rest.sandbox.lalamove.com/v3/orders' => Http::response([
-                'data' => [
-                    'orderId' => 'LALA-ORDER-123',
-                    'status' => 'ASSIGNING_DRIVER',
-                    'driverId' => null,
-                    'shareLink' => 'https://share.lalamove.test/LALA-ORDER-123',
-                ],
-            ]),
-        ]);
-
-        config()->set('services.lalamove.api_key', 'pk_test_lalamove');
-        config()->set('services.lalamove.api_secret', 'sk_test_lalamove');
-
-        $service = $this->serviceWithVariation();
-        $variation = $service->activeVariations()->firstOrFail();
-        $customer = User::factory()->create([
-            'role' => 'customer',
-            'email_verified_at' => now(),
-        ]);
-
-        $order = Order::create([
-            'user_id' => $customer->id,
-            'order_reference' => 'PFY-LALA-REAL',
-            'customer_name' => 'Sonny Quinton',
-            'customer_email' => 'sonny@example.com',
-            'customer_phone' => '+639451751414',
-            'status' => 'paid',
-            'total_price' => 299,
-            'payment_method' => 'gcash',
-            'paid_at' => now(),
-            'delivery_method' => 'lalamove',
-            'delivery_fee' => 284,
-            'delivery_address' => "Jenny's Ave, Pasig City, Metro Manila, Philippines",
-            'delivery_latitude' => 14.5764,
-            'delivery_longitude' => 121.0851,
-            'delivery_booking_status' => 'lalamove_booking_failed',
-            'lalamove_status' => 'BOOKING_FAILED',
-        ]);
-
-        $order->items()->create([
-            'service_id' => $service->id,
-            'service_variation_id' => $variation->id,
-            'service_item_id' => 'DOC-TXT-BW-A4-001',
-            'service_name' => 'Document Printing',
-            'variation_label' => 'Text Only / B&W / A4 / Standard / Package A',
-            'price_type' => 'retail',
-            'unit_price' => 15,
-            'quantity' => 1,
-            'subtotal' => 15,
-        ]);
-
-        $this
-            ->actingAs($customer)
-            ->withSession(['customer_otp_passed' => true])
-            ->from(route('co.place-order.tracking', $order))
-            ->post(route('orders.delivery.book', $order))
-            ->assertRedirect(route('co.place-order.tracking', $order, absolute: false));
-
-        $order->refresh();
-
-        $this->assertSame('booked_lalamove', $order->delivery_booking_status);
-        $this->assertSame('LALA-ORDER-123', $order->delivery_tracking_number);
-        $this->assertSame('https://share.lalamove.test/LALA-ORDER-123', $order->delivery_tracking_url);
-        $this->assertSame('LALA-ORDER-123', $order->lalamove_order_id);
-        $this->assertSame('ASSIGNING_DRIVER', $order->lalamove_status);
-        $this->assertNotNull($order->delivery_booked_at);
+        Http::assertSent(fn ($request) =>
+            $request->url() === 'https://api.paymongo.com/v1/checkout_sessions'
+            && data_get($request->data(), 'data.attributes.send_email_receipt') === true
+        );
     }
 
     public function test_paymongo_paid_webhook_sends_receipt_and_prepares_delivery_booking(): void
@@ -414,24 +278,40 @@ class ServiceOrderingAccessTest extends TestCase
 
         config()->set('services.paymongo.secret_key', 'sk_test_printify');
         config()->set('services.lalamove.api_key', null);
-        $this->serviceWithVariation();
+        $service = $this->serviceWithVariation();
+        $variation = $service->activeVariations()->firstOrFail();
 
         $customer = User::factory()->create([
             'role' => 'customer',
             'email_verified_at' => now(),
         ]);
 
-        $this
-            ->actingAs($customer)
-            ->withSession([
-                'customer_otp_passed' => true,
-                'cart' => $this->checkoutCart(),
-            ])
-            ->postJson(route('payment.start'), [
-                'payment_method' => 'gcash',
-                'checkout' => $this->completeCheckoutPayload(),
-            ])
-            ->assertOk();
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'order_reference' => 'PFY-WEBHOOK-TEST',
+            'customer_name' => 'Julie Anne Calusa',
+            'customer_email' => 'julieannecalusa@gmail.com',
+            'customer_phone' => '+639272902721',
+            'status' => 'pending_payment',
+            'total_price' => 20,
+            'checkout_details' => $this->completeCheckoutPayload(),
+            'payment_method' => 'gcash',
+            'payment_provider' => 'paymongo',
+            'payment_checkout_id' => 'cs_test_paid',
+            'delivery_method' => 'lalamove',
+            'delivery_address' => 'Blk 6 Lot 8 Commonwealth Ave, Batasan Hills, Quezon City',
+        ]);
+        $order->items()->create([
+            'service_id' => $service->id,
+            'service_variation_id' => $variation->id,
+            'service_item_id' => $variation->service_item_id,
+            'service_name' => $service->name,
+            'variation_label' => $variation->variation_label,
+            'price_type' => 'retail',
+            'unit_price' => 10,
+            'quantity' => 2,
+            'subtotal' => 20,
+        ]);
 
         $this->postJson(route('payment.paymongo.webhook'), [
             'data' => [
@@ -450,7 +330,7 @@ class ServiceOrderingAccessTest extends TestCase
         ])->assertOk()
             ->assertJsonPath('ok', true);
 
-        $order = Order::firstOrFail();
+        $order->refresh();
         $this->assertSame('paid', $order->status);
         $this->assertSame('pay_test_123', $order->payment_reference);
         $this->assertNotNull($order->paid_at);
@@ -544,6 +424,22 @@ class ServiceOrderingAccessTest extends TestCase
                 'qty' => 2,
             ],
         ];
+    }
+
+    private function receiptRequest(User $user): EReceiptRequest
+    {
+        return EReceiptRequest::create([
+            'user_id' => $user->id,
+            'receipt_type' => 'personal',
+            'full_name' => $user->name,
+            'region' => 'NCR',
+            'province' => 'Metro Manila',
+            'city' => 'Quezon City',
+            'barangay' => 'Batasan Hills',
+            'postal_code' => '1126',
+            'street_address' => 'Blk 6 Lot 8 Commonwealth Ave',
+            'status' => 'submitted',
+        ]);
     }
 
     private function completeCheckoutPayload(): array

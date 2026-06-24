@@ -558,11 +558,19 @@ body.checkout-open {
 body.checkout-open #pageWrapper,body.service-detail-open #pageWrapper {
   display:none!important
 }
-body.front-route-service-details #pageWrapper,body.front-route-checkout #pageWrapper {
+body.front-route-service-details #pageWrapper,body.front-route-checkout #pageWrapper,
+body.front-route-service-details .printify-footer,body.front-route-checkout .printify-footer {
   display:none!important
 }
 body.front-route-service-details #serviceDetail,body.service-detail-open #serviceDetail {
   display:block
+}
+body.front-route-service-details #checkout,
+body.front-route-checkout #serviceDetail {
+  display:none!important
+}
+body.front-route-checkout #checkout {
+  display:block!important
 }
 /* Standalone sections are route-authoritative. A stale JS/open-state class must
    never leak Service Details or Checkout below another public page/footer. */
@@ -958,15 +966,15 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 </div>
 <header class="top-nav-bar premium-site-header" id="mainHeader">
 <div class="premium-main-navbar">
-<a href="/home" class="brand-logo-block" aria-label="Printify and Co Home">
+<a href="{{ route('home') }}" class="brand-logo-block" aria-label="Printify and Co Home">
 <span class="brand-main-text">PRINTIFY &amp; CO.</span>
 <span class="brand-sub-text">CRAFTING YOUR VISION INTO REALITY</span>
 </a>
 <nav class="nav-horizontal" aria-label="Main navigation">
-<a href="/home" class="nav-link {{ $activeSection === 'home' ? 'active' : '' }}" data-section="home">HOME</a>
-<a href="/aboutus" class="nav-link {{ $activeSection === 'about' ? 'active' : '' }}" data-section="about">ABOUT US</a>
-<a href="/services" class="nav-link {{ $activeSection === 'products' || $activeSection === 'service-details' ? 'active' : '' }}" data-section="products">SERVICES</a>
-<a href="/contactus" class="nav-link {{ $activeSection === 'contact' ? 'active' : '' }}" data-section="contact">CONTACT US</a>
+<a href="{{ route('home') }}" class="nav-link {{ $activeSection === 'home' ? 'active' : '' }}" data-section="home">HOME</a>
+<a href="{{ route('landing.aboutus') }}" class="nav-link {{ $activeSection === 'about' ? 'active' : '' }}" data-section="about">ABOUT US</a>
+<a href="{{ route('services.index') }}" class="nav-link {{ $activeSection === 'products' || $activeSection === 'service-details' ? 'active' : '' }}" data-section="products">SERVICES</a>
+<a href="{{ route('landing.contactus') }}" class="nav-link {{ $activeSection === 'contact' ? 'active' : '' }}" data-section="contact">CONTACT US</a>
 </nav>
 <div class="hero-signin-container" id="authContainer">
 <div class="nav-search-box">
@@ -1002,6 +1010,8 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 </div>
 </div>
 </header>
+@php($isStandaloneFrontRoute = in_array($activeSection, ['service-details', 'checkout'], true))
+@unless($isStandaloneFrontRoute)
 <div class="main-content" id="pageWrapper">
 <section id="home" class="section active">
 <div class="home-premium-page">
@@ -1048,8 +1058,11 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 @include('f-about-us')
 @include('f-contact-us')
 </div>
+@endunless
 @include('f-service-details')
+@if($activeSection === 'checkout')
 @include('f-checkout')
+@endif
 <script>
 let currentHeroIndex=0,heroTimer=null,isAutoScrolling=false,autoScrollTarget='{{ $activeSection }}',scrollSpyTick=null;
 const initialRouteSection=(()=>{
@@ -1378,6 +1391,10 @@ fileName:fileName
     localStorage.setItem('printifyCheckoutItems',JSON.stringify([item]));
     localStorage.setItem('printifyCheckoutSource','direct');
   } else ensureCheckoutStorageFromVisibleOrder();
+  if(initialRouteSection!=='checkout'||!getSectionEl('checkout')){
+    window.location.assign('/checkout');
+    return false;
+  }
   if(window.location.pathname!=='/checkout'){
     window.location.href='/checkout';
     return false;

@@ -1,4 +1,4 @@
-﻿<x-guest-layout>
+<x-guest-layout>
     <style>
         :root {
             --primary-blue: #3158ff;
@@ -105,6 +105,23 @@
         }
 
         .sign-in-container { left: 0; z-index: 2; opacity: 1; }
+        .sign-up-container { left: 0; opacity: 0; z-index: 1; }
+
+        .auth-container.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+            opacity: 0;
+            z-index: 1;
+            filter: blur(1.2px);
+        }
+
+        .auth-container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            filter: blur(0);
+            animation: show var(--slide-time) var(--slide-ease);
+        }
+
         @keyframes show {
             0%, 45% { opacity: 0; z-index: 1; }
             46%, 100% { opacity: 1; z-index: 5; }
@@ -127,6 +144,11 @@
             transform-style: preserve-3d;
         }
 
+        .auth-container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+            border-radius: 0 82px 82px 0 !important;
+        }
+
         .overlay {
             background: linear-gradient(145deg, #5d72ff 0%, #4f46e5 48%, #241f9f 100%) !important;
             color: #fff;
@@ -140,6 +162,8 @@
             backface-visibility: hidden;
             transform-style: preserve-3d;
         }
+
+        .auth-container.right-panel-active .overlay { transform: translateX(50%); }
 
         .overlay-panel {
             position: absolute;
@@ -180,12 +204,21 @@
             z-index: 3;
         }
 
+        .overlay-left {
+            transform: translateX(-20%);
+            transition: transform var(--slide-time) var(--slide-ease);
+            background-position: -54px -50px, 28px 20px, center bottom -6px;
+        }
+
         .overlay-right {
             right: 0;
             transform: translateX(0);
             transition: transform var(--slide-time) var(--slide-ease);
             background-position: calc(100% + 48px) -48px, calc(100% - 25px) 20px, center bottom -6px;
         }
+
+        .auth-container.right-panel-active .overlay-left { transform: translateX(0); }
+        .auth-container.right-panel-active .overlay-right { transform: translateX(20%); }
 
         .overlay-panel h1 {
             font-size: 26px !important;
@@ -217,9 +250,46 @@
             backface-visibility: hidden;
         }
 
+        .sign-up-container .form-content { padding: 18px 38px !important; }
+
         .overlay-panel > * {
             will-change: transform, opacity, filter;
             backface-visibility: hidden;
+        }
+
+        .auth-container.is-sliding .form-content,
+        .auth-container.is-sliding .ghost-btn { pointer-events: none; }
+
+        .auth-container.slide-to-register .sign-in-container .form-content {
+            animation: authSlideOutLeft var(--content-time) var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-register .sign-up-container .form-content {
+            animation: authSlideInRight var(--content-time) var(--slide-ease) .12s both;
+        }
+
+        .auth-container.slide-to-login .sign-up-container .form-content {
+            animation: authSlideOutRight var(--content-time) var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-login .sign-in-container .form-content {
+            animation: authSlideInLeft var(--content-time) var(--slide-ease) .12s both;
+        }
+
+        .auth-container.slide-to-register .overlay-right > * {
+            animation: overlaySlideOutLeft .62s var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-register .overlay-left > * {
+            animation: overlaySlideInRight .72s var(--slide-ease) .12s both;
+        }
+
+        .auth-container.slide-to-login .overlay-left > * {
+            animation: overlaySlideOutRight .62s var(--slide-ease) both;
+        }
+
+        .auth-container.slide-to-login .overlay-right > * {
+            animation: overlaySlideInLeft .72s var(--slide-ease) .12s both;
         }
 
         @keyframes authSlideInRight {
@@ -415,6 +485,101 @@
             transform: none !important;
         }
 
+        .ghost-btn {
+            min-width: 158px !important;
+            height: 45px !important;
+            margin-top: 0 !important;
+            border-radius: 999px !important;
+            border: 2px solid #fff !important;
+            background: transparent !important;
+            color: #fff !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: none !important;
+            position: relative;
+            z-index: 3;
+            transition: all .3s ease;
+        }
+
+        .overlay-right .ghost-btn {
+            background: #fff !important;
+            color: var(--primary-blue) !important;
+            border-color: #fff !important;
+        }
+
+        .ghost-btn:hover {
+            background: #111827 !important;
+            border-color: #111827 !important;
+            color: #fff !important;
+        }
+
+        .auth-switch-text {
+            margin-top: 10px !important;
+            text-align: center;
+            color: #8b94a7;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .auth-switch-text button {
+            border: 0;
+            background: transparent;
+            padding: 0;
+            color: var(--primary-blue);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .auth-switch-text button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-blue) !important;
+            line-height: 1.15 !important;
+            text-decoration: none !important;
+        }
+
+        .auth-switch-text button::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform .18s ease;
+        }
+
+        .auth-switch-text button:hover::after,
+        .auth-switch-text button:focus-visible::after {
+            transform: scaleX(1);
+        }
+
+        .form-content > .auth-switch-text:first-child {
+            margin: 0 0 13px !important;
+            text-align: center !important;
+        }
+
+        .form-content > form + .auth-switch-text {
+            display: none !important;
+        }
+
+        .overlay-panel .ghost-btn {
+            border: 2px solid rgba(255,255,255,.98) !important;
+            background: rgba(255,255,255,.03) !important;
+            color: #fff !important;
+        }
+
+        .overlay-panel .ghost-btn:hover {
+            background: #111 !important;
+            border-color: #111 !important;
+            color: #fff !important;
+        }
+
         .error-text {
             color: #dc2626;
             font-size: 10px;
@@ -449,6 +614,60 @@
             font-variant-numeric: tabular-nums;
         }
 
+        .staff-access-panel {
+            display: grid;
+            gap: 14px;
+            width: 100%;
+            margin-top: 18px;
+        }
+
+        .staff-access-card {
+            border: 1px solid rgba(49, 88, 255, .20);
+            background: rgba(49, 88, 255, .055);
+            border-radius: 12px;
+            padding: 16px;
+            color: #111827;
+        }
+
+        .staff-access-card strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--primary-blue);
+        }
+
+        .staff-access-card p {
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: #4b5563;
+        }
+
+        .staff-access-list {
+            display: grid;
+            gap: 9px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .staff-access-list li {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            color: #111827;
+        }
+
+        .staff-access-list svg {
+            width: 16px;
+            height: 16px;
+            color: var(--primary-blue);
+            flex: 0 0 auto;
+        }
+
         @media (max-width: 860px) {
             .auth-container {
                 width: min(835px, calc(100vw - 28px)) !important;
@@ -462,6 +681,7 @@
                 min-height: 620px !important;
             }
             .form-content { padding: 24px !important; }
+            .sign-up-container .form-content { padding: 22px !important; }
             .overlay-panel { padding: 0 22px !important; }
         }
     </style>
@@ -551,6 +771,84 @@
             </div>
         </div>
     </div>
+
+    <style id="staff-auth-smooth-slide-final-0615">
+        :root {
+            --slide-ease: cubic-bezier(.22, 1, .36, 1) !important;
+            --slide-time: .72s !important;
+            --content-time: .46s !important;
+        }
+        .auth-container,
+        .form-container,
+        .overlay-container,
+        .overlay,
+        .overlay-panel,
+        .form-content {
+            backface-visibility: hidden !important;
+            transform-style: flat !important;
+        }
+        .auth-container.is-sliding .form-content,
+        .auth-container.is-sliding .overlay-panel > * {
+            will-change: transform, opacity !important;
+        }
+        .auth-container.slide-to-register .sign-in-container .form-content {
+            animation: authSmoothOutLeft var(--content-time) var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-register .sign-up-container .form-content {
+            animation: authSmoothInRight var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .sign-up-container .form-content {
+            animation: authSmoothOutRight var(--content-time) var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .sign-in-container .form-content {
+            animation: authSmoothInLeft var(--content-time) var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-register .overlay-right > * {
+            animation: authOverlayOutLeft .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-register .overlay-left > * {
+            animation: authOverlayInRight .48s var(--slide-ease) .08s both !important;
+        }
+        .auth-container.slide-to-login .overlay-left > * {
+            animation: authOverlayOutRight .38s var(--slide-ease) both !important;
+        }
+        .auth-container.slide-to-login .overlay-right > * {
+            animation: authOverlayInLeft .48s var(--slide-ease) .08s both !important;
+        }
+        @keyframes authSmoothInRight {
+            from { opacity: 0; transform: translate3d(26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothInLeft {
+            from { opacity: 0; transform: translate3d(-26px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authSmoothOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-26px,0,0); }
+        }
+        @keyframes authSmoothOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(26px,0,0); }
+        }
+        @keyframes authOverlayInRight {
+            from { opacity: 0; transform: translate3d(18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayInLeft {
+            from { opacity: 0; transform: translate3d(-18px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+        @keyframes authOverlayOutLeft {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(-18px,0,0); }
+        }
+        @keyframes authOverlayOutRight {
+            from { opacity: 1; transform: translate3d(0,0,0); }
+            to { opacity: 0; transform: translate3d(18px,0,0); }
+        }
+    </style>
+
     <style id="staff-auth-signin-only-lock">
         .auth-container {
             width: 835px !important;
@@ -605,8 +903,6 @@
             const input = document.getElementById(inputId);
             const svg = document.getElementById(svgId);
 
-            if (!input || !svg) return;
-
             if (input.type === 'password') {
                 input.type = 'text';
                 svg.innerHTML = `
@@ -636,6 +932,41 @@
         }
         .auth-shell .input-field {
             border-color:#6b7280!important;
+        }
+    </style>
+    <style id="staff-auth-customer-collage-bg-final-0624">
+        body,
+        .min-h-screen {
+            background:#fff!important;
+        }
+        .min-h-screen::before {
+            display:block!important;
+            content:""!important;
+            position:absolute!important;
+            inset:-18px!important;
+            z-index:0!important;
+            opacity:.96!important;
+            background:url('/images/customer-auth-collage-bg.jpg?v=0624') center/cover no-repeat!important;
+            filter:blur(1.35px) brightness(.78) saturate(.96)!important;
+            transform:scale(1.018)!important;
+            pointer-events:none!important;
+            animation:none!important;
+        }
+        .min-h-screen::after {
+            display:block!important;
+            content:""!important;
+            position:absolute!important;
+            inset:0!important;
+            z-index:1!important;
+            opacity:1!important;
+            background:rgba(0,0,0,.08)!important;
+            pointer-events:none!important;
+            animation:none!important;
+        }
+        .min-h-screen > div:last-child,
+        .auth-container {
+            position:relative!important;
+            z-index:10!important;
         }
     </style>
 </x-guest-layout>

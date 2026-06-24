@@ -733,6 +733,22 @@
   }
 }
 </style>
+<style id="about-right-showcase-position-lock">
+@media(min-width:901px){
+  #about .about-layout{
+    display:grid!important;
+    grid-template-columns:minmax(360px,500px) minmax(0,1fr)!important;
+    grid-template-areas:"mission showcase"!important;
+    column-gap:34px!important;
+    align-items:start!important;
+  }
+  #about .mission-card{grid-area:mission!important;min-width:0!important}
+  #about .right-showcase{grid-area:showcase!important;min-width:0!important;align-self:start!important}
+}
+@media(max-width:900px){
+  #about .about-layout{grid-template-columns:1fr!important;grid-template-areas:"mission" "showcase"!important}
+}
+</style>
 <style id="about-section-spacing-compact-final">
 #about.about-premium-page {
   scroll-margin-top:88px!important
@@ -754,8 +770,88 @@
 @media(max-width:760px) {
   #about .about-wrap {
     width:calc(100% - 28px)!important;
-    padding-top:24px!important;
+    padding-top:19px!important;
     padding-bottom:40px!important
+  }
+}
+</style>
+
+<style id="about-rightside-endpoint-align-final">
+/* Final alignment only: colored-border boxes are shorter while the image area is slightly taller, keeping the same endpoint. */
+@media(min-width:901px){
+  #about .about-layout{
+    align-items:start!important;
+  }
+
+  #about .mission-card{
+    height:650px!important;
+    min-height:650px!important;
+  }
+
+  #about .right-showcase{
+    height:650px!important;
+    min-height:650px!important;
+    display:grid!important;
+    grid-template-rows:140px 347px 135px!important;
+    gap:14px!important;
+    align-self:start!important;
+  }
+
+  #about .values-grid{
+    height:140px!important;
+    min-height:140px!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,1fr)!important;
+    gap:14px!important;
+  }
+
+  #about .value-card{
+    height:140px!important;
+    min-height:140px!important;
+    padding:14px 14px!important;
+  }
+
+  #about .top-gallery{
+    height:347px!important;
+    min-height:347px!important;
+    grid-template-rows:168.5px 168.5px!important;
+    gap:10px!important;
+  }
+
+  #about .about-process-strip{
+    height:135px!important;
+    min-height:135px!important;
+    margin-top:0!important;
+    gap:12px!important;
+  }
+
+  #about .process-step{
+    height:135px!important;
+    min-height:135px!important;
+    padding:19px 14px 14px 58px!important;
+  }
+
+  #about .process-num{
+    left:18px!important;
+    top:19px!important;
+  }
+
+  #about .process-step i{
+    left:16px!important;
+    top:46px!important;
+  }
+}
+
+@media(max-width:900px){
+  #about .mission-card,
+  #about .right-showcase,
+  #about .values-grid,
+  #about .value-card,
+  #about .top-gallery,
+  #about .about-process-strip,
+  #about .process-step{
+    height:auto!important;
+    min-height:0!important;
   }
 }
 </style>
@@ -803,7 +899,6 @@ One platform for ordering, payment validation, and delivery coordination - turni
 CONTACT US <i class="fa-solid fa-arrow-right">
 </i>
 </button>
-</div>
 </div>
 </div>
 <div class="right-showcase">
@@ -886,7 +981,6 @@ CONTACT US <i class="fa-solid fa-arrow-right">
 </i>
 <h3>Delivery Coordination</h3>
 <p>Delivery is coordinated through couriers like Lalamove and J&amp;T Express.</p>
-</div>
 </div>
 </div>
 </div>
@@ -1027,5 +1121,45 @@ body i,body .fa,body .fa-solid,body .fa-regular,body .fa-brands {
   font-family:'Clash Display','League Spartan',sans-serif!important;
   font-weight:600!important;
   letter-spacing:0!important
+}
+</style>
+
+<style id="about-color-border-text-size-final">
+@media(min-width:901px){
+  #about .value-card h3{
+    font-size:13.5px!important;
+    line-height:1.12!important;
+    margin:0 0 6px!important;
+  }
+
+  #about .value-card p{
+    font-size:11.2px!important;
+    line-height:1.26!important;
+  }
+
+  #about .value-icon{
+    font-size:19px!important;
+    margin-bottom:8px!important;
+  }
+
+  #about .process-num{
+    font-size:11px!important;
+    line-height:1!important;
+  }
+
+  #about .process-step h3{
+    font-size:13px!important;
+    line-height:1.12!important;
+    margin:0 0 5px!important;
+  }
+
+  #about .process-step p{
+    font-size:10.8px!important;
+    line-height:1.27!important;
+  }
+
+  #about .process-step i{
+    font-size:21px!important;
+  }
 }
 </style>

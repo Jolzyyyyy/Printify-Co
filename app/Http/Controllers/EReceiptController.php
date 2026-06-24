@@ -6,14 +6,22 @@ use App\Models\EReceiptRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EReceiptController extends Controller
 {
     public function show(Request $request): JsonResponse
     {
+        $receiptId = (int) $request->session()->get('checkout_e_receipt_request_id', 0);
+        $receipt = $receiptId > 0
+            ? EReceiptRequest::where('user_id', $request->user()->id)->find($receiptId)
+            : null;
+
         return response()->json([
             'ok' => true,
-            'receipt' => EReceiptRequest::where('user_id', $request->user()->id)->latest()->first(),
+            'request_complete' => (bool) $receipt,
+            'payment_verified' => $request->session()->get('checkout_payment_verified') === true,
+            'receipt' => $receipt,
         ]);
     }
 
@@ -61,10 +69,48 @@ class EReceiptController extends Controller
             return $receipt;
         });
 
+        $request->session()->put('checkout_e_receipt_request_id', $receipt->id);
+
         return response()->json([
             'ok' => true,
             'message' => 'Your e-receipt request has been submitted.',
             'receipt' => $receipt,
         ], 201);
+    }
+
+    public function upload(Request $request): JsonResponse
+    {
+        if ($request->session()->get('checkout_payment_verified') !== true) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Complete payment before uploading the received receipt.',
+            ], 422);
+        }
+
+        $data = $request->validate([
+            'receipt_file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+        ]);
+
+        $receipt = EReceiptRequest::where('user_id', $request->user()->id)
+            ->findOrFail((int) $request->session()->get('checkout_e_receipt_request_id', 0));
+
+        if ($receipt->uploaded_receipt_path) {
+            Storage::disk('local')->delete($receipt->uploaded_receipt_path);
+        }
+
+        $file = $data['receipt_file'];
+        $path = $file->store('e-receipt-uploads/' . $request->user()->id, 'local');
+        $receipt->forceFill([
+            'uploaded_receipt_path' => $path,
+            'uploaded_receipt_name' => $file->getClientOriginalName(),
+            'uploaded_receipt_at' => now(),
+            'status' => 'receipt_uploaded',
+        ])->save();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Received receipt uploaded successfully.',
+            'receipt' => $receipt->fresh(),
+        ]);
     }
 }

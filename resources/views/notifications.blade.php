@@ -688,8 +688,143 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
     gap:12px!important;
 }
 
-</style>
 
+
+/* === FINAL IMAGE-BASED UI PATCH: Mark All beside All, no extra preference button, wide list + narrower pending box === */
+.nf-page .nf-wrap{
+    max-width:1490px!important;
+    margin:0 auto!important;
+    padding:0 0 26px!important;
+}
+.nf-page .nf-head{
+    margin-bottom:22px!important;
+}
+.nf-page .nf-action-row{
+    display:none!important;
+}
+.nf-page .nf-tools{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:18px!important;
+    align-items:center!important;
+    margin-bottom:18px!important;
+    width:100%!important;
+}
+.nf-page .nf-tabs{
+    display:flex!important;
+    align-items:center!important;
+    gap:10px!important;
+    overflow-x:auto!important;
+    padding:0 0 2px!important;
+    min-width:0!important;
+}
+.nf-page .nf-tab,
+.nf-page .nf-mark-read-tab{
+    width:auto!important;
+    min-width:112px!important;
+    max-width:none!important;
+    height:38px!important;
+    padding:0 16px!important;
+    border:1px solid #e6e9ee!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    color:#111827!important;
+    font-size:11px!important;
+    font-weight:500!important;
+    letter-spacing:0!important;
+    box-shadow:none!important;
+    transform:none!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    white-space:nowrap!important;
+}
+.nf-page .nf-tab[data-filter="all"]{
+    min-width:92px!important;
+}
+.nf-page .nf-tab.active,
+.nf-page .nf-tab:hover,
+.nf-page .nf-tab:focus,
+.nf-page .nf-mark-read-tab:hover,
+.nf-page .nf-mark-read-tab:focus{
+    background:#111827!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    transform:none!important;
+}
+.nf-page .nf-mark-read-tab svg{
+    width:14px!important;
+    height:14px!important;
+    flex:0 0 auto!important;
+}
+.nf-page .nf-layout{
+    grid-template-columns:minmax(0,1fr) minmax(360px,420px)!important;
+    gap:18px!important;
+    align-items:start!important;
+    width:100%!important;
+}
+.nf-page .nf-list-card{
+    width:100%!important;
+    min-width:0!important;
+}
+.nf-page .nf-workspace{
+    display:block!important;
+    width:100%!important;
+    max-width:420px!important;
+}
+.nf-page .nf-detail{
+    width:100%!important;
+    max-width:420px!important;
+    border:1px solid #111827!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    padding:18px!important;
+    box-shadow:none!important;
+}
+.nf-page .nf-detail:hover{
+    background:#fff!important;
+    border-color:#111827!important;
+    box-shadow:none!important;
+}
+.nf-page .nf-detail-title{
+    font-size:18px!important;
+    line-height:1.25!important;
+}
+.nf-page .nf-actions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+    width:100%!important;
+    margin-top:18px!important;
+}
+.nf-page .nf-actions .nf-action{
+    width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+}
+.nf-page .nf-actions [data-open-modal="supportModal"]{
+    grid-column:1 / -1!important;
+}
+.nf-page .nf-side,
+.nf-page .nf-process-card{
+    display:none!important;
+}
+@media(max-width:1320px){
+    .nf-page .nf-layout{grid-template-columns:1fr!important;}
+    .nf-page .nf-workspace,.nf-page .nf-detail{max-width:none!important;}
+}
+@media(max-width:940px){
+    .nf-page .nf-tools{grid-template-columns:1fr!important;}
+    .nf-page .nf-notification-controls{justify-content:flex-start!important;flex-wrap:wrap!important;}
+}
+@media(max-width:720px){
+    .nf-page .nf-tab,.nf-page .nf-mark-read-tab{width:100%!important;min-width:0!important;}
+    .nf-page .nf-actions{grid-template-columns:1fr!important;}
+}
+</style>
 <div class="nf-page">
 <svg width="0" height="0" style="position:absolute;visibility:hidden">
     <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.9"/></symbol>
@@ -721,15 +856,13 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
             <button type="button" class="nf-date nf-calendar-trigger" id="nfCalendarToggle" data-calendar-target="header"><svg><use href="#i-calendar"/></svg><span id="nfCalendarToggleText">Today is {{ now()->format('M d, Y') }}</span></button>
         </div>
     </div>
-    <div class="nf-action-row">
-        <button class="nf-btn secondary" type="button" data-open-modal="preferencesModal"><svg><use href="#i-gear"/></svg>Notification Preferences</button>
-        <button class="nf-btn" type="button" id="markAllTop"><svg><use href="#i-check"/></svg>Mark All Read</button>
-    </div>
-
     <div class="nf-tools">
         <div class="nf-tabs">
             @foreach($tabs as $key => $label)
                 <button class="nf-tab {{ $key === 'all' ? 'active' : '' }}" data-filter="{{ $key }}" type="button">{{ $label }} (0)</button>
+                @if($key === 'all')
+                    <button class="nf-tab nf-mark-read-tab" type="button" id="markAllTop"><svg><use href="#i-check"/></svg>Mark All Read</button>
+                @endif
             @endforeach
         </div>
         <div class="nf-control nf-notification-controls">
@@ -749,17 +882,19 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
 
     <style id="notifications-clean-wide-layout-0621">
         .nf-page .nf-layout{
-            grid-template-columns:minmax(620px,1fr) minmax(520px,620px)!important;
-            gap:28px!important;
+            grid-template-columns:minmax(0,1fr) minmax(360px,420px)!important;
+            gap:18px!important;
             align-items:start!important;
+            width:100%!important;
         }
         .nf-page .nf-list-card{
             width:100%!important;
+            min-width:0!important;
         }
         .nf-page .nf-workspace{
             display:block!important;
             width:100%!important;
-            max-width:620px!important;
+            max-width:420px!important;
         }
         .nf-page .nf-center{
             display:block!important;
@@ -767,7 +902,7 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
         }
         .nf-page .nf-detail{
             width:100%!important;
-            max-width:620px!important;
+            max-width:420px!important;
         }
         .nf-page .nf-side,
         .nf-page .nf-process-card{
@@ -870,44 +1005,6 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
                     <p class="nf-process-meta">Reference: <span id="progressOrder">#ORD-55201</span> &nbsp;&nbsp;•&nbsp;&nbsp; Updates are based on your selected notification.</p>
                 </section>
             </div>
-
-            <aside class="nf-side" aria-label="Notification sidebar">
-                <section class="nf-card nf-side-card">
-                    <h3 class="nf-side-title">Notification Preferences</h3>
-                    <p class="nf-side-desc">Manage how and when you receive updates in one unified card.</p>
-                    @foreach([
-                        ['Email Notifications','Receive notifications via email','mail','orange',true],
-                        ['SMS Notifications','Receive notifications via SMS','phone','purple',true],
-                        ['In-App Notifications','Receive alerts in the dashboard','grid','orange',true],
-                        ['Promotions & Offers','Receive promos and special offers','tag','green',false],
-                    ] as $pref)
-                        <div class="nf-pref">
-                            <div class="nf-pref-left">
-                                <span class="nf-ico {{ $pref[3] }}"><svg><use href="#i-{{ $pref[2] }}"/></svg></span>
-                                <div><p class="nf-pref-title">{{ $pref[0] }}</p><p class="nf-pref-sub">{{ $pref[1] }}</p></div>
-                            </div>
-                            <label class="nf-switch"><input type="checkbox" data-pref-label="{{ $pref[0] }}" {{ $pref[4] ? 'checked' : '' }}><span class="nf-slider"></span></label>
-                        </div>
-                    @endforeach
-                    <button class="nf-btn nf-wide secondary" type="button" data-open-modal="preferencesModal"><svg><use href="#i-gear"/></svg>Manage Preferences</button>
-                </section>
-
-                <section class="nf-card nf-side-card">
-                    <h3 class="nf-side-title">Quick Info</h3>
-                    <p class="nf-side-desc">Fast notification controls with visible feedback.</p>
-                    <div class="nf-quick"><span>Unread Notifications</span><button class="nf-link" type="button" id="unreadBtn"><strong id="unreadCount">0</strong></button></div>
-                    <div class="nf-quick"><span>Mark all as read</span><button class="nf-link" type="button" id="markAllSide">Mark all</button></div>
-                    <div class="nf-quick"><span>Notification History</span><button class="nf-link" type="button" id="historyBtn">View all</button></div>
-                </section>
-
-                <section class="nf-card nf-side-card">
-                    <div class="nf-help">
-                        <span class="nf-help-icon"><svg><use href="#i-headset"/></svg></span>
-                        <div><h3 class="nf-side-title">Need Help?</h3><p class="nf-side-desc" style="margin-bottom:0">Our support team is here to help you.</p></div>
-                    </div>
-                    <button class="nf-btn nf-wide" type="button" data-open-modal="supportModal">Contact Support</button>
-                </section>
-            </aside>
         </div>
     </div>
 
@@ -1785,3 +1882,119 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
+<style>
+/* === ABSOLUTE FINAL OVERRIDE: follow screenshot spacing and proportions === */
+.nf-page .nf-wrap{max-width:1490px!important;margin:0 auto!important;padding:0 0 26px!important;}
+.nf-page .nf-action-row{display:none!important;}
+.nf-page .nf-tools{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:18px!important;align-items:center!important;width:100%!important;margin-bottom:18px!important;}
+.nf-page .nf-tabs{display:flex!important;align-items:center!important;gap:10px!important;overflow-x:auto!important;padding:0 0 2px!important;}
+.nf-page .nf-tab,.nf-page .nf-mark-read-tab{width:auto!important;min-width:112px!important;height:38px!important;padding:0 16px!important;border:1px solid #e6e9ee!important;border-radius:8px!important;background:#fff!important;color:#111827!important;font-size:11px!important;font-weight:500!important;box-shadow:none!important;transform:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;white-space:nowrap!important;}
+.nf-page .nf-tab[data-filter="all"]{min-width:92px!important;}
+.nf-page .nf-tab.active,.nf-page .nf-tab:hover,.nf-page .nf-tab:focus,.nf-page .nf-mark-read-tab:hover,.nf-page .nf-mark-read-tab:focus{background:#111827!important;border-color:#111827!important;color:#fff!important;box-shadow:none!important;transform:none!important;}
+.nf-page .nf-layout{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(360px,420px)!important;gap:18px!important;align-items:start!important;width:100%!important;}
+.nf-page .nf-list-card{width:100%!important;min-width:0!important;}
+.nf-page .nf-workspace{display:block!important;width:100%!important;max-width:420px!important;}
+.nf-page .nf-center{display:block!important;width:100%!important;}
+.nf-page .nf-detail{width:100%!important;max-width:420px!important;border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;padding:18px!important;box-shadow:none!important;}
+.nf-page .nf-detail:hover{background:#fff!important;border-color:#111827!important;box-shadow:none!important;}
+.nf-page .nf-side,.nf-page .nf-process-card{display:none!important;}
+.nf-page .nf-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;width:100%!important;}
+.nf-page .nf-actions .nf-action{width:100%!important;min-width:0!important;margin:0!important;}
+.nf-page .nf-actions [data-open-modal="supportModal"]{grid-column:1/-1!important;}
+@media(max-width:1320px){.nf-page .nf-layout{grid-template-columns:1fr!important}.nf-page .nf-workspace,.nf-page .nf-detail{max-width:none!important}}
+@media(max-width:940px){.nf-page .nf-tools{grid-template-columns:1fr!important}.nf-page .nf-notification-controls{justify-content:flex-start!important;flex-wrap:wrap!important}}
+@media(max-width:720px){.nf-page .nf-tab,.nf-page .nf-mark-read-tab{width:100%!important;min-width:0!important}.nf-page .nf-actions{grid-template-columns:1fr!important}}
+</style>
+
+<style>
+/* === FINAL PROFILE-MATCHED SPACING: narrower Notification box, same calendar width, all functions retained === */
+.nf-page .nf-wrap{
+    max-width:1490px!important;
+    width:auto!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    padding-bottom:26px!important;
+}
+.nf-page .nf-head,
+.nf-page .nf-tools,
+.nf-page .nf-footer{
+    width:100%!important;
+    max-width:none!important;
+}
+.nf-page .nf-date,
+.nf-page .nf-calendar-trigger{
+    width:178px!important;
+    min-width:178px!important;
+    max-width:178px!important;
+    height:42px!important;
+    padding:0 13px!important;
+}
+.nf-page .nf-tools{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:18px!important;
+    align-items:center!important;
+    margin-bottom:18px!important;
+}
+.nf-page .nf-layout{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(360px,420px)!important;
+    gap:18px!important;
+    align-items:start!important;
+    justify-content:start!important;
+    width:100%!important;
+    max-width:1200px!important;
+}
+.nf-page .nf-list-card{
+    width:100%!important;
+    min-width:0!important;
+}
+.nf-page .nf-workspace{
+    display:block!important;
+    width:100%!important;
+    max-width:420px!important;
+    justify-self:stretch!important;
+}
+.nf-page .nf-center,
+.nf-page .nf-detail{
+    width:100%!important;
+}
+.nf-page .nf-detail{
+    max-width:420px!important;
+    border:1px solid #111827!important;
+    border-radius:8px!important;
+    background:#fff!important;
+    padding:18px!important;
+    box-shadow:none!important;
+}
+.nf-page .nf-detail:hover{
+    background:#fff!important;
+    border-color:#111827!important;
+    box-shadow:none!important;
+}
+.nf-page .nf-side,
+.nf-page .nf-process-card{
+    display:none!important;
+}
+@media(max-width:1320px){
+    .nf-page .nf-layout{
+        grid-template-columns:1fr!important;
+        max-width:none!important;
+    }
+    .nf-page .nf-workspace,
+    .nf-page .nf-detail{
+        max-width:none!important;
+    }
+}
+@media(max-width:940px){
+    .nf-page .nf-tools{grid-template-columns:1fr!important;}
+    .nf-page .nf-notification-controls{justify-content:flex-start!important;flex-wrap:wrap!important;}
+}
+@media(max-width:620px){
+    .nf-page .nf-date,
+    .nf-page .nf-calendar-trigger{width:100%!important;max-width:none!important;}
+}
+</style>

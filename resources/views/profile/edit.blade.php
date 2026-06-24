@@ -46,6 +46,14 @@
 .prof-name{margin:0;font-family:var(--head);font-size:34px;font-weight:700;line-height:1.02;color:#111827;letter-spacing:-.028em}
 .prof-role{margin:7px 0 8px;color:#111827;font-family:var(--title);font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
 .prof-loc{display:flex;align-items:center;gap:6px;margin:0;color:#4b5563;font-size:13px;font-weight:500}
+.prof-profile-meta{display:grid;gap:4px;margin-top:8px;color:#111827;font-size:12px;line-height:1.35}
+.prof-email-line,.prof-member-line,.prof-premium-line{margin:0}
+.prof-email-line{color:#4b5563;font-size:12px}
+.prof-id-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:0;color:#111827}
+.prof-id-line strong{font-weight:600;letter-spacing:.01em}
+.prof-copy-mini{width:20px;height:20px;border:0;background:transparent;color:#6b7280;display:inline-grid;place-items:center;padding:0;cursor:pointer;border-radius:5px;transition:background .18s ease,color .18s ease}
+.prof-copy-mini:hover,.prof-copy-mini:focus{background:#111827;color:#fff;outline:0}
+.prof-premium-line{color:var(--p-orange);font-weight:600}
 .prof-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .prof-chip{display:inline-flex;align-items:center;gap:6px;min-height:27px;padding:5px 11px;border-radius:999px;background:var(--p-green-soft);color:var(--p-green);font-size:12px;font-weight:700}
 .prof-actions{width:184px;display:grid;gap:10px;flex:0 0 auto}
@@ -493,6 +501,410 @@
 .profile-page .prof-crop-actions .prof-success{background:var(--p-green)!important;border-color:var(--p-green)!important;color:#fff!important;}
 .profile-page .prof-crop-actions .prof-success:hover,.profile-page .prof-crop-actions .prof-success:focus{background:#111827!important;border-color:#111827!important;color:#fff!important;}
 
+
+
+/* FINAL USER REQUEST: remove right-side widgets, keep calendar/left spacing, and set My Profile box to 1200px */
+.profile-page .profile-shell{
+    max-width:1490px!important;
+}
+.profile-page .profile-grid{
+    grid-template-columns:minmax(0,1200px)!important;
+    justify-content:start!important;
+    gap:0!important;
+    width:100%!important;
+}
+.profile-page .profile-left{
+    width:100%!important;
+    max-width:1200px!important;
+}
+.profile-page .profile-right{
+    display:none!important;
+}
+.profile-page .profile-title-wrap .profile-sub{
+    max-width:620px!important;
+}
+@media(max-width:1180px){
+    .profile-page .profile-grid{grid-template-columns:minmax(0,1fr)!important;}
+    .profile-page .profile-left{max-width:none!important;}
+}
+
+/* FINAL USER REQUEST: My Profile Address Details hidden Manage Address dropdown only */
+.profile-page .prof-manage-address-wrap{
+    margin-top:12px!important;
+    border-top:1px solid rgba(17,24,39,.10)!important;
+    padding-top:10px!important;
+}
+.profile-page .prof-manage-address-toggle{
+    width:100%!important;
+    min-height:42px!important;
+    border:0!important;
+    border-bottom:1px solid #e5e7eb!important;
+    background:transparent!important;
+    color:#111827!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto 20px!important;
+    align-items:center!important;
+    gap:12px!important;
+    padding:8px 0!important;
+    text-align:left!important;
+    cursor:pointer!important;
+    box-shadow:none!important;
+    transform:none!important;
+}
+.profile-page .prof-manage-address-toggle:hover,
+.profile-page .prof-manage-address-toggle:focus{
+    background:transparent!important;
+    color:#ff7a00!important;
+    outline:none!important;
+}
+.profile-page .prof-manage-address-title{
+    display:inline-flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    color:inherit!important;
+    font-family:var(--title)!important;
+    font-size:13.5px!important;
+    font-weight:700!important;
+    line-height:1.25!important;
+}
+.profile-page .prof-manage-address-title svg,
+.profile-page .prof-manage-address-chevron{
+    color:currentColor!important;
+    flex:0 0 auto!important;
+}
+.profile-page .prof-manage-address-meta{
+    color:#6b7280!important;
+    font-size:11px!important;
+    font-weight:500!important;
+    white-space:nowrap!important;
+}
+.profile-page .prof-manage-address-toggle:hover .prof-manage-address-meta,
+.profile-page .prof-manage-address-toggle:focus .prof-manage-address-meta{
+    color:#ff7a00!important;
+}
+.profile-page .prof-manage-address-chevron{
+    transition:transform .18s ease!important;
+}
+.profile-page .prof-manage-address-chevron.is-open{
+    transform:rotate(180deg)!important;
+}
+.profile-page .prof-manage-address-panel{
+    padding:8px 0 2px!important;
+    background:transparent!important;
+}
+.profile-page .prof-manage-address-row{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 84px!important;
+    align-items:center!important;
+    gap:14px!important;
+    min-height:56px!important;
+    padding:9px 0!important;
+    border-bottom:1px solid #e8ebf0!important;
+    background:transparent!important;
+}
+.profile-page .prof-manage-address-row:last-child{
+    border-bottom:0!important;
+}
+.profile-page .prof-manage-address-left{
+    display:flex!important;
+    align-items:flex-start!important;
+    gap:10px!important;
+    min-width:0!important;
+}
+.profile-page .prof-manage-address-icon{
+    width:21px!important;
+    height:21px!important;
+    flex:0 0 21px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    color:#ff7a00!important;
+    background:transparent!important;
+    border:0!important;
+    margin-top:1px!important;
+}
+.profile-page .prof-manage-address-name{
+    margin:0!important;
+    color:#111827!important;
+    font-size:12px!important;
+    font-weight:700!important;
+    line-height:1.25!important;
+}
+.profile-page .prof-manage-address-text{
+    margin:3px 0 0!important;
+    color:#4b5563!important;
+    font-size:11px!important;
+    font-weight:400!important;
+    line-height:1.35!important;
+}
+.profile-page .prof-manage-address-edit{
+    height:32px!important;
+    min-width:76px!important;
+    border:1px solid #ff7a00!important;
+    border-radius:999px!important;
+    background:#fff!important;
+    color:#ff7a00!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0 13px!important;
+    font-size:11px!important;
+    font-weight:700!important;
+    cursor:pointer!important;
+    box-shadow:none!important;
+    transform:none!important;
+}
+.profile-page .prof-manage-address-edit:hover,
+.profile-page .prof-manage-address-edit:focus{
+    background:#111827!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    outline:none!important;
+}
+@media(max-width:760px){
+    .profile-page .prof-manage-address-toggle{
+        grid-template-columns:1fr 20px!important;
+    }
+    .profile-page .prof-manage-address-meta{
+        grid-column:1 / -1!important;
+        white-space:normal!important;
+    }
+    .profile-page .prof-manage-address-row{
+        grid-template-columns:1fr!important;
+    }
+    .profile-page .prof-manage-address-edit{
+        justify-self:start!important;
+    }
+}
+
+
+/* FINAL FIX: Manage Address must display exact saved text first; editable fields appear only after clicking its Edit button. */
+.profile-page .prof-manage-address-row.is-editing{
+    grid-template-columns:1fr!important;
+    align-items:start!important;
+    gap:10px!important;
+    padding:12px 0!important;
+}
+.profile-page .prof-manage-address-editor{
+    width:100%!important;
+    display:grid!important;
+    gap:10px!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+}
+.profile-page .prof-manage-address-editor-head{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+}
+.profile-page .prof-manage-address-editor-title{
+    margin:0!important;
+    font-size:12px!important;
+    font-weight:700!important;
+    color:#111827!important;
+}
+.profile-page .prof-manage-address-editor-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:9px 14px!important;
+}
+.profile-page .prof-manage-address-field{
+    display:grid!important;
+    gap:5px!important;
+}
+.profile-page .prof-manage-address-field label{
+    color:#111827!important;
+    font-size:11px!important;
+    font-weight:600!important;
+}
+.profile-page .prof-manage-address-input{
+    width:100%!important;
+    height:36px!important;
+    border:1px solid #d9dee8!important;
+    border-radius:9px!important;
+    background:#fff!important;
+    color:#111827!important;
+    padding:0 11px!important;
+    font-size:12px!important;
+    font-weight:500!important;
+    outline:0!important;
+}
+.profile-page .prof-manage-address-input:focus{
+    border-color:#ff7a00!important;
+    box-shadow:0 0 0 3px rgba(255,122,0,.10)!important;
+}
+.profile-page .prof-manage-address-editor-actions{
+    display:flex!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    gap:8px!important;
+}
+.profile-page .prof-manage-address-cancel,
+.profile-page .prof-manage-address-save{
+    height:32px!important;
+    min-width:76px!important;
+    border-radius:999px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0 13px!important;
+    font-size:11px!important;
+    font-weight:700!important;
+    cursor:pointer!important;
+    box-shadow:none!important;
+    transform:none!important;
+}
+.profile-page .prof-manage-address-cancel{
+    border:1px solid #111827!important;
+    background:#fff!important;
+    color:#111827!important;
+}
+.profile-page .prof-manage-address-save{
+    border:1px solid #16a34a!important;
+    background:#16a34a!important;
+    color:#fff!important;
+}
+.profile-page .prof-manage-address-cancel:hover,
+.profile-page .prof-manage-address-cancel:focus,
+.profile-page .prof-manage-address-save:hover,
+.profile-page .prof-manage-address-save:focus{
+    background:#111827!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    outline:none!important;
+}
+.profile-page .prof-manage-address-value{
+    margin:3px 0 0!important;
+    color:#374151!important;
+    font-size:11px!important;
+    line-height:1.35!important;
+    font-weight:500!important;
+}
+@media(max-width:760px){
+    .profile-page .prof-manage-address-editor-grid{grid-template-columns:1fr!important;}
+    .profile-page .prof-manage-address-editor-actions{justify-content:flex-start!important;}
+}
+
+
+/* FINAL ADDRESS DROPDOWN V3: Shopee-like saved address list with Default / Work / Branch Pickup labels */
+.profile-page .prof-manage-address-panel{
+    padding:10px 0 2px!important;
+}
+.profile-page .prof-manage-address-option{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:28px minmax(0,1fr) 86px!important;
+    align-items:center!important;
+    gap:14px!important;
+    min-height:74px!important;
+    padding:12px 0!important;
+    border-bottom:1px solid #e8ebf0!important;
+    background:transparent!important;
+}
+.profile-page .prof-manage-address-option:last-child{
+    border-bottom:0!important;
+}
+.profile-page .prof-manage-address-option:hover{
+    background:transparent!important;
+}
+.profile-page .prof-manage-address-main{
+    min-width:0!important;
+}
+.profile-page .prof-manage-address-topline{
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    flex-wrap:wrap!important;
+    margin:0 0 3px!important;
+}
+.profile-page .prof-manage-address-recipient{
+    color:#111827!important;
+    font-size:12.3px!important;
+    font-weight:750!important;
+    line-height:1.25!important;
+}
+.profile-page .prof-manage-address-chip{
+    display:inline-flex!important;
+    align-items:center!important;
+    min-height:18px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    border-radius:0!important;
+    font-size:10.5px!important;
+    font-weight:800!important;
+    line-height:1!important;
+}
+.profile-page .prof-manage-address-chip.default,
+.profile-page .prof-manage-address-phone{
+    color:#16a34a!important;
+}
+.profile-page .prof-manage-address-chip.work,
+.profile-page .prof-manage-address-chip.branch{
+    color:#ff7a00!important;
+}
+.profile-page .prof-manage-address-phone{
+    margin:0 0 3px!important;
+    font-size:11.2px!important;
+    font-weight:650!important;
+    line-height:1.25!important;
+}
+.profile-page .prof-manage-address-line{
+    margin:0!important;
+    color:#374151!important;
+    font-size:11.2px!important;
+    font-weight:400!important;
+    line-height:1.35!important;
+}
+.profile-page .prof-manage-address-note{
+    margin:3px 0 0!important;
+    color:#6b7280!important;
+    font-size:10.5px!important;
+    font-weight:500!important;
+    line-height:1.25!important;
+}
+.profile-page .prof-manage-address-action{
+    justify-self:end!important;
+    height:32px!important;
+    min-width:76px!important;
+    border:1px solid #ff7a00!important;
+    border-radius:999px!important;
+    background:#fff!important;
+    color:#ff7a00!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0 13px!important;
+    font-size:11px!important;
+    font-weight:800!important;
+    cursor:pointer!important;
+    box-shadow:none!important;
+    transform:none!important;
+}
+.profile-page .prof-manage-address-action:hover,
+.profile-page .prof-manage-address-action:focus{
+    background:#111827!important;
+    border-color:#111827!important;
+    color:#fff!important;
+    outline:none!important;
+}
+.profile-page .prof-manage-address-editor.is-work .prof-manage-address-editor-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}
+@media(max-width:760px){
+    .profile-page .prof-manage-address-option{
+        grid-template-columns:24px minmax(0,1fr)!important;
+        align-items:flex-start!important;
+    }
+    .profile-page .prof-manage-address-action{
+        grid-column:2!important;
+        justify-self:start!important;
+        margin-top:4px!important;
+    }
+}
+
 </style>
 
 <div class="profile-page" x-data="printifyProfile()" x-init="init()">
@@ -501,7 +913,7 @@
 <div class="profile-title-wrap">
 <div>
 <h1 class="profile-title">My Profile</h1>
-<p class="profile-sub">Manage your customer account, photo, and communication preferences.</p>
+<p class="profile-sub">Manage your customer account, photo, and profile information.</p>
 </div>
 </div>
 <button type="button" class="profile-date" @click="openDatePicker()" aria-label="Open calendar date picker">
@@ -567,15 +979,20 @@
 <div>
 <h1 class="prof-name" x-text="displayName">
 </h1>
-<p class="prof-role">Customer Account</p>
-<p class="prof-loc">
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-<path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0Z" stroke="currentColor" stroke-width="2"/>
-<circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2"/>
+<div class="prof-profile-meta">
+<p class="prof-email-line" x-text="p.email"></p>
+<p class="prof-id-line">
+<span>Customer ID: <strong x-text="p.customerId"></strong></span>
+<button class="prof-copy-mini" type="button" title="Copy Customer ID" aria-label="Copy Customer ID" @click="copyCustomerId()">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+<path d="M8 8h10v12H8V8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+<path d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
 </svg>
-<span x-text="p.city">
-</span>
+</button>
 </p>
+<p class="prof-member-line">Member since <span x-text="p.memberSince"></span></p>
+<p class="prof-premium-line" x-text="p.memberType"></p>
+</div>
 <div class="prof-chips">
 <span class="prof-chip">✓ Verified Email</span>
 <span class="prof-chip">● Active Account</span>
@@ -662,6 +1079,122 @@
 </div>
 </template>
 </div>
+<div class="prof-manage-address-wrap">
+<button type="button" class="prof-manage-address-toggle" @click="toggleManageAddress()" :aria-expanded="manageAddressOpen.toString()" aria-controls="profileManageAddressDropdown">
+<span class="prof-manage-address-title">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+<path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>
+Manage Address
+</span>
+<span class="prof-manage-address-meta">Click to view saved address options</span>
+<svg class="prof-manage-address-chevron" :class="manageAddressOpen ? 'is-open' : ''" width="16" height="16" viewBox="0 0 24 24" fill="none">
+<path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</button>
+<div id="profileManageAddressDropdown" class="prof-manage-address-panel" x-show="manageAddressOpen" x-transition x-cloak>
+<template x-if="!manageAddressEditing">
+<div>
+<div class="prof-manage-address-option">
+<span class="prof-manage-address-icon">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+<path d="M3 10.5 12 3l9 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5 10v10h14V10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+</svg>
+</span>
+<div class="prof-manage-address-main">
+<p class="prof-manage-address-topline">
+<span class="prof-manage-address-recipient" x-text="displayName || 'Eyra Mae Alla'"></span>
+<span class="prof-manage-address-chip default">Default</span>
+</p>
+<p class="prof-manage-address-phone" x-text="p.phone || '+63 912 345 6789'"></p>
+<p class="prof-manage-address-line" x-text="addressFallback('street')"></p>
+<p class="prof-manage-address-line" x-text="[addressFallback('barangay'), addressFallback('city'), addressFallback('region'), addressFallback('postalCode')].filter(Boolean).join(', ')"></p>
+<p class="prof-manage-address-note">Estimated Delivery: 2–4 business days</p>
+</div>
+<button type="button" class="prof-manage-address-action" @click.stop="startManageAddressEdit('primary')">Edit</button>
+</div>
+<div class="prof-manage-address-option">
+<span class="prof-manage-address-icon">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+<path d="M4 21V9l8-5 8 5v12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+<path d="M9 21v-7h6v7M8 10h.01M16 10h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</span>
+<div class="prof-manage-address-main">
+<p class="prof-manage-address-topline">
+<span class="prof-manage-address-recipient" x-text="workAddress.recipient"></span>
+<span class="prof-manage-address-chip work">Work</span>
+</p>
+<p class="prof-manage-address-phone" x-text="workAddress.phone"></p>
+<p class="prof-manage-address-line" x-text="workAddress.line1"></p>
+<p class="prof-manage-address-line" x-text="workAddress.line2"></p>
+</div>
+<button type="button" class="prof-manage-address-action" @click.stop="startManageAddressEdit('work')">Edit</button>
+</div>
+<div class="prof-manage-address-option">
+<span class="prof-manage-address-icon">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+<path d="M5 21V7l7-4 7 4v14" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+<path d="M9 21v-7h6v7M9 10h.01M15 10h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</span>
+<div class="prof-manage-address-main">
+<p class="prof-manage-address-topline">
+<span class="prof-manage-address-recipient">PrintifyCo. SM North EDSA Branch</span>
+<span class="prof-manage-address-chip branch">Branch Pickup</span>
+</p>
+<p class="prof-manage-address-phone">+63 2 8356 7890</p>
+<p class="prof-manage-address-line">SM City North EDSA, The Block, 2nd Level</p>
+<p class="prof-manage-address-line">Epifanio de los Santos Ave., Quezon City 1105</p>
+<p class="prof-manage-address-note">Pick-up Hours: Mon-Sun, 10:00 AM - 9:00 PM</p>
+</div>
+<button type="button" class="prof-manage-address-action" @click.stop="toastMsg('Branch pickup details displayed.')">View</button>
+</div>
+</div>
+</template>
+<template x-if="manageAddressEditing === 'primary'">
+<div class="prof-manage-address-row is-editing">
+<div class="prof-manage-address-editor">
+<div class="prof-manage-address-editor-head">
+<p class="prof-manage-address-editor-title">Edit Default Shipping Address</p>
+<p class="prof-manage-address-value">Display muna ang saved address; editable lang ito after clicking Edit.</p>
+</div>
+<div class="prof-manage-address-editor-grid">
+<div class="prof-manage-address-field"><label>Street / Unit / House No.</label><input class="prof-manage-address-input" type="text" x-model="addressDraft.street"></div>
+<div class="prof-manage-address-field"><label>Region</label><input class="prof-manage-address-input" type="text" x-model="addressDraft.region"></div>
+<div class="prof-manage-address-field"><label>City / Municipality</label><input class="prof-manage-address-input" type="text" x-model="addressDraft.city"></div>
+<div class="prof-manage-address-field"><label>Barangay</label><input class="prof-manage-address-input" type="text" x-model="addressDraft.barangay"></div>
+<div class="prof-manage-address-field"><label>Postal Code</label><input class="prof-manage-address-input" type="text" x-model="addressDraft.postalCode"></div>
+</div>
+<div class="prof-manage-address-editor-actions">
+<button type="button" class="prof-manage-address-cancel" @click="cancelManageAddressEdit()">Cancel</button>
+<button type="button" class="prof-manage-address-save" @click="saveManageAddressEdit()">Apply</button>
+</div>
+</div>
+</div>
+</template>
+<template x-if="manageAddressEditing === 'work'">
+<div class="prof-manage-address-row is-editing">
+<div class="prof-manage-address-editor is-work">
+<div class="prof-manage-address-editor-head">
+<p class="prof-manage-address-editor-title">Edit Work Address</p>
+<p class="prof-manage-address-value">Work address display lang ito sa Manage Address dropdown.</p>
+</div>
+<div class="prof-manage-address-editor-grid">
+<div class="prof-manage-address-field"><label>Recipient</label><input class="prof-manage-address-input" type="text" x-model="workDraft.recipient"></div>
+<div class="prof-manage-address-field"><label>Phone Number</label><input class="prof-manage-address-input" type="text" x-model="workDraft.phone"></div>
+<div class="prof-manage-address-field"><label>Address Line 1</label><input class="prof-manage-address-input" type="text" x-model="workDraft.line1"></div>
+<div class="prof-manage-address-field"><label>Address Line 2</label><input class="prof-manage-address-input" type="text" x-model="workDraft.line2"></div>
+</div>
+<div class="prof-manage-address-editor-actions">
+<button type="button" class="prof-manage-address-cancel" @click="cancelManageAddressEdit()">Cancel</button>
+<button type="button" class="prof-manage-address-save" @click="saveManageAddressEdit()">Apply</button>
+</div>
+</div>
+</div>
+</template>
+</div>
 </div>
         <div class="prof-section">
 <h3 class="prof-section-title">
@@ -697,109 +1230,7 @@
         </section>
 </main>
 
-        <aside class="profile-right">
-<section class="prof-card prof-widget">
-<div class="prof-complete">
-<div class="prof-ring">
-<span>88%</span>
-</div>
-<div>
-<h3 class="prof-widget-title" style="margin-bottom:4px">Profile Completion</h3>
-<p class="prof-widget-copy">Great job! Complete your profile to get the most out of your account.</p>
-</div>
-</div>
-<div class="prof-progress">
-<span>
-</span>
-</div>
-<button class="prof-link" type="button" @click="suggest = !suggest">
-<span>View Suggestions</span>
-<span>›</span>
-</button>
-<div class="prof-suggest" x-show="suggest" x-transition x-cloak>Add alternate contact number and verify your address to reach 100% completion.</div>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" stroke="currentColor" stroke-width="2"/>
-</svg>Communication Preferences</h3>
-<template x-for="pr in prefs" :key="pr.k">
-<div class="prof-pref">
-<span class="prof-pref-label" x-text="pr.l">
-</span>
-<div class="prof-pref-side">
-<button type="button" class="prof-toggle" :class="pr.on ? 'is-on' : 'is-off'" :aria-pressed="pr.on.toString()" @click="togglePref(pr)">
-<span class="prof-toggle-knob">
-<template x-if="pr.on">
-<svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-<path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</template>
-<template x-if="!pr.on">
-<svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-<path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-</svg>
-</template>
-</span>
-</button>
-<span class="prof-pref-state" :class="pr.on ? 'on' : 'off'" x-text="pr.on ? 'On' : 'Off'">
-</span>
-</div>
-</div>
-</template>
-<button class="prof-link prof-link-primary" type="button" @click="toastMsg('Preferences can be edited here. Click Save Changes after toggling.')">
-<span>Manage Preferences</span>
-<span>›</span>
-</button>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M4 19V9M10 19V5M16 19v-7M22 19H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-</svg>Quick Stats</h3>
-<div class="prof-stats">
-<template x-for="s in stats" :key="s.l">
-<div class="prof-stat">
-<span class="prof-ico" :class="s.c" x-html="s.i">
-</span>
-<span>
-<span class="prof-num" x-text="s.n">
-</span>
-<span class="prof-small" x-text="s.l">
-</span>
-</span>
-</div>
-</template>
-</div>
-</section>
-        <section class="prof-card prof-widget">
-<h3 class="prof-widget-title">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-<path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-<path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2"/>
-</svg>Recent Activity</h3>
-<template x-for="a in shownActs" :key="a.t">
-<div class="prof-act">
-<div class="prof-act-main">
-<span class="prof-dot2">
-</span>
-<span class="prof-act-text" x-text="a.t">
-</span>
-</div>
-<span class="prof-time" x-text="a.d">
-</span>
-</div>
-</template>
-<button class="prof-link prof-link-primary" type="button" @click="allActs = true" x-show="!allActs" x-transition>
-<span>View All Activity</span>
-<span>›</span>
-</button>
-<button class="prof-link" type="button" @click="allActs = false" x-show="allActs" x-transition x-cloak>
-<span>Show Less Activity</span>
-<span>›</span>
-</button>
-</section>
-</aside>
+        <!-- Right-side widgets removed as requested: Communication Preferences and Recent Activity. Main My Profile box now uses the full available width. -->
     </div>
 </div>
 
@@ -883,19 +1314,19 @@
 
 <script>
 function printifyProfile(){return{
-csrf:@json(csrf_token()),updateUrl:@json(Route::has('profile.update')?route('profile.update'):url()->current()),saving:false,editing:false,dirty:false,photoDirty:false,suggest:false,allActs:false,datePickerOpen:false,selectedDateValue:@json(now()->format('Y-m-d')),selectedDateText:'Today is '+@json(now()->format('M d, Y')),photo:@json($photo),fullPhoto:@json($photo),saved:null,photoMenu:{open:false},viewPhoto:{open:false},toast:{show:false,text:''},to:null,
+csrf:@json(csrf_token()),updateUrl:@json(Route::has('profile.update')?route('profile.update'):url()->current()),saving:false,editing:false,dirty:false,photoDirty:false,suggest:false,allActs:false,datePickerOpen:false,manageAddressOpen:false,manageAddressEditing:null,addressDraft:{street:'',barangay:'',city:'',region:'',postalCode:''},workAddress:{recipient:'Mae Alla',phone:'+63 917 888 2345',line1:'114F Printify Tower, 32nd St. Corner 9th Ave.',line2:'Bonifacio Global City, Taguig City, Metro Manila 1634'},workDraft:{recipient:'',phone:'',line1:'',line2:''},selectedDateValue:@json(now()->format('Y-m-d')),selectedDateText:'Today is '+@json(now()->format('M d, Y')),photo:@json($photo),fullPhoto:@json($photo),saved:null,photoMenu:{open:false},viewPhoto:{open:false},toast:{show:false,text:''},to:null,
 crop:{open:false,src:'',x:0,y:0,z:1,file:null,drag:false,sx:0,sy:0,ox:0,oy:0,naturalW:0,naturalH:0,baseW:270,baseH:270,cropSize:270},
-p:{firstName:@json($firstName),lastName:@json($lastName),username:@json($user->username ?? ''),email:@json($user->email ?? ''),alternateEmail:@json($user->backup_email ?? ''),phone:@json($user->phone ?? ''),birthdate:@json($user->birthdate ?? ''),gender:@json($user->gender ?? ''),street:@json($user->street ?? ''),barangay:@json($user->barangay ?? ''),region:@json($user->region ?? ''),province:@json($user->province ?? ''),city:@json($user->city ?? ''),postalCode:@json($user->postal_code ?? ''),memberSince:@json(optional($user->created_at)->format('F d, Y') ?? ''),lastLogin:'Current session',emailStatus:@json($user->email_verified_at ? 'Verified' : 'Unverified'),recoveryStatus:@json($user->backup_email ? 'Recovery email added' : 'Not set'),accountType:'Customer',accountStatus:'Active'},
-personal:[{k:'firstName',l:'First Name'},{k:'lastName',l:'Last Name'},{k:'username',l:'Username'},{k:'email',l:'Email Address',t:'email'},{k:'alternateEmail',l:'Alternate Email',t:'email'},{k:'phone',l:'Phone Number'},{k:'birthdate',l:'Birthdate'},{k:'gender',l:'Gender'}],address:[{k:'street',l:'Street / Unit / House No.',ph:'House no., street, subdivision'},{k:'region',l:'Region',options:['National Capital Region (NCR)','Cordillera Administrative Region (CAR)','Region I - Ilocos Region','Region II - Cagayan Valley','Region III - Central Luzon','Region IV-A - CALABARZON','MIMAROPA Region','Region V - Bicol Region','Region VI - Western Visayas','Region VII - Central Visayas','Region VIII - Eastern Visayas','Region IX - Zamboanga Peninsula','Region X - Northern Mindanao','Region XI - Davao Region','Region XII - SOCCSKSARGEN','Region XIII - Caraga','Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)']},{k:'province',l:'Province',ph:'Auto-suggest from PH province list'},{k:'city',l:'City / Municipality',ph:'City or municipality'},{k:'barangay',l:'Barangay',ph:'Barangay name'},{k:'postalCode',l:'Postal Code'}],account:[{k:'lastLogin',l:'Last Login'},{k:'memberSince',l:'Member Since'},{k:'emailStatus',l:'Email Verification',badge:true},{k:'recoveryStatus',l:'Recovery Email',badge:true},{k:'accountType',l:'Account Type'},{k:'accountStatus',l:'Account Status',badge:true}],prefs:[{k:'email',l:'Email Notifications',on:true},{k:'sms',l:'SMS Notifications',on:true},{k:'marketing',l:'Marketing Updates',on:false},{k:'orders',l:'Order Updates',on:true}],
+p:{firstName:@json($firstName),lastName:@json($lastName),username:@json($user->username ?? ''),email:@json($user->email ?? ''),alternateEmail:@json($user->backup_email ?? ''),phone:@json($user->phone ?? ''),birthdate:@json($user->birthdate ?? ''),gender:@json($user->gender ?? ''),street:@json($user->street ?: 'Blk 6 Lot 8 Ninada St.'),barangay:@json($user->barangay ?: 'Commonwealth'),region:@json($user->region ?: 'Metro Manila'),province:@json($user->province ?? ''),city:@json($user->city ?: 'Quezon City'),postalCode:@json($user->postal_code ?: '1121'),customerId:@json($user->customer_id ?? 'CUST-00002'),memberSince:@json(optional($user->created_at)->format('F d, Y') ?? 'June 14, 2026'),memberType:@json($user->membership_type ?? 'Premium Member'),lastLogin:'Current session',emailStatus:@json($user->email_verified_at ? 'Verified' : 'Unverified'),recoveryStatus:@json($user->backup_email ? 'Recovery email added' : 'Not set'),accountType:'Customer',accountStatus:'Active'},
+personal:[{k:'firstName',l:'First Name'},{k:'lastName',l:'Last Name'},{k:'username',l:'Username'},{k:'email',l:'Email Address',t:'email'},{k:'alternateEmail',l:'Alternate Email',t:'email'},{k:'phone',l:'Phone Number'},{k:'birthdate',l:'Birthdate'},{k:'gender',l:'Gender'}],address:[{k:'street',l:'Street / Unit / House No.',ph:'House no., street, subdivision'},{k:'region',l:'Region',options:['National Capital Region (NCR)','Cordillera Administrative Region (CAR)','Region I - Ilocos Region','Region II - Cagayan Valley','Region III - Central Luzon','Region IV-A - CALABARZON','MIMAROPA Region','Region V - Bicol Region','Region VI - Western Visayas','Region VII - Central Visayas','Region VIII - Eastern Visayas','Region IX - Zamboanga Peninsula','Region X - Northern Mindanao','Region XI - Davao Region','Region XII - SOCCSKSARGEN','Region XIII - Caraga','Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)']},{k:'province',l:'Province',ph:'Auto-suggest from PH province list'},{k:'city',l:'City / Municipality',ph:'City or municipality'},{k:'barangay',l:'Barangay',ph:'Barangay name'},{k:'postalCode',l:'Postal Code'}],account:[{k:'customerId',l:'Customer ID'},{k:'memberSince',l:'Member Since'},{k:'memberType',l:'Membership'},{k:'lastLogin',l:'Last Login'},{k:'emailStatus',l:'Email Verification',badge:true},{k:'recoveryStatus',l:'Recovery Email',badge:true},{k:'accountType',l:'Account Type'},{k:'accountStatus',l:'Account Status',badge:true}],prefs:[{k:'email',l:'Email Notifications',on:true},{k:'sms',l:'SMS Notifications',on:true},{k:'marketing',l:'Marketing Updates',on:false},{k:'orders',l:'Order Updates',on:true}],
 stats:[{n:24,l:'Total Orders',c:'ico-orange',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M6 7h12l1 14H5L6 7Z" stroke="currentColor" stroke-width="2"/><path d="M9 7a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="2"/></svg>'},{n:18,l:'Completed Orders',c:'ico-green',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5" stroke="currentColor" stroke-width="2"/></svg>'},{n:7,l:'Saved Designs',c:'ico-purple',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6M9 15l2 2 4-5" stroke="currentColor" stroke-width="2"/></svg>'},{n:3,l:'Pending Jobs',c:'ico-yellow',i:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2"/></svg>'}],
 acts:[{t:'Order #PRN-2026-0054 completed',d:'May 31, 2026 11:24 AM'},{t:'Uploaded design for Order #PRN-2026-0055',d:'May 31, 2026 10:43 AM'},{t:'Updated profile information',d:'May 31, 2026 10:15 AM'},{t:'Changed communication preference settings',d:'May 30, 2026 6:10 PM'},{t:'Logged in successfully',d:'May 30, 2026 5:58 PM'}],
-init(){this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs});this.syncHeader();window.addEventListener('pointermove',e=>this.dragMove(e));window.addEventListener('pointerup',()=>this.dragEnd());window.addEventListener('pointercancel',()=>this.dragEnd())},
-get fullName(){return `${this.p.firstName} ${this.p.lastName}`.trim()},get displayName(){return (this.p.username||'').trim()||this.fullName},get initials(){let parts=(this.fullName||this.displayName).trim().split(/\s+/).filter(Boolean);return ((parts[0]?.[0]||'E')+(parts[1]?.[0]||'M')).toUpperCase()},get shownActs(){return this.allActs?this.acts:this.acts.slice(0,3)},get viewPhotoSrc(){return this.fullPhoto||this.photo},openDatePicker(){this.datePickerOpen=true},closeDatePicker(){this.datePickerOpen=false},applySelectedDate(){let d=new Date((this.selectedDateValue||'')+'T00:00:00');if(!Number.isNaN(d.getTime())){this.selectedDateText='Today is '+d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});this.toastMsg('Calendar date selected.')}this.closeDatePicker()},clone(v){return JSON.parse(JSON.stringify(v))},editAll(){this.editing=true;this.toastMsg('Edit mode enabled. Save Changes will appear after edits.')},markDirty(){this.dirty=true},markPhotoDirty(){this.photoDirty=true},togglePref(pr){pr.on=!pr.on;this.editing=true;this.markDirty();this.toastMsg(`${pr.l} turned ${pr.on?'On':'Off'}. Click Save Changes to keep it.`)},cancel(){let d=this.clone(this.saved);this.p=d.p;this.photo=d.photo;this.fullPhoto=d.fullPhoto||d.photo;this.prefs=d.prefs;this.editing=false;this.dirty=false;this.photoDirty=false;this.photoMenu.open=false;this.viewPhoto.open=false;this.syncHeader();this.toastMsg('Changes cancelled.')},
+init(){this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs,workAddress:this.workAddress});this.syncHeader();window.addEventListener('pointermove',e=>this.dragMove(e));window.addEventListener('pointerup',()=>this.dragEnd());window.addEventListener('pointercancel',()=>this.dragEnd())},
+get fullName(){return `${this.p.firstName} ${this.p.lastName}`.trim()},get displayName(){return (this.p.username||'').trim()||this.fullName},get initials(){let parts=(this.fullName||this.displayName).trim().split(/\s+/).filter(Boolean);return ((parts[0]?.[0]||'E')+(parts[1]?.[0]||'M')).toUpperCase()},get shownActs(){return this.allActs?this.acts:this.acts.slice(0,3)},get viewPhotoSrc(){return this.fullPhoto||this.photo},addressFallback(k){let defaults={street:'Blk 6 Lot 8 Ninada St.',barangay:'Commonwealth',city:'Quezon City',region:'Metro Manila',postalCode:'1121'};let v=(this.p[k]||'').toString().trim();return v || defaults[k] || ''},get primaryAddressText(){return [this.addressFallback('street'),this.addressFallback('barangay'),this.addressFallback('city'),this.addressFallback('region'),this.addressFallback('postalCode')].filter(Boolean).join(', ')},get billingAddressText(){return 'Same as primary address'},toggleManageAddress(){this.manageAddressOpen=!this.manageAddressOpen;if(!this.manageAddressOpen)this.manageAddressEditing=null},startManageAddressEdit(type){this.manageAddressOpen=true;this.manageAddressEditing=type;if(type==='work'){this.workDraft=this.clone(this.workAddress)}else{this.addressDraft={street:this.addressFallback('street'),barangay:this.addressFallback('barangay'),city:this.addressFallback('city'),region:this.addressFallback('region'),postalCode:this.addressFallback('postalCode')}}this.$nextTick(()=>{let input=document.querySelector('.profile-page .prof-manage-address-input');if(input)input.focus()})},cancelManageAddressEdit(){this.manageAddressEditing=null;this.addressDraft={street:'',barangay:'',city:'',region:'',postalCode:''};this.workDraft={recipient:'',phone:'',line1:'',line2:''}},saveManageAddressEdit(){if(this.manageAddressEditing==='work'){this.workAddress=this.clone(this.workDraft);this.manageAddressEditing=null;this.toastMsg('Work address display updated.');return}this.p.street=this.addressDraft.street;this.p.barangay=this.addressDraft.barangay;this.p.city=this.addressDraft.city;this.p.region=this.addressDraft.region;this.p.postalCode=this.addressDraft.postalCode;this.manageAddressEditing=null;this.markDirty();this.toastMsg('Address details applied. Click Save Changes to keep it.')},editProfileAddress(){this.startManageAddressEdit('primary')},openDatePicker(){this.datePickerOpen=true},closeDatePicker(){this.datePickerOpen=false},applySelectedDate(){let d=new Date((this.selectedDateValue||'')+'T00:00:00');if(!Number.isNaN(d.getTime())){this.selectedDateText='Today is '+d.toLocaleDateString('en-US',{month:'short',day:'2-digit',year:'numeric'});this.toastMsg('Calendar date selected.')}this.closeDatePicker()},copyCustomerId(){let id=this.p.customerId||'CUST-00002';if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(id).then(()=>this.toastMsg('Customer ID copied.')).catch(()=>this.toastMsg('Customer ID: '+id));}else{this.toastMsg('Customer ID: '+id)}},clone(v){return JSON.parse(JSON.stringify(v))},editAll(){this.editing=true;this.toastMsg('Edit mode enabled. Save Changes will appear after edits.')},markDirty(){this.dirty=true},markPhotoDirty(){this.photoDirty=true},togglePref(pr){pr.on=!pr.on;this.editing=true;this.markDirty();this.toastMsg(`${pr.l} turned ${pr.on?'On':'Off'}. Click Save Changes to keep it.`)},cancel(){let d=this.clone(this.saved);this.p=d.p;this.photo=d.photo;this.fullPhoto=d.fullPhoto||d.photo;this.prefs=d.prefs;if(d.workAddress)this.workAddress=d.workAddress;this.editing=false;this.dirty=false;this.photoDirty=false;this.manageAddressEditing=null;this.photoMenu.open=false;this.viewPhoto.open=false;this.syncHeader();this.toastMsg('Changes cancelled.')},
 openProfileFilePicker(){this.photoMenu.open=false;this.viewPhoto.open=false;this.$nextTick(()=>this.$refs.profilePhotoInput?.click())},handleProfilePhotoClick(){if(this.photo){this.photoMenu.open=!this.photoMenu.open}else{this.openProfileFilePicker()}},handleUploadButton(){if(this.photo){this.photoMenu.open=!this.photoMenu.open}else{this.openProfileFilePicker()}},viewProfilePhoto(){if(!this.photo){this.openProfileFilePicker();return}this.photoMenu.open=false;this.viewPhoto.open=true},closeViewProfilePhoto(){this.viewPhoto.open=false},changeProfilePhoto(){this.photoMenu.open=false;this.viewPhoto.open=false;this.openProfileFilePicker()},
 profilePayload(source=this.p,prefs=this.prefs){return{first_name:source.firstName,last_name:source.lastName,name:`${source.firstName||''} ${source.lastName||''}`.trim(),username:source.username,email:source.email,backup_email:source.alternateEmail,phone:source.phone,birthdate:source.birthdate,gender:source.gender,street:source.street,barangay:source.barangay,region:source.region,province:source.province,city:source.city,postal_code:source.postalCode,preferences:prefs}},
-async save(){this.saving=true;let wasPhotoOnly=this.photoDirty&&!this.dirty,base=this.dirty?this.profilePayload(this.p,this.prefs):this.profilePayload(this.saved.p,this.saved.prefs);let payload={...base};if(this.photoDirty)payload.photo_base64=this.photo;let serverSaved=false;try{let r=await fetch(this.updateUrl,{method:'PATCH',headers:{'X-CSRF-TOKEN':this.csrf,'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(payload)});serverSaved=r.ok;if(!r.ok)throw new Error('Profile save failed')}catch(e){this.saving=false;this.toastMsg('Profile was not saved. Please check the details and try again.');return}this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs});this.editing=false;this.dirty=false;this.photoDirty=false;this.saving=false;this.syncHeader();this.toastMsg(serverSaved?(wasPhotoOnly?'Profile photo updated successfully.':'Profile updated successfully.'):'Profile saved successfully.')},
+async save(){this.saving=true;let wasPhotoOnly=this.photoDirty&&!this.dirty,base=this.dirty?this.profilePayload(this.p,this.prefs):this.profilePayload(this.saved.p,this.saved.prefs);let payload={...base};if(this.photoDirty)payload.photo_base64=this.photo;let serverSaved=false;try{let r=await fetch(this.updateUrl,{method:'PATCH',headers:{'X-CSRF-TOKEN':this.csrf,'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(payload)});serverSaved=r.ok;if(!r.ok)throw new Error('Profile save failed')}catch(e){this.saving=false;this.toastMsg('Profile was not saved. Please check the details and try again.');return}this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs,workAddress:this.workAddress});this.editing=false;this.dirty=false;this.photoDirty=false;this.saving=false;this.syncHeader();this.toastMsg(serverSaved?(wasPhotoOnly?'Profile photo updated successfully.':'Profile updated successfully.'):'Profile saved successfully.')},
 openCrop(e){let f=e.target.files[0];e.target.value='';if(!f)return;if(!f.type.startsWith('image/')){this.toastMsg('Please upload a valid image file.');return}let reader=new FileReader();reader.onload=()=>{let src=reader.result,img=new Image();img.onload=()=>{let cropSize=286,aspect=img.naturalWidth/img.naturalHeight,baseW=cropSize,baseH=cropSize;if(aspect>=1){baseW=cropSize*aspect}else{baseH=cropSize/aspect}this.fullPhoto=src;this.crop={open:true,src,x:0,y:0,z:1,file:f,drag:false,sx:0,sy:0,ox:0,oy:0,naturalW:img.naturalWidth,naturalH:img.naturalHeight,baseW,baseH,cropSize};this.toastMsg('Drag, zoom, preview, then apply the profile photo.')};img.src=src};reader.readAsDataURL(f)},closeCrop(){this.crop.open=false;this.crop.drag=false},resetCrop(){this.crop.x=0;this.crop.y=0;this.crop.z=1},centerCrop(){this.crop.x=0;this.crop.y=0},clampZoom(v){return Math.max(1,Math.min(2.8,Number(v.toFixed(2))))},zoomBy(v){this.crop.z=this.clampZoom(this.crop.z+v)},wheelZoom(e){this.zoomBy((e.deltaY < 0 ? 0.06 : -0.06))},previewVars(){let preview=58,scale=preview/(this.crop.cropSize||286);return `--pw:${this.crop.baseW*scale}px; --ph:${this.crop.baseH*scale}px; --px:${this.crop.x*scale}px; --py:${this.crop.y*scale}px; --pz:${this.crop.z};`},dragStart(e){if(!this.crop.open)return;this.crop.drag=true;this.crop.sx=e.clientX;this.crop.sy=e.clientY;this.crop.ox=this.crop.x;this.crop.oy=this.crop.y;if(e.currentTarget&&e.currentTarget.setPointerCapture){try{e.currentTarget.setPointerCapture(e.pointerId)}catch(err){}}},dragMove(e){if(!this.crop.drag||!e)return;this.crop.x=this.crop.ox+(e.clientX-this.crop.sx);this.crop.y=this.crop.oy+(e.clientY-this.crop.sy)},dragEnd(){this.crop.drag=false},
-async savePhotoOnly(){this.saving=true;let payload={...this.profilePayload(this.saved?.p||this.p,this.saved?.prefs||this.prefs),photo_base64:this.photo};try{let r=await fetch(this.updateUrl,{method:'PATCH',headers:{'X-CSRF-TOKEN':this.csrf,'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('Profile photo upload failed');this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs});this.photoDirty=false;this.saving=false;this.syncHeader();this.toastMsg('Profile photo uploaded successfully.')}catch(e){this.saving=false;this.photoDirty=true;this.toastMsg('Photo preview is ready, but upload failed. Click Save Changes to try again.')}},
+async savePhotoOnly(){this.saving=true;let payload={...this.profilePayload(this.saved?.p||this.p,this.saved?.prefs||this.prefs),photo_base64:this.photo};try{let r=await fetch(this.updateUrl,{method:'PATCH',headers:{'X-CSRF-TOKEN':this.csrf,'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('Profile photo upload failed');this.saved=this.clone({p:this.p,photo:this.photo,fullPhoto:this.fullPhoto,prefs:this.prefs,workAddress:this.workAddress});this.photoDirty=false;this.saving=false;this.syncHeader();this.toastMsg('Profile photo uploaded successfully.')}catch(e){this.saving=false;this.photoDirty=true;this.toastMsg('Photo preview is ready, but upload failed. Click Save Changes to try again.')}},
 applyCrop(){let img=new Image();img.onload=async()=>{let c=document.createElement('canvas'),ctx=c.getContext('2d'),out=512,crop=this.crop.cropSize||286,f=out/crop;c.width=out;c.height=out;ctx.fillStyle='#fff';ctx.fillRect(0,0,out,out);let w=this.crop.baseW*this.crop.z*f,h=this.crop.baseH*this.crop.z*f,x=out/2-w/2+this.crop.x*f,y=out/2-h/2+this.crop.y*f;ctx.drawImage(img,x,y,w,h);this.photo=c.toDataURL('image/png');this.fullPhoto=this.crop.src;this.crop.open=false;this.crop.drag=false;this.markPhotoDirty();this.syncHeader();this.toastMsg('Uploading profile photo...');await this.savePhotoOnly()};img.src=this.crop.src},
 syncHeader(){let d={name:this.displayName,photo:this.photo,initials:this.initials};window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:d}));document.querySelectorAll('[data-profile-name],.header-profile-name,.user-name').forEach(el=>el.textContent=d.name);document.querySelectorAll('[data-profile-avatar],.header-profile-img,.profile-avatar-img').forEach(el=>{if(d.photo){if(el.tagName==='IMG')el.src=d.photo;else el.style.backgroundImage=`url(${d.photo})`}});document.querySelectorAll('[data-profile-initials],.header-profile-initials').forEach(el=>el.textContent=d.initials)},toastMsg(t){this.toast.text=t;this.toast.show=true;clearTimeout(this.to);this.to=setTimeout(()=>this.toast.show=false,2400)}
 }}

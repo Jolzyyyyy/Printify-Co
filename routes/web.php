@@ -1,34 +1,39 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminClientInvitationController;
-use App\Http\Controllers\Admin\AdminClientProfileController;
-use App\Http\Controllers\Admin\AdminController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Models\Order;
+
 // --- CUSTOMER CONTROLLERS ---
+use App\Http\Controllers\FrontPageController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PaymongoCheckoutController;
+use App\Http\Controllers\EReceiptController;
+use App\Http\Controllers\SupportTicketController;
+use App\Http\Controllers\ServiceDetailController;
+use App\Http\Controllers\LalamoveDeliveryController;
+use App\Http\Controllers\CustomerHeaderController;
+
+// --- CUSTOMER AUTH CONTROLLERS ---
+use App\Http\Controllers\Auth\AuthenticatedSessionController; 
+
+// --- ADMIN CONTROLLERS ---
 use App\Http\Controllers\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\Auth\AdminPasswordResetLinkController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\AdminClientInvitationController;
+use App\Http\Controllers\Admin\AdminClientProfileController;
 use App\Http\Controllers\Admin\DeveloperAdminClientController;
-use App\Http\Controllers\Admin\SectionController as AdminSectionController;
 use App\Http\Controllers\Admin\SecurityController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\EReceiptController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\ServiceDetailController;
-// --- CUSTOMER AUTH CONTROLLERS ---
-use App\Http\Controllers\FrontPageController;
-// --- ADMIN CONTROLLERS ---
-use App\Http\Controllers\GoogleController;
-use App\Http\Controllers\LalamoveDeliveryController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PaymongoCheckoutController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\SupportTicketController;
-use App\Models\Order;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\SectionController as AdminSectionController;
+
 // --- THIRD PARTY AUTH CONTROLLERS ---
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GoogleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +50,7 @@ Route::get('/contact', [FrontPageController::class, 'contact'])->name('landing.c
 Route::get('/contactus', [FrontPageController::class, 'contact'])->name('landing.contactus');
 Route::post('/contact', [FrontPageController::class, 'submitContact'])->name('landing.contact.submit');
 Route::post('/contactus', [FrontPageController::class, 'submitContact'])->name('landing.contactus.submit');
+Route::post('/customer-care/policy/acknowledge', [FrontPageController::class, 'acknowledgeCustomerCarePolicy'])->name('customer-care.policy.acknowledge');
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('legal.privacy');
 Route::view('/terms-of-service', 'legal.terms-of-service')->name('legal.terms');
 Route::get('/support', fn () => redirect()->route('landing.contactus'))->name('support');
@@ -55,6 +61,7 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     Route::get('/e-receipt', [FrontPageController::class, 'eReceipt'])->name('e-receipt.index');
     Route::get('/e-receipt/details', [EReceiptController::class, 'show'])->name('e-receipt.show');
     Route::post('/e-receipt', [EReceiptController::class, 'store'])->name('e-receipt.store');
+    Route::post('/e-receipt/upload', [EReceiptController::class, 'upload'])->name('e-receipt.upload');
     Route::get('/service-details/catalog', [ServiceDetailController::class, 'catalog'])->name('service-details.catalog');
     Route::get('/service-details/state', [ServiceDetailController::class, 'state'])->name('service-details.state');
     Route::post('/service-details/state', [ServiceDetailController::class, 'update'])->name('service-details.update');
@@ -104,36 +111,14 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () {
-
+    
     // FIXED: Ngayon, kapag kinlick ang HOME sa sidebar, babalik ito sa main landing page ('welcome')
     Route::get('/customer-home', function () {
-        return redirect()->route('home');
+        return redirect()->route('home'); 
     })->name('customer.home');
 
-    Route::get('/dashboard', function (Request $request) {
-        $orders = Order::query()
-            ->where('user_id', $request->user()->id)
-            ->with(['items.service', 'items.serviceVariation', 'files'])
-            ->latest()
-            ->get()
-            ->map(function (Order $order) {
-                $firstItem = $order->items->first();
-                $status = strtolower((string) ($order->status ?: 'pending'));
-
-                $order->order_number = $order->order_reference ?: 'ORD-'.str_pad((string) $order->id, 6, '0', STR_PAD_LEFT);
-                $order->product_name = $firstItem?->service_name ?: $firstItem?->service?->name ?: 'Print Job';
-                $order->project_name = $order->product_name;
-                $order->total_amount = (float) ($order->total_price ?? 0);
-                $order->total = $order->total_amount;
-                $order->payment_status = $order->paid_at || in_array($status, ['paid', 'completed', 'delivered'], true) ? 'paid' : ($status === 'payment_setup_failed' ? 'failed' : 'pending');
-
-                return $order;
-            });
-
-        $activeOrders = $orders->filter(fn ($order) => ! in_array(strtolower((string) $order->status), ['completed', 'delivered', 'cancelled'], true));
-        $readyOrders = $orders->filter(fn ($order) => in_array(strtolower((string) ($order->lalamove_status ?: $order->status)), ['ready', 'ready_for_pickup', 'shipped', 'out_for_delivery', 'assigning_driver', 'on_going', 'picked_up'], true));
-
-        return view('dashboard', compact('orders', 'activeOrders', 'readyOrders'));
+    Route::get('/dashboard', function () {
+        return view('dashboard'); 
     })->name('dashboard');
 
     // ROUTES PARA SA CUSTOMER PROFILE
@@ -144,29 +129,40 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    // --- CUSTOMER ORDER FLOW ---
-    Route::get('/co/place-order', [OrderController::class, 'myOrders'])->name('co.place-order');
+    // --- FIXED ORDERS SECTION PARA SA CUSTOMER ---
+    Route::get('/myorders', [OrderController::class, 'myOrders'])->name('myorders');
+    Route::get('/myorders/{order}', [OrderController::class, 'myShow'])->name('myorders.show');
+    Route::get('/myorder', fn () => redirect()->route('myorders'))->name('myorder');
+    Route::get('/my-orders', fn () => redirect()->route('myorders'))->name('my-orders');
+    Route::get('/my-orders/{order}', fn (Order $order) => redirect()->route('myorders.show', $order))->name('my-orders.show');
+    Route::get('/orders', [OrderController::class, 'myOrders'])->name('orders.index');
+
+    Route::get('/co/place-order', [OrderController::class, 'placeOrderIndex'])->name('co.place-order');
     Route::get('/co/place-order/{order}', [OrderController::class, 'myShow'])->name('co.place-order.show');
     Route::get('/co/place-order/{order}/tracking', [OrderController::class, 'myTracking'])->name('co.place-order.tracking');
 
-    Route::get('/my-orders', [OrderController::class, 'portalMyOrders'])->name('my-orders');
-    Route::get('/my-orders/{order}', [OrderController::class, 'portalMyShow'])->name('my-orders.show');
-    Route::get('/customer/orders', [OrderController::class, 'portalMyOrders'])->name('customer.orders.index');
-    Route::get('/customer/orders/{order}', [OrderController::class, 'portalMyShow'])->name('customer.orders.show');
-    Route::get('/orders', [OrderController::class, 'portalMyOrders'])->name('orders.index');
-    Route::get('/orders/my', [OrderController::class, 'portalMyOrders'])->name('orders.my.index');
-    Route::get('/orders/my/{order}', [OrderController::class, 'portalMyShow'])->name('orders.my.show');
+    Route::get('/customer/search', [CustomerHeaderController::class, 'search'])->name('customer.search');
+    Route::post('/customer/notifications/mark-read', [CustomerHeaderController::class, 'markNotificationRead'])->name('customer.notifications.mark-read');
+    Route::post('/customer/notifications/mark-all-read', [CustomerHeaderController::class, 'markAllNotificationsRead'])->name('customer.notifications.mark-all-read');
+    Route::get('/customer/support/admin-status', [CustomerHeaderController::class, 'adminStatus'])->name('customer.support.admin-status');
+    Route::post('/customer/support/threads', [CustomerHeaderController::class, 'storeThread'])->name('customer.support.threads.store');
+    Route::get('/customer/support/messages', [CustomerHeaderController::class, 'messages'])->name('customer.support.messages.index');
+    Route::post('/customer/support/messages', [CustomerHeaderController::class, 'storeMessage'])->name('customer.support.messages.store');
+
+    Route::post('/delivery/lalamove/quote', [LalamoveDeliveryController::class, 'quote'])->name('delivery.lalamove.quote');
+    Route::post('/orders/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('orders.delivery.book');
+    Route::post('/orders/{order}/delivery/refresh', [LalamoveDeliveryController::class, 'refresh'])->name('orders.delivery.refresh');
 
     // 2. NOTIFICATIONS
-    Route::get('/notifications', function () {
-        return view('notifications');
+    Route::get('/notifications', function() {
+        return view('notifications'); 
     })->name('notifications');
 
     // 3. SETTINGS
-    Route::get('/settings', function () {
-        return view('settings');
+    Route::get('/settings', function() {
+        return view('settings'); 
     })->name('settings');
-    Route::post('/settings/save', function (Request $request) {
+    Route::post('/settings/save', function(Request $request) {
         $data = $request->validate([
             'key' => ['required', 'string', 'max:120'],
             'value' => ['nullable'],
@@ -186,20 +182,18 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     })->name('settings.save');
 
     // 4. SECURITY
-    Route::get('/security', function () {
-        return view('security');
+    Route::get('/security', function() {
+        return view('security'); 
     })->name('security');
 
     // 5. HELP CENTER
-    Route::get('/help-center', function () {
-        return view('help-center');
+    Route::get('/help-center', function() {
+        return view('help-center'); 
     })->name('help-center');
     Route::post('/help-center/tickets', [SupportTicketController::class, 'store'])->name('help-center.tickets.store');
 
     Route::post('/checkout/place', [CheckoutController::class, 'place'])->name('checkout.place');
-    Route::post('/delivery/lalamove/quote', [LalamoveDeliveryController::class, 'quote'])->name('delivery.lalamove.quote');
-    Route::post('/orders/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('orders.delivery.book');
-    Route::post('/orders/{order}/delivery/refresh', [LalamoveDeliveryController::class, 'refresh'])->name('orders.delivery.refresh');
+    Route::post('/checkout/finalize', [PaymongoCheckoutController::class, 'finalize'])->name('checkout.finalize');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('customer.logout');
 });
 
@@ -209,9 +203,9 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
 |--------------------------------------------------------------------------
 */
 
-// Admin Login Guest Routes
+// Admin Login/Register Guest Routes
 Route::get('/p-co-2026', function () {
-    if (! auth()->check() || ! auth()->user()->canAccessAdminPortal()) {
+    if (!auth()->check() || !auth()->user()->canAccessAdminPortal()) {
         return redirect()->route('admin.login');
     }
 
@@ -222,9 +216,9 @@ Route::get('/p-co-2026', function () {
 
 Route::middleware('guest')->prefix('p-co-2026')->group(function () {
     Route::get('/login-7b5e93-adm-key', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-    Route::get('/register-7b5e93-adm-key', fn () => abort(404))->name('admin.register');
+    Route::get('/register-7b5e93-adm-key', [AdminAuthController::class, 'showRegisterForm'])->name('admin.register');
     Route::post('/login-7b5e93-adm-key', [AdminAuthController::class, 'login'])->name('admin.login.submit');
-    Route::post('/register-7b5e93-adm-key', fn () => abort(404))->name('admin.register.submit');
+    Route::post('/register-7b5e93-adm-key', [AdminAuthController::class, 'register'])->name('admin.register.submit');
     Route::get('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'create'])->name('admin.password.request');
     Route::post('/forgot-password-7b5e93-adm-key', [AdminPasswordResetLinkController::class, 'store'])->name('admin.password.email');
     Route::get('/admin-client-invite/{token}', [AdminClientInvitationController::class, 'show'])->name('admin-client-invitations.show');
@@ -233,15 +227,15 @@ Route::middleware('guest')->prefix('p-co-2026')->group(function () {
 
 // Admin Authenticated Routes
 Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
-
+    
     // Phase 1: Email OTP
     Route::get('/verify-access', [AdminAuthController::class, 'showOtpForm'])->name('admin.otp.verify');
     Route::post('/verify-otp-submit', [AdminAuthController::class, 'verifyOtp'])->name('admin.otp.submit');
     Route::post('/resend-otp', [AdminAuthController::class, 'resendOtp'])->name('admin.otp.resend');
-
+    
     // Admin Dashboard & Resources
     Route::middleware(['role:admin_client,developer', 'staff.portal', 'admin.client.profile'])->group(function () {
-
+        
         // 1. DASHBOARD
         Route::get('/dashboard', AdminDashboardController::class)->name('admin.dashboard');
 
@@ -251,7 +245,7 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
 
         // 2. CUSTOMER/USER
         Route::get('/customers', [AdminController::class, 'customers'])->name('admin.customers');
-
+        
         // 3. ORDERS
         Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
         Route::get('/orders-database', [OrderController::class, 'index'])->name('admin.orders.index');
@@ -263,7 +257,7 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
             Route::put('/orders-database/{order}', [OrderController::class, 'update'])->name('admin.orders.update');
             Route::delete('/orders-database/{order}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
         });
-
+        
         // 4. PRODUCTS
         Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
         Route::get('/services', [ServiceController::class, 'adminIndex'])->name('admin.services.index');
@@ -275,16 +269,16 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
             Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('admin.services.destroy');
             Route::patch('/services/{service}/toggle', [ServiceController::class, 'toggleActive'])->name('admin.services.toggle');
         });
-
+        
         // 5. RATES
         Route::get('/rates', [AdminController::class, 'rates'])->name('admin.rates');
-
+        
         // 6. ANALYTICS
         Route::get('/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
-
+        
         // 7. REPORTS
         Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
-
+        
         // 8. SETTINGS
         Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
 
@@ -320,8 +314,8 @@ Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026
     Route::patch('/admin-clients/{user}/assign-customer', [DeveloperAdminClientController::class, 'assignCustomer'])->name('admin-clients.assign-customer');
 });
 
-if (file_exists(__DIR__.'/auth.php')) {
-    require __DIR__.'/auth.php';
+if (file_exists(__DIR__ . '/auth.php')) {
+    require __DIR__ . '/auth.php';
 }
 
 // Routes para sa CRUD operations ng Customers
