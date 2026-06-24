@@ -25,7 +25,7 @@
                             
                             <div class="relative h-48 w-full bg-gray-200">
                                 @if($service->image_path)
-                                    <img src="{{ asset('storage/'.$service->image_path) }}" alt="{{ $service->name }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/'.$service->image_path) }}" alt="{{ $service->name }}" class="w-full h-full object-cover" loading="eager" decoding="sync" fetchpriority="high">
                                 @else
                                     <div class="flex items-center justify-center h-full text-gray-400">
                                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">

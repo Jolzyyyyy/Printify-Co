@@ -934,4 +934,39 @@
             border-color:#6b7280!important;
         }
     </style>
+    <style id="staff-auth-customer-collage-bg-final-0624">
+        body,
+        .min-h-screen {
+            background:#fff!important;
+        }
+        .min-h-screen::before {
+            display:block!important;
+            content:""!important;
+            position:absolute!important;
+            inset:-18px!important;
+            z-index:0!important;
+            opacity:.96!important;
+            background:url('/images/customer-auth-collage-bg.jpg?v=0624') center/cover no-repeat!important;
+            filter:blur(1.35px) brightness(.78) saturate(.96)!important;
+            transform:scale(1.018)!important;
+            pointer-events:none!important;
+            animation:none!important;
+        }
+        .min-h-screen::after {
+            display:block!important;
+            content:""!important;
+            position:absolute!important;
+            inset:0!important;
+            z-index:1!important;
+            opacity:1!important;
+            background:rgba(0,0,0,.08)!important;
+            pointer-events:none!important;
+            animation:none!important;
+        }
+        .min-h-screen > div:last-child,
+        .auth-container {
+            position:relative!important;
+            z-index:10!important;
+        }
+    </style>
 </x-guest-layout>

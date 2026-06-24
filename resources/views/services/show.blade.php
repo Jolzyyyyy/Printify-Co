@@ -50,7 +50,10 @@
                                     @click="activeIndex = index">
                                 <img :src="variant.image"
                                      :alt="variant.package_type"
-                                     class="w-full h-20 object-cover rounded-md">
+                                     class="w-full h-20 object-cover rounded-md"
+                                     loading="eager"
+                                     decoding="sync"
+                                     fetchpriority="high">
                                 <p class="mt-2 text-xs font-semibold text-gray-700" x-text="variant.package_type"></p>
                                 <p class="text-[11px] text-gray-500 truncate" x-text="variant.product_size"></p>
                             </button>
@@ -62,7 +65,10 @@
                             <div class="relative">
                                 <img :src="current ? current.image : ''"
                                      :alt="current ? current.package_type : '{{ $service->name }}'"
-                                     class="w-full h-[450px] object-cover rounded-xl">
+                                     class="w-full h-[450px] object-cover rounded-xl"
+                                     loading="eager"
+                                     decoding="sync"
+                                     fetchpriority="high">
                             </div>
 
                             <div class="mt-4 rounded-xl bg-gray-50 border border-gray-200 p-4">

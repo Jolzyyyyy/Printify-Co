@@ -197,7 +197,7 @@
     <div class="po-products-grid">
       <template x-for="product in pagedProducts" :key="product.id">
         <div class="po-product-card" @dblclick="openTemplate(product)">
-          <div class="po-product-image"><img :src="product.image" :alt="product.name"></div>
+          <div class="po-product-image"><img :src="product.image" :alt="product.name" loading="eager" decoding="sync" fetchpriority="high"></div>
           <div class="po-product-body">
             <h3 class="po-product-name" x-text="product.name"></h3>
             <p class="po-product-desc" x-text="product.desc"></p>
