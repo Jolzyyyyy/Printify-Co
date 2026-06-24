@@ -70,11 +70,11 @@
 <i class="fa-brands fa-facebook-f">
 </i>
 </a>
-<a href="https://instagram.com" target="_blank" rel="noopener" class="instagram" aria-label="Instagram">
+<a href="https://www.instagram.com/co.printify?igsh=bzBhaTJzdzc1MnQ5" target="_blank" rel="noopener" class="instagram" aria-label="Instagram">
 <i class="fa-brands fa-instagram">
 </i>
 </a>
-<a href="https://www.tiktok.com" target="_blank" rel="noopener" class="tiktok" aria-label="TikTok">
+<a href="https://www.tiktok.com/@printifyco.ph?_r=1&_t=ZS-97SktvYyskv" target="_blank" rel="noopener" class="tiktok" aria-label="TikTok">
 <i class="fa-brands fa-tiktok">
 </i>
 </a>
@@ -2469,7 +2469,7 @@ body.footer-policy-open {
 
 <script id="front-footer-customer-care-final-functions-0622">
 (function(){
-  const ACK_URL = "{{ url('/customer-care/policy/acknowledge') }}";
+  const ACK_URL = "{{ route('customer-care.policy.acknowledge') }}";
   const getCsrfToken = () => {
     const meta = document.querySelector('meta[name="csrf-token"]');
     return meta ? meta.getAttribute('content') : "{{ csrf_token() }}";

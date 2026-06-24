@@ -79,7 +79,7 @@
         </button>
         <div class="po-action-row">
           <button class="po-button" @click="exportCSV()"><?= svg_icon('upload') ?> Export</button>
-          <button class="po-button primary" @click="openAddModal()"><?= svg_icon('plus') ?> Add Product</button>
+          <button class="po-button primary" @click="openAddModal()"><?= svg_icon('plus') ?> {{ auth()->user()?->isDeveloper() ? 'Add Product' : 'Open Catalog' }}</button>
         </div>
       </div>
     </div>
@@ -202,7 +202,7 @@
             <h3 class="po-product-name" x-text="product.name"></h3>
             <p class="po-product-desc" x-text="product.desc"></p>
             <div class="po-product-row"><div class="po-price" x-text="product.price"></div><div class="po-stock" :class="product.status==='out'?'red':(product.status==='low'?'orange':'green')" x-text="product.stock"></div></div>
-            <div class="po-card-actions"><button class="po-card-action edit" @click.stop="editProduct(product)"><?= svg_icon('pencil') ?> Edit</button><button class="po-card-action delete" @click.stop="deleteProduct(product)"><?= svg_icon('trash') ?> Delete</button></div>
+            <div class="po-card-actions"><button class="po-card-action edit" @click.stop="editProduct(product)"><?= svg_icon('pencil') ?> {{ auth()->user()?->isDeveloper() ? 'Edit' : 'Catalog' }}</button><button class="po-card-action delete" @click.stop="openCatalogProduct(product)"><?= svg_icon('box') ?> View</button></div>
           </div>
         </div>
       </template>
@@ -221,8 +221,8 @@
       <div class="po-modal">
         <div class="po-modal-header"><div class="po-modal-title" x-text="modal.mode==='add'?'Add Product Template':'Product Details Template'"></div><button class="po-modal-close" @click="closeModal()"><?= svg_icon('x') ?></button></div>
         <div class="po-modal-body">
-          <div class="po-template-grid"><div class="po-template-card"><h4>Product Information</h4><div class="po-fieldline"><span>Product Name</span><b x-text="modal.product?.name || '—'"></b></div><div class="po-fieldline"><span>Category</span><b>—</b></div><div class="po-fieldline"><span>SKU</span><b>—</b></div><div class="po-fieldline"><span>Status</span><b>—</b></div></div><div class="po-template-card"><h4>Pricing & Inventory</h4><div class="po-fieldline"><span>Price</span><b x-text="modal.product?.price || '—'"></b></div><div class="po-fieldline"><span>Stock</span><b x-text="modal.product?.stock || '—'"></b></div><div class="po-fieldline"><span>Unit</span><b>—</b></div><div class="po-fieldline"><span>Reorder Level</span><b>—</b></div></div><div class="po-template-card"><h4>Publishing</h4><div class="po-fieldline"><span>Visibility</span><b>—</b></div><div class="po-fieldline"><span>Last Updated</span><b>—</b></div><div class="po-fieldline"><span>Created By</span><b>—</b></div><div class="po-fieldline"><span>Notes</span><b>—</b></div></div></div>
-          <div class="po-items-template"><h4>Items / Service Template</h4><table><thead><tr><th>ITEM</th><th>DESCRIPTION</th><th>QTY</th><th>UNIT PRICE</th><th>TOTAL</th></tr></thead><tbody><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody></table></div>
+          <div class="po-template-grid"><div class="po-template-card"><h4>Product Information</h4><div class="po-fieldline"><span>Product Name</span><b x-text="modal.product?.name || '—'"></b></div><div class="po-fieldline"><span>Category</span><b x-text="modal.product?.category || '—'"></b></div><div class="po-fieldline"><span>SKU</span><b x-text="modal.product?.sku || '—'"></b></div><div class="po-fieldline"><span>Status</span><b x-text="modal.product?.statusLabel || '—'"></b></div></div><div class="po-template-card"><h4>Pricing & Inventory</h4><div class="po-fieldline"><span>Price</span><b x-text="modal.product?.price || '—'"></b></div><div class="po-fieldline"><span>Stock</span><b x-text="modal.product?.stock || '—'"></b></div><div class="po-fieldline"><span>Unit</span><b x-text="modal.product?.unit || '—'"></b></div><div class="po-fieldline"><span>Options</span><b x-text="modal.product?.variationSummary || '—'"></b></div></div><div class="po-template-card"><h4>Publishing</h4><div class="po-fieldline"><span>Visibility</span><b x-text="modal.product?.isActive ? 'Customer visible' : 'Hidden'"></b></div><div class="po-fieldline"><span>Last Updated</span><b x-text="modal.product?.updatedAt || '—'"></b></div><div class="po-fieldline"><span>Created By</span><b>Service Catalog</b></div><div class="po-fieldline"><span>Notes</span><b x-text="modal.product?.desc || '—'"></b></div></div></div>
+          <div class="po-items-template"><h4>Items / Service Template</h4><table><thead><tr><th>ITEM</th><th>DESCRIPTION</th><th>QTY</th><th>UNIT PRICE</th><th>TOTAL</th></tr></thead><tbody><template x-for="variation in (modal.product?.variations || [])" :key="variation.id"><tr><td x-text="variation.name"></td><td x-text="variation.description"></td><td>1</td><td x-text="variation.price"></td><td x-text="variation.price"></td></tr></template><tr x-show="!(modal.product?.variations || []).length"><td>—</td><td>No active variations yet.</td><td>—</td><td>—</td><td>—</td></tr></tbody></table></div>
         </div><div class="po-modal-actions"><button class="po-button primary" @click="saveTemplate()">Save Template</button><button class="po-button" @click="printTemplate()"><?= svg_icon('printer') ?> Print</button></div>
       </div>
     </div>
@@ -250,33 +250,74 @@ function svg_icon($name){
   return $icons[$name] ?? '';
 }
 ?>
+@php
+  $canManageServices = auth()->user()?->isDeveloper() ?? false;
+  $serviceImageUrl = function (?string $path) {
+      if (!$path) {
+          return null;
+      }
+
+      return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://', 'data:'])
+          ? $path
+          : asset('storage/' . ltrim($path, '/'));
+  };
+  $serviceCatalogProducts = \App\Models\Service::query()
+      ->with(['activeVariations' => fn ($query) => $query->orderBy('retail_price')])
+      ->withCount(['variations', 'activeVariations'])
+      ->orderBy('category')
+      ->orderBy('name')
+      ->get()
+      ->map(function ($service) use ($canManageServices, $serviceImageUrl) {
+          $activeOptions = (int) ($service->active_variations_count ?? $service->activeVariations->count());
+          $priceValue = (float) ($service->activeVariations->min('retail_price') ?? $service->retail_price ?? 0);
+          $firstVariationImage = optional($service->activeVariations->first())->variation_image_path;
+          $status = ! $service->is_active ? 'out' : ($activeOptions === 0 ? 'low' : 'published');
+
+          return [
+              'id' => $service->id,
+              'name' => $service->name,
+              'desc' => $service->description ?: 'Customer-visible print service from the live catalog.',
+              'category' => $service->category ?: 'Uncategorized',
+              'sku' => $service->service_item_id ?: ('SVC-' . str_pad((string) $service->id, 4, '0', STR_PAD_LEFT)),
+              'unit' => $service->unit ?: 'per service',
+              'price' => 'PHP ' . number_format($priceValue, 2),
+              'stock' => ! $service->is_active ? 'INACTIVE' : ($activeOptions > 0 ? $activeOptions . ' OPTIONS' : 'NO OPTIONS'),
+              'status' => $status,
+              'statusLabel' => $service->is_active ? 'Published' : 'Inactive',
+              'isActive' => (bool) $service->is_active,
+              'variationSummary' => $activeOptions . ' active / ' . (int) ($service->variations_count ?? 0) . ' total',
+              'updatedAt' => optional($service->updated_at)->format('M d, Y') ?: '—',
+              'image' => $serviceImageUrl($service->image_path ?: $firstVariationImage),
+              'showUrl' => $service->is_active ? route('services.show', $service) : route('admin.services.index'),
+              'editUrl' => $canManageServices ? route('admin.services.edit', $service) : route('admin.services.index'),
+              'adminUrl' => route('admin.services.index'),
+              'variations' => $service->activeVariations->take(6)->map(fn ($variation) => [
+                  'id' => $variation->id,
+                  'name' => $variation->service_item_id ?: ('Option ' . $variation->id),
+                  'description' => $variation->variation_label ?: 'Standard service option',
+                  'price' => 'PHP ' . number_format((float) $variation->retail_price, 2),
+              ])->values(),
+          ];
+      })
+      ->values();
+  $serviceCatalogRoutes = [
+      'create' => $canManageServices ? route('admin.services.create') : route('admin.services.index'),
+      'index' => route('admin.services.index'),
+      'canManage' => $canManageServices,
+  ];
+@endphp
 <script>
 function productsOverviewExact(){
+  const liveCatalogProducts=@json($serviceCatalogProducts);
+  const serviceCatalogRoutes=@json($serviceCatalogRoutes);
   const esc=(v)=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const img=(seed)=>`data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 260"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#020617"/><stop offset=".55" stop-color="#0b2038"/><stop offset="1" stop-color="#07111f"/></linearGradient><radialGradient id="b" cx="35%" cy="18%" r="44%"><stop stop-color="#0b6cff" stop-opacity=".78"/><stop offset="1" stop-color="#0b6cff" stop-opacity="0"/></radialGradient></defs><rect width="520" height="260" fill="url(#g)"/><rect width="520" height="260" fill="url(#b)"/><g transform="translate(78 62)" opacity=".96"><rect x="0" y="54" width="310" height="86" rx="9" fill="#f8fafc"/><rect x="30" y="24" width="220" height="50" rx="5" fill="#dbeafe"/><rect x="60" y="14" width="266" height="34" rx="3" fill="#ffffff" opacity=".88"/><circle cx="340" cy="94" r="27" fill="#2563eb" opacity=".82"/><rect x="32" y="96" width="190" height="14" rx="6" fill="#94a3b8"/><rect x="240" y="96" width="54" height="14" rx="6" fill="#94a3b8"/></g><text x="490" y="232" font-family="Arial" font-size="26" fill="#93c5fd" text-anchor="end">${esc(seed)}</text></svg>`)}`;
   return{
     filter:'all',search:'',filterMenu:false,currentPage:1,perPage:13,toast:{show:false,text:''},modal:{open:false,mode:'view',product:null},calendarOpen:false,selectedProductDate:'2026-06-06',calendarMonth:5,calendarYear:2026,calendarDraft:{id:null,title:'',time:'09:00',note:''},productCalendarEvents:[{id:1,date:'2026-06-06',title:'Product inventory review',time:'09:00',note:'Check low stock and out of stock products.'},{id:2,date:'2026-06-10',title:'Restock follow-up',time:'14:00',note:'Review supplier status and reorder items.'}],
-    products:[
-      {id:1,name:'Document Printing',desc:'Standard A4, short and long document printing.',price:'PHP 5.00',stock:'UNLIMITED',status:'published',image:img('PRINT')},
-      {id:2,name:'Photocopy & Scanning',desc:'High-speed photocopy and digital scanning services.',price:'PHP 2.00',stock:'SOLD OUT',status:'out',image:img('COPY')},
-      {id:3,name:'ID & Photo Services',desc:'Passport, 2x2, 1x1, and reduced photo packages.',price:'PHP 50.00',stock:'100 SETS',status:'published',image:img('PHOTO')},
-      {id:4,name:'Lamination & Binding',desc:'Lamination, coil, and ring document binding.',price:'PHP 25.00',stock:'50 PCS',status:'published',image:img('BIND')},
-      {id:5,name:'Large Format Printing',desc:'Tarpaulin, blueprints, canvas, and poster printing.',price:'PHP 500.00',stock:'SOLD OUT',status:'out',image:img('LARGE')},
-      {id:6,name:'Custom Special Printing',desc:'Customized mugs, shirts, totes, and giveaways.',price:'PHP 150.00',stock:'30 PCS',status:'low',image:img('CUSTOM')},
-      {id:7,name:'Black & White Print',desc:'Budget black and white document printing.',price:'PHP 3.00',stock:'UNLIMITED',status:'published',image:img('B&W')},
-      {id:8,name:'Full Color Print',desc:'Full color document and report printing.',price:'PHP 10.00',stock:'UNLIMITED',status:'published',image:img('COLOR')},
-      {id:9,name:'Photo Copy Bundle',desc:'Bulk photocopy packages for school and office.',price:'PHP 35.00',stock:'80 PCS',status:'low',image:img('BUNDLE')},
-      {id:10,name:'Document Scanning',desc:'Clean PDF and image scanning output.',price:'PHP 15.00',stock:'UNLIMITED',status:'published',image:img('SCAN')},
-      {id:11,name:'2x2 ID Photo Package',desc:'2x2 ID photos with basic retouching.',price:'PHP 80.00',stock:'45 SETS',status:'low',image:img('2X2')},
-      {id:12,name:'Passport Photo Package',desc:'Passport photo package ready for documents.',price:'PHP 90.00',stock:'26 SETS',status:'low',image:img('PASS')},
-      {id:13,name:'Gloss Lamination',desc:'Glossy lamination for certificates and IDs.',price:'PHP 35.00',stock:'20 PCS',status:'low',image:img('GLOSS')},
-      {id:14,name:'Coil Binding',desc:'Coil binding for reports and thesis copies.',price:'PHP 45.00',stock:'80 PCS',status:'published',image:img('COIL')},
-      {id:15,name:'Tarpaulin Print',desc:'Event tarpaulin and signage printing.',price:'PHP 350.00',stock:'18 PCS',status:'low',image:img('TARP')},
-      {id:16,name:'Custom Mug Print',desc:'Personalized mugs for gifts and branding.',price:'PHP 180.00',stock:'25 PCS',status:'published',image:img('MUG')}
-    ],
-    init(){this.products=this.products.slice(0,13);this.currentPage=1;this.loadProductCalendarEvents()},
+    products:liveCatalogProducts.map(product=>({...product,image:product.image||img(product.name||'SERVICE')})),
+    init(){this.currentPage=1;this.loadProductCalendarEvents()},
     get filteredProducts(){let q=this.search.toLowerCase().trim();return this.products.filter(p=>(this.filter==='all'||p.status===this.filter)&&(!q||p.name.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)))},
-    get displayProducts(){return this.filteredProducts.slice(0,13)},
+    get displayProducts(){return this.filteredProducts},
     get totalPages(){return Math.max(1,Math.ceil(this.displayProducts.length/this.perPage))},
     get pagedProducts(){let start=(this.currentPage-1)*this.perPage;return this.displayProducts.slice(start,start+this.perPage)},
     get showingText(){let total=this.displayProducts.length;if(!total)return 'Showing 0 products';let start=(this.currentPage-1)*this.perPage+1;let end=Math.min(start+this.perPage-1,total);return `Showing ${start}–${end} of ${total} products`},
@@ -303,7 +344,7 @@ function productsOverviewExact(){
     saveProductCalendarEvent(){if(!this.calendarDraft.title.trim()){this.showToast('Lagyan muna ng title yung calendar reminder');return}if(this.calendarDraft.id){const found=this.productCalendarEvents.find(e=>e.id===this.calendarDraft.id);if(found){found.title=this.calendarDraft.title.trim();found.time=this.calendarDraft.time;found.note=this.calendarDraft.note;found.date=this.selectedProductDate}this.showToast('Product calendar reminder updated')}else{this.productCalendarEvents.push({id:Date.now(),date:this.selectedProductDate,title:this.calendarDraft.title.trim(),time:this.calendarDraft.time,note:this.calendarDraft.note});this.showToast('Product calendar reminder saved')}this.persistProductCalendarEvents();this.resetProductCalendarForm()},
     editProductCalendarEvent(event){this.calendarDraft={id:event.id,title:event.title,time:event.time||'09:00',note:event.note||''}},
     deleteProductCalendarEvent(id){this.productCalendarEvents=this.productCalendarEvents.filter(e=>e.id!==id);this.persistProductCalendarEvents();this.resetProductCalendarForm();this.showToast('Product calendar reminder deleted')},
-    openAddModal(){this.modal={open:true,mode:'add',product:null}},editProduct(p){this.modal={open:true,mode:'edit',product:{...p}}},openTemplate(p){this.modal={open:true,mode:'view',product:p}},closeModal(){this.modal.open=false},saveTemplate(){this.showToast('Template saved')},printTemplate(){window.print()},deleteProduct(p){if(confirm('Delete '+p.name+'?')){this.products=this.products.filter(x=>x.id!==p.id);this.showToast('Product deleted')}}
+    openAddModal(){window.location.href=serviceCatalogRoutes.create||serviceCatalogRoutes.index},editProduct(p){window.location.href=p.editUrl||serviceCatalogRoutes.index},openCatalogProduct(p){window.location.href=p.showUrl||p.adminUrl||serviceCatalogRoutes.index},openTemplate(p){this.modal={open:true,mode:'view',product:p}},closeModal(){this.modal.open=false},saveTemplate(){this.showToast('Service details are managed in the live catalog')},printTemplate(){window.print()}
   }
 }
 </script>

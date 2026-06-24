@@ -569,6 +569,96 @@
     border-color:var(--hc-orange)!important;
     box-shadow:0 0 0 3px rgba(255,122,0,.10)!important;
 }
+.hc-answer-panel{
+    border:1px solid #e5e7eb!important;
+    border-radius:18px!important;
+    background:#fff!important;
+    box-shadow:0 18px 42px rgba(15,23,42,.06)!important;
+    overflow:hidden!important;
+}
+.hc-answer-panel[hidden]{display:none!important;}
+.hc-answer-head{
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:14px!important;
+    padding:18px 20px!important;
+    border-bottom:1px solid #eef2f7!important;
+    background:#fff8f1!important;
+}
+.hc-answer-head h2{
+    margin:0!important;
+    font-size:18px!important;
+    color:#111827!important;
+}
+.hc-answer-head p{
+    margin:4px 0 0!important;
+    color:#64748b!important;
+    font-size:12px!important;
+}
+.hc-answer-close{
+    border:1px solid #fed7aa!important;
+    background:#fff!important;
+    color:#ff4f16!important;
+    border-radius:999px!important;
+    height:32px!important;
+    min-width:32px!important;
+    display:grid!important;
+    place-items:center!important;
+    cursor:pointer!important;
+    transition:.18s!important;
+}
+.hc-answer-close:hover{
+    background:#ff4f16!important;
+    color:#fff!important;
+}
+.hc-answer-list{
+    padding:14px 18px 18px!important;
+    display:grid!important;
+    gap:10px!important;
+}
+.hc-answer-item{
+    border:1px solid #e5e7eb!important;
+    border-radius:14px!important;
+    background:#fff!important;
+    overflow:hidden!important;
+}
+.hc-answer-question{
+    width:100%!important;
+    border:0!important;
+    background:#fff!important;
+    padding:13px 14px!important;
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:center!important;
+    gap:12px!important;
+    cursor:pointer!important;
+    color:#111827!important;
+    font-size:13px!important;
+    font-weight:900!important;
+    text-align:left!important;
+}
+.hc-answer-question:hover{
+    color:#ff4f16!important;
+    background:#fff8f1!important;
+}
+.hc-answer-body{
+    display:none!important;
+    padding:0 14px 14px!important;
+    color:#334155!important;
+    font-size:12.5px!important;
+    line-height:1.55!important;
+}
+.hc-answer-item.open .hc-answer-body{display:block!important;}
+.hc-answer-item.open .hc-answer-question{color:#ff4f16!important;background:#fff8f1!important;}
+.hc-answer-empty{
+    padding:16px!important;
+    border:1px dashed #fed7aa!important;
+    border-radius:14px!important;
+    color:#92400e!important;
+    background:#fffbeb!important;
+    font-size:12px!important;
+}
 .hc-cal-form-actions{
     display:flex!important;
     align-items:center!important;
@@ -642,6 +732,19 @@
                         @endforeach
                     </div>
                 </div>
+            </section>
+
+            <section id="helpAnswerPanel" class="hc-answer-panel" hidden>
+                <div class="hc-answer-head">
+                    <div>
+                        <h2 id="helpAnswerTitle">Help answers</h2>
+                        <p id="helpAnswerSubtitle">Click a question to view the answer.</p>
+                    </div>
+                    <button type="button" class="hc-answer-close" onclick="closeHelpAnswers()" aria-label="Close help answers">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div id="helpAnswerList" class="hc-answer-list"></div>
             </section>
 
             <section class="hc-card">
@@ -726,17 +829,90 @@ function saveTickets(items){localStorage.setItem(helpKey,JSON.stringify(items))}
 function helpField(id){return document.getElementById(id)}
 function escapeHelpText(value){return String(value||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function updateHelpUrl(view){history.replaceState(null,'',window.location.pathname+(view?'#'+view:''))}
+const helpKnowledgeBase={
+    'Orders & Shipping':[
+        ['How do I place an order?','Go to your chosen tenant’s storefront, select your product and specifications, upload your print-ready file, and confirm your order after payment is verified.'],
+        ['What do the order statuses mean?','Pending means your order is awaiting payment confirmation. Processing means the tenant has started production. Ready means your order is available for pickup or awaiting dispatch. Delivered means the courier has completed the drop-off.'],
+        ['How do delivery options work?','At checkout, select either Store Pickup or Courier Delivery. If courier, choose your preferred logistics provider (Lalamove) and enter your delivery address.']
+    ],
+    'Payments & Billing':[
+        ['What payment methods do you accept?','Accepted payment methods depend on the tenant but generally include GCash, Maya, and cash on pickup. All digital payments are validated and logged through the platform.'],
+        ['My payment was deducted but no order appeared. What should I do?','Wait a few minutes and check your order status under My Orders. If no order appears and your payment was deducted, contact the tenant directly through the platform or flag the transaction to hello@printify.co.'],
+        ['Where can I view or download my invoice?','Go to My Orders, select the transaction, and tap View Invoice to download a copy. Full transaction history is available under your account dashboard.']
+    ],
+    'Account & Security':[
+        ['How do I create an account?','Click Sign Up, enter your full name, email address, contact number, and create a secure password. Verify your email to activate your account.'],
+        ['I forgot my password. How can I reset it?','On the login page, click Forgot Password and enter your registered email. A reset link will be sent to your inbox. If you no longer have access to that email, contact hello@printify.co.'],
+        ['How do I request access or deletion of my personal data?','Submit a formal data request to hello@printify.co, referencing your right to access, correct, or delete personal data under Republic Act No. 10173 (Data Privacy Act of 2012).']
+    ],
+    'Product Design Help':[
+        ['What file formats and resolution should I upload?','Upload files in PDF, PNG, or DOCS format at a minimum of 300 DPI. Check your chosen tenant’s storefront for any additional file requirements specific to their shop.'],
+        ['Why do printed colors look different from my screen?','Screens use RGB (light-based color), while printers use CMYK (ink-based color). Minor color shifts between your screen preview and the final print are normal and within standard industry tolerance.'],
+        ['Can I request a proof before printing?','Message the tenant directly through the platform before confirming your order and request a physical proof or sample print. Proof availability and fees vary by tenant.']
+    ],
+    'Returns & Refunds':[
+        ['When am I eligible for a refund or return?','Valid grounds include clear production defects, incorrect product type or quantity received, damage in transit with unboxing evidence, or a tenant-initiated cancellation after payment. Conditions and timelines vary by tenant — check their storefront policy.'],
+        ['How do I submit a refund claim?','Submit your claim directly to the tenant through the platform, attaching photo or video evidence of the defect or damage. If the tenant is unresponsive, escalate to hello@printify.co for platform-level review.'],
+        ['Can I cancel or modify an order after production starts?','All print orders are custom-made to your specifications. Once production has started, cancellations or modifications due to a change of mind are not accepted. Always review your design, sizing, and spelling before paying.']
+    ],
+    'General FAQs':[
+        ['What is Printify & Co.?','Printify & Co. is a technology platform, not a print shop. It connects customers with independent printing businesses (tenants) and manages the ordering, payment, and delivery process — but does not produce or fulfill orders itself.'],
+        ['Are all shops on the platform the same?','No. Pricing, turnaround times, quality standards, and production schedules are set independently by each tenant. Printify & Co. only enforces minimum platform-wide standards covering data privacy, payment security, and baseline consumer protections.'],
+        ['How do I escalate an unresolved issue?','Submit your unresolved complaint to hello@printify.co with your order details and evidence. The platform will conduct a review and may intervene at the platform level if the tenant is found to be in violation of baseline standards.']
+    ]
+};
+function normalizeHelpCategory(category){
+    if(category==='Product Design')return 'Product Design Help';
+    return helpKnowledgeBase[category]?category:null;
+}
+function helpKnowledgeRows(category=null,query=''){
+    const q=String(query||'').toLowerCase().trim();
+    const normalized=normalizeHelpCategory(category);
+    const source=normalized?{[normalized]:helpKnowledgeBase[normalized]}:helpKnowledgeBase;
+    const rows=[];
+    Object.entries(source).forEach(([cat,items])=>{
+        items.forEach(([question,answer],index)=>{
+            const haystack=(cat+' '+question+' '+answer).toLowerCase();
+            if(!q||haystack.includes(q))rows.push({cat,question,answer,index});
+        });
+    });
+    return rows;
+}
+function renderHelpAnswers(category=null,query=''){
+    const panel=helpField('helpAnswerPanel'),title=helpField('helpAnswerTitle'),subtitle=helpField('helpAnswerSubtitle'),list=helpField('helpAnswerList');
+    if(!panel||!title||!subtitle||!list)return;
+    const normalized=normalizeHelpCategory(category);
+    const rows=helpKnowledgeRows(normalized,query);
+    title.textContent=normalized||'Help answers';
+    subtitle.textContent=query?`Showing answers for "${query}"`:'Click a question to view the answer.';
+    if(!rows.length){
+        list.innerHTML='<div class="hc-answer-empty">No exact answer matched your search. Try another keyword or submit a ticket.</div>';
+    }else{
+        list.innerHTML=rows.map((row,i)=>`<article class="hc-answer-item ${i===0?'open':''}"><button type="button" class="hc-answer-question" onclick="toggleHelpAnswer(this)"><span>${escapeHelpText(row.question)}</span><i class="fa-solid fa-chevron-down"></i></button><div class="hc-answer-body"><strong>${escapeHelpText(row.cat)}</strong><p>${escapeHelpText(row.answer)}</p></div></article>`).join('');
+    }
+    panel.hidden=false;
+    panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function toggleHelpAnswer(button){
+    const item=button.closest('.hc-answer-item');
+    if(!item)return;
+    item.classList.toggle('open');
+}
+function closeHelpAnswers(){
+    const panel=helpField('helpAnswerPanel');
+    if(panel)panel.hidden=true;
+}
 function renderTickets(){const box=helpField('ticketList');if(!box)return;const items=helpTickets();box.innerHTML=items.length?items.slice(-3).reverse().map(t=>`<div class="hc-ticket"><i class="fa-regular fa-message"></i><div><p class="hc-row-title">${escapeHelpText(t.ref||t.topic)}</p><p class="hc-row-sub">${escapeHelpText(t.topic)} - ${escapeHelpText((t.message||'').slice(0,62))}</p></div><span class="hc-tag">${escapeHelpText(t.status)}</span></div>`).join(''):'<div class="hc-ticket"><i class="fa-regular fa-message"></i><div><p class="hc-row-title">No tickets yet</p><p class="hc-row-sub">Submit a ticket to see it here.</p></div><span class="hc-tag">Ready</span></div>'}
 function openTicketModal(topicValue){const modal=helpField('ticketModal'),topic=helpField('supportTopic'),message=helpField('supportMessage');if(topic&&topicValue)topic.value=topicValue;if(modal){modal.classList.add('active');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}setTimeout(()=>message?.focus(),80);updateHelpUrl('support-ticket')}
 function closeTicketModal(){const modal=helpField('ticketModal');if(modal){modal.classList.remove('active');modal.setAttribute('aria-hidden','true');document.body.style.overflow=''}}
 function saveHelpDraft(){const topic=helpField('supportTopic'),order=helpField('supportOrder'),message=helpField('supportMessage');localStorage.setItem('printify_help_draft',JSON.stringify({topic:topic?.value||'',order:order?.value||'',message:message?.value||'',savedAt:new Date().toISOString()}));updateHelpUrl('draft-saved');helpToast('Draft saved.')}
 function startLiveChat(){localStorage.setItem('printify_live_chat_requested_at',new Date().toISOString());updateHelpUrl('live-chat');helpToast('Live chat request opened.')}
-function selectHelpCategory(category){const search=helpField('helpSearch');if(search)search.value=category;runHelpSearch();helpToast(category+' articles shown.')}
+function selectHelpCategory(category){const search=helpField('helpSearch');const normalized=normalizeHelpCategory(category)||category;if(search)search.value=normalized;runHelpSearch();renderHelpAnswers(normalized,'');helpToast(normalized+' answers shown.')}
 function quickHelpSearch(term){const search=helpField('helpSearch');if(search)search.value=term;runHelpSearch()}
-function runHelpSearch(){const search=helpField('helpSearch');const q=(search?.value||'').toLowerCase().trim();document.querySelectorAll('[data-help-item]').forEach(item=>{item.style.display=!q||item.dataset.helpItem.includes(q)?'':'none'});updateHelpUrl(q?'search':'help-center');helpToast(q?'Filtered help results.':'Showing all help results.')}
-function openArticle(title){localStorage.setItem('printify_help_last_article',title);updateHelpUrl(title.toLowerCase().replace(/[^a-z0-9]+/g,'-'));helpToast(title)}
+function runHelpSearch(){const search=helpField('helpSearch');const raw=(search?.value||'').trim();const q=raw.toLowerCase();document.querySelectorAll('[data-help-item]').forEach(item=>{item.style.display=!q||item.dataset.helpItem.includes(q)?'':'none'});const category=normalizeHelpCategory(raw);renderHelpAnswers(category,category?'':raw);updateHelpUrl(q?'search':'help-center');helpToast(q?'Filtered help answers.':'Showing all help results.')}
+function openArticle(title){localStorage.setItem('printify_help_last_article',title);const match=helpKnowledgeRows(null,title).find(row=>row.question===title)||helpKnowledgeRows(null,title)[0];renderHelpAnswers(match?.cat||null,title);updateHelpUrl(title.toLowerCase().replace(/[^a-z0-9]+/g,'-'));helpToast(title)}
 function openAnnouncement(title){localStorage.setItem('printify_help_last_announcement',title);updateHelpUrl('announcements');helpToast(title)}
-function showAllArticles(){const search=helpField('helpSearch');if(search)search.value='';runHelpSearch();helpToast('All articles visible.')}
+function showAllArticles(){const search=helpField('helpSearch');if(search)search.value='';closeHelpAnswers();runHelpSearch();helpToast('All articles visible.')}
 helpField('ticketModal')?.addEventListener('click',e=>{if(e.target.id==='ticketModal')closeTicketModal()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTicketModal()});
 helpField('supportForm')?.addEventListener('submit',async e=>{e.preventDefault();const topic=helpField('supportTopic'),order=helpField('supportOrder'),message=helpField('supportMessage');const body=(message?.value||'').trim();if(!body){helpToast('Please describe your concern.');return}const fallbackRef='TKT-'+Date.now().toString().slice(-6);let ticket={ref:fallbackRef,topic:topic?.value||'Order Concern',order:(order?.value||'').trim(),message:body,status:'Open',createdAt:new Date().toISOString()};let savedToServer=false;try{if(helpTicketStoreUrl){const res=await fetch(helpTicketStoreUrl,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':helpCsrf},body:JSON.stringify({topic:ticket.topic,order_reference:ticket.order,message:ticket.message})});if(!res.ok)throw new Error('Ticket save failed');const data=await res.json();if(data.ticket){ticket={ref:data.ticket.ref||data.ticket.reference||ticket.ref,topic:data.ticket.topic||ticket.topic,order:data.ticket.order||data.ticket.order_reference||ticket.order,message:data.ticket.message||ticket.message,status:data.ticket.status||ticket.status,createdAt:data.ticket.createdAt||data.ticket.created_at||ticket.createdAt};savedToServer=true;}}}catch(err){console.warn(err)}const items=helpTickets();items.push(ticket);saveTickets(items);localStorage.removeItem('printify_help_draft');if(message)message.value='';if(order)order.value='';renderTickets();closeTicketModal();updateHelpUrl('ticket-'+String(ticket.ref).toLowerCase());helpToast((savedToServer?'Support ticket saved: ':'Support ticket saved locally: ')+ticket.ref);});

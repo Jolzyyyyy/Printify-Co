@@ -4942,7 +4942,6 @@ function openMap() {
   }
 }
 </style>
-
 <style id="contact-yellowline-more-compact-final-0623">
 /* Mas binawasan pa ang highlighted yellow-line spaces only */
 #contact.contact-section {
@@ -5495,6 +5494,192 @@ function openMap() {
     border-right:0!important;
     padding-left:0!important;
     padding-right:0!important
+  }
+}
+</style>
+
+<style id="contact-about-us-left-spacing-only-final">
+/* Left spacing only: matched to About Us desktop alignment. Nothing else changed. */
+#contact.contact-section {
+  padding-left:80px!important;
+}
+@media(max-width:1320px) {
+  #contact.contact-section {
+    padding-left:80px!important;
+  }
+}
+@media(max-width:1080px) {
+  #contact.contact-section {
+    padding-left:22px!important;
+  }
+}
+@media(max-width:760px) {
+  #contact.contact-section {
+    padding-left:14px!important;
+  }
+}
+</style>
+
+<style id="contact-send-message-height-compact-final-0623">
+/* Final request: bawas height ng Send Us a Message main box, Message field, Upload File, at inner spacing */
+#contact .form-card {
+  height:auto!important;
+  min-height:0!important;
+  padding:14px 18px 12px!important;
+}
+
+#contact .form-card .card-title {
+  margin-bottom:9px!important;
+  gap:10px!important;
+}
+
+#contact .form-card .card-title>i {
+  width:32px!important;
+  min-width:32px!important;
+  height:32px!important;
+  font-size:22px!important;
+}
+
+#contact .form-card .card-title h3 {
+  font-size:20px!important;
+  line-height:1!important;
+  margin:0 0 3px!important;
+}
+
+#contact .form-card .card-title p {
+  font-size:10px!important;
+  line-height:1.2!important;
+  margin:0!important;
+}
+
+#contact .form-card form {
+  min-height:0!important;
+}
+
+#contact .form-fields {
+  gap:6px!important;
+  flex:0 0 auto!important;
+}
+
+#contact .form-row,
+#contact .message-row,
+#contact .upload-row {
+  flex:0 0 auto!important;
+  margin:0!important;
+}
+
+#contact .form-row>span {
+  margin:0 0 3px!important;
+  font-size:11px!important;
+  line-height:1!important;
+}
+
+#contact .input-wrapper i {
+  left:12px!important;
+  width:14px!important;
+  font-size:12px!important;
+}
+
+#contact .input-wrapper input {
+  height:28px!important;
+  min-height:28px!important;
+  padding:6px 10px 6px 34px!important;
+  font-size:12px!important;
+  line-height:1.1!important;
+}
+
+#contact .input-wrapper textarea {
+  height:44px!important;
+  min-height:44px!important;
+  max-height:44px!important;
+  padding:8px 10px 6px 34px!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+  resize:none!important;
+}
+
+#contact .textarea-wrapper i {
+  top:9px!important;
+  transform:none!important;
+}
+
+#contact .upload-drop {
+  min-height:36px!important;
+  height:36px!important;
+  padding:4px 9px!important;
+  gap:8px!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+
+#contact .upload-drop>i {
+  font-size:16px!important;
+}
+
+#contact .upload-drop>span {
+  gap:0!important;
+  line-height:1!important;
+}
+
+#contact .upload-drop b {
+  font-size:10.5px!important;
+  line-height:1!important;
+}
+
+#contact .upload-drop small {
+  font-size:9.5px!important;
+  line-height:1!important;
+}
+
+#contact .form-bottom {
+  margin-top:8px!important;
+  gap:10px!important;
+}
+
+#contact .form-bottom small {
+  font-size:10px!important;
+  line-height:1.05!important;
+}
+
+#contact .form-bottom .ui-btn {
+  width:112px!important;
+  min-width:112px!important;
+  height:28px!important;
+  min-height:28px!important;
+  padding:6px 12px!important;
+  font-size:10.5px!important;
+}
+
+@media(max-width:1320px) {
+  #contact .form-card {
+    padding:13px 16px 11px!important;
+  }
+
+  #contact .form-fields {
+    gap:6px!important;
+  }
+
+  #contact .input-wrapper input {
+    height:28px!important;
+    min-height:28px!important;
+  }
+
+  #contact .input-wrapper textarea {
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+  }
+
+  #contact .upload-drop {
+    min-height:35px!important;
+    height:35px!important;
+  }
+}
+
+@media(max-width:1080px) {
+  #contact .form-card {
+    width:100%!important;
+    max-width:none!important;
   }
 }
 </style>

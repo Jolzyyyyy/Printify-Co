@@ -72,6 +72,38 @@ class FrontPageController extends Controller
         return back()->with('contact_status', 'success');
     }
 
+    public function acknowledgeCustomerCarePolicy(Request $request)
+    {
+        $validated = $request->validate([
+            'topic' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        $record = [
+            'topic' => $validated['topic'] ?? 'unknown',
+            'user_id' => $request->user()?->id,
+            'acknowledged_at' => now()->toDateTimeString(),
+            'url' => $request->headers->get('referer'),
+            'ip' => $request->ip(),
+        ];
+
+        $file = 'customer-care/acknowledgements.json';
+        $existing = Storage::disk('local')->exists($file)
+            ? json_decode(Storage::disk('local')->get($file), true)
+            : [];
+
+        if (!is_array($existing)) {
+            $existing = [];
+        }
+
+        $existing[] = $record;
+        Storage::disk('local')->put($file, json_encode($existing, JSON_PRETTY_PRINT));
+
+        return response()->json([
+            'ok' => true,
+            'acknowledgement' => $record,
+        ]);
+    }
+
     public function serviceDetail()
     {
         return $this->page('service-details');

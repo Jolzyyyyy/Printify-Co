@@ -23,7 +23,7 @@ class OrderController extends Controller
             ->latest()
             ->get();
 
-        return view('orders.my_index', [
+        return view('myorders', [
             'orders' => $orders,
             'selectedStatus' => (string) $request->query('status', 'all'),
             'searchTerm' => trim((string) $request->query('q', '')),
@@ -39,7 +39,7 @@ class OrderController extends Controller
             ->latest()
             ->get();
 
-        return view('customer-orders', [
+        return view('co.order-tracking', [
             'orders' => $orders,
             'selectedStatus' => (string) $request->query('status', 'all'),
             'searchTerm' => trim((string) $request->query('q', '')),
@@ -55,7 +55,7 @@ class OrderController extends Controller
 
         $order->load(['items.service', 'items.serviceVariation', 'files']);
 
-        return view('customer-order-detail', compact('order'));
+        return view('co.order-details', compact('order'));
     }
 
     public function portalMyShow(Order $order): View
@@ -68,7 +68,7 @@ class OrderController extends Controller
         $this->authorizeCustomerOrder($order);
 
         $order->load(['items.service', 'items.serviceVariation', 'files']);
-        return view('customer-order-tracking', compact('order'));
+        return view('co.order-details', compact('order'));
     }
 
     /*

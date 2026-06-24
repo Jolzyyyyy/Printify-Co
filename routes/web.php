@@ -16,6 +16,7 @@ use App\Http\Controllers\EReceiptController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\ServiceDetailController;
 use App\Http\Controllers\LalamoveDeliveryController;
+use App\Http\Controllers\CustomerHeaderController;
 
 // --- CUSTOMER AUTH CONTROLLERS ---
 use App\Http\Controllers\Auth\AuthenticatedSessionController; 
@@ -49,6 +50,7 @@ Route::get('/contact', [FrontPageController::class, 'contact'])->name('landing.c
 Route::get('/contactus', [FrontPageController::class, 'contact'])->name('landing.contactus');
 Route::post('/contact', [FrontPageController::class, 'submitContact'])->name('landing.contact.submit');
 Route::post('/contactus', [FrontPageController::class, 'submitContact'])->name('landing.contactus.submit');
+Route::post('/customer-care/policy/acknowledge', [FrontPageController::class, 'acknowledgeCustomerCarePolicy'])->name('customer-care.policy.acknowledge');
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('legal.privacy');
 Route::view('/terms-of-service', 'legal.terms-of-service')->name('legal.terms');
 Route::get('/support', fn () => redirect()->route('landing.contactus'))->name('support');
@@ -138,6 +140,14 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     Route::get('/co/place-order', [OrderController::class, 'placeOrderIndex'])->name('co.place-order');
     Route::get('/co/place-order/{order}', [OrderController::class, 'myShow'])->name('co.place-order.show');
     Route::get('/co/place-order/{order}/tracking', [OrderController::class, 'myTracking'])->name('co.place-order.tracking');
+
+    Route::get('/customer/search', [CustomerHeaderController::class, 'search'])->name('customer.search');
+    Route::post('/customer/notifications/mark-read', [CustomerHeaderController::class, 'markNotificationRead'])->name('customer.notifications.mark-read');
+    Route::post('/customer/notifications/mark-all-read', [CustomerHeaderController::class, 'markAllNotificationsRead'])->name('customer.notifications.mark-all-read');
+    Route::get('/customer/support/admin-status', [CustomerHeaderController::class, 'adminStatus'])->name('customer.support.admin-status');
+    Route::post('/customer/support/threads', [CustomerHeaderController::class, 'storeThread'])->name('customer.support.threads.store');
+    Route::get('/customer/support/messages', [CustomerHeaderController::class, 'messages'])->name('customer.support.messages.index');
+    Route::post('/customer/support/messages', [CustomerHeaderController::class, 'storeMessage'])->name('customer.support.messages.store');
 
     Route::post('/delivery/lalamove/quote', [LalamoveDeliveryController::class, 'quote'])->name('delivery.lalamove.quote');
     Route::post('/orders/{order}/delivery/book', [LalamoveDeliveryController::class, 'book'])->name('orders.delivery.book');

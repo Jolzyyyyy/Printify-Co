@@ -31,7 +31,7 @@
                 ->where('admin_client_id', $portalUser->id))
             ->when(!$isDeveloperPortal && !$isAdminClientPortal, fn ($query) => $query
                 ->where('role', \App\Models\User::ROLE_CUSTOMER));
-        $dashboardServices = \App\Models\Service::query();
+        $dashboardServices = \App\Models\Service::query()->where('is_active', true);
         $dashboardStats = [
             'revenue' => (float) (clone $dashboardOrders)->sum('total_price'),
             'orders' => (clone $dashboardOrders)->count(),
