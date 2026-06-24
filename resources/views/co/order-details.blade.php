@@ -1353,48 +1353,14 @@ button{cursor:pointer}
   .ot-body{padding:12px}
 }
 @media print{
-  .top-nav-bar,.ot-top-actions,.ot-actions,.ot-toast{display:none!important}
+  .top-nav-bar,.customer-front-header,.ot-top-actions,.ot-actions,.ot-toast{display:none!important}
   .ot-wrap{width:100%;max-width:none;margin:0;padding:0}
   .ot-card,.ot-hero{box-shadow:none;break-inside:avoid}
 }
 </style>
 </head>
 <body>
-<header class="top-nav-bar premium-site-header header-dark" id="customerOriginalHeader">
-  <div class="premium-main-navbar">
-    <a href="{{ route('home') }}" class="brand-logo-block" aria-label="Printify and Co Home">
-      <span class="brand-main-text">PRINTIFY &amp; CO.</span>
-      <span class="brand-sub-text">CRAFTING YOUR VISION INTO REALITY</span>
-    </a>
-
-    <nav class="nav-horizontal" aria-label="Main navigation">
-      <a href="{{ route('home') }}" class="nav-link">HOME</a>
-      <a href="{{ route('landing.aboutus') }}" class="nav-link">ABOUT US</a>
-      <a href="{{ route('services.index') }}" class="nav-link">SERVICES</a>
-      <a href="{{ route('landing.contactus') }}" class="nav-link">CONTACT US</a>
-    </nav>
-
-    <div class="hero-signin-container" id="authContainer">
-      <form class="nav-search-box" method="GET" action="{{ route('customer.search') }}">
-        <input type="search" name="q" id="navSearchInput" value="{{ request('q') }}" placeholder="Search orders or services..." autocomplete="off">
-      </form>
-
-      <a href="{{ route('help-center') }}" class="nav-icon-link" aria-label="Wishlist">
-        <img src="{{ asset('images/Heart.svg') }}" alt="Heart" class="nav-svg-icon">
-      </a>
-
-      <a href="{{ route('cart.index') }}" class="nav-icon-link" aria-label="Cart">
-        <img src="{{ asset('images/Shopping cart.svg') }}" alt="Cart" class="nav-svg-icon">
-        <span class="cart-badge" id="cartBadge">{{ session('cart') ? count(session('cart')) : 0 }}</span>
-      </a>
-
-      <a href="{{ route('dashboard') }}" class="nav-icon-link">
-        <img src="{{ asset('images/user-logged.svg') }}" alt="Profile" class="nav-svg-icon">
-        <span class="account-label">{{ $user?->name ?? 'Account' }}</span>
-      </a>
-    </div>
-  </div>
-</header>
+@include('components.customer-front-header', ['frontActive' => ''])
 
 <div id="otToast" class="ot-toast" role="status" aria-live="polite"></div>
 

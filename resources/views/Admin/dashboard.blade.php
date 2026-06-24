@@ -943,7 +943,7 @@
         [x-cloak] { display: none !important; }
     </style>
 
-    <div x-data="{ 
+    <div class="staff-portal-shell {{ $isDeveloperPortal ? 'staff-portal-developer' : 'staff-portal-admin' }}" x-data="{
         sidebarOpen: true, 
         showDetail: false,
         searchOpen: false,
@@ -4008,6 +4008,7 @@
     </style>
 
 <style id="admin-developer-portal-final-cleanup">
+    .staff-portal-shell,
     .admin-main-shell{
         --portal-accent: {{ $isDeveloperPortal ? '#10B981' : '#2563EB' }};
         --portal-accent-soft: {{ $isDeveloperPortal ? '#ECFDF5' : '#EFF6FF' }};
@@ -4046,7 +4047,7 @@
     .admin-main-shell .action-circle-group{
         display:none!important;
     }
-    .admin-main-shell .sidebar{
+    .staff-portal-shell .sidebar{
         width:260px!important;
         background:#fff!important;
         border-right:1px solid #E2E8F0!important;
@@ -4054,13 +4055,13 @@
     }
     .admin-main-shell.expanded{margin-left:85px!important}
     .admin-main-shell:not(.expanded){margin-left:260px!important}
-    .admin-main-shell .sidebar.closed{width:85px!important}
-    .admin-main-shell .sidebar-header{
+    .staff-portal-shell .sidebar.closed{width:85px!important}
+    .staff-portal-shell .sidebar-header{
         min-height:96px!important;
         padding:1.5rem!important;
         border-bottom:1px solid #F1F5F9!important;
     }
-    .admin-main-shell .sidebar-link{
+    .staff-portal-shell .sidebar-link{
         min-height:46px!important;
         margin-bottom:5px!important;
         padding:11px 16px!important;
@@ -4074,8 +4075,8 @@
         text-transform:uppercase!important;
         transition:background .18s ease,color .18s ease,border-color .18s ease!important;
     }
-    .admin-main-shell .sidebar-link:not(.active):hover,
-    .admin-main-shell .sidebar-link:not(.active):focus-visible{
+    .staff-portal-shell .sidebar-link:not(.active):hover,
+    .staff-portal-shell .sidebar-link:not(.active):focus-visible{
         background:rgba(17,24,39,.10)!important;
         color:#334155!important;
         border:0!important;
@@ -4083,19 +4084,24 @@
         transform:none!important;
         outline:0!important;
     }
-    .admin-main-shell .sidebar-link.active{
+    .staff-portal-shell .sidebar-link.active{
         background:var(--portal-accent-soft)!important;
         color:var(--portal-accent)!important;
         box-shadow:none!important;
     }
-    .admin-main-shell .sidebar-link.active::before{
+    .staff-portal-shell .sidebar-link.active::before{
         background:var(--portal-accent)!important;
     }
-    .admin-main-shell .sidebar-link.active::after{
+    .staff-portal-shell .sidebar-link.active::after{
         color:var(--portal-accent)!important;
         background:transparent!important;
     }
-    .admin-main-shell .menu-toggle:hover{
+    .staff-portal-shell .sidebar-link.active i,
+    .staff-portal-shell .sidebar-link.active svg{
+        color:var(--portal-accent)!important;
+        stroke:var(--portal-accent)!important;
+    }
+    .staff-portal-shell .menu-toggle:hover{
         background:#F1F5F9!important;
         color:var(--portal-accent)!important;
     }
@@ -4247,11 +4253,11 @@
     @media(max-width:1024px){
         .admin-main-shell:not(.expanded),
         .admin-main-shell.expanded{margin-left:85px!important}
-        .admin-main-shell .sidebar{width:85px!important}
-        .admin-main-shell .brand-name,
-        .admin-main-shell .sidebar-link span,
-        .admin-main-shell .sidebar-link.active::after{display:none!important}
-        .admin-main-shell .sidebar-link{justify-content:center!important;padding-left:0!important;padding-right:0!important}
+        .staff-portal-shell .sidebar{width:85px!important}
+        .staff-portal-shell .brand-name,
+        .staff-portal-shell .sidebar-link span,
+        .staff-portal-shell .sidebar-link.active::after{display:none!important}
+        .staff-portal-shell .sidebar-link{justify-content:center!important;padding-left:0!important;padding-right:0!important}
         .admin-main-shell .hero-banner{padding:5px 28px!important}
         .admin-main-shell .content-container,
         .admin-main-shell .admin-section-content{padding:32px 40px 60px!important}

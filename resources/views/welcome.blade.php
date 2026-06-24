@@ -319,7 +319,6 @@ body {
   display:block
 }
 #home,#products,#services,#about,#contact {
-  display:block!important;
   scroll-margin-top:76px
 }
 .home-premium-page {
@@ -966,15 +965,15 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 </div>
 <header class="top-nav-bar premium-site-header" id="mainHeader">
 <div class="premium-main-navbar">
-<a href="/home" class="brand-logo-block" aria-label="Printify and Co Home">
+<a href="{{ route('home') }}" class="brand-logo-block" aria-label="Printify and Co Home">
 <span class="brand-main-text">PRINTIFY &amp; CO.</span>
 <span class="brand-sub-text">CRAFTING YOUR VISION INTO REALITY</span>
 </a>
 <nav class="nav-horizontal" aria-label="Main navigation">
-<a href="/home" class="nav-link {{ $activeSection === 'home' ? 'active' : '' }}" data-section="home">HOME</a>
-<a href="/aboutus" class="nav-link {{ $activeSection === 'about' ? 'active' : '' }}" data-section="about">ABOUT US</a>
-<a href="/services" class="nav-link {{ $activeSection === 'products' || $activeSection === 'service-details' ? 'active' : '' }}" data-section="products">SERVICES</a>
-<a href="/contactus" class="nav-link {{ $activeSection === 'contact' ? 'active' : '' }}" data-section="contact">CONTACT US</a>
+<a href="{{ route('home') }}" class="nav-link {{ $activeSection === 'home' ? 'active' : '' }}" data-section="home">HOME</a>
+<a href="{{ route('landing.aboutus') }}" class="nav-link {{ $activeSection === 'about' ? 'active' : '' }}" data-section="about">ABOUT US</a>
+<a href="{{ route('services.index') }}" class="nav-link {{ $activeSection === 'products' || $activeSection === 'service-details' ? 'active' : '' }}" data-section="products">SERVICES</a>
+<a href="{{ route('landing.contactus') }}" class="nav-link {{ $activeSection === 'contact' ? 'active' : '' }}" data-section="contact">CONTACT US</a>
 </nav>
 <div class="hero-signin-container" id="authContainer">
 <div class="nav-search-box">
@@ -1013,7 +1012,7 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 @php($isStandaloneFrontRoute = in_array($activeSection, ['service-details', 'checkout'], true))
 @unless($isStandaloneFrontRoute)
 <div class="main-content" id="pageWrapper">
-<section id="home" class="section active">
+<section id="home" class="section {{ $activeSection === 'home' ? 'active' : '' }}">
 <div class="home-premium-page">
 <div class="home-premium-hero">
 <div class="hero-slider home-premium-slider">
@@ -1121,6 +1120,14 @@ function normalizeSectionId(sectionId){
   const normalized=normalizeSectionId(sectionId),navTarget=navSectionFor(normalized);
   document.querySelectorAll('.nav-link').forEach(link=>link.classList.toggle('active',!!navTarget&&link.dataset.section===navTarget));
   updateHeaderTheme(normalized);
+} function setPublicSectionVisibility(sectionId){
+  const normalized=normalizeSectionId(sectionId);
+  const publicSections=['home','products','about','contact'];
+  if(!publicSections.includes(normalized))return;
+  publicSections.forEach(id=>{
+    const el=getSectionEl(id);
+    if(el)el.classList.toggle('active',id===normalized);
+  });
 } function sectionPath(sectionId){
   const normalized=normalizeSectionId(sectionId);
   return ({
@@ -1150,6 +1157,7 @@ function normalizeSectionId(sectionId){
 }){
   const normalized=normalizeSectionId(sectionId);
   setStandalonePage(normalized);
+  setPublicSectionVisibility(normalized);
   const target=getSectionEl(normalized);
   autoScrollTarget=normalized;
   isAutoScrolling=true;
@@ -1492,6 +1500,20 @@ document.addEventListener('DOMContentLoaded',()=>{
 }
 #pageWrapper i,#serviceDetail i,#checkout i,.printify-footer i,.footer-policy-popover i {
   font-family:"Font Awesome 6 Free","Font Awesome 6 Brands"!important
+}
+</style>
+<style id="front-route-single-section-display-0624">
+#pageWrapper > #home,
+#pageWrapper > #products,
+#pageWrapper > #about,
+#pageWrapper > #contact {
+  display:none!important;
+}
+#pageWrapper > #home.section.active,
+#pageWrapper > #products.section.active,
+#pageWrapper > #about.section.active,
+#pageWrapper > #contact.section.active {
+  display:block!important;
 }
 </style>
 </body>

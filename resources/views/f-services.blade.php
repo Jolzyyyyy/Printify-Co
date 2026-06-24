@@ -1,4 +1,4 @@
-<section id="products" class="pfsvc" aria-labelledby="pfsvcTitle">
+<section id="products" class="pfsvc section {{ ($activeSection ?? '') === 'products' ? 'active' : '' }}" aria-labelledby="pfsvcTitle">
 <div class="pfsvc-feedback" id="pfsvcFeedback" role="status" aria-live="polite">
 <i class="fa-regular fa-circle-check">
 </i>

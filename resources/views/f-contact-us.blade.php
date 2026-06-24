@@ -2,7 +2,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<section id="contact" class="contact-section">
+<section id="contact" class="contact-section section {{ ($activeSection ?? '') === 'contact' ? 'active' : '' }}">
 <div id="contactToast" class="contact-toast" role="status" aria-live="polite">
 </div>
 <div class="contact-container">
