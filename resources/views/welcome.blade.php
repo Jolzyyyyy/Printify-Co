@@ -319,6 +319,7 @@ body {
   display:block
 }
 #home,#products,#services,#about,#contact {
+  display:block!important;
   scroll-margin-top:76px
 }
 .home-premium-page {
@@ -1012,7 +1013,7 @@ i,.fa,.fas,.far,.fab,.fa-solid,.fa-regular,.fa-brands {
 @php($isStandaloneFrontRoute = in_array($activeSection, ['service-details', 'checkout'], true))
 @unless($isStandaloneFrontRoute)
 <div class="main-content" id="pageWrapper">
-<section id="home" class="section {{ $activeSection === 'home' ? 'active' : '' }}">
+<section id="home" class="section active">
 <div class="home-premium-page">
 <div class="home-premium-hero">
 <div class="hero-slider home-premium-slider">
@@ -1120,14 +1121,6 @@ function normalizeSectionId(sectionId){
   const normalized=normalizeSectionId(sectionId),navTarget=navSectionFor(normalized);
   document.querySelectorAll('.nav-link').forEach(link=>link.classList.toggle('active',!!navTarget&&link.dataset.section===navTarget));
   updateHeaderTheme(normalized);
-} function setPublicSectionVisibility(sectionId){
-  const normalized=normalizeSectionId(sectionId);
-  const publicSections=['home','products','about','contact'];
-  if(!publicSections.includes(normalized))return;
-  publicSections.forEach(id=>{
-    const el=getSectionEl(id);
-    if(el)el.classList.toggle('active',id===normalized);
-  });
 } function sectionPath(sectionId){
   const normalized=normalizeSectionId(sectionId);
   return ({
@@ -1157,7 +1150,6 @@ function normalizeSectionId(sectionId){
 }){
   const normalized=normalizeSectionId(sectionId);
   setStandalonePage(normalized);
-  setPublicSectionVisibility(normalized);
   const target=getSectionEl(normalized);
   autoScrollTarget=normalized;
   isAutoScrolling=true;
@@ -1500,20 +1492,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 }
 #pageWrapper i,#serviceDetail i,#checkout i,.printify-footer i,.footer-policy-popover i {
   font-family:"Font Awesome 6 Free","Font Awesome 6 Brands"!important
-}
-</style>
-<style id="front-route-single-section-display-0624">
-#pageWrapper > #home,
-#pageWrapper > #products,
-#pageWrapper > #about,
-#pageWrapper > #contact {
-  display:none!important;
-}
-#pageWrapper > #home.section.active,
-#pageWrapper > #products.section.active,
-#pageWrapper > #about.section.active,
-#pageWrapper > #contact.section.active {
-  display:block!important;
 }
 </style>
 </body>

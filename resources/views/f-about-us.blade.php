@@ -855,7 +855,7 @@
   }
 }
 </style>
-<section id="about" class="about-premium-page section {{ ($activeSection ?? '') === 'about' ? 'active' : '' }}">
+<section id="about" class="about-premium-page">
 <div class="about-feedback" id="aboutFeedback" role="status" aria-live="polite">
 </div>
 <div class="about-wrap">
