@@ -2749,16 +2749,16 @@ bulkPrice:2.5
   title:"ID & Photo Services",desc:"Professional ID pictures and photo printing services.",icon:"fa-solid fa-id-card",img:"{{ asset('images/Photo IDS.png') }}",time:"same-day",express:true,order:3,key:"id",price:5,
 options:[{
     slug:"id-photo",name:"ID Photo",desc:"ID photo print package.",price:"from <b>₱45.00/set</b>",icon:"fa-solid fa-id-card",serviceId:"IDP-ID-B-BW-BC",retailPrice:45,bulkPrice:35,
-image:"{{ asset('images/Photo ID (cover).png') }}"
+image:"{{ asset('images/Photo IDS.png') }}"
   },{
     slug:"passport-visa",name:"Passport / Visa",desc:"Passport and visa photo preparation.",price:"from <b>₱80.00/set</b>",icon:"fa-solid fa-passport",serviceId:"IDP-PV-PASS-BW-BCC",retailPrice:80,bulkPrice:70,
-image:"{{ asset('images/Photo ID (cover).png') }}"
+image:"{{ asset('images/Photo IDS.png') }}"
   },{
     slug:"single-photo-print",name:"Single Photo Print",desc:"Single photo print output.",price:"from <b>₱5.00/print</b>",icon:"fa-solid fa-image",serviceId:"IDP-SP-2R-BW-BC",retailPrice:5,bulkPrice:4,
-image:"{{ asset('images/Single Photo Print.png') }}"
+image:"{{ asset('images/Photo IDS.png') }}"
   }]
 },{
-  title:"Lamination & Binding",desc:"Durable lamination and clean document binding solutions.",icon:"fa-solid fa-book-open",img:"{{ asset('images/Lamination & BindingS.png') }}",time:"next-day",express:false,order:4,
+  title:"Lamination & Binding",desc:"Durable lamination and clean document binding solutions.",icon:"fa-solid fa-book-open",img:"{{ asset('images/Lamination & BindingS.PNG') }}",time:"next-day",express:false,order:4,
 key:"bind",price:35,options:[{
     slug:"lamination",name:"Lamination",desc:"Protective film for certificates and documents.",price:"from <b>₱35.00/piece</b>",icon:"fa-solid fa-layer-group",serviceId:"BND-LAM-STD-A4-CCS",retailPrice:35,bulkPrice:30
   },{
@@ -2807,10 +2807,13 @@ function pfsvcToast(message){
     "text-only":1, "text-image":2, "image-only":3, "photocopy":4, "scanning":5, "id-photo":6, "passport-visa":7, "single-photo-print":8, "lamination":9, "spiral-binding":10, "sintra-board":11, "tarpaulin":12,
 "custom-layout":13, "marketing-collateral":14, "sticker-cut":15
   };
-  return pfsvcServices.flatMap(service=> service.options.map((option,index)=>({
-    service, option, index, key:service.key, title:option.name, desc:option.desc, icon:option.icon||service.icon, img:option.image||service.img, time:service.time, price:option.retailPrice ?? service.price,
-express:service.express, order:displayOrder[option.slug] || ((service.order*100)+index)
-  })) ).sort((a,b)=>a.order-b.order);
+  return pfsvcServices.flatMap(service=> service.options.map((option,index)=>{
+    const detailSlug=pfsvcDetailSlug(option.slug);
+    return {
+    service, option, index, key:service.key, detailSlug, serviceSlug:detailSlug, title:option.name, desc:option.desc, icon:option.icon||service.icon, img:option.image||service.img, time:service.time, price:option.retailPrice ?? service.price,
+express:service.express, order:displayOrder[detailSlug] || displayOrder[option.slug] || ((service.order*100)+index)
+  };
+  })).sort((a,b)=>a.order-b.order);
 } function pfsvcShortNote(text){
   const clean=String(text||"").replace(/<[^>]+>/g,"").trim();
   if(!clean)return "";
@@ -2823,6 +2826,17 @@ express:service.express, order:displayOrder[option.slug] || ((service.order*100)
   pfsvcState.activeKey=serviceKey;
   pfsvcState.activeIndex=Number(index)||0;
   return pfsvcProceedSelected();
+} function pfsvcOpenOptionBySlug(serviceSlug){
+  const wanted=pfsvcDetailSlug(serviceSlug);
+  for(const service of pfsvcServices){
+    const index=service.options.findIndex(option=>pfsvcDetailSlug(option.slug)===wanted);
+    if(index>-1){
+      pfsvcState.activeKey=service.key;
+      pfsvcState.activeIndex=index;
+      return pfsvcProceedSelected();
+    }
+  }
+  return false;
 } function pfsvcRenderPagination(totalPages){
   const pager=document.getElementById("pfsvcPagination");
   if(!pager)return;
@@ -2853,8 +2867,8 @@ pager.innerHTML=` <button type="button" class="pfsvc-page-arrow" onclick="pfsvcG
   pfsvcState.page=Math.min(Math.max(1,pfsvcState.page),totalPages);
   const start=(pfsvcState.page-1)*pfsvcPageSize;
   const visibleList=list.slice(start,start+pfsvcPageSize);
-grid.innerHTML=visibleList.map(item=>` <article class="pfsvc-card" data-key="${item.key}" onclick="pfsvcOpenOption('${item.key}',${item.index})"> <div class="pfsvc-img ${item.img ? "" : "no-image"}">
-${item.img ? `<img src="${item.img}" alt="${pfsvcSafe(item.title)}" loading="eager" decoding="sync" fetchpriority="high" onerror="this.closest('.pfsvc-img')?.classList.add('no-image');this.remove();">` : ""} <span class="pfsvc-icon"><i class="${item.icon}"></i></span> </div> <div class="pfsvc-body"> <div class="pfsvc-info"> <h3>${pfsvcSafe(item.title)}</h3> <p class="pfsvc-card-subtitle">${pfsvcSafe(pfsvcShortNote(item.desc || item.option.desc))}</p> </div> <div class="pfsvc-actions"> <span class="pfsvc-price">${pfsvcShortPrice(item.option.price)}</span> <button type="button" onclick="event.stopPropagation();pfsvcOpenOption('${item.key}',${item.index})">VIEW FULL</button> </div> </div> </article> `).join("");
+grid.innerHTML=visibleList.map(item=>` <article class="pfsvc-card" data-key="${item.key}" data-category-key="${item.key}" data-service-slug="${item.detailSlug}" data-service-key="${item.detailSlug}" data-service-title="${pfsvcSafe(item.title)}" onclick="pfsvcOpenOptionBySlug('${item.detailSlug}')"> <div class="pfsvc-img ${item.img ? "" : "no-image"}">
+${item.img ? `<img src="${item.img}" alt="${pfsvcSafe(item.title)}" loading="eager" decoding="sync" fetchpriority="high" onerror="this.closest('.pfsvc-img')?.classList.add('no-image');this.remove();">` : ""} <span class="pfsvc-icon"><i class="${item.icon}"></i></span> </div> <div class="pfsvc-body"> <div class="pfsvc-info"> <h3 data-service-title>${pfsvcSafe(item.title)}</h3> <p class="pfsvc-card-subtitle">${pfsvcSafe(pfsvcShortNote(item.desc || item.option.desc))}</p> </div> <div class="pfsvc-actions"> <span class="pfsvc-price">${pfsvcShortPrice(item.option.price)}</span> <button type="button" onclick="event.stopPropagation();pfsvcOpenOptionBySlug('${item.detailSlug}')">VIEW FULL</button> </div> </div> </article> `).join("");
   pfsvcRenderPagination(totalPages);
   empty.style.display=list.length?"none":"block";
 } function pfsvcSetCategory(category){
@@ -2905,7 +2919,7 @@ ${item.img ? `<img src="${item.img}" alt="${pfsvcSafe(item.title)}" loading="eag
       transform=`translate(-50%,-50%) translateX(${twoCards?-96:-118}px) translateY(16px) rotate(-6deg) scale(.9)`;
       opacity="1";
     } if(cls==="right"){
-      transform=`translate(-50%,-50%) translateX(${twoCards?110:118}px) translateY(${twoCards?0:16}px) rotate(${twoCards?0:6}deg) scale(${twoCards?.94:.9})`;
+      transform=`translate(-50%,-50%) translateX(${twoCards?110:118}px) translateY(${twoCards?0:16}px) rotate(${twoCards?0:6}deg) scale(${twoCards ? 0.94 : 0.9})`;
       opacity="1";
     } if(cls==="hidden"){
       transform="translate(-50%,-50%) translateY(22px) scale(.72)";

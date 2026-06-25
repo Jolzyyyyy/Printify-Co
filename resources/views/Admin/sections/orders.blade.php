@@ -1,7 +1,7 @@
 @php
     $portalOrders = \App\Models\Order::query()
         ->visibleToPortalUser(auth()->user())
-        ->with(['user', 'items'])
+        ->with(['user', 'items.service', 'items.serviceVariation'])
         ->latest()
         ->get();
 
@@ -13,7 +13,7 @@
             str_contains($value, 'complete'), str_contains($value, 'deliver') => 'Completed',
             str_contains($value, 'ship'), str_contains($value, 'out for delivery') => 'Shipped',
             str_contains($value, 'ready') => 'Ready for Pickup',
-            str_contains($value, 'process'), str_contains($value, 'production'), str_contains($value, 'verification') => 'Processing',
+            str_contains($value, 'paid'), str_contains($value, 'confirm'), str_contains($value, 'approved'), str_contains($value, 'process'), str_contains($value, 'production'), str_contains($value, 'verification') => 'Processing',
             default => 'Pending',
         };
     };
@@ -29,13 +29,30 @@
     $lalamoveCount = $portalOrders->where('delivery_method', 'lalamove')->count();
     $pickupCount = $orderTotal - $lalamoveCount;
 
-    $adminOrderPayload = $portalOrders->map(function ($order) use ($normalizeOrderStatus) {
+    $imageUrl = function (?string $path) {
+        $path = trim((string) $path);
+        if ($path === '') return null;
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) return $path;
+        if (str_starts_with($path, 'images/')) return asset($path);
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
+            ? \Illuminate\Support\Facades\Storage::url($path)
+            : asset($path);
+    };
+    $itemImage = fn ($item) => $imageUrl($item?->serviceVariation?->variation_image_path ?: $item?->service?->image_path);
+
+    $adminOrderPayload = $portalOrders->map(function ($order) use ($normalizeOrderStatus, $itemImage) {
         $status = $normalizeOrderStatus($order->status);
         $isLalamove = $order->delivery_method === 'lalamove';
         $subtotal = max(0, (float) $order->total_price - (float) $order->delivery_fee);
-        $payment = str_contains(strtolower((string) $order->status), 'cash on delivery')
+        $paid = $order->paid_at
+            || filled($order->payment_reference)
+            || str_contains(strtolower((string) $order->status), 'paid')
+            || str_contains(strtolower((string) $order->status), 'complete');
+        $payment = $paid
+            ? 'Paid'
+            : (str_contains(strtolower((string) $order->status), 'cash on delivery')
             ? 'Cash on Delivery'
-            : ($status === 'Completed' ? 'Paid' : 'Unpaid');
+            : ($status === 'Completed' ? 'Paid' : 'Unpaid'));
 
         return [
             'id' => 'ORD-'.str_pad((string) $order->id, 5, '0', STR_PAD_LEFT),
@@ -47,6 +64,7 @@
             'payment' => $payment,
             'status' => $status,
             'rawStatus' => $order->status ?: 'Pending',
+            'image' => $itemImage($order->items->first()),
             'total' => 'PHP '.number_format((float) $order->total_price, 2),
             'email' => $order->customer_email ?: ($order->user?->email ?? 'Not provided'),
             'phone' => $order->customer_phone ?: ($order->user?->phone ?? 'Not provided'),
@@ -55,7 +73,7 @@
             'orderDateTime' => optional($order->created_at)->format('M j, Y h:i A') ?? '',
             'fulfillmentType' => $isLalamove ? 'Lalamove' : 'Pickup',
             'estimatedDelivery' => $isLalamove ? 'See Lalamove status' : 'Store pickup',
-            'tracking' => $order->lalamove_order_id ?: ($order->lalamove_status ?: 'Not booked yet'),
+            'tracking' => $order->delivery_tracking_number ?: $order->lalamove_order_id ?: ($order->lalamove_status ?: 'Not booked yet'),
             'deliveryStatus' => $order->lalamove_status ?: ($isLalamove ? 'Pending booking' : 'Store pickup'),
             'subtotal' => 'PHP '.number_format($subtotal, 2),
             'shippingFee' => 'PHP '.number_format((float) $order->delivery_fee, 2),
@@ -64,6 +82,7 @@
             'items' => $order->items->map(fn ($item) => [
                 'name' => $item->service_name ?: 'Print item',
                 'desc' => $item->variation_label ?: 'Custom print service',
+                'image' => $itemImage($item),
                 'qty' => (int) $item->quantity,
                 'unit' => 'PHP '.number_format((float) $item->unit_price, 2),
                 'total' => 'PHP '.number_format((float) $item->subtotal, 2),
@@ -307,7 +326,7 @@
                             <tr :class="selectedOrder && selectedOrder.id === order.id ? 'selected-row' : ''">
                                 <td><button class="order-link" @click="openOrder(order)" x-text="order.id"></button></td>
                                 <td x-text="order.customer"></td>
-                                <td x-text="order.service"></td>
+                                <td><span class="item-name-with-img"><template x-if="order.image"><img :src="order.image" :alt="order.service"></template><span class="template-img" x-show="!order.image"></span><span x-text="order.service"></span></span></td>
                                 <td x-text="order.date"></td>
                                 <td><span class="pill" :class="paymentClass(order.payment)" x-text="order.payment"></span></td>
                                 <td><span class="pill" :class="statusClass(order.status)" x-text="order.status"></span></td>
@@ -404,7 +423,7 @@
                     <thead><tr><th>Item</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
                     <tbody>
                         <template x-for="item in selectedOrder?.items || []" :key="item.name + item.qty">
-                            <tr><td><span class="template-img"></span><span x-text="item.name"></span></td><td x-text="item.desc"></td><td x-text="item.qty"></td><td x-text="item.unit"></td><td x-text="item.total"></td></tr>
+                            <tr><td><span class="item-name-with-img"><template x-if="item.image"><img :src="item.image" :alt="item.name"></template><span class="template-img" x-show="!item.image"></span><span x-text="item.name"></span></span></td><td x-text="item.desc"></td><td x-text="item.qty"></td><td x-text="item.unit"></td><td x-text="item.total"></td></tr>
                         </template>
                     </tbody>
                     <tfoot>

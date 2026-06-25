@@ -4250,6 +4250,42 @@
     .admin-main-shell .settings-calendar-trigger{
         cursor:pointer!important;
     }
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active,
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active span,
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active i,
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active svg,
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active svg *{
+        color:#2563EB!important;
+        stroke:#2563EB!important;
+    }
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active{
+        background:#EFF6FF!important;
+    }
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active::before{
+        background:#2563EB!important;
+    }
+    .staff-portal-shell.staff-portal-admin .sidebar .sidebar-link.active::after{
+        color:#2563EB!important;
+        background:transparent!important;
+    }
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active,
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active span,
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active i,
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active svg,
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active svg *{
+        color:#10B981!important;
+        stroke:#10B981!important;
+    }
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active{
+        background:#ECFDF5!important;
+    }
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active::before{
+        background:#10B981!important;
+    }
+    .staff-portal-shell.staff-portal-developer .sidebar .sidebar-link.active::after{
+        color:#10B981!important;
+        background:transparent!important;
+    }
     @media(max-width:1024px){
         .admin-main-shell:not(.expanded),
         .admin-main-shell.expanded{margin-left:85px!important}

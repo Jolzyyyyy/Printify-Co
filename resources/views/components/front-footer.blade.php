@@ -66,7 +66,7 @@
 <span class="footer-title-line">
 </span>
 <div class="footer-socials">
-<a href="https://facebook.com" target="_blank" rel="noopener" class="facebook" aria-label="Facebook">
+<a href="https://www.facebook.com/share/1DzWqaqA7a/" target="_blank" rel="noopener noreferrer" class="facebook" aria-label="Facebook">
 <i class="fa-brands fa-facebook-f">
 </i>
 </a>

@@ -671,6 +671,66 @@
     .hc-calendar-main{border-right:0!important;border-bottom:1px solid #eceff3!important;}
     .hc-day{min-height:62px!important;}
 }
+
+
+/* === REQUESTED HELP CENTER ADJUSTMENTS: 2 columns, no article count, direct Q/A === */
+.hc-category-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:18px!important;
+}
+.hc-category em{
+    display:none!important;
+}
+.hc-answer-head p{
+    color:#64748b!important;
+}
+.hc-answer-item{
+    padding:13px 14px!important;
+    border:1px solid #e5e7eb!important;
+    border-radius:14px!important;
+    background:#fff!important;
+}
+.hc-answer-question{
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    color:#ff4f16!important;
+    display:block!important;
+    font-family:'Poppins',system-ui,sans-serif!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    line-height:1.45!important;
+    text-align:left!important;
+    cursor:default!important;
+}
+.hc-answer-question:hover,
+.hc-answer-item.open .hc-answer-question{
+    background:transparent!important;
+    color:#ff4f16!important;
+}
+.hc-answer-question i{
+    display:none!important;
+}
+.hc-answer-body,
+.hc-answer-item.open .hc-answer-body{
+    display:block!important;
+    padding:6px 0 0!important;
+    color:#334155!important;
+    font-size:12.5px!important;
+    line-height:1.55!important;
+}
+.hc-answer-body strong{
+    display:none!important;
+}
+.hc-answer-body p{
+    margin:0!important;
+}
+@media(max-width:940px){
+    .hc-category-grid{grid-template-columns:1fr!important;}
+}
+
 </style>
 
 <div class="hc-page">
@@ -706,7 +766,7 @@
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M11.4601 10.3188L15.7639 14.6226C15.9151 14.7739 16.0001 14.9792 16 15.1932C15.9999 15.4072 15.9148 15.6124 15.7635 15.7637C15.6121 15.915 15.4068 15.9999 15.1928 15.9998C14.9788 15.9998 14.7736 15.9147 14.6223 15.7633L10.3185 11.4595C9.03194 12.456 7.41407 12.9249 5.79403 12.7709C4.17398 12.6169 2.67346 11.8515 1.59771 10.6304C0.521957 9.40936 -0.0482098 7.82433 0.00319691 6.19779C0.0546036 4.57125 0.723722 3.02539 1.87443 1.87468C3.02514 0.723966 4.57101 0.0548478 6.19754 0.00344105C7.82408 -0.0479657 9.40911 0.522201 10.6302 1.59795C11.8513 2.6737 12.6167 4.17423 12.7707 5.79427C12.9247 7.41432 12.4558 9.03219 11.4593 10.3188H11.4601ZM6.4003 11.1995C7.67328 11.1995 8.89412 10.6938 9.79425 9.7937C10.6944 8.89356 11.2001 7.67272 11.2001 6.39974C11.2001 5.12676 10.6944 3.90592 9.79425 3.00579C8.89412 2.10565 7.67328 1.59997 6.4003 1.59997C5.12732 1.59997 3.90648 2.10565 3.00634 3.00579C2.10621 3.90592 1.60052 5.12676 1.60052 6.39974C1.60052 7.67272 2.10621 8.89356 3.00634 9.7937C3.90648 10.6938 5.12732 11.1995 6.4003 11.1995Z" fill="gray" />
                                     </svg>
                                 </div>
-                                <input id="helpSearch" class="hc-search-input" type="search" placeholder="Search" onkeydown="if(event.key==='Enter') runHelpSearch()">
+                                <input id="helpSearch" class="hc-search-input" type="search" placeholder="Search or type a question" oninput="liveHelpSearch()" onkeydown="if(event.key==='Enter') runHelpSearch()">
                             </div>
                         </div>
                     </div>
@@ -717,16 +777,16 @@
                 <div class="hc-body">
                     <div class="hc-category-grid" id="categoryGrid">
                         @foreach([
-                            ['bag-shopping','Orders & Shipping','Track orders, shipping times, delivery updates and more.','18 articles','Orders & Shipping'],
-                            ['credit-card','Payments & Billing','Payment methods, billing issues, invoices and refunds.','16 articles','Payments & Billing'],
-                            ['lock','Account & Security','Account settings, login help, security and privacy.','14 articles','Account & Security'],
-                            ['pen-to-square','Product Design Help','Design tools, file requirements, templates and tips.','12 articles','Product Design'],
-                            ['truck-arrow-right','Returns & Refunds','Return process, eligibility, refund status and more.','10 articles','Returns & Refunds'],
-                            ['circle-question','General FAQs','Browse common questions about our services.','20 articles','General FAQs'],
+                            ['bag-shopping','Orders & Shipping','Track orders, shipping times, delivery updates and more.','Orders & Shipping'],
+                            ['credit-card','Payments & Billing','Payment methods, billing issues, invoices and refunds.','Payments & Billing'],
+                            ['lock','Account & Security','Account settings, login help, security and privacy.','Account & Security'],
+                            ['pen-to-square','Product Design Help','Design tools, file requirements, templates and tips.','Product Design Help'],
+                            ['truck-arrow-right','Returns & Refunds','Return process, eligibility, refund status and more.','Returns & Refunds'],
+                            ['circle-question','General FAQs','Browse common questions about our services.','General FAQs'],
                         ] as $cat)
-                        <button class="hc-category" type="button" data-help-item="{{ strtolower($cat[1].' '.$cat[2]) }}" onclick="selectHelpCategory('{{ $cat[4] }}')">
+                        <button class="hc-category" type="button" data-help-item="{{ strtolower($cat[1].' '.$cat[2]) }}" onclick="selectHelpCategory('{{ $cat[3] }}')">
                             <span class="hc-icon {{ $loop->index === 1 ? 'green' : ($loop->index === 2 ? 'purple' : ($loop->index === 3 ? 'blue' : '')) }}"><i class="fa-solid fa-{{ $cat[0] }}"></i></span>
-                            <span><strong>{{ $cat[1] }}</strong><small>{{ $cat[2] }}</small><em>{{ $cat[3] }}</em></span>
+                            <span><strong>{{ $cat[1] }}</strong><small>{{ $cat[2] }}</small></span>
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
                         @endforeach
@@ -752,11 +812,11 @@
                     <h2 class="hc-card-title">Popular Articles</h2>
                     <div class="hc-list" id="articleList">
                         @foreach([
-                            ['How do I track my order?','Orders & Shipping',''],
-                            ['What payment methods do you accept?','Payments & Billing','green'],
-                            ['How do I change or cancel my order?','Orders & Shipping',''],
-                            ['How do I start a return or request a refund?','Returns & Refunds',''],
-                            ['I forgot my password. How can I reset it?','Account & Security','purple'],
+                            ['Understanding your order status: Pending, Processing, Ready, Delivered','Orders & Shipping',''],
+                            ['Accepted payment methods: GCash, Maya, and cash on pickup','Payments & Billing','green'],
+                            ['How to reset your password or recover access to your account','Account & Security','purple'],
+                            ['When you can request a reprint or refund (defects, wrong item, damage in transit)','Returns & Refunds',''],
+                            ['What is Printify & Co. and how does it differ from a regular print shop?','General FAQs',''],
                         ] as $article)
                         <div class="hc-article" data-help-item="{{ strtolower($article[0].' '.$article[1]) }}">
                             <i class="fa-regular fa-file-lines"></i>
@@ -830,35 +890,89 @@ function helpField(id){return document.getElementById(id)}
 function escapeHelpText(value){return String(value||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function updateHelpUrl(view){history.replaceState(null,'',window.location.pathname+(view?'#'+view:''))}
 const helpKnowledgeBase={
-    'Orders & Shipping':[
-        ['How do I place an order?','Go to your chosen tenant’s storefront, select your product and specifications, upload your print-ready file, and confirm your order after payment is verified.'],
-        ['What do the order statuses mean?','Pending means your order is awaiting payment confirmation. Processing means the tenant has started production. Ready means your order is available for pickup or awaiting dispatch. Delivered means the courier has completed the drop-off.'],
-        ['How do delivery options work?','At checkout, select either Store Pickup or Courier Delivery. If courier, choose your preferred logistics provider (Lalamove) and enter your delivery address.']
+    "Orders & Shipping": [
+        [
+            "How to place an order through a tenant's storefront",
+            "Go to your chosen tenant's storefront, select your product and specifications, upload your print-ready file, and confirm your order after payment is verified."
+        ],
+        [
+            "Understanding your order status: Pending, Processing, Ready, Delivered",
+            "Pending means your order is awaiting payment confirmation. Processing means the tenant has started production. Ready means your order is available for pickup or awaiting dispatch. Delivered means the courier has completed the drop-off."
+        ],
+        [
+            "How to choose between pickup and courier delivery at checkout",
+            "At checkout, select either Store Pickup or Courier Delivery. If courier, choose your preferred logistics provider (Lalamove) and enter your delivery address."
+        ]
     ],
-    'Payments & Billing':[
-        ['What payment methods do you accept?','Accepted payment methods depend on the tenant but generally include GCash, Maya, and cash on pickup. All digital payments are validated and logged through the platform.'],
-        ['My payment was deducted but no order appeared. What should I do?','Wait a few minutes and check your order status under My Orders. If no order appears and your payment was deducted, contact the tenant directly through the platform or flag the transaction to hello@printify.co.'],
-        ['Where can I view or download my invoice?','Go to My Orders, select the transaction, and tap View Invoice to download a copy. Full transaction history is available under your account dashboard.']
+    "Payments & Billing": [
+        [
+            "Accepted payment methods: GCash, Maya, and cash on pickup",
+            "Accepted payment methods depend on the tenant but generally include GCash, Maya, and cash on pickup. All digital payments are validated and logged through the platform."
+        ],
+        [
+            "What to do if your payment was deducted but order was not confirmed",
+            "Wait a few minutes and check your order status under My Orders. If no order appears and your payment was deducted, contact the tenant directly through the platform or flag the transaction to hello@printify.co."
+        ],
+        [
+            "How to view your transaction history and download your invoice",
+            "Go to My Orders, select the transaction, and tap View Invoice to download a copy. Full transaction history is available under your account dashboard."
+        ]
     ],
-    'Account & Security':[
-        ['How do I create an account?','Click Sign Up, enter your full name, email address, contact number, and create a secure password. Verify your email to activate your account.'],
-        ['I forgot my password. How can I reset it?','On the login page, click Forgot Password and enter your registered email. A reset link will be sent to your inbox. If you no longer have access to that email, contact hello@printify.co.'],
-        ['How do I request access or deletion of my personal data?','Submit a formal data request to hello@printify.co, referencing your right to access, correct, or delete personal data under Republic Act No. 10173 (Data Privacy Act of 2012).']
+    "Account & Security": [
+        [
+            "How to register and set up your Printify & Co. customer account",
+            "Click Sign Up, enter your full name, email address, contact number, and create a secure password. Verify your email to activate your account."
+        ],
+        [
+            "How to reset your password or recover access to your account",
+            "On the login page, click Forgot Password and enter your registered email. A reset link will be sent to your inbox. If you no longer have access to that email, contact hello@printify.co."
+        ],
+        [
+            "How to request deletion or correction of your personal data (RA 10173)",
+            "Submit a formal data request to hello@printify.co, referencing your right to access, correct, or delete personal data under Republic Act No. 10173 (Data Privacy Act of 2012)."
+        ]
     ],
-    'Product Design Help':[
-        ['What file formats and resolution should I upload?','Upload files in PDF, PNG, or DOCS format at a minimum of 300 DPI. Check your chosen tenant’s storefront for any additional file requirements specific to their shop.'],
-        ['Why do printed colors look different from my screen?','Screens use RGB (light-based color), while printers use CMYK (ink-based color). Minor color shifts between your screen preview and the final print are normal and within standard industry tolerance.'],
-        ['Can I request a proof before printing?','Message the tenant directly through the platform before confirming your order and request a physical proof or sample print. Proof availability and fees vary by tenant.']
+    "Product Design Help": [
+        [
+            "What file formats to upload and why high resolution matters (PDF, PNG, TIFF)",
+            "Upload files in PDF, PNG, or TIFF format at a minimum of 300 DPI. Check your chosen tenant's storefront for any additional file requirements specific to their shop."
+        ],
+        [
+            "Understanding RGB vs. CMYK and why printed colors may look different",
+            "Screens use RGB (light-based color), while printers use CMYK (ink-based color). Minor color shifts between your screen preview and the final print are normal and within standard industry tolerance."
+        ],
+        [
+            "How to request a print proof or sample from your tenant before production",
+            "Message the tenant directly through the platform before confirming your order and request a physical proof or sample print. Proof availability and fees vary by tenant."
+        ]
     ],
-    'Returns & Refunds':[
-        ['When am I eligible for a refund or return?','Valid grounds include clear production defects, incorrect product type or quantity received, damage in transit with unboxing evidence, or a tenant-initiated cancellation after payment. Conditions and timelines vary by tenant — check their storefront policy.'],
-        ['How do I submit a refund claim?','Submit your claim directly to the tenant through the platform, attaching photo or video evidence of the defect or damage. If the tenant is unresponsive, escalate to hello@printify.co for platform-level review.'],
-        ['Can I cancel or modify an order after production starts?','All print orders are custom-made to your specifications. Once production has started, cancellations or modifications due to a change of mind are not accepted. Always review your design, sizing, and spelling before paying.']
+    "Returns & Refunds": [
+        [
+            "When you can request a reprint or refund (defects, wrong item, damage in transit)",
+            "Valid grounds include clear production defects, incorrect product type or quantity received, damage in transit with unboxing evidence, or a tenant-initiated cancellation after payment. Conditions and timelines vary by tenant — check their storefront policy."
+        ],
+        [
+            "How to file a refund or reprint claim with photo or video evidence",
+            "Submit your claim directly to the tenant through the platform, attaching photo or video evidence of the defect or damage. If the tenant is unresponsive, escalate to hello@printify.co for platform-level review."
+        ],
+        [
+            "Why change-of-mind cancellations are not accepted for custom print orders",
+            "All print orders are custom-made to your specifications. Once production has started, cancellations or modifications due to a change of mind are not accepted. Always review your design, sizing, and spelling before paying."
+        ]
     ],
-    'General FAQs':[
-        ['What is Printify & Co.?','Printify & Co. is a technology platform, not a print shop. It connects customers with independent printing businesses (tenants) and manages the ordering, payment, and delivery process — but does not produce or fulfill orders itself.'],
-        ['Are all shops on the platform the same?','No. Pricing, turnaround times, quality standards, and production schedules are set independently by each tenant. Printify & Co. only enforces minimum platform-wide standards covering data privacy, payment security, and baseline consumer protections.'],
-        ['How do I escalate an unresolved issue?','Submit your unresolved complaint to hello@printify.co with your order details and evidence. The platform will conduct a review and may intervene at the platform level if the tenant is found to be in violation of baseline standards.']
+    "General FAQs": [
+        [
+            "What is Printify & Co. and how does it differ from a regular print shop?",
+            "Printify & Co. is a technology platform, not a print shop. It connects customers with independent printing businesses (tenants) and manages the ordering, payment, and delivery process — but does not produce or fulfill orders itself."
+        ],
+        [
+            "Does Printify & Co. set the pricing, quality, and turnaround for all tenants?",
+            "No. Pricing, turnaround times, quality standards, and production schedules are set independently by each tenant. Printify & Co. only enforces minimum platform-wide standards covering data privacy, payment security, and baseline consumer protections."
+        ],
+        [
+            "What to do if a tenant does not respond to your complaint or refund request?",
+            "Submit your unresolved complaint to hello@printify.co with your order details and evidence. The platform will conduct a review and may intervene at the platform level if the tenant is found to be in violation of baseline standards."
+        ]
     ]
 };
 function normalizeHelpCategory(category){
@@ -884,11 +998,11 @@ function renderHelpAnswers(category=null,query=''){
     const normalized=normalizeHelpCategory(category);
     const rows=helpKnowledgeRows(normalized,query);
     title.textContent=normalized||'Help answers';
-    subtitle.textContent=query?`Showing answers for "${query}"`:'Click a question to view the answer.';
+    subtitle.textContent=query?`Direct Q/A for "${query}"`:'Direct questions and answers.';
     if(!rows.length){
         list.innerHTML='<div class="hc-answer-empty">No exact answer matched your search. Try another keyword or submit a ticket.</div>';
     }else{
-        list.innerHTML=rows.map((row,i)=>`<article class="hc-answer-item ${i===0?'open':''}"><button type="button" class="hc-answer-question" onclick="toggleHelpAnswer(this)"><span>${escapeHelpText(row.question)}</span><i class="fa-solid fa-chevron-down"></i></button><div class="hc-answer-body"><strong>${escapeHelpText(row.cat)}</strong><p>${escapeHelpText(row.answer)}</p></div></article>`).join('');
+        list.innerHTML=rows.map(row=>`<article class="hc-answer-item open"><p class="hc-answer-question"><span>${escapeHelpText(row.question)}</p><div class="hc-answer-body">${escapeHelpText(row.answer)}</div></article>`).join('');
     }
     panel.hidden=false;
     panel.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -909,10 +1023,21 @@ function saveHelpDraft(){const topic=helpField('supportTopic'),order=helpField('
 function startLiveChat(){localStorage.setItem('printify_live_chat_requested_at',new Date().toISOString());updateHelpUrl('live-chat');helpToast('Live chat request opened.')}
 function selectHelpCategory(category){const search=helpField('helpSearch');const normalized=normalizeHelpCategory(category)||category;if(search)search.value=normalized;runHelpSearch();renderHelpAnswers(normalized,'');helpToast(normalized+' answers shown.')}
 function quickHelpSearch(term){const search=helpField('helpSearch');if(search)search.value=term;runHelpSearch()}
+function liveHelpSearch(){clearTimeout(window.helpSearchTimer);window.helpSearchTimer=setTimeout(runHelpSearch,180)}
 function runHelpSearch(){const search=helpField('helpSearch');const raw=(search?.value||'').trim();const q=raw.toLowerCase();document.querySelectorAll('[data-help-item]').forEach(item=>{item.style.display=!q||item.dataset.helpItem.includes(q)?'':'none'});const category=normalizeHelpCategory(raw);renderHelpAnswers(category,category?'':raw);updateHelpUrl(q?'search':'help-center');helpToast(q?'Filtered help answers.':'Showing all help results.')}
-function openArticle(title){localStorage.setItem('printify_help_last_article',title);const match=helpKnowledgeRows(null,title).find(row=>row.question===title)||helpKnowledgeRows(null,title)[0];renderHelpAnswers(match?.cat||null,title);updateHelpUrl(title.toLowerCase().replace(/[^a-z0-9]+/g,'-'));helpToast(title)}
+function openArticle(title){
+const match = helpKnowledgeRows(null,title).find(r=>r.question===title) || helpKnowledgeRows(null,title)[0];
+renderHelpAnswers(match?.cat||null,title);
+helpToast(title);
+}
 function openAnnouncement(title){localStorage.setItem('printify_help_last_announcement',title);updateHelpUrl('announcements');helpToast(title)}
-function showAllArticles(){const search=helpField('helpSearch');if(search)search.value='';closeHelpAnswers();runHelpSearch();helpToast('All articles visible.')}
+function showAllArticles(){
+const search=helpField('helpSearch');
+if(search) search.value='';
+closeHelpAnswers();
+runHelpSearch();
+helpToast('All articles visible.');
+}
 helpField('ticketModal')?.addEventListener('click',e=>{if(e.target.id==='ticketModal')closeTicketModal()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTicketModal()});
 helpField('supportForm')?.addEventListener('submit',async e=>{e.preventDefault();const topic=helpField('supportTopic'),order=helpField('supportOrder'),message=helpField('supportMessage');const body=(message?.value||'').trim();if(!body){helpToast('Please describe your concern.');return}const fallbackRef='TKT-'+Date.now().toString().slice(-6);let ticket={ref:fallbackRef,topic:topic?.value||'Order Concern',order:(order?.value||'').trim(),message:body,status:'Open',createdAt:new Date().toISOString()};let savedToServer=false;try{if(helpTicketStoreUrl){const res=await fetch(helpTicketStoreUrl,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':helpCsrf},body:JSON.stringify({topic:ticket.topic,order_reference:ticket.order,message:ticket.message})});if(!res.ok)throw new Error('Ticket save failed');const data=await res.json();if(data.ticket){ticket={ref:data.ticket.ref||data.ticket.reference||ticket.ref,topic:data.ticket.topic||ticket.topic,order:data.ticket.order||data.ticket.order_reference||ticket.order,message:data.ticket.message||ticket.message,status:data.ticket.status||ticket.status,createdAt:data.ticket.createdAt||data.ticket.created_at||ticket.createdAt};savedToServer=true;}}}catch(err){console.warn(err)}const items=helpTickets();items.push(ticket);saveTickets(items);localStorage.removeItem('printify_help_draft');if(message)message.value='';if(order)order.value='';renderTickets();closeTicketModal();updateHelpUrl('ticket-'+String(ticket.ref).toLowerCase());helpToast((savedToServer?'Support ticket saved: ':'Support ticket saved locally: ')+ticket.ref);});
