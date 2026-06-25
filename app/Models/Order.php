@@ -13,6 +13,7 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'admin_client_id',
+        'business_id',
         'order_reference',
         'customer_name',
         'customer_email',
@@ -71,6 +72,11 @@ class Order extends Model
         return $this->belongsTo(User::class, 'admin_client_id');
     }
 
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
@@ -95,9 +101,11 @@ class Order extends Model
 
         if ($user->isAdminClient()) {
             return $query->where(function (Builder $scope) use ($user) {
-                $scope->where('admin_client_id', $user->id)
+                $scope->when($user->business_id, fn (Builder $tenant) => $tenant->where('business_id', $user->business_id))
+                    ->orWhere('admin_client_id', $user->id)
                     ->orWhereHas('user', function (Builder $customer) use ($user) {
-                        $customer->where('admin_client_id', $user->id);
+                        $customer->where('admin_client_id', $user->id)
+                            ->when($user->business_id, fn (Builder $tenant) => $tenant->orWhere('business_id', $user->business_id));
                     });
             });
         }
@@ -115,7 +123,8 @@ class Order extends Model
             return false;
         }
 
-        return (int) $this->admin_client_id === (int) $user->id
+        return ($user->business_id && (int) $this->business_id === (int) $user->business_id)
+            || (int) $this->admin_client_id === (int) $user->id
             || (int) optional($this->user)->admin_client_id === (int) $user->id;
     }
 }

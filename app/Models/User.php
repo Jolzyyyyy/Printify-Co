@@ -51,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'preferences',
         'password',
         'role',               // customer, admin_client, or developer
+        'business_id',
         'admin_client_id',
         'otp_code',           // 6-digit code
         'otp_expires_at',     // Expiration timestamp
@@ -206,6 +207,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function assignedAdminClient(): BelongsTo
     {
         return $this->belongsTo(self::class, 'admin_client_id');
+    }
+
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
+    public function ownedBusiness(): HasOne
+    {
+        return $this->hasOne(Business::class, 'owner_user_id');
     }
 
     public function assignedCustomers(): HasMany

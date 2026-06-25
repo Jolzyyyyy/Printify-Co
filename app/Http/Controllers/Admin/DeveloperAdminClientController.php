@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\Business;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
@@ -187,6 +188,8 @@ class DeveloperAdminClientController extends Controller
             'approved_by' => $request->user()->id,
         ])->save();
 
+        $this->ensureBusinessForAdminClient($user);
+
         AuditLog::record(
             'admin_client_approved',
             $request->user(),
@@ -257,16 +260,23 @@ class DeveloperAdminClientController extends Controller
 
         $oldValues = [
             'admin_client_id' => $customer->admin_client_id,
+            'business_id' => $customer->business_id,
         ];
 
         DB::transaction(function () use ($request, $user, $customer, $oldValues) {
+            $business = $this->ensureBusinessForAdminClient($user);
+
             $customer->forceFill([
                 'admin_client_id' => $user->id,
+                'business_id' => $business->id,
             ])->save();
 
             Order::query()
                 ->where('user_id', $customer->id)
-                ->update(['admin_client_id' => $user->id]);
+                ->update([
+                    'admin_client_id' => $user->id,
+                    'business_id' => $business->id,
+                ]);
 
             AuditLog::record(
                 'customer_assigned_to_admin_client',
@@ -276,6 +286,7 @@ class DeveloperAdminClientController extends Controller
                 $oldValues,
                 [
                     'admin_client_id' => $user->id,
+                    'business_id' => $business->id,
                     'admin_client_email' => $user->email,
                     'customer_email' => $customer->email,
                 ],
@@ -286,5 +297,46 @@ class DeveloperAdminClientController extends Controller
         return redirect()
             ->route('developer.admin-clients.index')
             ->with('success', 'Customer account assigned to admin client successfully.');
+    }
+
+    private function ensureBusinessForAdminClient(User $user): Business
+    {
+        if ($user->business_id && $user->business) {
+            return $user->business;
+        }
+
+        $user->loadMissing('adminClientProfile');
+        $businessName = $user->adminClientProfile?->business_name
+            ?: ($user->company ?: $user->name ?: 'Business ' . $user->id);
+
+        $business = Business::firstOrCreate(
+            ['owner_user_id' => $user->id],
+            [
+                'name' => $businessName,
+                'slug' => $this->uniqueBusinessSlug($businessName, $user->id),
+                'status' => $user->approved_at ? Business::STATUS_ACTIVE : Business::STATUS_INACTIVE,
+                'email' => $user->email,
+                'contact_number' => $user->adminClientProfile?->contact_number ?? $user->phone,
+                'address' => $user->adminClientProfile?->business_address,
+            ]
+        );
+
+        $user->forceFill(['business_id' => $business->id])->save();
+
+        return $business;
+    }
+
+    private function uniqueBusinessSlug(string $name, int $adminClientId): string
+    {
+        $base = Str::slug($name) ?: 'business-' . $adminClientId;
+        $slug = $base;
+        $counter = 2;
+
+        while (Business::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

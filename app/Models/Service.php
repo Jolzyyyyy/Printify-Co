@@ -8,6 +8,7 @@ class Service extends Model
 {
     protected $fillable = [
         'service_item_id',
+        'business_id',
         'name',
         'category',
         'retail_price',
@@ -27,6 +28,11 @@ class Service extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
     }
 
     public function variations()
