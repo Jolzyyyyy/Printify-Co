@@ -4,118 +4,21 @@
         $portalUser = $portalUser ?? auth()->user();
         $isDeveloperPortal = isset($portalUser) && $portalUser->isDeveloper();
         $isAdminClientPortal = isset($portalUser) && $portalUser->isAdminClient();
-        $headerAuditLogs = isset($recentAuditLogs)
-            ? $recentAuditLogs
-            : \App\Models\AuditLog::with(['actor', 'targetUser'])->latest()->limit(8)->get();
-        $headerNotifications = $headerAuditLogs->map(fn ($log) => [
-            'title' => \Illuminate\Support\Str::headline($log->event ?? 'System update'),
-            'body' => trim(($log->actor?->name ?? 'System') . ($log->targetUser ? ' updated ' . $log->targetUser->name : ' activity recorded')),
-            'time' => optional($log->created_at)->diffForHumans() ?? 'Just now',
-        ])->values();
-        if ($headerNotifications->isEmpty()) {
-            $headerNotifications = collect([
-                ['title' => 'Dashboard ready', 'body' => 'Admin workspace is ready for today.', 'time' => 'Now'],
-                ['title' => 'System status', 'body' => 'No critical alerts detected.', 'time' => 'Now'],
-            ]);
-        }
-        $dashboardOrders = \App\Models\Order::query();
-        $dashboardActiveUsers = \App\Models\User::query()
-            ->whereNotNull('email_verified_at')
-            ->when($isDeveloperPortal, fn ($query) => $query
-                ->where('role', \App\Models\User::ROLE_ADMIN_CLIENT)
-                ->where('email', 'enchantingasha@gmail.com')
-                ->whereNotNull('approved_at'))
-            ->when($isAdminClientPortal, fn ($query) => $query
-                ->where('role', \App\Models\User::ROLE_CUSTOMER)
-                ->where('email', 'julieannecalusa@gmail.com')
-                ->where('admin_client_id', $portalUser->id))
-            ->when(!$isDeveloperPortal && !$isAdminClientPortal, fn ($query) => $query
-                ->where('role', \App\Models\User::ROLE_CUSTOMER));
-        $dashboardServices = \App\Models\Service::query()->where('is_active', true);
-        $dashboardServiceAlerts = \App\Models\Service::query()
-            ->where('is_active', true)
-            ->withCount('activeVariations')
-            ->orderBy('category')
-            ->orderBy('name')
-            ->limit(3)
-            ->get()
-            ->map(function ($service) {
-                $category = strtolower((string) ($service->category ?? ''));
-                $icon = str_contains($category, 'photo') || str_contains($category, 'id')
-                    ? 'image'
-                    : (str_contains($category, 'lamination') || str_contains($category, 'binding')
-                        ? 'book-open'
-                        : (str_contains($category, 'large') || str_contains($category, 'custom')
-                            ? 'package'
-                            : (str_contains($category, 'copy') || str_contains($category, 'scan')
-                                ? 'copy'
-                                : 'printer')));
-                $variationCount = (int) $service->active_variations_count;
-
-                return [
-                    'name' => $service->name,
-                    'category' => $service->category ?: 'General Service',
-                    'icon' => $icon,
-                    'options' => $variationCount,
-                    'status' => $variationCount > 0 ? 'Live' : 'Needs setup',
-                    'status_class' => $variationCount > 0 ? 'completed' : 'low',
-                    'message' => $variationCount > 0
-                        ? "{$variationCount} live service option" . ($variationCount === 1 ? '' : 's') . ' synced from the customer catalog.'
-                        : 'No active options yet. Open the catalog to finish setup.',
-                ];
-            })
-            ->values();
-        $dashboardStats = [
-            'revenue' => (float) (clone $dashboardOrders)->sum('total_price'),
-            'orders' => (clone $dashboardOrders)->count(),
-            'customers' => (clone $dashboardActiveUsers)->count(),
-            'services' => (clone $dashboardServices)->count(),
-            'pending' => (clone $dashboardOrders)->whereIn('status', ['Pending', 'For Verification'])->count(),
-            'ready' => (clone $dashboardOrders)->whereIn('status', ['Ready', 'Ready / Delivery'])->count(),
-            'completed' => (clone $dashboardOrders)->where('status', 'Completed')->count(),
-            'cancelled' => (clone $dashboardOrders)->where('status', 'Cancelled')->count(),
-        ];
-        $dashboardServiceAlertCount = $dashboardServiceAlerts->count();
-        $dashboardActiveUsersLabel = $isDeveloperPortal
-            ? 'Active Admin Clients'
-            : ($isAdminClientPortal ? 'Active Customers' : 'Active Users');
-        $dashboardActiveUsersRoute = $isDeveloperPortal
-            ? route('developer.admin-clients.index')
-            : route('admin.customers');
-        $dashboardRecentOrders = \App\Models\Order::with('user')->latest()->limit(5)->get();
-        $portalRoleLabel = $isDeveloperPortal
-            ? 'Developer'
-            : ($isAdminClientPortal ? 'Admin Client' : 'Admin');
-        $portalRoleUpper = strtoupper($portalRoleLabel);
-        $portalTitle = $isDeveloperPortal ? 'Developer Dashboard' : 'ADMIN DASHBOARD';
-        $portalKicker = $isDeveloperPortal ? 'Developer Management Portal' : 'Admin Management Portal';
-        $portalTagline = $isDeveloperPortal
-            ? 'Manage admin clients, services, analytics, and platform controls from one developer workspace.'
-            : ($isAdminClientPortal
-                ? 'Manage assigned customers, orders, reports, and reference profile activity from one admin-client workspace.'
-                : 'Manage customers, orders, products, reports, and system activity from one admin workspace.');
-        $portalDisplayName = $portalUser->name ?? $portalRoleLabel;
-        $portalInitial = strtoupper(substr($portalDisplayName, 0, 1));
-        $headerSearchItems = $isDeveloperPortal
-            ? [
-                ['title' => 'Dashboard', 'meta' => 'Developer overview and platform activity', 'url' => route('admin.dashboard')],
-                ['title' => 'Manage Admin Clients', 'meta' => 'Approve, assign, and review admin clients', 'url' => route('developer.admin-clients.index')],
-                ['title' => 'Orders', 'meta' => 'Developer order monitoring', 'url' => route('developer.orders.index')],
-                ['title' => 'Services', 'meta' => 'Manage service catalog and availability', 'url' => route('developer.services.index')],
-                ['title' => 'Customers', 'meta' => 'Review customer records and activity', 'url' => route('developer.customers.index')],
-                ['title' => 'Analytics', 'meta' => 'Developer analytics and platform insights', 'url' => route('developer.analytics.index')],
-                ['title' => 'Reports', 'meta' => 'Operational and performance reports', 'url' => route('developer.reports.index')],
-                ['title' => 'Settings', 'meta' => 'Developer preferences and system controls', 'url' => route('developer.settings.index')],
-            ]
-            : [
-                ['title' => 'Dashboard', 'meta' => 'Overview and recent transactions', 'url' => route('admin.dashboard')],
-                ['title' => 'Customer/User', 'meta' => 'Manage registered users', 'url' => route('admin.customers')],
-                ['title' => 'Orders', 'meta' => 'Order management and status tracking', 'url' => route('admin.orders')],
-                ['title' => 'Products', 'meta' => 'Product inventory and services', 'url' => route('admin.products')],
-                ['title' => 'Reports', 'meta' => 'Sales reports and export tools', 'url' => route('admin.reports')],
-                ['title' => 'Analytics', 'meta' => 'Traffic and performance charts', 'url' => route('admin.analytics')],
-                ['title' => 'Settings', 'meta' => 'Preferences and system controls', 'url' => route('admin.settings')],
-            ];
+        $headerNotifications = $headerNotifications ?? collect();
+        $dashboardStats = $dashboardStats ?? ['revenue' => 0, 'orders' => 0, 'customers' => 0, 'services' => 0, 'pending' => 0, 'ready' => 0, 'completed' => 0, 'cancelled' => 0];
+        $dashboardServiceAlerts = $dashboardServiceAlerts ?? collect();
+        $dashboardServiceAlertCount = $dashboardServiceAlertCount ?? $dashboardServiceAlerts->count();
+        $dashboardActiveUsersLabel = $dashboardActiveUsersLabel ?? 'Active Users';
+        $dashboardActiveUsersRoute = $dashboardActiveUsersRoute ?? route('admin.customers');
+        $dashboardRecentOrders = $dashboardRecentOrders ?? collect();
+        $portalRoleLabel = $portalRoleLabel ?? ($isDeveloperPortal ? 'Developer' : ($isAdminClientPortal ? 'Admin Client' : 'Admin'));
+        $portalRoleUpper = $portalRoleUpper ?? strtoupper($portalRoleLabel);
+        $portalTitle = $portalTitle ?? ($isDeveloperPortal ? 'Developer Dashboard' : 'ADMIN DASHBOARD');
+        $portalKicker = $portalKicker ?? ($isDeveloperPortal ? 'Developer Management Portal' : 'Admin Management Portal');
+        $portalTagline = $portalTagline ?? 'Manage dashboard activity from one workspace.';
+        $portalDisplayName = $portalDisplayName ?? ($portalUser->name ?? $portalRoleLabel);
+        $portalInitial = $portalInitial ?? strtoupper(substr($portalDisplayName, 0, 1));
+        $headerSearchItems = $headerSearchItems ?? [];
     @endphp
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700&display=swap');
@@ -1090,22 +993,50 @@
                 </a>
 
                 @if(isset($portalUser) && $portalUser->isDeveloper())
+                    <div class="nav-text" x-show="sidebarOpen" x-transition style="padding:10px 16px 6px;font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;">Businesses / Tenants</div>
+                    <a href="{{ route('developer.admin-clients.index') }}" class="sidebar-link">
+                        <i data-lucide="building-2"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>All Businesses</span>
+                    </a>
+                    <a href="{{ route('developer.admin-clients.index') }}" class="sidebar-link">
+                        <i data-lucide="badge-check"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Active Businesses</span>
+                    </a>
+                    <a href="{{ route('developer.admin-clients.index') }}" class="sidebar-link">
+                        <i data-lucide="ban"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Suspended Businesses</span>
+                    </a>
+                    <div class="nav-text" x-show="sidebarOpen" x-transition style="padding:10px 16px 6px;font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;">Admin Clients</div>
                     <a href="{{ route('developer.admin-clients.index') }}" class="sidebar-link">
                         <i data-lucide="shield-check"></i>
-                        <span class="nav-text" x-show="sidebarOpen" x-transition>Manage Admin Clients</span>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Admin Clients</span>
                     </a>
+                    <a href="{{ route('developer.admin-clients.index') }}" class="sidebar-link">
+                        <i data-lucide="mail-clock"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Invitations</span>
+                    </a>
+                    <div class="nav-text" x-show="sidebarOpen" x-transition style="padding:10px 16px 6px;font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;">Operations</div>
                     <a href="{{ route('developer.orders.index') }}" class="sidebar-link">
                         <i data-lucide="shopping-cart"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Orders</span>
-                    </a>
-                    <a href="{{ route('developer.services.index') }}" class="sidebar-link">
-                        <i data-lucide="package"></i>
-                        <span class="nav-text" x-show="sidebarOpen" x-transition>Services</span>
                     </a>
                     <a href="{{ route('developer.customers.index') }}" class="sidebar-link">
                         <i data-lucide="users"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Customers</span>
                     </a>
+                    <a href="{{ route('developer.orders.index') }}" class="sidebar-link">
+                        <i data-lucide="wallet-cards"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Payments</span>
+                    </a>
+                    <a href="{{ route('developer.orders.index') }}" class="sidebar-link">
+                        <i data-lucide="truck"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Deliveries</span>
+                    </a>
+                    <a href="{{ route('developer.services.index') }}" class="sidebar-link">
+                        <i data-lucide="package"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Services</span>
+                    </a>
+                    <div class="nav-text" x-show="sidebarOpen" x-transition style="padding:10px 16px 6px;font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;">Reports & Security</div>
                     <a href="{{ route('developer.reports.index') }}" class="sidebar-link">
                         <i data-lucide="file-text"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Reports</span>
@@ -1113,6 +1044,10 @@
                     <a href="{{ route('developer.analytics.index') }}" class="sidebar-link">
                         <i data-lucide="bar-chart-3"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Analytics</span>
+                    </a>
+                    <a href="{{ route('developer.reports.index') }}" class="sidebar-link">
+                        <i data-lucide="scroll-text"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Audit Logs</span>
                     </a>
                     <a href="{{ route('developer.settings.index') }}" class="sidebar-link">
                         <i data-lucide="settings"></i>
@@ -1280,6 +1215,7 @@
                         'tracking' => $order->tracking_number ?? 'N/A',
                         'notes' => $order->notes ?? 'No special instructions.',
                     ])->values();
+                    $developer = $developerCommandCenter ?? null;
                 @endphp
                 <main class="content-container admin-dashboard-final" x-data="adminDashboardFinal()" x-init="init()">
                     @if($isAdminClientPortal)
@@ -2696,6 +2632,7 @@
                         }
                     </style>
 
+                    @unless($isDeveloperPortal)
                     <section class="dash-page-head">
                         <div class="dash-title-wrap">
                             <h1>Dashboard</h1>
@@ -2783,7 +2720,126 @@
                             </aside>
                         </div>
                     </div>
+                    @endunless
 
+
+                    @if($isDeveloperPortal && $developer)
+                        @include('Admin.partials.developer-dashboard', ['developer' => $developer])
+                        @if(false)
+                        <style id="developer-command-center-style">
+                            .dev-command-center{display:grid;gap:14px}.dev-toolbar{display:grid;grid-template-columns:minmax(240px,1fr) 170px auto auto;gap:10px;align-items:center}.dev-tool{height:40px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;display:flex;align-items:center;gap:9px;padding:0 12px;font-size:12px;font-weight:700}.dev-tool input,.dev-tool select{width:100%;border:0;background:transparent;outline:0;font:inherit;color:inherit}.dev-export{height:40px;border:0;border-radius:8px;background:#ff7a00;color:#111827;font-weight:800;padding:0 15px;display:inline-flex;align-items:center;gap:8px}.dev-bell{width:40px;height:40px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;display:grid;place-items:center;position:relative}.dev-bell b{position:absolute;top:5px;right:5px;min-width:15px;height:15px;border-radius:99px;background:#ef4444;color:#fff;font-size:9px;display:grid;place-items:center}.dev-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.dev-kpi{min-height:82px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;text-decoration:none;padding:12px;display:flex;align-items:center;gap:10px}.dev-kpi:hover{border-color:#111827;background:#fff8f1}.dev-kpi-icon{width:34px;height:34px;border-radius:8px;display:grid;place-items:center}.dev-kpi-icon.blue{background:#eaf1ff;color:#0b63f6}.dev-kpi-icon.green{background:#e4f8ee;color:#10b981}.dev-kpi-icon.orange{background:#fff3e6;color:#ff7a00}.dev-kpi-icon.red{background:#ffe9e9;color:#ef4444}.dev-kpi-icon.slate{background:#f1f5f9;color:#475569}.dev-kpi small{display:block;font-size:9px;text-transform:uppercase;font-weight:800;color:#64748b}.dev-kpi strong{display:block;margin-top:5px;font-size:18px;font-weight:900;color:#111827}.dev-chart-grid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px}.dev-panel{border:1px solid #d8dee8;border-radius:8px;background:#fff;padding:14px;min-width:0}.dev-panel h2{margin:0 0 12px;font:800 14px 'Poppins',system-ui,sans-serif;color:#111827}.dev-bars{display:grid;gap:9px}.dev-bar-row{display:grid;grid-template-columns:110px 1fr 42px;gap:8px;align-items:center;font-size:11px;color:#475569;font-weight:700}.dev-bar-track{height:8px;border-radius:99px;background:#eef2f7;overflow:hidden}.dev-bar-fill{height:100%;border-radius:99px;background:#0b63f6}.dev-rank-row{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid #eef2f7;padding:8px 0;font-size:12px}.dev-rank-row:last-child{border-bottom:0}.dev-rank-row small{display:block;margin-top:2px;color:#64748b}.dev-table-wrap{overflow:auto;border:1px solid #e8edf5;border-radius:8px}.dev-table{width:100%;min-width:920px;border-collapse:collapse}.dev-table th{height:34px;background:#fbfcfe;border-bottom:1px solid #e8edf5;text-align:left;padding:0 10px;font-size:10px;text-transform:uppercase;color:#475569}.dev-table td{height:42px;border-bottom:1px solid #eef2f7;padding:0 10px;font-size:12px;color:#111827}.dev-table tbody tr:hover{background:#fff8f1}.dev-status{display:inline-flex;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:900}.dev-status.Active{background:#dcfce7;color:#166534}.dev-status.Inactive{background:#f1f5f9;color:#475569}.dev-status.Suspended{background:#fee2e2;color:#991b1b}.dev-action{color:#0b63f6;font-weight:800;text-decoration:none}.dev-issue-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.dev-issue-line{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eef2f7;padding:8px 0;font-size:12px}.dev-issue-line:last-child{border-bottom:0}.dev-issue-line small{display:block;color:#64748b;margin-top:2px}@media(max-width:1200px){.dev-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dev-chart-grid,.dev-issue-grid{grid-template-columns:1fr}.dev-toolbar{grid-template-columns:1fr 1fr}}@media(max-width:700px){.dev-kpi-grid,.dev-toolbar{grid-template-columns:1fr}}
+                        </style>
+
+                        <section class="dev-command-center">
+                            @php
+                                $pendingInviteKpi = collect($developer['kpis'])->firstWhere('label', 'Pending Invitations');
+                                $alertCount = (int) ($developer['failedDeliveries'] ?? 0) + (int) ($pendingInviteKpi['value'] ?? 0);
+                                $statusTotalForTrend = max(1, (int) collect($developer['statusCounts'])->sum());
+                            @endphp
+                            <div class="dev-toolbar">
+                                <label class="dev-tool"><i data-lucide="search"></i><input type="search" placeholder="Search business, admin_client, customer, order ID, payment ref"></label>
+                                <label class="dev-tool"><i data-lucide="calendar-days"></i><select><option>Today</option><option>This Week</option><option>This Month</option><option>Custom Range</option></select></label>
+                                <button type="button" class="dev-export" @click="exportDashboard()"><i data-lucide="download"></i>Export</button>
+                                <button type="button" class="dev-bell" @click="openInfo('Platform Alerts','Pending invitations, pending payments, failed deliveries, and suspended tenants are summarized below.')"><i data-lucide="bell"></i><b>{{ number_format($alertCount) }}</b></button>
+                            </div>
+
+                            <section class="dev-kpi-grid">
+                                @foreach($developer['kpis'] as $kpi)
+                                    <a class="dev-kpi" href="{{ $kpi['url'] }}">
+                                        <span class="dev-kpi-icon {{ $kpi['tone'] }}"><i data-lucide="{{ $kpi['icon'] }}"></i></span>
+                                        <span><small>{{ $kpi['label'] }}</small><strong>{{ is_numeric($kpi['value']) ? number_format($kpi['value']) : $kpi['value'] }}</strong></span>
+                                    </a>
+                                @endforeach
+                            </section>
+
+                            <section class="dev-chart-grid">
+                                <article class="dev-panel">
+                                    <h2>Orders by Status</h2>
+                                    <div class="dev-bars">
+                                        @php $maxStatus = max(1, (int) collect($developer['statusCounts'])->max()); @endphp
+                                        @foreach(['Pending','For Verification','Processing','Ready','Completed','Cancelled'] as $statusName)
+                                            @php $statusTotal = (int) ($developer['statusCounts'][$statusName] ?? 0); @endphp
+                                            <div class="dev-bar-row"><span>{{ $statusName }}</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:{{ ($statusTotal / $maxStatus) * 100 }}%;"></div></div><strong>{{ number_format($statusTotal) }}</strong></div>
+                                        @endforeach
+                                    </div>
+                                </article>
+                                <article class="dev-panel">
+                                    <h2>Top Performing Businesses</h2>
+                                    @forelse($developer['businessRows']->sortByDesc('revenue')->take(5) as $row)
+                                        <div class="dev-rank-row"><span><strong>{{ $row['business_name'] }}</strong><small>{{ number_format($row['orders']) }} orders</small></span><b>PHP {{ number_format($row['revenue'], 2) }}</b></div>
+                                    @empty
+                                        <div class="dev-rank-row"><span>No businesses yet</span><b>PHP 0.00</b></div>
+                                    @endforelse
+                                </article>
+                                <article class="dev-panel">
+                                    <h2>Payment Method Breakdown</h2>
+                                    <div class="dev-bars">
+                                        @php $maxPayment = max(1, (int) collect($developer['paymentBreakdown'])->max()); @endphp
+                                        @forelse($developer['paymentBreakdown'] as $method => $total)
+                                            <div class="dev-bar-row"><span>{{ ucfirst((string) $method) }}</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:{{ ($total / $maxPayment) * 100 }}%;background:#ff7a00"></div></div><strong>{{ number_format($total) }}</strong></div>
+                                        @empty
+                                            <div class="dev-bar-row"><span>No payments</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:0"></div></div><strong>0</strong></div>
+                                        @endforelse
+                                    </div>
+                                </article>
+                            </section>
+
+                            <section class="dev-chart-grid">
+                                <article class="dev-panel">
+                                    <h2>Revenue Overview</h2>
+                                    <div class="dev-bars">
+                                        @php $maxSales = max(1, (float) $developer['businessRows']->max('sales')); @endphp
+                                        @forelse($developer['businessRows']->sortByDesc('sales')->take(6) as $row)
+                                            <div class="dev-bar-row"><span>{{ \Illuminate\Support\Str::limit($row['business_name'], 16) }}</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:{{ ($row['sales'] / $maxSales) * 100 }}%;background:#10b981"></div></div><strong>{{ number_format($row['sales'] / 1000, 1) }}k</strong></div>
+                                        @empty
+                                            <div class="dev-bar-row"><span>No revenue</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:0"></div></div><strong>0</strong></div>
+                                        @endforelse
+                                    </div>
+                                </article>
+                                <article class="dev-panel">
+                                    <h2>Delivery Status Overview</h2>
+                                    <div class="dev-bars">
+                                        @php $maxDelivery = max(1, (int) collect($developer['deliveryBreakdown'])->max()); @endphp
+                                        @forelse($developer['deliveryBreakdown'] as $deliveryStatus => $total)
+                                            <div class="dev-bar-row"><span>{{ \Illuminate\Support\Str::headline((string) $deliveryStatus) }}</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:{{ ($total / $maxDelivery) * 100 }}%;background:#0ea5e9"></div></div><strong>{{ number_format($total) }}</strong></div>
+                                        @empty
+                                            <div class="dev-bar-row"><span>No deliveries</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:0"></div></div><strong>0</strong></div>
+                                        @endforelse
+                                    </div>
+                                </article>
+                                <article class="dev-panel">
+                                    <h2>Cancellation Trend</h2>
+                                    <div class="dev-bars">
+                                        <div class="dev-bar-row"><span>Cancelled</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:{{ max(4, (($developer['statusCounts']['Cancelled'] ?? 0) / $statusTotalForTrend) * 100) }}%;background:#ef4444"></div></div><strong>{{ number_format($developer['statusCounts']['Cancelled'] ?? 0) }}</strong></div>
+                                        <div class="dev-bar-row"><span>Completed</span><div class="dev-bar-track"><div class="dev-bar-fill" style="width:{{ max(4, (($developer['statusCounts']['Completed'] ?? 0) / $statusTotalForTrend) * 100) }}%;background:#10b981"></div></div><strong>{{ number_format($developer['statusCounts']['Completed'] ?? 0) }}</strong></div>
+                                    </div>
+                                </article>
+                            </section>
+
+                            <article class="dev-panel">
+                                <h2>Business Performance Table</h2>
+                                <div class="dev-table-wrap">
+                                    <table class="dev-table">
+                                        <thead><tr><th>Business Name</th><th>Admin_Client</th><th>Status</th><th>Customers</th><th>Orders</th><th>Completed</th><th>Cancelled</th><th>Sales</th><th>Revenue</th><th>Payment Issues</th><th>Action</th></tr></thead>
+                                        <tbody>
+                                            @forelse($developer['businessRows'] as $row)
+                                                <tr><td><strong>{{ $row['business_name'] }}</strong></td><td>{{ $row['admin_client'] }}</td><td><span class="dev-status {{ $row['status'] }}">{{ $row['status'] }}</span></td><td>{{ number_format($row['customers']) }}</td><td>{{ number_format($row['orders']) }}</td><td>{{ number_format($row['completed']) }}</td><td>{{ number_format($row['cancelled']) }}</td><td>PHP {{ number_format($row['sales'], 2) }}</td><td>PHP {{ number_format($row['revenue'], 2) }}</td><td>{{ number_format($row['payment_issues']) }} Pending</td><td><a class="dev-action" href="{{ $row['url'] }}">View</a></td></tr>
+                                            @empty
+                                                <tr><td colspan="11">No admin_client businesses have been registered yet.</td></tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </article>
+
+                            <section class="dev-issue-grid">
+                                <article class="dev-panel"><h2>Recent Payment Issues</h2>@forelse($developer['recentPayments'] as $paymentOrder)<div class="dev-issue-line"><span><strong>{{ $paymentOrder->payment_reference ?: $paymentOrder->order_reference ?: '#'.$paymentOrder->id }}</strong><small>{{ $paymentOrder->payment_method ?: 'Payment' }} / {{ $paymentOrder->adminClient?->name ?? 'Unassigned' }}</small></span><b>PHP {{ number_format((float) $paymentOrder->total_price, 2) }}</b></div>@empty<div class="dev-issue-line"><span>No payment records yet</span><b>0</b></div>@endforelse</article>
+                                <article class="dev-panel"><h2>Recent Cancellations</h2>@forelse($developer['recentCancellations'] as $cancelledOrder)<div class="dev-issue-line"><span><strong>{{ $cancelledOrder->order_reference ?: '#'.$cancelledOrder->id }}</strong><small>{{ $cancelledOrder->user?->name ?? 'Customer' }}</small></span><b>{{ optional($cancelledOrder->created_at)->format('M d') }}</b></div>@empty<div class="dev-issue-line"><span>No cancelled orders</span><b>0</b></div>@endforelse</article>
+                                <article class="dev-panel"><h2>Recent Deliveries</h2>@forelse($developer['recentDeliveries'] as $deliveryOrder)<div class="dev-issue-line"><span><strong>{{ $deliveryOrder->delivery_tracking_number ?: $deliveryOrder->order_reference ?: '#'.$deliveryOrder->id }}</strong><small>{{ \Illuminate\Support\Str::headline($deliveryOrder->delivery_booking_status ?? $deliveryOrder->lalamove_status ?? 'Recorded') }}</small></span><b>{{ optional($deliveryOrder->delivery_booked_at ?? $deliveryOrder->created_at)->format('M d') }}</b></div>@empty<div class="dev-issue-line"><span>No delivery records yet</span><b>0</b></div>@endforelse</article>
+                            </section>
+                        </section>
+                        @endif
+                    @else
 
                     <section class="dash-metrics">
                         <button type="button" class="dash-metric blue" @click="openInfo('Revenue Details','Total recorded revenue: PHP {{ number_format($dashboardStats['revenue'], 2) }}. This is calculated from order totals.')">
@@ -2934,6 +2990,8 @@
                             <a class="dash-link" href="{{ route('admin.customers') }}">View all tasks <i data-lucide="arrow-right" style="width:14px"></i></a>
                         </article>
                     </section>
+
+                    @endif
 
                     <div x-show="orderModal" x-transition.opacity class="dash-modal-overlay" style="display:none" @click.self="orderModal=false">
                         <div class="dash-order-modal" x-transition.scale.origin.center>
@@ -4268,6 +4326,36 @@
         .admin-main-shell .hero-banner{height:390px!important;padding:16px!important}
         .admin-main-shell .content-container,
         .admin-main-shell .admin-section-content{padding:20px 16px!important}
+    }
+</style>
+<style id="developer-dashboard-final-compact-overrides">
+    .staff-portal-developer .admin-main-shell .hero-banner{
+        height:150px!important;
+        padding:8px 44px!important;
+    }
+    .staff-portal-developer .admin-main-shell .content-container{
+        padding:22px 44px 56px!important;
+    }
+    .staff-portal-developer .hero-title-area{
+        bottom:20px!important;
+    }
+    .staff-portal-developer .admin-dashboard-final .dash-head-actions{
+        grid-template-columns:274px!important;
+        grid-template-areas:"date"!important;
+        min-width:274px!important;
+    }
+    .staff-portal-developer .admin-dashboard-final .dash-export-btn,
+    .staff-portal-developer .admin-dashboard-final .dash-refresh-btn{
+        display:none!important;
+    }
+    @media(max-width:760px){
+        .staff-portal-developer .admin-main-shell .hero-banner{
+            height:220px!important;
+            padding:16px!important;
+        }
+        .staff-portal-developer .admin-main-shell .content-container{
+            padding:18px 14px 40px!important;
+        }
     }
 </style>
 </x-app-layout>
