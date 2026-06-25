@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
 
 class DeveloperDashboardMetricsService
 {
@@ -54,13 +56,15 @@ class DeveloperDashboardMetricsService
         $businesses = Business::query()->get();
 
         $orders = $this->orderQuery($filters)->with(['user', 'adminClient'])->latest();
+        $payments = $this->paymentQuery($filters)->with(['order.adminClient', 'customer', 'business'])->latest();
+        $hasPaymentRows = $this->hasPaymentRows();
         $totalOrders = (clone $orders)->count();
         $completedOrders = $this->completedOrders(clone $orders)->count();
         $cancelledOrders = $this->cancelledOrders(clone $orders)->count();
-        $totalSales = (float) (clone $orders)->sum('total_price');
-        $totalRevenue = (float) $this->paidOrders(clone $orders)->sum('total_price');
-        $pendingPayments = $this->pendingPaymentOrders(clone $orders)->count();
-        $failedPayments = $this->failedPaymentOrders(clone $orders)->count();
+        $totalSales = $hasPaymentRows ? (float) (clone $payments)->sum('amount') : (float) (clone $orders)->sum('total_price');
+        $totalRevenue = $hasPaymentRows ? (float) $this->paidPayments(clone $payments)->sum('amount') : (float) $this->paidOrders(clone $orders)->sum('total_price');
+        $pendingPayments = $hasPaymentRows ? $this->pendingPayments(clone $payments)->count() : $this->pendingPaymentOrders(clone $orders)->count();
+        $failedPayments = $hasPaymentRows ? $this->failedPayments(clone $payments)->count() : $this->failedPaymentOrders(clone $orders)->count();
         $activeDeliveries = $this->activeDeliveryOrders(clone $orders)->count();
         $failedDeliveries = $this->failedDeliveryOrders(clone $orders)->count();
 
@@ -75,11 +79,17 @@ class DeveloperDashboardMetricsService
             ->pluck('total', 'status');
 
         $paymentMethodExpression = "COALESCE(payment_method, 'Unrecorded')";
-        $paymentBreakdown = (clone $orders)
-            ->reorder()
-            ->selectRaw($paymentMethodExpression . ' as method, COUNT(*) as total')
-            ->groupByRaw($paymentMethodExpression)
-            ->pluck('total', 'method');
+        $paymentBreakdown = $hasPaymentRows
+            ? (clone $payments)
+                ->reorder()
+                ->selectRaw("COALESCE(payment_method, 'Unrecorded') as method, COUNT(*) as total")
+                ->groupByRaw("COALESCE(payment_method, 'Unrecorded')")
+                ->pluck('total', 'method')
+            : (clone $orders)
+                ->reorder()
+                ->selectRaw($paymentMethodExpression . ' as method, COUNT(*) as total')
+                ->groupByRaw($paymentMethodExpression)
+                ->pluck('total', 'method');
 
         $deliveryStatusExpression = "COALESCE(delivery_booking_status, COALESCE(lalamove_status, 'Not Booked'))";
         $deliveryBreakdown = (clone $orders)
@@ -88,12 +98,19 @@ class DeveloperDashboardMetricsService
             ->groupByRaw($deliveryStatusExpression)
             ->pluck('total', 'status');
 
-        $revenueTrend = $this->paidOrders(clone $orders)
-            ->reorder()
-            ->selectRaw('DATE(created_at) as day, SUM(total_price) as total')
-            ->groupByRaw('DATE(created_at)')
-            ->orderBy('day')
-            ->pluck('total', 'day');
+        $revenueTrend = $hasPaymentRows
+            ? $this->paidPayments(clone $payments)
+                ->reorder()
+                ->selectRaw('DATE(created_at) as day, SUM(amount) as total')
+                ->groupByRaw('DATE(created_at)')
+                ->orderBy('day')
+                ->pluck('total', 'day')
+            : $this->paidOrders(clone $orders)
+                ->reorder()
+                ->selectRaw('DATE(created_at) as day, SUM(total_price) as total')
+                ->groupByRaw('DATE(created_at)')
+                ->orderBy('day')
+                ->pluck('total', 'day');
 
         $cancellationTrend = $this->cancelledOrders(clone $orders)
             ->reorder()
@@ -129,7 +146,9 @@ class DeveloperDashboardMetricsService
             'deliveryBreakdown' => $deliveryBreakdown,
             'revenueTrend' => $revenueTrend,
             'cancellationTrend' => $cancellationTrend,
-            'recentPayments' => $this->pendingPaymentOrders(clone $orders)->limit(5)->get(),
+            'recentPayments' => $hasPaymentRows
+                ? $this->paymentIssues(clone $payments)->limit(5)->get()
+                : $this->pendingPaymentOrders(clone $orders)->limit(5)->get(),
             'recentCancellations' => $this->cancelledOrders(clone $orders)->limit(5)->get(),
             'recentDeliveries' => $this->activeDeliveryOrders(clone $orders)->limit(5)->get(),
             'recentAuditLogs' => AuditLog::with(['actor', 'targetUser', 'business'])->latest()->limit(5)->get(),
@@ -170,6 +189,15 @@ class DeveloperDashboardMetricsService
 
         $pendingIssues = $this->pendingPaymentOrders(clone $tenantOrders)->count();
         $failedIssues = $this->failedPaymentOrders(clone $tenantOrders)->count();
+        $tenantPayments = $this->paymentQuery([
+            ...$filters,
+            'business_id' => $adminClient->business_id ?: $adminClient->id,
+            'search' => null,
+        ]);
+        if ($this->hasPaymentRows()) {
+            $pendingIssues = $this->pendingPayments(clone $tenantPayments)->count();
+            $failedIssues = $this->failedPayments(clone $tenantPayments)->count();
+        }
 
         return [
             'id' => $adminClient->id,
@@ -182,8 +210,8 @@ class DeveloperDashboardMetricsService
             'orders' => (clone $tenantOrders)->count(),
             'completed' => $this->completedOrders(clone $tenantOrders)->count(),
             'cancelled' => $this->cancelledOrders(clone $tenantOrders)->count(),
-            'sales' => (float) (clone $tenantOrders)->sum('total_price'),
-            'revenue' => (float) $this->paidOrders(clone $tenantOrders)->sum('total_price'),
+            'sales' => $this->hasPaymentRows() ? (float) (clone $tenantPayments)->sum('amount') : (float) (clone $tenantOrders)->sum('total_price'),
+            'revenue' => $this->hasPaymentRows() ? (float) $this->paidPayments(clone $tenantPayments)->sum('amount') : (float) $this->paidOrders(clone $tenantOrders)->sum('total_price'),
             'payment_issues' => $pendingIssues + $failedIssues,
             'last_activity' => optional($adminClient->updated_at)->diffForHumans() ?? 'No activity',
             'url' => route('developer.admin-clients.show', $adminClient),
@@ -246,6 +274,40 @@ class DeveloperDashboardMetricsService
             });
     }
 
+    private function paymentQuery(array $filters): Builder
+    {
+        return Payment::query()
+            ->when($filters['date_from'] ?? null, fn (Builder $query, $date) => $query->where('created_at', '>=', $date))
+            ->when($filters['date_to'] ?? null, fn (Builder $query, $date) => $query->where('created_at', '<=', $date))
+            ->when($filters['business_id'] ?? null, function (Builder $query, int $businessId) {
+                $query->where(function (Builder $tenant) use ($businessId) {
+                    $tenant->where('business_id', $businessId)
+                        ->orWhereHas('order', function (Builder $order) use ($businessId) {
+                            $order->where('business_id', $businessId)
+                                ->orWhere('admin_client_id', $businessId)
+                                ->orWhereHas('user', fn (Builder $customer) => $customer->where('business_id', $businessId)->orWhere('admin_client_id', $businessId));
+                        });
+                });
+            })
+            ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $this->normalizePaymentStatus($status)))
+            ->when($filters['payment_method'] ?? null, fn (Builder $query, string $method) => $query->where('payment_method', $method))
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+                $query->where(function (Builder $nested) use ($search) {
+                    $nested->where('gateway_reference', 'like', "%{$search}%")
+                        ->orWhere('gateway_checkout_id', 'like', "%{$search}%")
+                        ->orWhereHas('customer', fn (Builder $customer) => $customer->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('business', fn (Builder $business) => $business->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('order', function (Builder $order) use ($search) {
+                            $order->where('order_reference', 'like', "%{$search}%")
+                                ->orWhere('payment_reference', 'like', "%{$search}%")
+                                ->orWhere('customer_name', 'like', "%{$search}%")
+                                ->orWhere('customer_email', 'like', "%{$search}%")
+                                ->orWhereHas('adminClient', fn (Builder $admin) => $admin->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+                        });
+                });
+            });
+    }
+
     private function completedOrders(Builder $query): Builder
     {
         return $query->whereIn('status', self::COMPLETED_STATUSES);
@@ -262,6 +324,56 @@ class DeveloperDashboardMetricsService
             $scope->whereNotNull('paid_at')
                 ->orWhereIn('status', self::PAID_STATUSES);
         });
+    }
+
+    private function paidPayments(Builder $query): Builder
+    {
+        return $query->where('status', Payment::STATUS_PAID);
+    }
+
+    private function pendingPayments(Builder $query): Builder
+    {
+        return $query->where('status', Payment::STATUS_PENDING);
+    }
+
+    private function failedPayments(Builder $query): Builder
+    {
+        return $query->whereIn('status', [
+            Payment::STATUS_FAILED,
+            Payment::STATUS_DISCREPANCY,
+            Payment::STATUS_REFUNDED,
+            Payment::STATUS_CANCELLED,
+        ]);
+    }
+
+    private function paymentIssues(Builder $query): Builder
+    {
+        return $query->whereIn('status', [
+            Payment::STATUS_PENDING,
+            Payment::STATUS_FAILED,
+            Payment::STATUS_DISCREPANCY,
+            Payment::STATUS_REFUNDED,
+            Payment::STATUS_CANCELLED,
+        ]);
+    }
+
+    private function hasPaymentRows(): bool
+    {
+        return Schema::hasTable('payments') && Payment::query()->exists();
+    }
+
+    private function normalizePaymentStatus(string $status): string
+    {
+        $status = strtolower($status);
+
+        return match ($status) {
+            'paid', 'completed' => Payment::STATUS_PAID,
+            'failed', 'payment_failed' => Payment::STATUS_FAILED,
+            'refunded' => Payment::STATUS_REFUNDED,
+            'discrepancy' => Payment::STATUS_DISCREPANCY,
+            'cancelled', 'canceled' => Payment::STATUS_CANCELLED,
+            default => $status,
+        };
     }
 
     private function pendingPaymentOrders(Builder $query): Builder

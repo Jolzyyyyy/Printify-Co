@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Mail\OrderReceiptMail;
 use App\Models\EReceiptRequest;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Service;
 use App\Models\ServiceVariation;
 use App\Models\User;
@@ -334,6 +335,12 @@ class ServiceOrderingAccessTest extends TestCase
         $this->assertSame('paid', $order->status);
         $this->assertSame('pay_test_123', $order->payment_reference);
         $this->assertNotNull($order->paid_at);
+        $this->assertDatabaseHas('payments', [
+            'order_id' => $order->id,
+            'gateway_checkout_id' => 'cs_test_paid',
+            'gateway_reference' => 'pay_test_123',
+            'status' => Payment::STATUS_PAID,
+        ]);
         $this->assertNotNull($order->receipt_number);
         $this->assertNotNull($order->receipt_pdf_path);
         $this->assertNotNull($order->receipt_sent_at);

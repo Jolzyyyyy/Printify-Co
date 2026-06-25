@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\EReceiptRequest;
+use App\Models\Payment;
 use App\Rules\PhilippineMobileNumber;
 use App\Services\CheckoutOrderFactory;
 use App\Services\CheckoutReceiptService;
@@ -221,6 +222,15 @@ class PaymongoCheckoutController extends Controller
                 'payment_reference' => (string) session('checkout_payment_reference'),
                 'payment_checkout_id' => session('checkout_provider_id'),
             ]);
+            $this->recordPaymentForOrder($order->fresh() ?? $order, [
+                'payment_method' => (string) session('checkout_payment_method', 'card'),
+                'payment_gateway' => (string) session('checkout_payment_provider', 'paymongo'),
+                'gateway_checkout_id' => (string) session('checkout_provider_id'),
+                'gateway_reference' => (string) session('checkout_payment_reference'),
+                'amount' => $finalTotal,
+                'status' => Payment::STATUS_PAID,
+                'paid_at' => now(),
+            ]);
             $deliveryBooking->book($order->fresh() ?? $order);
 
             try {
@@ -273,6 +283,15 @@ class PaymongoCheckoutController extends Controller
             'payment_reference' => $paymentReference,
             'paid_at' => $order->paid_at ?: now(),
         ])->save();
+        $this->recordPaymentForOrder($order->fresh() ?? $order, [
+            'payment_method' => $order->payment_method ?: 'gcash',
+            'payment_gateway' => $order->payment_provider ?: 'paymongo',
+            'gateway_checkout_id' => $checkoutId,
+            'gateway_reference' => $paymentReference,
+            'amount' => (float) $order->total_price,
+            'status' => Payment::STATUS_PAID,
+            'paid_at' => $order->paid_at ?: now(),
+        ]);
 
         try {
             $receiptService->send($order->fresh('items') ?? $order);
@@ -313,6 +332,28 @@ class PaymongoCheckoutController extends Controller
 
         $expected = hash_hmac('sha256', $timestamp . '.' . $request->getContent(), $secret);
         return $signatures->contains(fn (string $signature) => hash_equals($expected, $signature));
+    }
+
+    private function recordPaymentForOrder(Order $order, array $attributes): Payment
+    {
+        return Payment::updateOrCreate(
+            [
+                'order_id' => $order->id,
+                'gateway_checkout_id' => $attributes['gateway_checkout_id'] ?: $order->payment_checkout_id,
+            ],
+            [
+                'business_id' => $order->business_id,
+                'customer_id' => $order->user_id,
+                'payment_method' => $attributes['payment_method'] ?: ($order->payment_method ?: 'manual'),
+                'payment_gateway' => $attributes['payment_gateway'] ?: $order->payment_provider,
+                'gateway_reference' => $attributes['gateway_reference'] ?: $order->payment_reference,
+                'amount' => round((float) ($attributes['amount'] ?? $order->total_price), 2),
+                'status' => $attributes['status'] ?: Payment::STATUS_PENDING,
+                'verified_by' => null,
+                'paid_at' => $attributes['paid_at'] ?? $order->paid_at,
+                'remarks' => 'Synced from checkout payment flow.',
+            ]
+        );
     }
 
     private function mapPaymentMethodTypes(string $method): array

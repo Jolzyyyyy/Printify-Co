@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Business;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -336,6 +338,206 @@ class DashboardAccessTest extends TestCase
             ->withSession(['staff_otp_passed' => true])
             ->get(route('admin.orders.show', $assignedOrder, false))
             ->assertOk();
+    }
+
+    public function test_developer_dashboard_can_show_all_businesses(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+
+        $firstAdmin = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $firstBusiness = Business::create([
+            'name' => 'North Print Studio',
+            'slug' => 'north-print-studio',
+            'owner_user_id' => $firstAdmin->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $firstAdmin->forceFill(['business_id' => $firstBusiness->id])->save();
+
+        $secondAdmin = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $secondBusiness = Business::create([
+            'name' => 'South Print Studio',
+            'slug' => 'south-print-studio',
+            'owner_user_id' => $secondAdmin->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $secondAdmin->forceFill(['business_id' => $secondBusiness->id])->save();
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('admin.dashboard', absolute: false));
+
+        $response
+            ->assertOk()
+            ->assertSee('North Print Studio')
+            ->assertSee('South Print Studio')
+            ->assertSee('Total Businesses');
+    }
+
+    public function test_admin_client_order_visibility_prefers_business_id_with_admin_client_fallback(): void
+    {
+        $developer = User::factory()->create(['role' => User::ROLE_DEVELOPER]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'approved_by' => $developer->id,
+            'invitation_accepted_at' => now(),
+            'email_verified_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Tenant Scope Studio',
+            'slug' => 'tenant-scope-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+        $adminClient->adminClientProfile()->create([
+            'business_name' => 'Tenant Scope Studio',
+            'contact_person' => 'Scope Owner',
+            'contact_number' => '09173333333',
+            'business_address' => '100 Scope Street',
+            'profile_completed_at' => now(),
+        ]);
+
+        $otherAdminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'approved_by' => $developer->id,
+            'invitation_accepted_at' => now(),
+        ]);
+        $otherBusiness = Business::create([
+            'name' => 'Other Tenant Studio',
+            'slug' => 'other-tenant-studio',
+            'owner_user_id' => $otherAdminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $otherAdminClient->forceFill(['business_id' => $otherBusiness->id])->save();
+
+        $assignedCustomer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'name' => 'Business Assigned Customer',
+            'business_id' => $business->id,
+        ]);
+        $otherCustomer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'name' => 'Other Business Customer',
+            'business_id' => $otherBusiness->id,
+        ]);
+
+        Order::create([
+            'user_id' => $assignedCustomer->id,
+            'business_id' => $business->id,
+            'customer_name' => 'Business Assigned Customer',
+            'customer_email' => $assignedCustomer->email,
+            'status' => 'Processing',
+            'total_price' => 250,
+        ]);
+        Order::create([
+            'user_id' => $otherCustomer->id,
+            'business_id' => $otherBusiness->id,
+            'customer_name' => 'Other Business Customer',
+            'customer_email' => $otherCustomer->email,
+            'status' => 'Pending',
+            'total_price' => 300,
+        ]);
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('admin.orders.index', absolute: false))
+            ->assertOk()
+            ->assertSee('Business Assigned Customer')
+            ->assertDontSee('Other Business Customer');
+    }
+
+    public function test_admin_client_only_sees_payments_for_own_business(): void
+    {
+        $developer = User::factory()->create(['role' => User::ROLE_DEVELOPER]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'approved_by' => $developer->id,
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Payment Tenant Studio',
+            'slug' => 'payment-tenant-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $otherAdminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'approved_by' => $developer->id,
+            'invitation_accepted_at' => now(),
+        ]);
+        $otherBusiness = Business::create([
+            'name' => 'Other Payment Tenant',
+            'slug' => 'other-payment-tenant',
+            'owner_user_id' => $otherAdminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $otherAdminClient->forceFill(['business_id' => $otherBusiness->id])->save();
+
+        $ownOrder = Order::create([
+            'user_id' => User::factory()->create(['role' => User::ROLE_CUSTOMER, 'business_id' => $business->id])->id,
+            'business_id' => $business->id,
+            'admin_client_id' => $adminClient->id,
+            'customer_name' => 'Payment Tenant Customer',
+            'customer_email' => 'tenant-payment@example.com',
+            'status' => 'paid',
+            'total_price' => 500,
+        ]);
+        $otherOrder = Order::create([
+            'user_id' => User::factory()->create(['role' => User::ROLE_CUSTOMER, 'business_id' => $otherBusiness->id])->id,
+            'business_id' => $otherBusiness->id,
+            'admin_client_id' => $otherAdminClient->id,
+            'customer_name' => 'Other Payment Customer',
+            'customer_email' => 'other-payment@example.com',
+            'status' => 'paid',
+            'total_price' => 900,
+        ]);
+
+        Payment::create([
+            'business_id' => $business->id,
+            'order_id' => $ownOrder->id,
+            'customer_id' => $ownOrder->user_id,
+            'payment_method' => 'gcash',
+            'payment_gateway' => 'paymongo',
+            'gateway_reference' => 'own-payment-ref',
+            'amount' => 500,
+            'status' => Payment::STATUS_PAID,
+            'paid_at' => now(),
+        ]);
+        Payment::create([
+            'business_id' => $otherBusiness->id,
+            'order_id' => $otherOrder->id,
+            'customer_id' => $otherOrder->user_id,
+            'payment_method' => 'card',
+            'payment_gateway' => 'paymongo',
+            'gateway_reference' => 'other-payment-ref',
+            'amount' => 900,
+            'status' => Payment::STATUS_PAID,
+            'paid_at' => now(),
+        ]);
+
+        $visiblePayments = Payment::visibleToPortalUser($adminClient)->pluck('gateway_reference')->all();
+
+        $this->assertContains('own-payment-ref', $visiblePayments);
+        $this->assertNotContains('other-payment-ref', $visiblePayments);
     }
 
     public function test_admin_client_can_view_but_not_manage_service_catalog(): void

@@ -87,6 +87,11 @@ class Order extends Model
         return $this->hasMany(\App\Models\OrderFile::class);
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function recomputeTotal(): void
     {
         $total = $this->items()->sum('subtotal') + (float) ($this->delivery_fee ?? 0);
