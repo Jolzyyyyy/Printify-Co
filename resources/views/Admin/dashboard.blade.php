@@ -993,7 +993,7 @@
                 </a>
 
                 @if(isset($portalUser) && $portalUser->isDeveloper())
-                    <div class="nav-text" x-show="sidebarOpen" x-transition style="padding:10px 16px 6px;font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;">Businesses / Tenants</div>
+                    <div class="nav-text" x-show="sidebarOpen" x-transition style="padding:10px 16px 6px;font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;">Businesses</div>
                     <a href="{{ route('developer.admin-clients.index') }}" class="sidebar-link">
                         <i data-lucide="building-2"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>All Businesses</span>
@@ -1011,7 +1011,7 @@
                         <i data-lucide="shield-check"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Admin Clients</span>
                     </a>
-                    <a href="{{ route('developer.admin-clients.index') }}" class="sidebar-link">
+                    <a href="{{ route('developer.invitations.index') }}" class="sidebar-link">
                         <i data-lucide="mail-clock"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Invitations</span>
                     </a>

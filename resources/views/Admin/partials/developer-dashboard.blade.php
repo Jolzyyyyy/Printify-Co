@@ -30,20 +30,20 @@
     .staff-portal-developer .hero-title-area{bottom:22px!important}
     .staff-portal-developer .hero-main-title{font-size:34px!important}
     .staff-portal-developer .hero-subline{max-width:720px!important}
-    .devx{display:grid;gap:16px;color:#111827}
+    .devx{display:grid;gap:18px;color:#111827}
     .devx-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
     .devx-title h1{margin:0;font:900 22px 'Poppins',system-ui,sans-serif;color:#111827}
     .devx-title p{margin:4px 0 0;color:#64748b;font-size:12px}
-    .devx-filter{display:grid;grid-template-columns:minmax(220px,1.4fr) minmax(135px,.72fr) minmax(112px,.58fr) minmax(112px,.58fr) minmax(130px,.7fr) 102px 120px 120px;gap:7px;align-items:center;width:100%;max-width:100%;overflow:visible}
-    .devx-control,.devx-btn{height:38px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;display:flex;align-items:center;gap:8px;padding:0 10px;font-size:12px;font-weight:700;min-width:0}
+    .devx-filter{display:grid;grid-template-columns:minmax(260px,1.5fr) minmax(140px,.72fr) minmax(118px,.58fr) minmax(118px,.58fr) minmax(136px,.7fr) 104px 118px 118px;gap:8px;align-items:center;width:100%;max-width:100%;overflow:visible}
+    .devx-control,.devx-btn{height:40px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;display:flex;align-items:center;gap:8px;padding:0 11px;font-size:12px;font-weight:800;min-width:0}
     .devx-control input,.devx-control select{width:100%;border:0;background:transparent;outline:0;font:inherit;color:inherit;min-width:0}
     .devx-btn{justify-content:center;text-decoration:none;cursor:pointer}
     .devx-btn.primary{border-color:#ff7a00;background:#ff7a00;color:#111827}
     .devx-btn:hover{border-color:#111827;background:#fff8f1}
     .devx-btn.refresh{border-color:#2f6fed;background:#2f6fed;color:#fff}
     .devx-btn.refresh:hover{border-color:#2459c8;background:#2459c8;color:#fff}
-    .devx-export-menu{height:38px;position:relative}
-    .devx-export-menu summary{height:38px;border:1px solid #111827;border-radius:999px;background:#fff;color:#111827;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;font-size:12px;font-weight:800;cursor:pointer;list-style:none}
+    .devx-export-menu{height:40px;position:relative}
+    .devx-export-menu summary{height:40px;border:1px solid #111827;border-radius:8px;background:#fff;color:#111827;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;font-size:12px;font-weight:900;cursor:pointer;list-style:none}
     .devx-export-menu summary::-webkit-details-marker{display:none}
     .devx-export-menu[open] summary{background:#fff8f1}
     .devx-export-options{position:absolute;top:44px;right:0;z-index:30;min-width:132px;border:1px solid #d8dee8;border-radius:8px;background:#fff;box-shadow:0 16px 36px rgba(15,23,42,.14);padding:6px}
@@ -51,24 +51,24 @@
     .devx-export-options a:hover{background:#fff8f1}
     .devx-kpi-section{display:grid;gap:8px}
     .devx-section-title{margin:0;font:900 11px 'Poppins',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:#475569}
-    .devx-kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+    .devx-kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
     .devx-kpi-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
-    .devx-kpi{min-height:74px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;text-decoration:none;padding:11px;display:flex;align-items:center;gap:9px}
+    .devx-kpi{min-height:78px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;text-decoration:none;padding:12px;display:flex;align-items:center;gap:10px}
     .devx-kpi:hover{border-color:#111827;background:#fff8f1}
     .devx-kpi-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex:0 0 auto}
     .devx-kpi-icon.blue{background:#eaf1ff;color:#0b63f6}.devx-kpi-icon.green{background:#e4f8ee;color:#10b981}.devx-kpi-icon.orange{background:#fff3e6;color:#ff7a00}.devx-kpi-icon.red{background:#ffe9e9;color:#ef4444}.devx-kpi-icon.slate{background:#f1f5f9;color:#475569}
     .devx-kpi small{display:block;font-size:9px;text-transform:uppercase;font-weight:900;color:#64748b;line-height:1.2}.devx-kpi strong{display:block;margin-top:5px;font-size:16px;font-weight:900;color:#111827;line-height:1.1}
     .devx-chart-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}.devx-chart-grid.three{grid-template-columns:1fr 1fr 1fr}
-    .devx-panel{border:1px solid #d8dee8;border-radius:8px;background:#fff;padding:14px;min-width:0}.devx-panel h2{margin:0 0 12px;font:900 14px 'Poppins',system-ui,sans-serif;color:#111827}
-    .devx-empty{min-height:86px;display:grid;place-items:center;border:1px dashed #d8dee8;border-radius:8px;color:#94a3b8;font-size:12px;font-weight:700;text-align:center;padding:12px}
+    .devx-panel{border:1px solid #d8dee8;border-radius:8px;background:#fff;padding:15px;min-width:0}.devx-panel h2{margin:0 0 12px;font:900 14px 'Poppins',system-ui,sans-serif;color:#111827}
+    .devx-empty{min-height:88px;display:grid;place-items:center;border:1px dashed #d8dee8;border-radius:8px;background:#fbfcfe;color:#64748b;font-size:12px;font-weight:800;text-align:center;padding:14px}
     .devx-bars{display:grid;gap:9px}.devx-bar-row{display:grid;grid-template-columns:120px 1fr 48px;gap:8px;align-items:center;font-size:11px;color:#475569;font-weight:800}.devx-bar-track{height:9px;border-radius:99px;background:#eef2f7;overflow:hidden}.devx-bar-fill{height:100%;border-radius:99px;background:#0b63f6}
     .devx-line{height:150px;width:100%;overflow:visible}.devx-line path{fill:none;stroke:#0b63f6;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.devx-line .muted{stroke:#eef2f7;stroke-width:1}.devx-line .cancel{stroke:#ef4444}
     .devx-rank{display:grid;gap:0}.devx-rank-row{display:grid;grid-template-columns:1fr auto;gap:10px;border-bottom:1px solid #eef2f7;padding:8px 0;font-size:12px}.devx-rank-row:last-child{border-bottom:0}.devx-rank-row small{display:block;color:#64748b;margin-top:2px}
-    .devx-table-wrap{overflow:auto;border:1px solid #e8edf5;border-radius:8px}.devx-table{width:100%;min-width:1180px;border-collapse:collapse}.devx-table th{height:34px;background:#fbfcfe;border-bottom:1px solid #e8edf5;text-align:left;padding:0 10px;font-size:10px;text-transform:uppercase;color:#475569}.devx-table td{height:44px;border-bottom:1px solid #eef2f7;padding:0 10px;font-size:12px;color:#111827;vertical-align:middle}.devx-table tbody tr:hover{background:#fff8f1}
-    .devx-status{display:inline-flex;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:900}.devx-status.Active{background:#dcfce7;color:#166534}.devx-status.Inactive{background:#f1f5f9;color:#475569}.devx-status.Suspended{background:#fee2e2;color:#991b1b}
-    .devx-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.devx-action{border:1px solid #d8dee8;border-radius:7px;background:#fff;color:#0b63f6;text-decoration:none;font-size:10px;font-weight:900;padding:5px 8px;cursor:pointer}.devx-action.danger{color:#dc2626;border-color:#fecaca}.devx-action.success{color:#16a34a;border-color:#bbf7d0}.devx-action:hover{background:#f8fafc}
+    .devx-table-wrap{overflow:auto;border:1px solid #e8edf5;border-radius:8px}.devx-table{width:100%;min-width:1220px;border-collapse:collapse}.devx-table th{height:36px;background:#fbfcfe;border-bottom:1px solid #e8edf5;text-align:left;padding:0 11px;font-size:10px;text-transform:uppercase;color:#475569}.devx-table td{height:48px;border-bottom:1px solid #eef2f7;padding:0 11px;font-size:12px;color:#111827;vertical-align:middle}.devx-table tbody tr:hover{background:#fff8f1}
+    .devx-status{display:inline-flex;align-items:center;min-height:22px;border-radius:999px;padding:3px 10px;font-size:10px;font-weight:900;white-space:nowrap}.devx-status.Active,.devx-status.Paid,.devx-status.Completed{background:#dcfce7;color:#166534}.devx-status.Inactive,.devx-status.Pending{background:#f1f5f9;color:#475569}.devx-status.Suspended,.devx-status.Failed,.devx-status.Cancelled,.devx-status.Canceled{background:#fee2e2;color:#991b1b}.devx-status.Deleted{background:#e5e7eb;color:#111827}
+    .devx-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.devx-action{min-height:28px;border:1px solid #d8dee8;border-radius:7px;background:#fff;color:#0b63f6;text-decoration:none;font-size:10px;font-weight:900;padding:5px 9px;cursor:pointer;display:inline-flex;align-items:center}.devx-action.danger{color:#dc2626;border-color:#fecaca}.devx-action.success{color:#16a34a;border-color:#bbf7d0}.devx-action:hover{background:#f8fafc}
     .devx-issue-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.devx-issue-line{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eef2f7;padding:8px 0;font-size:12px}.devx-issue-line:last-child{border-bottom:0}.devx-issue-line small{display:block;color:#64748b;margin-top:2px}
-    @media(max-width:1450px){.devx-filter{grid-template-columns:minmax(190px,1.2fr) minmax(126px,.62fr) minmax(104px,.5fr) minmax(104px,.5fr) minmax(116px,.56fr) 92px 110px 110px;gap:6px}.devx-control,.devx-btn,.devx-export-menu summary{font-size:11px}.devx-btn{padding:0 8px}}
+    @media(max-width:1450px){.devx-filter{grid-template-columns:minmax(210px,1.2fr) minmax(126px,.62fr) minmax(108px,.5fr) minmax(108px,.5fr) minmax(118px,.56fr) 96px 108px 108px;gap:7px}.devx-control,.devx-btn,.devx-export-menu summary{font-size:11px}.devx-btn{padding:0 8px}}
     @media(max-width:1300px){.devx-filter{grid-template-columns:1fr 1fr 1fr}.devx-kpi-grid,.devx-kpi-grid.four{grid-template-columns:repeat(2,minmax(0,1fr))}.devx-chart-grid,.devx-chart-grid.three,.devx-issue-grid{grid-template-columns:1fr}}
     @media(max-width:720px){.devx-head{display:grid}.devx-filter{grid-template-columns:1fr}.devx-kpi-grid,.devx-kpi-grid.four{grid-template-columns:1fr}}
 </style>
@@ -104,12 +104,14 @@
         <section class="devx-kpi-section">
             <h2 class="devx-section-title">{{ $groupTitle }}</h2>
             <div class="devx-kpi-grid {{ $groupKpis->count() <= 4 ? 'four' : '' }}">
-                @foreach($groupKpis as $kpi)
+                @forelse($groupKpis as $kpi)
                     <a class="devx-kpi" href="{{ $kpi['url'] ?? '#' }}">
                         <span class="devx-kpi-icon {{ $kpi['tone'] }}"><i data-lucide="{{ $kpi['icon'] }}"></i></span>
                         <span><small>{{ $kpi['label'] }}</small><strong>{{ is_numeric($kpi['value']) ? number_format($kpi['value']) : $kpi['value'] }}</strong></span>
                     </a>
-                @endforeach
+                @empty
+                    <div class="devx-empty">No dashboard cards available.</div>
+                @endforelse
             </div>
         </section>
     @endforeach
@@ -188,7 +190,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="12">No businesses match the selected filters.</td></tr>
+                    <tr><td colspan="12"><div class="devx-empty">No business records found for the selected filters.</div></td></tr>
                 @endforelse
                 </tbody>
             </table>
