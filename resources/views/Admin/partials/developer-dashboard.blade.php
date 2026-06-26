@@ -105,10 +105,10 @@
             <h2 class="devx-section-title">{{ $groupTitle }}</h2>
             <div class="devx-kpi-grid {{ $groupKpis->count() <= 4 ? 'four' : '' }}">
                 @foreach($groupKpis as $kpi)
-                    <div class="devx-kpi">
+                    <a class="devx-kpi" href="{{ $kpi['url'] ?? '#' }}">
                         <span class="devx-kpi-icon {{ $kpi['tone'] }}"><i data-lucide="{{ $kpi['icon'] }}"></i></span>
                         <span><small>{{ $kpi['label'] }}</small><strong>{{ is_numeric($kpi['value']) ? number_format($kpi['value']) : $kpi['value'] }}</strong></span>
-                    </div>
+                    </a>
                 @endforeach
             </div>
         </section>

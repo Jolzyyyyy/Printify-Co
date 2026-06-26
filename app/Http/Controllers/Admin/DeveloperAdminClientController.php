@@ -128,6 +128,7 @@ class DeveloperAdminClientController extends Controller
                 'approved_by' => null,
                 'invite_token' => hash('sha256', $plainToken),
                 'invite_expires_at' => now()->addDays(7),
+                'invite_cancelled_at' => null,
             ]);
 
             AuditLog::record(
@@ -144,6 +145,22 @@ class DeveloperAdminClientController extends Controller
                 ],
                 $request
             );
+            AuditLog::create([
+                'actor_id' => $request->user()->id,
+                'target_user_id' => $user->id,
+                'business_id' => $user->business_id,
+                'auditable_type' => User::class,
+                'auditable_id' => $user->id,
+                'action' => 'admin_client_invitation_sent',
+                'module' => 'invitation',
+                'old_values' => null,
+                'new_values' => [
+                    'email' => $user->email,
+                    'invite_expires_at' => optional($user->invite_expires_at)->toDateTimeString(),
+                ],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
 
             return $user;
         });
@@ -190,15 +207,24 @@ class DeveloperAdminClientController extends Controller
 
         $this->ensureBusinessForAdminClient($user);
 
-        AuditLog::record(
-            'admin_client_approved',
-            $request->user(),
-            $user,
-            $user,
-            $oldValues,
-            $user->only(['role', 'approved_at', 'approved_by']),
-            $request
-        );
+        $wasSuspended = AuditLog::query()
+            ->where('target_user_id', $user->id)
+            ->where('action', 'admin_client_suspended')
+            ->exists();
+
+        AuditLog::create([
+            'actor_id' => $request->user()->id,
+            'target_user_id' => $user->id,
+            'business_id' => $user->business_id,
+            'auditable_type' => User::class,
+            'auditable_id' => $user->id,
+            'action' => $wasSuspended ? 'admin_client_restored' : 'admin_client_approved',
+            'module' => 'admin_client',
+            'old_values' => $oldValues,
+            'new_values' => $user->only(['role', 'approved_at', 'approved_by']),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         return redirect()
             ->route('developer.admin-clients.index')
@@ -223,15 +249,19 @@ class DeveloperAdminClientController extends Controller
             'recovery_codes' => null,
         ])->save();
 
-        AuditLog::record(
-            'admin_client_suspended',
-            request()->user(),
-            $user,
-            $user,
-            $oldValues,
-            $user->only(['approved_at', 'approved_by', 'google2fa_enabled']),
-            request()
-        );
+        AuditLog::create([
+            'actor_id' => request()->user()->id,
+            'target_user_id' => $user->id,
+            'business_id' => $user->business_id,
+            'auditable_type' => User::class,
+            'auditable_id' => $user->id,
+            'action' => 'admin_client_suspended',
+            'module' => 'admin_client',
+            'old_values' => $oldValues,
+            'new_values' => $user->only(['approved_at', 'approved_by', 'google2fa_enabled']),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
 
         return redirect()
             ->route('developer.admin-clients.index')

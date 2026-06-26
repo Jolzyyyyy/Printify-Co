@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\Services\DeveloperDashboardMetricsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class DashboardAccessTest extends TestCase
@@ -1035,6 +1036,140 @@ class DashboardAccessTest extends TestCase
             ->get(route('admin.dashboard', absolute: false))
             ->assertOk()
             ->assertSee('Suspended Businesses');
+    }
+
+    public function test_developer_can_view_invitation_page(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'name' => 'Pending Invite User',
+            'email' => 'pending-invite@example.com',
+            'preregistered_by' => $developer->id,
+            'invite_token' => hash('sha256', 'pending-token'),
+            'invite_expires_at' => now()->addDays(7),
+        ]);
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.invitations.index', absolute: false))
+            ->assertOk()
+            ->assertSee('Admin-Client Invitations')
+            ->assertSee('Pending Invite User')
+            ->assertSee('pending-invite@example.com');
+    }
+
+    public function test_admin_client_cannot_view_invitation_page(): void
+    {
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'email_verified_at' => now(),
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.invitations.index', absolute: false))
+            ->assertForbidden();
+    }
+
+    public function test_developer_can_send_resend_and_cancel_invitation_with_business_link_and_audit_logs(): void
+    {
+        Notification::fake();
+
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Invitation Linked Studio',
+            'slug' => 'invitation-linked-studio',
+            'status' => Business::STATUS_INACTIVE,
+        ]);
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->post(route('developer.invitations.store', absolute: false), [
+                'name' => 'Invited Admin Client',
+                'email' => 'invited-admin@example.com',
+                'business_id' => $business->id,
+            ])
+            ->assertRedirect(route('developer.invitations.index', absolute: false));
+
+        $adminClient = User::where('email', 'invited-admin@example.com')->firstOrFail();
+        $originalToken = $adminClient->invite_token;
+
+        $this->assertSame($business->id, $adminClient->business_id);
+        $this->assertSame($adminClient->id, $business->fresh()->owner_user_id);
+        $this->assertNotNull($adminClient->invite_token);
+        $this->assertDatabaseHas('audit_logs', [
+            'target_user_id' => $adminClient->id,
+            'business_id' => $business->id,
+            'action' => 'admin_client_invitation_sent',
+            'module' => 'invitation',
+        ]);
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->patch(route('developer.invitations.resend', $adminClient, false))
+            ->assertRedirect(route('developer.invitations.index', absolute: false));
+
+        $adminClient->refresh();
+        $this->assertNotSame($originalToken, $adminClient->invite_token);
+        $this->assertDatabaseHas('audit_logs', [
+            'target_user_id' => $adminClient->id,
+            'business_id' => $business->id,
+            'action' => 'admin_client_invitation_resent',
+            'module' => 'invitation',
+        ]);
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->patch(route('developer.invitations.cancel', $adminClient, false))
+            ->assertRedirect(route('developer.invitations.index', absolute: false));
+
+        $adminClient->refresh();
+        $this->assertNull($adminClient->invite_token);
+        $this->assertNull($adminClient->invite_expires_at);
+        $this->assertNotNull($adminClient->invite_cancelled_at);
+        $this->assertDatabaseHas('audit_logs', [
+            'target_user_id' => $adminClient->id,
+            'business_id' => $business->id,
+            'action' => 'admin_client_invitation_cancelled',
+            'module' => 'invitation',
+        ]);
+    }
+
+    public function test_pending_invitations_dashboard_card_links_to_invitation_page(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'name' => 'Dashboard Pending Invite',
+            'preregistered_by' => $developer->id,
+            'invite_token' => hash('sha256', 'dashboard-pending-token'),
+            'invite_expires_at' => now()->addDays(7),
+        ]);
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('admin.dashboard', absolute: false))
+            ->assertOk()
+            ->assertSee('Pending Invitations')
+            ->assertSee('href="'.route('developer.invitations.index', ['status' => 'pending']).'"', false);
     }
 
     public function test_admin_client_can_view_but_not_manage_service_catalog(): void

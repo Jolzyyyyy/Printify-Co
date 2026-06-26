@@ -114,6 +114,7 @@
         <a href="#payments">Payments</a>
         <a href="#deliveries">Deliveries</a>
         <a href="#services">Services</a>
+        <a href="#invitations">Invitations</a>
         <a href="#audit-logs">Audit Logs</a>
     </nav>
 
@@ -160,6 +161,15 @@
                 <div class="bd-empty">No business-specific services assigned yet.</div>
             @else
                 <div class="bd-table-wrap"><table class="bd-table"><thead><tr><th>Service</th><th>Category</th><th>Options</th><th>Status</th></tr></thead><tbody>@foreach($services as $service)<tr><td>{{ $service->name }}</td><td>{{ $service->category ?: 'General' }}</td><td>{{ number_format($service->active_variations_count) }}</td><td>{{ $service->is_active ? 'Active' : 'Inactive' }}</td></tr>@endforeach</tbody></table></div>
+            @endif
+        </article>
+
+        <article class="bd-card bd-section" id="invitations">
+            <h2>Invitation History</h2>
+            @if($invitations->isEmpty())
+                <div class="bd-empty">No admin-client invitations recorded for this business.</div>
+            @else
+                <div class="bd-table-wrap"><table class="bd-table"><thead><tr><th>Invitee</th><th>Email</th><th>Status</th><th>Sent</th></tr></thead><tbody>@foreach($invitations as $invite)@php $inviteStatus = $invite->invite_cancelled_at ? 'Cancelled' : ($invite->invitation_accepted_at ? 'Accepted' : (($invite->invite_token && $invite->invite_expires_at && $invite->invite_expires_at->isPast()) ? 'Expired' : ($invite->invite_token ? 'Pending' : 'Recorded'))); @endphp<tr><td><a href="{{ route('developer.invitations.show', $invite) }}">{{ $invite->name }}</a></td><td>{{ $invite->email }}</td><td>{{ $inviteStatus }}</td><td>{{ optional($invite->created_at)->format('M d, Y') }}</td></tr>@endforeach</tbody></table></div>
             @endif
         </article>
 
