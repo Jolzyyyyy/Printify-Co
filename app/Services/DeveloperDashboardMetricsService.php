@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AuditLog;
 use App\Models\Business;
+use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
@@ -43,8 +44,14 @@ class DeveloperDashboardMetricsService
         'ongoing',
         'picked_up',
         'out_for_delivery',
+        'pending_lalamove_configuration',
+        'pending_lalamove_coordinates',
+        'booked_lalamove',
+        'PENDING_CONFIGURATION',
+        'PENDING_COORDINATES',
+        'PENDING_PAYMENT',
     ];
-    private const FAILED_DELIVERY_STATUSES = ['failed', 'cancelled', 'canceled', 'rejected'];
+    private const FAILED_DELIVERY_STATUSES = ['failed', 'cancelled', 'canceled', 'rejected', 'lalamove_booking_failed', 'BOOKING_FAILED'];
 
     public function overview(array $filters): array
     {
@@ -57,7 +64,9 @@ class DeveloperDashboardMetricsService
 
         $orders = $this->orderQuery($filters)->with(['user', 'adminClient'])->latest();
         $payments = $this->paymentQuery($filters)->with(['order.adminClient', 'customer', 'business'])->latest();
+        $deliveries = $this->deliveryQuery($filters)->with(['order.adminClient', 'customer', 'business'])->latest();
         $hasPaymentRows = $this->hasPaymentRows();
+        $hasDeliveryRows = $this->hasDeliveryRows();
         $totalOrders = (clone $orders)->count();
         $completedOrders = $this->completedOrders(clone $orders)->count();
         $cancelledOrders = $this->cancelledOrders(clone $orders)->count();
@@ -65,8 +74,8 @@ class DeveloperDashboardMetricsService
         $totalRevenue = $hasPaymentRows ? (float) $this->paidPayments(clone $payments)->sum('amount') : (float) $this->paidOrders(clone $orders)->sum('total_price');
         $pendingPayments = $hasPaymentRows ? $this->pendingPayments(clone $payments)->count() : $this->pendingPaymentOrders(clone $orders)->count();
         $failedPayments = $hasPaymentRows ? $this->failedPayments(clone $payments)->count() : $this->failedPaymentOrders(clone $orders)->count();
-        $activeDeliveries = $this->activeDeliveryOrders(clone $orders)->count();
-        $failedDeliveries = $this->failedDeliveryOrders(clone $orders)->count();
+        $activeDeliveries = $hasDeliveryRows ? $this->activeDeliveries(clone $deliveries)->count() : $this->activeDeliveryOrders(clone $orders)->count();
+        $failedDeliveries = $hasDeliveryRows ? $this->failedDeliveries(clone $deliveries)->count() : $this->failedDeliveryOrders(clone $orders)->count();
 
         $businessRows = $adminClients
             ->map(fn (User $adminClient) => $this->businessRow($adminClient, $filters))
@@ -92,11 +101,17 @@ class DeveloperDashboardMetricsService
                 ->pluck('total', 'method');
 
         $deliveryStatusExpression = "COALESCE(delivery_booking_status, COALESCE(lalamove_status, 'Not Booked'))";
-        $deliveryBreakdown = (clone $orders)
-            ->reorder()
-            ->selectRaw($deliveryStatusExpression . ' as status, COUNT(*) as total')
-            ->groupByRaw($deliveryStatusExpression)
-            ->pluck('total', 'status');
+        $deliveryBreakdown = $hasDeliveryRows
+            ? (clone $deliveries)
+                ->reorder()
+                ->selectRaw("COALESCE(status, 'Not Booked') as status, COUNT(*) as total")
+                ->groupByRaw("COALESCE(status, 'Not Booked')")
+                ->pluck('total', 'status')
+            : (clone $orders)
+                ->reorder()
+                ->selectRaw($deliveryStatusExpression . ' as status, COUNT(*) as total')
+                ->groupByRaw($deliveryStatusExpression)
+                ->pluck('total', 'status');
 
         $revenueTrend = $hasPaymentRows
             ? $this->paidPayments(clone $payments)
@@ -150,7 +165,9 @@ class DeveloperDashboardMetricsService
                 ? $this->paymentIssues(clone $payments)->limit(5)->get()
                 : $this->pendingPaymentOrders(clone $orders)->limit(5)->get(),
             'recentCancellations' => $this->cancelledOrders(clone $orders)->limit(5)->get(),
-            'recentDeliveries' => $this->activeDeliveryOrders(clone $orders)->limit(5)->get(),
+            'recentDeliveries' => $hasDeliveryRows
+                ? $this->activeDeliveries(clone $deliveries)->limit(5)->get()
+                : $this->activeDeliveryOrders(clone $orders)->limit(5)->get(),
             'recentAuditLogs' => AuditLog::with(['actor', 'targetUser', 'business'])->latest()->limit(5)->get(),
             'failedDeliveries' => $failedDeliveries,
         ];
@@ -308,6 +325,38 @@ class DeveloperDashboardMetricsService
             });
     }
 
+    private function deliveryQuery(array $filters): Builder
+    {
+        return Delivery::query()
+            ->when($filters['date_from'] ?? null, fn (Builder $query, $date) => $query->where('created_at', '>=', $date))
+            ->when($filters['date_to'] ?? null, fn (Builder $query, $date) => $query->where('created_at', '<=', $date))
+            ->when($filters['business_id'] ?? null, function (Builder $query, int $businessId) {
+                $query->where(function (Builder $tenant) use ($businessId) {
+                    $tenant->where('business_id', $businessId)
+                        ->orWhereHas('order', function (Builder $order) use ($businessId) {
+                            $order->where('business_id', $businessId)
+                                ->orWhere('admin_client_id', $businessId)
+                                ->orWhereHas('user', fn (Builder $customer) => $customer->where('business_id', $businessId)->orWhere('admin_client_id', $businessId));
+                        });
+                });
+            })
+            ->when($filters['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
+            ->when($filters['search'] ?? null, function (Builder $query, string $search) {
+                $query->where(function (Builder $nested) use ($search) {
+                    $nested->where('tracking_reference', 'like', "%{$search}%")
+                        ->orWhere('delivery_address', 'like', "%{$search}%")
+                        ->orWhereHas('customer', fn (Builder $customer) => $customer->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('business', fn (Builder $business) => $business->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('order', function (Builder $order) use ($search) {
+                            $order->where('order_reference', 'like', "%{$search}%")
+                                ->orWhere('customer_name', 'like', "%{$search}%")
+                                ->orWhere('customer_email', 'like', "%{$search}%")
+                                ->orWhereHas('adminClient', fn (Builder $admin) => $admin->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+                        });
+                });
+            });
+    }
+
     private function completedOrders(Builder $query): Builder
     {
         return $query->whereIn('status', self::COMPLETED_STATUSES);
@@ -357,9 +406,24 @@ class DeveloperDashboardMetricsService
         ]);
     }
 
+    private function activeDeliveries(Builder $query): Builder
+    {
+        return $query->whereIn('status', self::ACTIVE_DELIVERY_STATUSES);
+    }
+
+    private function failedDeliveries(Builder $query): Builder
+    {
+        return $query->whereIn('status', self::FAILED_DELIVERY_STATUSES);
+    }
+
     private function hasPaymentRows(): bool
     {
         return Schema::hasTable('payments') && Payment::query()->exists();
+    }
+
+    private function hasDeliveryRows(): bool
+    {
+        return Schema::hasTable('deliveries') && Delivery::query()->exists();
     }
 
     private function normalizePaymentStatus(string $status): string

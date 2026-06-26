@@ -92,6 +92,16 @@ class Order extends Model
         return $this->hasMany(Payment::class);
     }
 
+    public function deliveries()
+    {
+        return $this->hasMany(Delivery::class);
+    }
+
+    public function latestDelivery()
+    {
+        return $this->hasOne(Delivery::class)->latestOfMany();
+    }
+
     public function recomputeTotal(): void
     {
         $total = $this->items()->sum('subtotal') + (float) ($this->delivery_fee ?? 0);

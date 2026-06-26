@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Mail\OrderReceiptMail;
+use App\Models\Delivery;
 use App\Models\EReceiptRequest;
 use App\Models\Order;
 use App\Models\Payment;
@@ -341,6 +342,13 @@ class ServiceOrderingAccessTest extends TestCase
             'gateway_reference' => 'pay_test_123',
             'status' => Payment::STATUS_PAID,
         ]);
+        $this->assertDatabaseHas('deliveries', [
+            'order_id' => $order->id,
+            'customer_id' => $customer->id,
+            'delivery_method' => 'lalamove',
+            'delivery_address' => 'Blk 6 Lot 8 Commonwealth Ave, Batasan Hills, Quezon City',
+            'status' => 'pending_lalamove_configuration',
+        ]);
         $this->assertNotNull($order->receipt_number);
         $this->assertNotNull($order->receipt_pdf_path);
         $this->assertNotNull($order->receipt_sent_at);
@@ -351,6 +359,45 @@ class ServiceOrderingAccessTest extends TestCase
         Mail::assertSent(OrderReceiptMail::class, function (OrderReceiptMail $mail) {
             return $mail->hasTo('julieannecalusa@gmail.com');
         });
+    }
+
+    public function test_delivery_record_can_be_created_from_existing_order_delivery_data(): void
+    {
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'email_verified_at' => now(),
+        ]);
+
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'order_reference' => 'PFY-DELIVERY-SYNC',
+            'customer_name' => $customer->name,
+            'customer_email' => $customer->email,
+            'customer_phone' => '+639171234567',
+            'status' => 'paid',
+            'total_price' => 250,
+            'delivery_method' => 'lalamove',
+            'delivery_fee' => 150,
+            'delivery_address' => '123 Delivery Street, Pasay City',
+            'delivery_booking_status' => 'pending_manual_booking',
+            'delivery_tracking_number' => 'TRACK-123',
+            'delivery_tracking_url' => 'https://tracking.test/TRACK-123',
+            'delivery_booked_at' => now(),
+        ]);
+
+        $delivery = Delivery::syncFromOrder($order);
+
+        $this->assertNotNull($delivery);
+        $this->assertDatabaseHas('deliveries', [
+            'order_id' => $order->id,
+            'customer_id' => $customer->id,
+            'delivery_method' => 'lalamove',
+            'tracking_reference' => 'TRACK-123',
+            'delivery_address' => '123 Delivery Street, Pasay City',
+            'delivery_fee' => 150,
+            'status' => 'pending_manual_booking',
+        ]);
+        $this->assertSame('pending_manual_booking', $order->fresh()->delivery_booking_status);
     }
 
     public function test_paymongo_webhook_rejects_missing_signature_when_secret_is_configured(): void

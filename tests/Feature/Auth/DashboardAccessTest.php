@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\Business;
+use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Service;
@@ -538,6 +539,83 @@ class DashboardAccessTest extends TestCase
 
         $this->assertContains('own-payment-ref', $visiblePayments);
         $this->assertNotContains('other-payment-ref', $visiblePayments);
+    }
+
+    public function test_admin_client_only_sees_deliveries_for_own_business(): void
+    {
+        $developer = User::factory()->create(['role' => User::ROLE_DEVELOPER]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'approved_by' => $developer->id,
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Delivery Tenant Studio',
+            'slug' => 'delivery-tenant-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $otherAdminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'approved_by' => $developer->id,
+            'invitation_accepted_at' => now(),
+        ]);
+        $otherBusiness = Business::create([
+            'name' => 'Other Delivery Tenant',
+            'slug' => 'other-delivery-tenant',
+            'owner_user_id' => $otherAdminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $otherAdminClient->forceFill(['business_id' => $otherBusiness->id])->save();
+
+        $ownOrder = Order::create([
+            'user_id' => User::factory()->create(['role' => User::ROLE_CUSTOMER, 'business_id' => $business->id])->id,
+            'business_id' => $business->id,
+            'admin_client_id' => $adminClient->id,
+            'customer_name' => 'Delivery Tenant Customer',
+            'customer_email' => 'tenant-delivery@example.com',
+            'status' => 'paid',
+            'total_price' => 500,
+        ]);
+        $otherOrder = Order::create([
+            'user_id' => User::factory()->create(['role' => User::ROLE_CUSTOMER, 'business_id' => $otherBusiness->id])->id,
+            'business_id' => $otherBusiness->id,
+            'admin_client_id' => $otherAdminClient->id,
+            'customer_name' => 'Other Delivery Customer',
+            'customer_email' => 'other-delivery@example.com',
+            'status' => 'paid',
+            'total_price' => 900,
+        ]);
+
+        Delivery::create([
+            'business_id' => $business->id,
+            'order_id' => $ownOrder->id,
+            'customer_id' => $ownOrder->user_id,
+            'delivery_method' => 'lalamove',
+            'tracking_reference' => 'own-delivery-ref',
+            'delivery_address' => 'Own customer address',
+            'delivery_fee' => 150,
+            'status' => 'pending_manual_booking',
+        ]);
+        Delivery::create([
+            'business_id' => $otherBusiness->id,
+            'order_id' => $otherOrder->id,
+            'customer_id' => $otherOrder->user_id,
+            'delivery_method' => 'lalamove',
+            'tracking_reference' => 'other-delivery-ref',
+            'delivery_address' => 'Other customer address',
+            'delivery_fee' => 150,
+            'status' => 'pending_manual_booking',
+        ]);
+
+        $visibleDeliveries = Delivery::visibleToPortalUser($adminClient)->pluck('tracking_reference')->all();
+
+        $this->assertContains('own-delivery-ref', $visibleDeliveries);
+        $this->assertNotContains('other-delivery-ref', $visibleDeliveries);
     }
 
     public function test_admin_client_can_view_but_not_manage_service_catalog(): void

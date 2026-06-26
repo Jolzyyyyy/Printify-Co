@@ -255,6 +255,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Payment::class, 'verified_by');
     }
 
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(Delivery::class, 'customer_id');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | OTP & SECURITY HELPERS (Para sa Customers)

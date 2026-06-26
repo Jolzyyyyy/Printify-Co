@@ -51,4 +51,9 @@ class Business extends Model
     {
         return $this->hasMany(AuditLog::class);
     }
+
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(Delivery::class);
+    }
 }
