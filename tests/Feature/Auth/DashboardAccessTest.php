@@ -872,6 +872,247 @@ class DashboardAccessTest extends TestCase
             ->assertSee('href="'.route('developer.businesses.show', $business).'"', false);
     }
 
+    public function test_developer_dashboard_report_route_renders(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'name' => 'Report Admin Client',
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Report Ready Studio',
+            'slug' => 'report-ready-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.dashboard.export', ['format' => 'xls'], false));
+
+        $response->assertOk();
+        $content = $response->streamedContent();
+
+        $this->assertStringContainsString('Developer Dashboard Report', $content);
+        $this->assertStringContainsString('Report Ready Studio', $content);
+        $this->assertStringContainsString('Business Health Summary', $content);
+    }
+
+    public function test_business_level_report_route_renders(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'name' => 'Business Report Owner',
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Business Report Studio',
+            'slug' => 'business-report-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'name' => 'Report Customer',
+            'business_id' => $business->id,
+        ]);
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'business_id' => $business->id,
+            'admin_client_id' => $adminClient->id,
+            'order_reference' => 'PFY-BIZ-REPORT',
+            'customer_name' => $customer->name,
+            'customer_email' => $customer->email,
+            'status' => 'Completed',
+            'total_price' => 1200,
+            'paid_at' => now(),
+        ]);
+        Payment::create([
+            'business_id' => $business->id,
+            'order_id' => $order->id,
+            'customer_id' => $customer->id,
+            'payment_method' => 'gcash',
+            'payment_gateway' => 'paymongo',
+            'gateway_reference' => 'biz-report-payment-ref',
+            'amount' => 1200,
+            'status' => Payment::STATUS_PAID,
+            'paid_at' => now(),
+        ]);
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.businesses.export', [$business, 'format' => 'xls'], false));
+
+        $response->assertOk();
+        $content = $response->streamedContent();
+
+        $this->assertStringContainsString('Business-Level Report', $content);
+        $this->assertStringContainsString('Business Report Studio', $content);
+        $this->assertStringContainsString('biz-report-payment-ref', $content);
+    }
+
+    public function test_admin_client_cannot_access_developer_report_exports(): void
+    {
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'email_verified_at' => now(),
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Protected Report Studio',
+            'slug' => 'protected-report-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.dashboard.export', ['format' => 'xls'], false))
+            ->assertForbidden();
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.businesses.export', [$business, 'format' => 'xls'], false))
+            ->assertForbidden();
+    }
+
+    public function test_reports_work_with_empty_data(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Empty Report Studio',
+            'slug' => 'empty-report-studio',
+            'status' => Business::STATUS_INACTIVE,
+        ]);
+
+        $dashboardResponse = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.dashboard.export', ['format' => 'xls'], false));
+
+        $dashboardResponse->assertOk();
+        $this->assertStringContainsString('No payments found for this period.', $dashboardResponse->streamedContent());
+
+        $businessResponse = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.businesses.export', [$business, 'format' => 'xls'], false));
+
+        $businessResponse->assertOk();
+        $businessContent = $businessResponse->streamedContent();
+        $this->assertStringContainsString('No payments found for this period.', $businessContent);
+        $this->assertStringContainsString('No deliveries found for this period.', $businessContent);
+        $this->assertStringContainsString('No audit logs found.', $businessContent);
+    }
+
+    public function test_business_report_uses_business_id_filtering(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $selectedAdmin = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $hiddenAdmin = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $selectedBusiness = Business::create([
+            'name' => 'Selected Report Studio',
+            'slug' => 'selected-report-studio',
+            'owner_user_id' => $selectedAdmin->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $hiddenBusiness = Business::create([
+            'name' => 'Hidden Report Studio',
+            'slug' => 'hidden-report-studio',
+            'owner_user_id' => $hiddenAdmin->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $selectedAdmin->forceFill(['business_id' => $selectedBusiness->id])->save();
+        $hiddenAdmin->forceFill(['business_id' => $hiddenBusiness->id])->save();
+        $selectedCustomer = User::factory()->create(['role' => User::ROLE_CUSTOMER, 'business_id' => $selectedBusiness->id]);
+        $hiddenCustomer = User::factory()->create(['role' => User::ROLE_CUSTOMER, 'business_id' => $hiddenBusiness->id]);
+        $selectedOrder = Order::create([
+            'user_id' => $selectedCustomer->id,
+            'business_id' => $selectedBusiness->id,
+            'admin_client_id' => $selectedAdmin->id,
+            'order_reference' => 'PFY-REPORT-SELECTED',
+            'customer_name' => $selectedCustomer->name,
+            'customer_email' => $selectedCustomer->email,
+            'status' => 'Completed',
+            'total_price' => 500,
+            'paid_at' => now(),
+        ]);
+        $hiddenOrder = Order::create([
+            'user_id' => $hiddenCustomer->id,
+            'business_id' => $hiddenBusiness->id,
+            'admin_client_id' => $hiddenAdmin->id,
+            'order_reference' => 'PFY-REPORT-HIDDEN',
+            'customer_name' => $hiddenCustomer->name,
+            'customer_email' => $hiddenCustomer->email,
+            'status' => 'Completed',
+            'total_price' => 900,
+            'paid_at' => now(),
+        ]);
+        Payment::create([
+            'business_id' => $selectedBusiness->id,
+            'order_id' => $selectedOrder->id,
+            'customer_id' => $selectedCustomer->id,
+            'payment_method' => 'gcash',
+            'gateway_reference' => 'selected-business-report-payment',
+            'amount' => 500,
+            'status' => Payment::STATUS_PAID,
+        ]);
+        Payment::create([
+            'business_id' => $hiddenBusiness->id,
+            'order_id' => $hiddenOrder->id,
+            'customer_id' => $hiddenCustomer->id,
+            'payment_method' => 'card',
+            'gateway_reference' => 'hidden-business-report-payment',
+            'amount' => 900,
+            'status' => Payment::STATUS_PAID,
+        ]);
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.businesses.export', [$selectedBusiness, 'format' => 'xls'], false));
+
+        $response->assertOk();
+        $content = $response->streamedContent();
+
+        $this->assertStringContainsString('Selected Report Studio', $content);
+        $this->assertStringContainsString('selected-business-report-payment', $content);
+        $this->assertStringNotContainsString('Hidden Report Studio', $content);
+        $this->assertStringNotContainsString('hidden-business-report-payment', $content);
+    }
+
     public function test_developer_can_suspend_business_and_audit_log_is_created(): void
     {
         $developer = User::factory()->create([

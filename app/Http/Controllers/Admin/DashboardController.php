@@ -254,7 +254,8 @@ class DashboardController extends Controller
     public function export(Request $request, DeveloperDashboardMetricsService $developerMetrics): Response
     {
         $filters = $this->developerDashboardFilters($request);
-        $dashboard = $developerMetrics->overview($filters);
+        $report = $developerMetrics->reportData($filters);
+        $dashboard = $report['dashboard'];
         $rows = $developerMetrics->exportRows($filters);
         $format = in_array($request->query('format'), ['csv', 'pdf', 'xls'], true)
             ? $request->query('format')
@@ -277,6 +278,8 @@ class DashboardController extends Controller
         if ($format === 'pdf' && class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
             return \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.developer-dashboard-report', [
                 'dashboard' => $dashboard,
+                'report' => $report,
+                'filters' => $filters,
                 'headers' => $headers,
                 'rows' => $rows,
                 'generatedAt' => now(),
@@ -284,9 +287,11 @@ class DashboardController extends Controller
         }
 
         if ($format === 'xls') {
-            return response()->streamDownload(function () use ($dashboard, $headers, $rows) {
+            return response()->streamDownload(function () use ($dashboard, $report, $filters, $headers, $rows) {
                 echo view('pdf.developer-dashboard-report', [
                     'dashboard' => $dashboard,
+                    'report' => $report,
+                    'filters' => $filters,
                     'headers' => $headers,
                     'rows' => $rows,
                     'generatedAt' => now(),

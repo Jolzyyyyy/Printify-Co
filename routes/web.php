@@ -310,6 +310,7 @@ Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026
     Route::get('/analytics', [AdminSectionController::class, 'analytics'])->name('analytics.index');
     Route::get('/settings', [AdminSectionController::class, 'settings'])->name('settings.index');
     Route::get('/businesses/{business}', [DeveloperBusinessController::class, 'show'])->name('businesses.show');
+    Route::get('/businesses/{business}/export', [DeveloperBusinessController::class, 'export'])->name('businesses.export');
     Route::patch('/businesses/{business}/activate', [DeveloperBusinessController::class, 'activate'])->name('businesses.activate');
     Route::patch('/businesses/{business}/inactive', [DeveloperBusinessController::class, 'markInactive'])->name('businesses.inactive');
     Route::patch('/businesses/{business}/suspend', [DeveloperBusinessController::class, 'suspend'])->name('businesses.suspend');

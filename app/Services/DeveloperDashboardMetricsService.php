@@ -192,6 +192,50 @@ class DeveloperDashboardMetricsService
             ->all();
     }
 
+    public function reportData(array $filters): array
+    {
+        $dashboard = $this->overview($filters);
+
+        return [
+            'dashboard' => $dashboard,
+            'filters' => $filters,
+            'businessHealth' => $this->kpisFor($dashboard, [
+                'Total Businesses',
+                'Active Businesses',
+                'Inactive Businesses',
+                'Suspended Businesses',
+                'Deleted Businesses',
+            ]),
+            'accessUsers' => $this->kpisFor($dashboard, [
+                'Total Admin Clients',
+                'Pending Invitations',
+                'Total Customers',
+                'Suspended Accounts',
+            ]),
+            'operations' => $this->kpisFor($dashboard, [
+                'Total Orders',
+                'Completed Orders',
+                'Cancelled Orders',
+                'Active Deliveries',
+            ]),
+            'financial' => $this->kpisFor($dashboard, [
+                'Total Sales',
+                'Total Revenue',
+                'Pending Payments',
+                'Failed Payments',
+            ]),
+            'topBusinesses' => $dashboard['businessRows']
+                ->sortByDesc('revenue')
+                ->take(8)
+                ->values(),
+            'recentPayments' => collect($dashboard['recentPayments'] ?? []),
+            'recentCancellations' => collect($dashboard['recentCancellations'] ?? []),
+            'recentDeliveries' => collect($dashboard['recentDeliveries'] ?? []),
+            'recentAuditLogs' => collect($dashboard['recentAuditLogs'] ?? []),
+            'businessRows' => $dashboard['businessRows'],
+        ];
+    }
+
     private function businessRow(User $adminClient, array $filters): array
     {
         $tenantOrders = $this->orderQuery([
@@ -249,6 +293,14 @@ class DeveloperDashboardMetricsService
             'suspend_url' => route('developer.admin-clients.suspend', $adminClient),
             'activate_url' => route('developer.admin-clients.approve', $adminClient),
         ];
+    }
+
+    private function kpisFor(array $dashboard, array $labels): array
+    {
+        return collect($dashboard['kpis'] ?? [])
+            ->whereIn('label', $labels)
+            ->mapWithKeys(fn (array $kpi) => [$kpi['label'] => $kpi['value']])
+            ->all();
     }
 
     private function adminClientQuery(array $filters): Builder
