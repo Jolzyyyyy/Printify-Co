@@ -49,6 +49,22 @@ class DeveloperBusinessController extends Controller
         $deliveries = $this->deliveriesForBusiness($business, $fallbackAdminClientId)->with(['order', 'customer'])->latest();
         $services = $this->servicesForBusiness($business)->withCount('activeVariations')->orderBy('category')->orderBy('name')->limit(12)->get();
         $auditLogs = $this->auditLogsForBusiness($business, $fallbackAdminClientId)->with(['actor', 'targetUser'])->latest()->limit(12)->get();
+        $invitations = User::query()
+            ->where('role', User::ROLE_ADMIN_CLIENT)
+            ->where(function (Builder $query) use ($business, $fallbackAdminClientId) {
+                $query->where('business_id', $business->id)
+                    ->orWhere('id', $business->owner_user_id)
+                    ->when($fallbackAdminClientId, fn (Builder $scope) => $scope->orWhere('id', $fallbackAdminClientId));
+            })
+            ->where(function (Builder $query) {
+                $query->whereNotNull('preregistered_by')
+                    ->orWhereNotNull('invite_token')
+                    ->orWhereNotNull('invitation_accepted_at')
+                    ->orWhereNotNull('invite_cancelled_at');
+            })
+            ->latest()
+            ->limit(8)
+            ->get();
 
         $hasPaymentRows = (clone $payments)->exists();
         $hasDeliveryRows = (clone $deliveries)->exists();
@@ -86,6 +102,7 @@ class DeveloperBusinessController extends Controller
             'payments' => (clone $payments)->limit(12)->get(),
             'deliveries' => (clone $deliveries)->limit(12)->get(),
             'services' => $services,
+            'invitations' => $invitations,
             'auditLogs' => $auditLogs,
             'lastActivity' => $lastActivity,
         ]);

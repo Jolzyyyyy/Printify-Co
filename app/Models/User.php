@@ -62,6 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'invite_token',
         'invite_expires_at',
         'invitation_accepted_at',
+        'invite_cancelled_at',
         'google2fa_secret',   // Para sa Admin Google Authenticator
         'google2fa_enabled',  // 2FA toggle para sa Admin
         'recovery_codes',     // Backup codes para sa 2FA
@@ -101,9 +102,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'approved_at'       => 'datetime',
         'invite_expires_at'  => 'datetime',
         'invitation_accepted_at' => 'datetime',
+        'invite_cancelled_at' => 'datetime',
         'approved_at'       => 'datetime',
         'invite_expires_at'  => 'datetime',
         'invitation_accepted_at' => 'datetime',
+        'invite_cancelled_at' => 'datetime',
         'password'          => 'hashed',
         'has_set_password'  => 'boolean',
         'google2fa_enabled' => 'boolean',
