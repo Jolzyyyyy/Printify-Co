@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\Delivery;
 use App\Models\Order;
@@ -616,6 +617,257 @@ class DashboardAccessTest extends TestCase
 
         $this->assertContains('own-delivery-ref', $visibleDeliveries);
         $this->assertNotContains('other-delivery-ref', $visibleDeliveries);
+    }
+
+    public function test_developer_can_view_business_detail_page(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Detail Page Studio',
+            'slug' => 'detail-page-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+            'email' => 'detail@example.com',
+            'contact_number' => '09175550000',
+            'address' => 'Detail Street',
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.businesses.show', $business, false));
+
+        $response
+            ->assertOk()
+            ->assertSee('Detail Page Studio')
+            ->assertSee('Business Profile')
+            ->assertSee('Customers')
+            ->assertSee('Orders')
+            ->assertSee('Payments')
+            ->assertSee('Deliveries')
+            ->assertSee('Audit Logs');
+    }
+
+    public function test_admin_client_cannot_view_developer_business_detail_page(): void
+    {
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'email_verified_at' => now(),
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Restricted Business Studio',
+            'slug' => 'restricted-business-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.businesses.show', $business, false))
+            ->assertForbidden();
+    }
+
+    public function test_business_detail_page_shows_only_selected_business_records(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Selected Tenant Studio',
+            'slug' => 'selected-tenant-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $otherAdminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $otherBusiness = Business::create([
+            'name' => 'Other Tenant Detail',
+            'slug' => 'other-tenant-detail',
+            'owner_user_id' => $otherAdminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $otherAdminClient->forceFill(['business_id' => $otherBusiness->id])->save();
+
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'name' => 'Selected Tenant Customer',
+            'business_id' => $business->id,
+        ]);
+        $otherCustomer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+            'name' => 'Other Tenant Customer Hidden',
+            'business_id' => $otherBusiness->id,
+        ]);
+
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'business_id' => $business->id,
+            'admin_client_id' => $adminClient->id,
+            'order_reference' => 'PFY-SELECTED-BIZ',
+            'customer_name' => $customer->name,
+            'customer_email' => $customer->email,
+            'status' => 'Completed',
+            'total_price' => 750,
+            'paid_at' => now(),
+        ]);
+        $otherOrder = Order::create([
+            'user_id' => $otherCustomer->id,
+            'business_id' => $otherBusiness->id,
+            'admin_client_id' => $otherAdminClient->id,
+            'order_reference' => 'PFY-HIDDEN-BIZ',
+            'customer_name' => $otherCustomer->name,
+            'customer_email' => $otherCustomer->email,
+            'status' => 'Completed',
+            'total_price' => 900,
+            'paid_at' => now(),
+        ]);
+
+        Payment::create([
+            'business_id' => $business->id,
+            'order_id' => $order->id,
+            'customer_id' => $customer->id,
+            'payment_method' => 'gcash',
+            'payment_gateway' => 'paymongo',
+            'gateway_reference' => 'pay-selected-business',
+            'amount' => 750,
+            'status' => Payment::STATUS_PAID,
+            'paid_at' => now(),
+        ]);
+        Payment::create([
+            'business_id' => $otherBusiness->id,
+            'order_id' => $otherOrder->id,
+            'customer_id' => $otherCustomer->id,
+            'payment_method' => 'card',
+            'payment_gateway' => 'paymongo',
+            'gateway_reference' => 'pay-hidden-business',
+            'amount' => 900,
+            'status' => Payment::STATUS_PAID,
+            'paid_at' => now(),
+        ]);
+        Delivery::create([
+            'business_id' => $business->id,
+            'order_id' => $order->id,
+            'customer_id' => $customer->id,
+            'delivery_method' => 'lalamove',
+            'tracking_reference' => 'delivery-selected-business',
+            'delivery_address' => 'Selected address',
+            'delivery_fee' => 150,
+            'status' => 'pending_manual_booking',
+        ]);
+        Delivery::create([
+            'business_id' => $otherBusiness->id,
+            'order_id' => $otherOrder->id,
+            'customer_id' => $otherCustomer->id,
+            'delivery_method' => 'lalamove',
+            'tracking_reference' => 'delivery-hidden-business',
+            'delivery_address' => 'Other address',
+            'delivery_fee' => 150,
+            'status' => 'pending_manual_booking',
+        ]);
+        Service::create([
+            'business_id' => $business->id,
+            'name' => 'Selected Business Service',
+            'category' => 'Printing',
+            'retail_price' => 10,
+            'bulk_price' => 8,
+            'unit' => 'page',
+            'is_active' => true,
+        ]);
+        Service::create([
+            'business_id' => $otherBusiness->id,
+            'name' => 'Hidden Business Service',
+            'category' => 'Printing',
+            'retail_price' => 10,
+            'bulk_price' => 8,
+            'unit' => 'page',
+            'is_active' => true,
+        ]);
+        AuditLog::create([
+            'actor_id' => $adminClient->id,
+            'target_user_id' => $customer->id,
+            'business_id' => $business->id,
+            'action' => 'selected_business_action',
+        ]);
+        AuditLog::create([
+            'actor_id' => $otherAdminClient->id,
+            'target_user_id' => $otherCustomer->id,
+            'business_id' => $otherBusiness->id,
+            'action' => 'hidden_business_action',
+        ]);
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('developer.businesses.show', $business, false));
+
+        $response
+            ->assertOk()
+            ->assertSee('Selected Tenant Studio')
+            ->assertSee('Selected Tenant Customer')
+            ->assertSee('PFY-SELECTED-BIZ')
+            ->assertSee('pay-selected-business')
+            ->assertSee('delivery-selected-business')
+            ->assertSee('Selected Business Service')
+            ->assertSee('Selected Business Action')
+            ->assertDontSee('Other Tenant Customer Hidden')
+            ->assertDontSee('PFY-HIDDEN-BIZ')
+            ->assertDontSee('pay-hidden-business')
+            ->assertDontSee('delivery-hidden-business')
+            ->assertDontSee('Hidden Business Service')
+            ->assertDontSee('Hidden Business Action');
+    }
+
+    public function test_dashboard_view_link_resolves_to_business_detail_page(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'name' => 'Dashboard Link Admin',
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Dashboard Link Studio',
+            'slug' => 'dashboard-link-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('admin.dashboard', absolute: false))
+            ->assertOk()
+            ->assertSee('Dashboard Link Studio')
+            ->assertSee('href="'.route('developer.businesses.show', $business).'"', false);
     }
 
     public function test_admin_client_can_view_but_not_manage_service_catalog(): void

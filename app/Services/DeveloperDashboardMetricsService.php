@@ -231,7 +231,9 @@ class DeveloperDashboardMetricsService
             'revenue' => $this->hasPaymentRows() ? (float) $this->paidPayments(clone $tenantPayments)->sum('amount') : (float) $this->paidOrders(clone $tenantOrders)->sum('total_price'),
             'payment_issues' => $pendingIssues + $failedIssues,
             'last_activity' => optional($adminClient->updated_at)->diffForHumans() ?? 'No activity',
-            'url' => route('developer.admin-clients.show', $adminClient),
+            'url' => $adminClient->business_id
+                ? route('developer.businesses.show', $adminClient->business_id)
+                : route('developer.admin-clients.show', $adminClient),
             'orders_url' => route('developer.orders.index', ['business_id' => $adminClient->id]),
             'customers_url' => route('developer.customers.index', ['business_id' => $adminClient->id]),
             'payments_url' => route('developer.orders.index', ['business_id' => $adminClient->id, 'payment' => 'issues']),
