@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\Delivery;
 use App\Models\OrderItem;
 use App\Models\Service;
 use App\Models\ServiceVariation;
@@ -22,6 +23,7 @@ class CheckoutOrderFactory
             $order = Order::create([
                 'user_id' => $customer?->id,
                 'admin_client_id' => $customer?->admin_client_id,
+                'business_id' => $customer?->business_id,
                 'order_reference' => $this->makeOrderReference(),
                 'customer_name' => trim(data_get($checkout, 'customer.firstName') . ' ' . data_get($checkout, 'customer.lastName')),
                 'customer_email' => data_get($checkout, 'customer.email'),
@@ -46,6 +48,8 @@ class CheckoutOrderFactory
                 $this->createOrderItem($order, $item);
                 $this->attachOrderFile($order, $item);
             }
+
+            Delivery::syncFromOrder($order->fresh() ?? $order);
 
             return $order->fresh('items') ?? $order;
         });

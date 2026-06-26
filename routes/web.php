@@ -309,6 +309,11 @@ Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026
     Route::get('/analytics', [AdminSectionController::class, 'analytics'])->name('analytics.index');
     Route::get('/settings', [AdminSectionController::class, 'settings'])->name('settings.index');
     Route::get('/businesses/{business}', [DeveloperBusinessController::class, 'show'])->name('businesses.show');
+    Route::patch('/businesses/{business}/activate', [DeveloperBusinessController::class, 'activate'])->name('businesses.activate');
+    Route::patch('/businesses/{business}/inactive', [DeveloperBusinessController::class, 'markInactive'])->name('businesses.inactive');
+    Route::patch('/businesses/{business}/suspend', [DeveloperBusinessController::class, 'suspend'])->name('businesses.suspend');
+    Route::delete('/businesses/{business}', [DeveloperBusinessController::class, 'destroy'])->name('businesses.destroy');
+    Route::patch('/businesses/{business}/restore', [DeveloperBusinessController::class, 'restore'])->name('businesses.restore');
     Route::get('/admin-clients', [DeveloperAdminClientController::class, 'index'])->name('admin-clients.index');
     Route::post('/admin-clients', [DeveloperAdminClientController::class, 'store'])->name('admin-clients.store');
     Route::get('/admin-clients/{user}', [DeveloperAdminClientController::class, 'show'])->name('admin-clients.show');

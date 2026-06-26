@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\DeveloperDashboardMetricsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -868,6 +869,172 @@ class DashboardAccessTest extends TestCase
             ->assertOk()
             ->assertSee('Dashboard Link Studio')
             ->assertSee('href="'.route('developer.businesses.show', $business).'"', false);
+    }
+
+    public function test_developer_can_suspend_business_and_audit_log_is_created(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Suspendable Studio',
+            'slug' => 'suspendable-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->patch(route('developer.businesses.suspend', $business, false))
+            ->assertRedirect();
+
+        $this->assertSame(Business::STATUS_SUSPENDED, $business->fresh()->status);
+
+        $log = AuditLog::where('business_id', $business->id)
+            ->where('action', 'business_suspended')
+            ->first();
+
+        $this->assertNotNull($log);
+        $this->assertSame('business', $log->module);
+        $this->assertSame(Business::STATUS_ACTIVE, $log->old_values['status']);
+        $this->assertSame(Business::STATUS_SUSPENDED, $log->new_values['status']);
+    }
+
+    public function test_developer_can_reactivate_business(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Reactivate Studio',
+            'slug' => 'reactivate-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_SUSPENDED,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->patch(route('developer.businesses.activate', $business, false))
+            ->assertRedirect();
+
+        $this->assertSame(Business::STATUS_ACTIVE, $business->fresh()->status);
+        $this->assertDatabaseHas('audit_logs', [
+            'business_id' => $business->id,
+            'action' => 'business_activated',
+            'module' => 'business',
+        ]);
+    }
+
+    public function test_admin_client_cannot_change_business_status(): void
+    {
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'email_verified_at' => now(),
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Protected Status Studio',
+            'slug' => 'protected-status-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_ACTIVE,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->patch(route('developer.businesses.suspend', $business, false))
+            ->assertForbidden();
+
+        $this->assertSame(Business::STATUS_ACTIVE, $business->fresh()->status);
+    }
+
+    public function test_suspended_business_admin_client_access_is_blocked(): void
+    {
+        $adminClient = User::factory()->create([
+            'role' => User::ROLE_ADMIN_CLIENT,
+            'email_verified_at' => now(),
+            'approved_at' => now(),
+            'invitation_accepted_at' => now(),
+        ]);
+        $business = Business::create([
+            'name' => 'Blocked Workspace Studio',
+            'slug' => 'blocked-workspace-studio',
+            'owner_user_id' => $adminClient->id,
+            'status' => Business::STATUS_SUSPENDED,
+        ]);
+        $adminClient->forceFill(['business_id' => $business->id])->save();
+
+        $this
+            ->actingAs($adminClient)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('admin.dashboard', absolute: false))
+            ->assertRedirect(route('admin.login', absolute: false))
+            ->assertSessionHasErrors('email');
+    }
+
+    public function test_developer_dashboard_counts_business_statuses_from_business_records(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+            'email_verified_at' => now(),
+        ]);
+
+        foreach ([Business::STATUS_ACTIVE, Business::STATUS_INACTIVE, Business::STATUS_SUSPENDED] as $index => $status) {
+            $adminClient = User::factory()->create([
+                'role' => User::ROLE_ADMIN_CLIENT,
+                'approved_at' => now(),
+                'invitation_accepted_at' => now(),
+            ]);
+            $business = Business::create([
+                'name' => "Status Count Studio {$index}",
+                'slug' => "status-count-studio-{$index}",
+                'owner_user_id' => $adminClient->id,
+                'status' => $status,
+            ]);
+            $adminClient->forceFill(['business_id' => $business->id])->save();
+        }
+
+        $dashboard = app(DeveloperDashboardMetricsService::class)->overview([
+            'search' => null,
+            'date_range' => 'this_month',
+            'date_from' => null,
+            'date_to' => null,
+            'business_id' => null,
+            'status' => null,
+            'payment_method' => null,
+        ]);
+
+        $kpis = collect($dashboard['kpis'])->pluck('value', 'label');
+
+        $this->assertSame(3, $kpis['Total Businesses']);
+        $this->assertSame(1, $kpis['Active Businesses']);
+        $this->assertSame(1, $kpis['Inactive Businesses']);
+        $this->assertSame(1, $kpis['Suspended Businesses']);
+
+        $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get(route('admin.dashboard', absolute: false))
+            ->assertOk()
+            ->assertSee('Suspended Businesses');
     }
 
     public function test_admin_client_can_view_but_not_manage_service_catalog(): void

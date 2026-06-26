@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Delivery;
 use App\Models\Order;
 
 class DeliveryBookingService
@@ -13,6 +14,7 @@ class DeliveryBookingService
     public function book(Order $order): void
     {
         if ($order->delivery_booked_at) {
+            Delivery::syncFromOrder($order);
             return;
         }
 
@@ -23,6 +25,7 @@ class DeliveryBookingService
                 'delivery_booking_status' => 'not_required_pickup',
                 'delivery_booked_at' => now(),
             ])->save();
+            Delivery::syncFromOrder($order->fresh() ?? $order);
 
             return;
         }
@@ -33,6 +36,7 @@ class DeliveryBookingService
                     'delivery_booking_status' => 'pending_lalamove_configuration',
                     'lalamove_status' => 'PENDING_CONFIGURATION',
                 ])->save();
+                Delivery::syncFromOrder($order->fresh() ?? $order);
 
                 return;
             }
@@ -42,6 +46,7 @@ class DeliveryBookingService
                     'delivery_booking_status' => 'pending_lalamove_coordinates',
                     'lalamove_status' => 'PENDING_COORDINATES',
                 ])->save();
+                Delivery::syncFromOrder($order->fresh() ?? $order);
 
                 return;
             }
@@ -71,6 +76,7 @@ class DeliveryBookingService
                     'lalamove_share_link' => data_get($shipment, 'data.shareLink'),
                     'lalamove_last_synced_at' => now(),
                 ])->save();
+                Delivery::syncFromOrder($order->fresh() ?? $order);
 
                 return;
             } catch (\Throwable $exception) {
@@ -80,6 +86,7 @@ class DeliveryBookingService
                     'delivery_booking_status' => 'lalamove_booking_failed',
                     'lalamove_status' => 'BOOKING_FAILED',
                 ])->save();
+                Delivery::syncFromOrder($order->fresh() ?? $order);
 
                 return;
             }
@@ -89,5 +96,6 @@ class DeliveryBookingService
         $order->forceFill([
             'delivery_booking_status' => 'pending_manual_booking',
         ])->save();
+        Delivery::syncFromOrder($order->fresh() ?? $order);
     }
 }

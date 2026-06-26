@@ -18,6 +18,7 @@
     .bd-actions{display:flex;gap:8px;flex-wrap:wrap}
     .bd-btn{height:38px;border:1px solid #d8dee8;border-radius:8px;background:#fff;color:#111827;display:inline-flex;align-items:center;gap:8px;padding:0 13px;font-size:12px;font-weight:900;text-decoration:none}
     .bd-btn.primary{background:#ff7a00;border-color:#ff7a00;color:#111827}
+    .bd-btn.success{border-color:#bbf7d0;color:#16a34a}.bd-btn.danger{border-color:#fecaca;color:#dc2626}
     .bd-status{display:inline-flex;margin-top:10px;border-radius:999px;padding:5px 12px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
     .bd-status.active{background:#dcfce7;color:#166534}.bd-status.inactive{background:#f1f5f9;color:#475569}.bd-status.suspended{background:#fee2e2;color:#991b1b}.bd-status.deleted{background:#e5e7eb;color:#111827}
     .bd-profile{display:grid;grid-template-columns:1.3fr .9fr;gap:14px;margin-bottom:18px}
@@ -63,6 +64,16 @@
             @if($owner)
                 <a class="bd-btn primary" href="{{ route('developer.admin-clients.show', $owner) }}">Admin Client</a>
             @endif
+            @if($business->status !== \App\Models\Business::STATUS_ACTIVE)
+                <form method="POST" action="{{ route('developer.businesses.activate', $business) }}">@csrf @method('PATCH')<button class="bd-btn success" type="submit">Activate</button></form>
+            @endif
+            @if($business->status === \App\Models\Business::STATUS_ACTIVE)
+                <form method="POST" action="{{ route('developer.businesses.inactive', $business) }}" onsubmit="return confirm('Mark this business as inactive?');">@csrf @method('PATCH')<button class="bd-btn" type="submit">Mark Inactive</button></form>
+            @endif
+            @if($business->status !== \App\Models\Business::STATUS_SUSPENDED)
+                <form method="POST" action="{{ route('developer.businesses.suspend', $business) }}" onsubmit="return confirm('Suspend this business and block admin-client access?');">@csrf @method('PATCH')<button class="bd-btn danger" type="submit">Suspend</button></form>
+            @endif
+            <form method="POST" action="{{ route('developer.businesses.destroy', $business) }}" onsubmit="return confirm('Mark this business as deleted?');">@csrf @method('DELETE')<button class="bd-btn danger" type="submit">Delete</button></form>
         </div>
     </header>
 

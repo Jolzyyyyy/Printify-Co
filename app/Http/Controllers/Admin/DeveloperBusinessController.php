@@ -11,6 +11,8 @@ use App\Models\Payment;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DeveloperBusinessController extends Controller
@@ -86,6 +88,81 @@ class DeveloperBusinessController extends Controller
             'services' => $services,
             'auditLogs' => $auditLogs,
             'lastActivity' => $lastActivity,
+        ]);
+    }
+
+    public function activate(Request $request, Business $business): RedirectResponse
+    {
+        return $this->changeStatus($request, $business, Business::STATUS_ACTIVE, 'business_activated');
+    }
+
+    public function markInactive(Request $request, Business $business): RedirectResponse
+    {
+        return $this->changeStatus($request, $business, Business::STATUS_INACTIVE, 'business_marked_inactive');
+    }
+
+    public function suspend(Request $request, Business $business): RedirectResponse
+    {
+        return $this->changeStatus($request, $business, Business::STATUS_SUSPENDED, 'business_suspended');
+    }
+
+    public function destroy(Request $request, Business $business): RedirectResponse
+    {
+        $oldStatus = $business->status;
+
+        $business->forceFill(['status' => Business::STATUS_DELETED])->save();
+        $business->delete();
+
+        $this->recordBusinessStatusAudit($request, $business, 'business_deleted', $oldStatus, Business::STATUS_DELETED);
+
+        return redirect()
+            ->route('admin.dashboard')
+            ->with('success', 'Business marked as deleted.');
+    }
+
+    public function restore(Request $request, int $business): RedirectResponse
+    {
+        $business = Business::withTrashed()->findOrFail($business);
+        $oldStatus = $business->status;
+
+        if ($business->trashed()) {
+            $business->restore();
+        }
+
+        $business->forceFill(['status' => Business::STATUS_ACTIVE])->save();
+        $this->recordBusinessStatusAudit($request, $business, 'business_restored', $oldStatus, Business::STATUS_ACTIVE);
+
+        return redirect()
+            ->route('developer.businesses.show', $business)
+            ->with('success', 'Business restored and reactivated.');
+    }
+
+    private function changeStatus(Request $request, Business $business, string $status, string $action): RedirectResponse
+    {
+        $oldStatus = $business->status;
+
+        $business->forceFill(['status' => $status])->save();
+        $this->recordBusinessStatusAudit($request, $business, $action, $oldStatus, $status);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Business status updated to ' . str($status)->headline() . '.');
+    }
+
+    private function recordBusinessStatusAudit(Request $request, Business $business, string $action, ?string $oldStatus, string $newStatus): void
+    {
+        AuditLog::create([
+            'actor_id' => $request->user()?->id,
+            'target_user_id' => $business->owner_user_id,
+            'business_id' => $business->id,
+            'auditable_type' => Business::class,
+            'auditable_id' => $business->id,
+            'action' => $action,
+            'module' => 'business',
+            'old_values' => ['status' => $oldStatus],
+            'new_values' => ['status' => $newStatus],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
         ]);
     }
 

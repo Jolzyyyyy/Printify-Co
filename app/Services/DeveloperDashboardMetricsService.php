@@ -216,12 +216,15 @@ class DeveloperDashboardMetricsService
             $failedIssues = $this->failedPayments(clone $tenantPayments)->count();
         }
 
+        $business = $adminClient->business;
+
         return [
             'id' => $adminClient->id,
+            'business_id' => $business?->id,
             'business_name' => $businessName ?: 'Unregistered Business',
             'admin_client' => $adminClient->name ?: 'Admin Client',
-            'status' => $adminClient->business
-                ? str($adminClient->business->status)->headline()->toString()
+            'status' => $business
+                ? str($business->status)->headline()->toString()
                 : ($adminClient->approved_at ? 'Active' : ($adminClient->invitation_accepted_at ? 'Suspended' : 'Inactive')),
             'customers' => $adminClient->assigned_customers_count,
             'orders' => (clone $tenantOrders)->count(),
@@ -231,14 +234,18 @@ class DeveloperDashboardMetricsService
             'revenue' => $this->hasPaymentRows() ? (float) $this->paidPayments(clone $tenantPayments)->sum('amount') : (float) $this->paidOrders(clone $tenantOrders)->sum('total_price'),
             'payment_issues' => $pendingIssues + $failedIssues,
             'last_activity' => optional($adminClient->updated_at)->diffForHumans() ?? 'No activity',
-            'url' => $adminClient->business_id
-                ? route('developer.businesses.show', $adminClient->business_id)
+            'url' => $business
+                ? route('developer.businesses.show', $business)
                 : route('developer.admin-clients.show', $adminClient),
             'orders_url' => route('developer.orders.index', ['business_id' => $adminClient->id]),
             'customers_url' => route('developer.customers.index', ['business_id' => $adminClient->id]),
             'payments_url' => route('developer.orders.index', ['business_id' => $adminClient->id, 'payment' => 'issues']),
             'deliveries_url' => route('developer.orders.index', ['business_id' => $adminClient->id, 'delivery' => 'all']),
             'logs_url' => route('developer.reports.index', ['business_id' => $adminClient->id, 'type' => 'audit']),
+            'business_activate_url' => $business ? route('developer.businesses.activate', $business) : null,
+            'business_inactive_url' => $business ? route('developer.businesses.inactive', $business) : null,
+            'business_suspend_url' => $business ? route('developer.businesses.suspend', $business) : null,
+            'business_delete_url' => $business ? route('developer.businesses.destroy', $business) : null,
             'suspend_url' => route('developer.admin-clients.suspend', $adminClient),
             'activate_url' => route('developer.admin-clients.approve', $adminClient),
         ];

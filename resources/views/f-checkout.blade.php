@@ -751,15 +751,17 @@ html{scroll-behavior:smooth}
         <div class="pfy-ereceipt-field"><label for="pfyReceiptName">Full Name</label><input id="pfyReceiptName" name="full_name" type="text" value="{{ Auth::check() ? Auth::user()->name : '' }}" autocomplete="name" placeholder="Enter" required></div>
         <div class="pfy-ereceipt-field"><label for="pfyReceiptTin">TIN</label><input id="pfyReceiptTin" name="tin" type="text" inputmode="numeric" placeholder="Enter"></div>
         <div class="pfy-ereceipt-section-label">Address Info</div>
-        <button class="pfy-address-toggle" type="button" aria-expanded="true" aria-controls="pfyReceiptAddressFields"><span>Region, Province, City, Barangay</span><i class="fa-solid fa-chevron-up"></i></button>
+        <div class="pfy-address-street-row">
+          <input id="pfyReceiptStreet" name="street_address" type="text" value="{{ Auth::check() ? Auth::user()->street : '' }}" autocomplete="street-address" placeholder="Street Address" required>
+          <button class="pfy-address-toggle" type="button" aria-expanded="true" aria-label="Toggle address details" aria-controls="pfyReceiptAddressFields"><i class="fa-solid fa-chevron-up"></i></button>
+        </div>
         <div class="pfy-address-grid" id="pfyReceiptAddressFields">
-          <div class="pfy-ereceipt-field"><label for="pfyReceiptRegion">Region</label><input id="pfyReceiptRegion" name="region" type="text" value="{{ Auth::check() ? Auth::user()->region : '' }}" placeholder="Enter region" required></div>
-          <div class="pfy-ereceipt-field"><label for="pfyReceiptProvince">Province</label><input id="pfyReceiptProvince" name="province" type="text" placeholder="Enter province" required></div>
-          <div class="pfy-ereceipt-field"><label for="pfyReceiptCity">City</label><input id="pfyReceiptCity" name="city" type="text" value="{{ Auth::check() ? Auth::user()->city : '' }}" placeholder="Enter city" required></div>
-          <div class="pfy-ereceipt-field"><label for="pfyReceiptBarangay">Barangay</label><input id="pfyReceiptBarangay" name="barangay" type="text" value="{{ Auth::check() ? Auth::user()->barangay : '' }}" placeholder="Enter barangay" required></div>
+          <div class="pfy-ereceipt-field"><label for="pfyReceiptRegion">Region</label><select id="pfyReceiptRegion" name="region" data-current="{{ Auth::check() ? Auth::user()->region : '' }}" required><option value="">Enter region</option></select></div>
+          <div class="pfy-ereceipt-field"><label for="pfyReceiptProvince">Province</label><select id="pfyReceiptProvince" name="province" data-current="{{ Auth::check() ? Auth::user()->province : '' }}" required disabled><option value="">Enter province</option></select></div>
+          <div class="pfy-ereceipt-field"><label for="pfyReceiptCity">City</label><select id="pfyReceiptCity" name="city" data-current="{{ Auth::check() ? Auth::user()->city : '' }}" required disabled><option value="">Enter city</option></select></div>
+          <div class="pfy-ereceipt-field"><label for="pfyReceiptBarangay">Barangay</label><select id="pfyReceiptBarangay" name="barangay" data-current="{{ Auth::check() ? Auth::user()->barangay : '' }}" required disabled><option value="">Enter barangay</option></select></div>
         </div>
         <div class="pfy-ereceipt-field"><label for="pfyReceiptPostal">Postal Code</label><input id="pfyReceiptPostal" name="postal_code" type="text" value="{{ Auth::check() ? Auth::user()->postal_code : '' }}" inputmode="numeric" placeholder="Enter" required></div>
-        <div class="pfy-ereceipt-field"><label for="pfyReceiptStreet">Street Name, Building, House No.</label><input id="pfyReceiptStreet" name="street_address" type="text" value="{{ Auth::check() ? Auth::user()->street : '' }}" placeholder="Enter" required></div>
         <label class="pfy-default-toggle"><span>Set as default <b id="pfyReceiptDefaultType">Personal</b> Billing Information</span><input type="checkbox" name="is_default" value="1"><i></i></label>
         <div class="pfy-ereceipt-disclaimer">
           <h3>Disclaimer</h3>
@@ -797,9 +799,9 @@ body.pfy-ereceipt-open{overflow:hidden!important}
 #checkout #pfyEReceiptForm{min-height:0;display:flex;flex:1;flex-direction:column}#checkout .pfy-ereceipt-scroll{min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 14px;scrollbar-width:thin;scrollbar-color:#c9cdd4 transparent}#checkout .pfy-ereceipt-scroll::-webkit-scrollbar{width:5px}#checkout .pfy-ereceipt-scroll::-webkit-scrollbar-thumb{border-radius:99px;background:#c9cdd4}
 #checkout .pfy-ereceipt-notice{display:grid;grid-template-columns:17px 1fr;gap:7px;margin-bottom:12px;padding:8px 9px;border:1px solid #f4b743;border-radius:5px;background:#fff9e8;color:#4b3a12}#checkout .pfy-ereceipt-notice i{margin-top:1px;color:#f59e0b;font-size:12px}#checkout .pfy-ereceipt-notice p{margin:0;font-size:8.8px;line-height:1.35}#checkout .pfy-ereceipt-notice strong{font-weight:800}
 #checkout .pfy-ereceipt-types{display:flex;align-items:center;gap:18px;margin:0 0 11px;padding:0;border:0}#checkout .pfy-ereceipt-types legend{float:left;width:84px;font-size:10px;font-weight:800}#checkout .pfy-ereceipt-types label{display:flex;align-items:center;gap:5px;font-size:9.5px;cursor:pointer}#checkout .pfy-ereceipt-types input{width:13px;height:13px;margin:0;accent-color:var(--pf-orange)}
-#checkout .pfy-ereceipt-field{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:center;min-height:38px;border-bottom:1px solid #eceff3}#checkout .pfy-ereceipt-field label,#checkout .pfy-ereceipt-section-label{font-size:9.2px;font-weight:700;color:#111827}#checkout .pfy-ereceipt-field input{width:100%;height:36px;padding:0 2px;border:0!important;background:transparent!important;color:#111827;font-size:9.5px;outline:0!important;box-shadow:none!important}#checkout .pfy-ereceipt-field input::placeholder{color:#a1a7b0}#checkout .pfy-ereceipt-field input:focus{color:var(--pf-orange)}
-#checkout .pfy-ereceipt-section-label{padding:12px 0 5px}#checkout .pfy-address-toggle{width:100%;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0;border:0;border-bottom:1px solid #eceff3;background:#fff;color:#5f6671;font-size:9.3px;text-align:left}#checkout .pfy-address-toggle:hover{color:var(--pf-orange)}#checkout .pfy-address-toggle i{font-size:8px}
-#checkout .pfy-address-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:10px}#checkout .pfy-address-grid[hidden]{display:none}#checkout .pfy-address-grid .pfy-ereceipt-field{grid-template-columns:1fr;align-content:center;padding:4px 0}#checkout .pfy-address-grid .pfy-ereceipt-field label{font-size:8.2px;color:#6b7280}#checkout .pfy-address-grid .pfy-ereceipt-field input{height:25px}
+#checkout .pfy-ereceipt-field{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:center;min-height:38px;border-bottom:1px solid #eceff3}#checkout .pfy-ereceipt-field label,#checkout .pfy-ereceipt-section-label{font-size:9.2px;font-weight:700;color:#111827}#checkout .pfy-ereceipt-field input,#checkout .pfy-ereceipt-field select{width:100%;height:36px;padding:0 2px;border:0!important;background:transparent!important;color:#111827;font-size:9.5px;outline:0!important;box-shadow:none!important}#checkout .pfy-ereceipt-field input::placeholder{color:#a1a7b0}#checkout .pfy-ereceipt-field input:focus,#checkout .pfy-ereceipt-field select:focus{color:var(--pf-orange)}
+#checkout .pfy-ereceipt-section-label{padding:12px 0 5px}#checkout .pfy-address-street-row{height:34px;display:grid;grid-template-columns:minmax(0,1fr) 24px;align-items:center;border-bottom:1px solid #eceff3}#checkout .pfy-address-street-row input{width:100%;height:32px;padding:0 2px;border:0!important;background:transparent!important;color:#111827;font-size:9.5px;outline:0!important;box-shadow:none!important}#checkout .pfy-address-street-row input::placeholder{color:#5f6671}#checkout .pfy-address-toggle{width:24px;height:24px;display:grid;place-items:center;padding:0;border:0;background:#fff;color:#5f6671;font-size:9.3px}#checkout .pfy-address-toggle:hover{color:var(--pf-orange)}#checkout .pfy-address-toggle i{font-size:8px}
+#checkout .pfy-address-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:10px}#checkout .pfy-address-grid[hidden]{display:none}#checkout .pfy-address-grid .pfy-ereceipt-field{grid-template-columns:1fr;align-content:center;padding:4px 0}#checkout .pfy-address-grid .pfy-ereceipt-field label{font-size:8.2px;color:#6b7280}#checkout .pfy-address-grid .pfy-ereceipt-field input,#checkout .pfy-address-grid .pfy-ereceipt-field select{height:25px}.pfy-ereceipt-field-full{grid-column:1/-1}
 #checkout .pfy-default-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 7px;font-size:9.3px;font-weight:700;cursor:pointer}#checkout .pfy-default-toggle input{position:absolute;opacity:0;pointer-events:none}#checkout .pfy-default-toggle i{position:relative;width:29px;height:16px;flex:0 0 29px;border-radius:99px;background:#d7dbe1;transition:.18s}#checkout .pfy-default-toggle i:after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.18s}#checkout .pfy-default-toggle input:checked+i{background:var(--pf-orange)}#checkout .pfy-default-toggle input:checked+i:after{transform:translateX(13px)}
 #checkout .pfy-ereceipt-disclaimer{margin-top:5px;color:#525966}#checkout .pfy-ereceipt-disclaimer h3{margin:0 0 5px;font-size:9.2px;color:#111827}#checkout .pfy-ereceipt-disclaimer ul{margin:0;padding-left:14px;font-size:7.8px;line-height:1.42}#checkout .pfy-ereceipt-disclaimer li+li{margin-top:3px}#checkout .pfy-consent{display:flex;align-items:flex-start;gap:6px;margin-top:9px;font-size:8px;line-height:1.35;cursor:pointer}#checkout .pfy-consent input{width:11px;height:11px;flex:0 0 11px;margin:0;accent-color:var(--pf-orange)}#checkout .pfy-consent a{color:var(--pf-orange);font-weight:700;text-decoration:underline}
 #checkout .pfy-ereceipt-error{margin:9px 0 0;padding:7px 8px;border-radius:5px;background:#fff0ed;color:#c52b18;font-size:8.5px;line-height:1.35}#checkout .pfy-ereceipt-footer{min-height:57px;display:grid;place-items:center;padding:10px 14px;border-top:1px solid #eceff3;background:#fff}#checkout .pfy-ereceipt-footer button{width:190px;height:36px;border:0;border-radius:999px;background:var(--pf-gradient);color:#111827;font-size:10px;font-weight:800;box-shadow:none}#checkout .pfy-ereceipt-footer button:hover{background:#111827;color:#fff}#checkout .pfy-ereceipt-footer button:disabled{cursor:wait;opacity:.62}
@@ -2426,6 +2428,7 @@ window.addEventListener("hashchange",openCheckoutFromHash);if(document.readyStat
 @media(max-width:760px){#checkout .pfy-sidebar>.pfy-card-payment .pfy-payment-grid{grid-template-columns:1fr 1fr!important}}
 </style>
 
+<script src="{{ asset('js/psgc-cascade.js') }}"></script>
 <script id="checkout-ph-address-cascade">
 (function(){
   var province=document.getElementById('province');
@@ -2484,6 +2487,53 @@ window.addEventListener("hashchange",openCheckoutFromHash);if(document.readyStat
   populateCities(currentCity,currentBarangay);
   province.addEventListener('change',function(){populateCities('','')});
   city.addEventListener('change',function(){populateBarangays('')});
+})();
+</script>
+
+<script id="checkout-psgc-address-cascade">
+(function(){
+  if(!window.PrintifyPsgc)return;
+  var source='/data/ph-locations.json';
+  var shippingProvince=document.getElementById('province');
+  window.PrintifyPsgc.bindCascade({
+    source:source,
+    region:'#pfyReceiptRegion',
+    province:'#pfyReceiptProvince',
+    city:'#pfyReceiptCity',
+    barangay:'#pfyReceiptBarangay',
+    current:{
+      region:document.getElementById('pfyReceiptRegion')?.dataset.current||'',
+      province:document.getElementById('pfyReceiptProvince')?.dataset.current||'',
+      city:document.getElementById('pfyReceiptCity')?.dataset.current||'',
+      barangay:document.getElementById('pfyReceiptBarangay')?.dataset.current||''
+    },
+    placeholders:{
+      region:'Enter region',
+      province:'Enter province',
+      city:'Enter city',
+      barangay:'Enter barangay'
+    }
+  });
+  window.PrintifyPsgc.bindCascade({
+    source:source,
+    region:'#province',
+    province:'#province',
+    city:'#city',
+    barangay:'#barangay',
+    current:{
+      region:shippingProvince?.dataset.current||'',
+      province:shippingProvince?.dataset.current||'',
+      city:document.getElementById('city')?.dataset.current||'',
+      barangay:document.getElementById('barangay')?.dataset.current||''
+    },
+    placeholders:{
+      region:'Select state / province',
+      province:'Select state / province',
+      city:'Select city / town',
+      barangay:'Select barangay'
+    },
+    onChange:function(){if(typeof syncCheckoutStep==='function')syncCheckoutStep()}
+  });
 })();
 </script>
 

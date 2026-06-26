@@ -56,4 +56,19 @@ class Business extends Model
     {
         return $this->hasMany(Delivery::class);
     }
+
+    public function isSuspended(): bool
+    {
+        return $this->status === self::STATUS_SUSPENDED;
+    }
+
+    public function isDeletedStatus(): bool
+    {
+        return $this->status === self::STATUS_DELETED || $this->trashed();
+    }
+
+    public function blocksAdminClientAccess(): bool
+    {
+        return $this->isSuspended() || $this->isDeletedStatus();
+    }
 }

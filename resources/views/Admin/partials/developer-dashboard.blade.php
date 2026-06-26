@@ -169,7 +169,23 @@
                 @forelse($developer['businessRows'] as $row)
                     <tr>
                         <td><strong>{{ $row['business_name'] }}</strong></td><td>{{ $row['admin_client'] }}</td><td><span class="devx-status {{ $row['status'] }}">{{ $row['status'] }}</span></td><td>{{ number_format($row['customers']) }}</td><td>{{ number_format($row['orders']) }}</td><td>{{ number_format($row['completed']) }}</td><td>{{ number_format($row['cancelled']) }}</td><td>PHP {{ number_format($row['sales'], 2) }}</td><td>PHP {{ number_format($row['revenue'], 2) }}</td><td>{{ number_format($row['payment_issues']) }} Issues</td><td>{{ $row['last_activity'] }}</td>
-                        <td><div class="devx-actions"><a class="devx-action" href="{{ $row['url'] }}">View</a><a class="devx-action" href="{{ $row['orders_url'] }}">Orders</a><a class="devx-action" href="{{ $row['payments_url'] }}">Payments</a><a class="devx-action" href="{{ $row['deliveries_url'] }}">Deliveries</a><a class="devx-action" href="{{ $row['customers_url'] }}">Customers</a><a class="devx-action" href="{{ $row['logs_url'] }}">Logs</a>@if($row['status'] === 'Active')<form method="POST" action="{{ $row['suspend_url'] }}">@csrf @method('PATCH')<button class="devx-action danger" type="submit">Suspend</button></form>@else<form method="POST" action="{{ $row['activate_url'] }}">@csrf @method('PATCH')<button class="devx-action success" type="submit">Activate</button></form>@endif</div></td>
+                        <td>
+                            <div class="devx-actions">
+                                <a class="devx-action" href="{{ $row['url'] }}">View</a><a class="devx-action" href="{{ $row['orders_url'] }}">Orders</a><a class="devx-action" href="{{ $row['payments_url'] }}">Payments</a><a class="devx-action" href="{{ $row['deliveries_url'] }}">Deliveries</a><a class="devx-action" href="{{ $row['customers_url'] }}">Customers</a><a class="devx-action" href="{{ $row['logs_url'] }}">Logs</a>
+                                @if($row['business_activate_url'] && $row['status'] !== 'Active')
+                                    <form method="POST" action="{{ $row['business_activate_url'] }}">@csrf @method('PATCH')<button class="devx-action success" type="submit">Activate</button></form>
+                                @endif
+                                @if($row['business_inactive_url'] && $row['status'] === 'Active')
+                                    <form method="POST" action="{{ $row['business_inactive_url'] }}" onsubmit="return confirm('Mark this business as inactive?');">@csrf @method('PATCH')<button class="devx-action" type="submit">Inactive</button></form>
+                                @endif
+                                @if($row['business_suspend_url'] && $row['status'] !== 'Suspended')
+                                    <form method="POST" action="{{ $row['business_suspend_url'] }}" onsubmit="return confirm('Suspend this business and block admin-client access?');">@csrf @method('PATCH')<button class="devx-action danger" type="submit">Suspend</button></form>
+                                @endif
+                                @if($row['business_delete_url'])
+                                    <form method="POST" action="{{ $row['business_delete_url'] }}" onsubmit="return confirm('Mark this business as deleted?');">@csrf @method('DELETE')<button class="devx-action danger" type="submit">Delete</button></form>
+                                @endif
+                            </div>
+                        </td>
                     </tr>
                 @empty
                     <tr><td colspan="12">No businesses match the selected filters.</td></tr>
