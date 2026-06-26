@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\Auth\AdminPasswordResetLinkController;
 use App\Http\Controllers\Admin\AdminClientInvitationController;
 use App\Http\Controllers\Admin\AdminClientProfileController;
+use App\Http\Controllers\Admin\DeveloperBusinessController;
 use App\Http\Controllers\Admin\DeveloperAdminClientController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\AdminController;
@@ -300,12 +301,14 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
 });
 
 Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026/developer')->name('developer.')->group(function () {
+    Route::get('/dashboard/export', [AdminDashboardController::class, 'export'])->name('dashboard.export');
     Route::get('/orders', [AdminSectionController::class, 'orders'])->name('orders.index');
     Route::get('/services', [AdminSectionController::class, 'services'])->name('services.index');
     Route::get('/customers', [AdminSectionController::class, 'customers'])->name('customers.index');
     Route::get('/reports', [AdminSectionController::class, 'reports'])->name('reports.index');
     Route::get('/analytics', [AdminSectionController::class, 'analytics'])->name('analytics.index');
     Route::get('/settings', [AdminSectionController::class, 'settings'])->name('settings.index');
+    Route::get('/businesses/{business}', [DeveloperBusinessController::class, 'show'])->name('businesses.show');
     Route::get('/admin-clients', [DeveloperAdminClientController::class, 'index'])->name('admin-clients.index');
     Route::post('/admin-clients', [DeveloperAdminClientController::class, 'store'])->name('admin-clients.store');
     Route::get('/admin-clients/{user}', [DeveloperAdminClientController::class, 'show'])->name('admin-clients.show');
