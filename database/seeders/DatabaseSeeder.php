@@ -14,9 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ServiceSeeder::class,
             ServiceVariationSeeder::class,
-            // You can add more seeders here later:
-            // UserSeeder::class,
-            // OrderSeeder::class,
+            DemoReadinessSeeder::class,
         ]);
     }
 }

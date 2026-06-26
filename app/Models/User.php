@@ -51,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'preferences',
         'password',
         'role',               // customer, admin_client, or developer
+        'business_id',
         'admin_client_id',
         'otp_code',           // 6-digit code
         'otp_expires_at',     // Expiration timestamp
@@ -61,6 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'invite_token',
         'invite_expires_at',
         'invitation_accepted_at',
+        'invite_cancelled_at',
         'google2fa_secret',   // Para sa Admin Google Authenticator
         'google2fa_enabled',  // 2FA toggle para sa Admin
         'recovery_codes',     // Backup codes para sa 2FA
@@ -100,9 +102,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'approved_at'       => 'datetime',
         'invite_expires_at'  => 'datetime',
         'invitation_accepted_at' => 'datetime',
+        'invite_cancelled_at' => 'datetime',
         'approved_at'       => 'datetime',
         'invite_expires_at'  => 'datetime',
         'invitation_accepted_at' => 'datetime',
+        'invite_cancelled_at' => 'datetime',
         'password'          => 'hashed',
         'has_set_password'  => 'boolean',
         'google2fa_enabled' => 'boolean',
@@ -208,6 +212,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(self::class, 'admin_client_id');
     }
 
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
+    public function ownedBusiness(): HasOne
+    {
+        return $this->hasOne(Business::class, 'owner_user_id');
+    }
+
     public function assignedCustomers(): HasMany
     {
         return $this->hasMany(self::class, 'admin_client_id')
@@ -232,6 +246,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'customer_id');
+    }
+
+    public function verifiedPayments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'verified_by');
+    }
+
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(Delivery::class, 'customer_id');
     }
 
     /*

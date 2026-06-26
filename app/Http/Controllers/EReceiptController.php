@@ -55,15 +55,18 @@ class EReceiptController extends Controller
             ));
 
             if ($isDefault) {
-                $request->user()->forceFill([
+                $profileData = [
                     'name' => $data['full_name'],
                     'street' => $data['street_address'],
-                    'barangay' => $data['barangay'],
-                    'region' => $data['region'],
-                    'city' => $data['city'],
                     'postal_code' => $data['postal_code'],
                     'company' => $data['receipt_type'] === 'business' ? $data['business_name'] : $request->user()->company,
-                ])->save();
+                    'barangay' => $data['barangay'],
+                    'region' => $data['region'],
+                    'province' => $data['province'],
+                    'city' => $data['city'],
+                ];
+
+                $request->user()->forceFill($profileData)->save();
             }
 
             return $receipt;

@@ -73,6 +73,16 @@ class RoleMiddleware
             ]);
         }
 
+        if ($user->isAdminClient() && $user->business?->blocksAdminClientAccess()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('admin.login')->withErrors([
+                'email' => 'This business workspace is currently suspended. Please contact the developer for access.',
+            ]);
+        }
+
         // 3. Allow access kung match ang role
         return $next($request);
     }

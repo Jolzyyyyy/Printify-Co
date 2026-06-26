@@ -6,11 +6,20 @@
 <x-guest-layout>
     {{-- 1. LAYOUT OVERRIDE (Same as Customer) --}}
     <style>
+        html,
+        body {
+            min-height: 100% !important;
+            margin: 0 !important;
+            background: #f8fafc !important;
+        }
+
         .min-h-screen {
             background-color: #f3f4f6 !important;
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
+            min-height: 100vh !important;
+            height: 100vh !important;
             padding: 0 !important;
         }
         
@@ -18,12 +27,17 @@
 
         .min-h-screen > div:last-child {
             width: 100% !important;
+            min-height: 100vh !important;
+            height: 100vh !important;
             max-width: none !important;
             display: flex !important;
             justify-content: center !important;
             align-items: center !important;
             background-color: transparent !important;
             box-shadow: none !important;
+            margin: 0 !important;
+            padding: 24px !important;
+            overflow: hidden !important;
         }
     </style>
 
@@ -32,28 +46,31 @@
         .auth-container {
             background-color: #fff !important;
             border-radius: 20px !important;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.05) !important;
-            width: 350px !important; /* EXACT SIZE */
-            max-width: 95vw !important;
-            padding: 30px 25px !important; /* EXACT PADDING */
+            box-shadow: 0 24px 70px rgba(15,23,42,0.14), 0 10px 22px rgba(15,23,42,0.06) !important;
+            width: 420px !important;
+            max-width: min(92vw, 420px) !important;
+            padding: 34px 32px 30px !important;
             text-align: center !important;
             box-sizing: border-box !important;
+            border: 1px solid rgba(226,232,240,.9) !important;
         }
 
         .auth-title {
-            font-size: 1.25rem !important; 
-            font-weight: 700 !important;
-            color: #1a202c !important;
-            margin-bottom: 0.5rem !important;
+            font-size: 1.45rem !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            margin-bottom: 0.65rem !important;
             text-transform: none !important;
             letter-spacing: normal !important;
+            line-height: 1.2 !important;
         }
 
         .instruction-text {
             font-size: 13px !important;
-            color: #64748b !important;
-            line-height: 1.5 !important;
-            margin-bottom: 20px !important;
+            color: #475569 !important;
+            line-height: 1.55 !important;
+            margin: 0 auto 22px !important;
+            max-width: 310px !important;
         }
 
         .otp-input {
@@ -62,7 +79,7 @@
             padding: 12px 15px !important;
             border-radius: 8px !important; 
             width: 100% !important;
-            font-size: 22px !important;
+            font-size: 24px !important;
             font-weight: 800 !important;
             letter-spacing: 0.4em !important;
             text-align: center !important;
@@ -70,6 +87,7 @@
             box-sizing: border-box !important;
             outline: none !important;
             margin-bottom: 5px !important;
+            box-shadow: inset 0 0 0 1px rgba(226,232,240,.7) !important;
         }
 
         .auth-btn {
@@ -94,10 +112,10 @@
         .auth-btn:disabled { background-color: #cbd5e1 !important; cursor: not-allowed !important; }
 
         .footer-nav {
-            margin-top: 10px !important;
+            margin-top: 14px !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 2px !important;
+            gap: 6px !important;
         }
 
         .nav-link {
@@ -184,6 +202,11 @@
                 }, 1000);
             }
          }">
+        <noscript>
+            <style>
+                [x-show] { display: none !important; }
+            </style>
+        </noscript>
         
         <h1 class="auth-title">Verify {{ $portalRoleLabel ?? session('admin_role_label', 'Staff') }} Account</h1>
         
@@ -191,11 +214,15 @@
             Please enter the 6-digit security code sent to your email address to continue to your {{ $portalDashboardLabel ?? session('admin_dashboard_label', 'staff dashboard') }}.
         </p>
 
-        <div x-show="otpLocked" class="lockout-info" role="alert">
-            <strong>Verification cooldown active</strong>
-            Too many incorrect codes. Please wait <span x-text="Math.ceil(lockoutTimer / 60)"></span> minute<span x-show="Math.ceil(lockoutTimer / 60) !== 1">s</span>
-            (<span x-text="lockoutTimer"></span>s) before trying again.
-        </div>
+        @if((int) $otpLockoutSeconds > 0)
+            <div class="lockout-info" role="alert" data-lockout-box>
+                <strong>Verification cooldown active</strong>
+                Too many incorrect codes. Please wait
+                <span data-lockout-minutes>{{ (int) ceil($otpLockoutSeconds / 60) }}</span>
+                minute<span data-lockout-minute-label>{{ (int) ceil($otpLockoutSeconds / 60) === 1 ? '' : 's' }}</span>
+                (<span data-lockout-seconds>{{ (int) $otpLockoutSeconds }}</span>s) before trying again.
+            </div>
+        @endif
 
         @if (session('status'))
             <div style="color: #16a34a; font-size: 12px; font-weight: 600; margin-bottom: 10px;">
@@ -217,6 +244,7 @@
                 placeholder="000000"
                 class="otp-input"
                 x-bind:disabled="otpLocked"
+                @disabled((int) $otpLockoutSeconds > 0)
                 required
                 autofocus
             />
@@ -225,7 +253,7 @@
                 <div style="color: #dc2626; font-size: 11px; font-weight: 700; margin-top: 5px;">{{ $message }}</div>
             @enderror
 
-            <button type="submit" class="auth-btn" x-bind:disabled="otpLocked || otp.length !== 6">
+            <button type="submit" class="auth-btn" x-bind:disabled="otpLocked || otp.length !== 6" @disabled((int) $otpLockoutSeconds > 0)>
                 Verify My Account
             </button>
         </form>
@@ -237,13 +265,15 @@
                     @csrf
                     <input type="hidden" name="email" value="{{ session('admin_email') }}">
                     
-                    <button type="submit" x-show="canResend && !otpLocked" class="nav-link resend-link">
-                        Resend Code
-                    </button>
-
-                    <div x-show="!otpLocked && !canResend" class="timer-info">
-                        Resend available in <span x-text="timer" style="color:#4f46e5; font-weight: bold;"></span>s
-                    </div>
+                    @if((int) $otpLockoutSeconds <= 0 && (int) $resendCooldownSeconds <= 0)
+                        <button type="submit" class="nav-link resend-link">
+                            Resend Code
+                        </button>
+                    @elseif((int) $otpLockoutSeconds <= 0)
+                        <div class="timer-info">
+                            Resend available in <span data-resend-seconds style="color:#4f46e5; font-weight: bold;">{{ (int) $resendCooldownSeconds }}</span>s
+                        </div>
+                    @endif
                 </form>
             </div>
 
@@ -259,11 +289,18 @@
         </div>
     </div>
     <style id="staff-otp-blue-wave-bg-final-0624">
+        body {
+            min-height:100vh!important;
+            background:#f8fafc!important;
+            overflow:hidden!important;
+        }
         .min-h-screen {
             background:
                 linear-gradient(151deg, rgba(239, 242, 255, .90) 0 27%, rgba(255, 255, 255, .96) 27.2% 63%, rgba(239, 242, 255, .86) 63.2% 100%),
                 linear-gradient(26deg, transparent 0 72%, rgba(49, 88, 255, .14) 72.2% 74%, transparent 74.2% 100%) !important;
             position:relative!important;
+            min-height:100vh!important;
+            height:100vh!important;
             overflow:hidden!important;
             isolation:isolate!important;
         }
@@ -296,10 +333,63 @@
             background-position:center,left 80px top 270px!important;
             background-repeat:no-repeat!important;
         }
+        .min-h-screen > div:last-child {
+            min-height:100vh!important;
+            height:100vh!important;
+            display:flex!important;
+            align-items:center!important;
+            justify-content:center!important;
+            margin:0!important;
+            padding:24px!important;
+            overflow:hidden!important;
+        }
         .min-h-screen > div:last-child,
         .auth-container {
             position:relative!important;
             z-index:10!important;
         }
+        @media(max-width:640px){
+            .min-h-screen > div:last-child{padding:16px!important}
+            .auth-container{width:100%!important;max-width:390px!important;padding:28px 22px 24px!important}
+            .auth-title{font-size:1.25rem!important}
+            .otp-input{font-size:22px!important;letter-spacing:.32em!important}
+        }
     </style>
+    <script>
+        (function(){
+            var lockoutSeconds = Number(document.querySelector('[data-lockout-seconds]')?.textContent || 0);
+            var resendSeconds = Number(document.querySelector('[data-resend-seconds]')?.textContent || 0);
+            var lockoutBox = document.querySelector('[data-lockout-box]');
+            var lockoutSecondsEl = document.querySelector('[data-lockout-seconds]');
+            var lockoutMinutesEl = document.querySelector('[data-lockout-minutes]');
+            var lockoutMinuteLabelEl = document.querySelector('[data-lockout-minute-label]');
+            var resendSecondsEl = document.querySelector('[data-resend-seconds]');
+
+            if (lockoutSeconds > 0 && lockoutSecondsEl) {
+                var lockoutInterval = window.setInterval(function(){
+                    lockoutSeconds -= 1;
+                    var minutes = Math.ceil(Math.max(lockoutSeconds, 0) / 60);
+                    lockoutSecondsEl.textContent = String(Math.max(lockoutSeconds, 0));
+                    if (lockoutMinutesEl) lockoutMinutesEl.textContent = String(minutes);
+                    if (lockoutMinuteLabelEl) lockoutMinuteLabelEl.textContent = minutes === 1 ? '' : 's';
+                    if (lockoutSeconds <= 0) {
+                        window.clearInterval(lockoutInterval);
+                        if (lockoutBox) lockoutBox.style.display = 'none';
+                        window.location.reload();
+                    }
+                }, 1000);
+            }
+
+            if (resendSeconds > 0 && resendSecondsEl) {
+                var resendInterval = window.setInterval(function(){
+                    resendSeconds -= 1;
+                    resendSecondsEl.textContent = String(Math.max(resendSeconds, 0));
+                    if (resendSeconds <= 0) {
+                        window.clearInterval(resendInterval);
+                        window.location.reload();
+                    }
+                }, 1000);
+            }
+        })();
+    </script>
 </x-guest-layout>

@@ -12,9 +12,11 @@ class AuditLog extends Model
     protected $fillable = [
         'actor_id',
         'target_user_id',
+        'business_id',
         'auditable_type',
         'auditable_id',
         'action',
+        'module',
         'old_values',
         'new_values',
         'ip_address',
@@ -36,6 +38,11 @@ class AuditLog extends Model
         return $this->belongsTo(User::class, 'target_user_id');
     }
 
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
     public function auditable(): MorphTo
     {
         return $this->morphTo();
@@ -55,6 +62,7 @@ class AuditLog extends Model
         return self::create([
             'actor_id' => $actor?->id,
             'target_user_id' => $targetUser?->id,
+            'business_id' => $actor?->business_id ?? $targetUser?->business_id ?? null,
             'auditable_type' => $auditable ? $auditable::class : null,
             'auditable_id' => $auditable?->getKey(),
             'action' => $action,

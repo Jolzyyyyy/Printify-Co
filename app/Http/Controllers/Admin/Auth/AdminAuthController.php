@@ -256,6 +256,8 @@ class AdminAuthController extends Controller
     private function sendStaffOtp(Request $request, User $user, string $status, $redirect = null)
     {
         $otp = sprintf('%06d', mt_rand(100000, 999999));
+        $otpThrottleKey = $this->staffOtpThrottleKeyFromContext((string) $user->email, $request->ip());
+        $resendThrottleKey = $this->staffOtpResendThrottleKeyFromContext((string) $user->email, $request->ip());
 
         $user->forceFill([
             'otp_code' => $otp,
@@ -264,7 +266,7 @@ class AdminAuthController extends Controller
 
         try {
             Mail::to($user->email)->send(new OTPVerificationMail($otp));
-            RateLimiter::hit($this->staffOtpResendThrottleKey($request), User::EMAIL_OTP_RESEND_COOLDOWN_SECONDS);
+            RateLimiter::hit($resendThrottleKey, User::EMAIL_OTP_RESEND_COOLDOWN_SECONDS);
         } catch (\Throwable $e) {
             Log::error('Staff OTP send failed for ' . $user->email . ': ' . $e->getMessage());
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\Business;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
@@ -127,6 +128,7 @@ class DeveloperAdminClientController extends Controller
                 'approved_by' => null,
                 'invite_token' => hash('sha256', $plainToken),
                 'invite_expires_at' => now()->addDays(7),
+                'invite_cancelled_at' => null,
             ]);
 
             AuditLog::record(
@@ -143,6 +145,22 @@ class DeveloperAdminClientController extends Controller
                 ],
                 $request
             );
+            AuditLog::create([
+                'actor_id' => $request->user()->id,
+                'target_user_id' => $user->id,
+                'business_id' => $user->business_id,
+                'auditable_type' => User::class,
+                'auditable_id' => $user->id,
+                'action' => 'admin_client_invitation_sent',
+                'module' => 'invitation',
+                'old_values' => null,
+                'new_values' => [
+                    'email' => $user->email,
+                    'invite_expires_at' => optional($user->invite_expires_at)->toDateTimeString(),
+                ],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
 
             return $user;
         });
@@ -187,15 +205,26 @@ class DeveloperAdminClientController extends Controller
             'approved_by' => $request->user()->id,
         ])->save();
 
-        AuditLog::record(
-            'admin_client_approved',
-            $request->user(),
-            $user,
-            $user,
-            $oldValues,
-            $user->only(['role', 'approved_at', 'approved_by']),
-            $request
-        );
+        $this->ensureBusinessForAdminClient($user);
+
+        $wasSuspended = AuditLog::query()
+            ->where('target_user_id', $user->id)
+            ->where('action', 'admin_client_suspended')
+            ->exists();
+
+        AuditLog::create([
+            'actor_id' => $request->user()->id,
+            'target_user_id' => $user->id,
+            'business_id' => $user->business_id,
+            'auditable_type' => User::class,
+            'auditable_id' => $user->id,
+            'action' => $wasSuspended ? 'admin_client_restored' : 'admin_client_approved',
+            'module' => 'admin_client',
+            'old_values' => $oldValues,
+            'new_values' => $user->only(['role', 'approved_at', 'approved_by']),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         return redirect()
             ->route('developer.admin-clients.index')
@@ -220,15 +249,19 @@ class DeveloperAdminClientController extends Controller
             'recovery_codes' => null,
         ])->save();
 
-        AuditLog::record(
-            'admin_client_suspended',
-            request()->user(),
-            $user,
-            $user,
-            $oldValues,
-            $user->only(['approved_at', 'approved_by', 'google2fa_enabled']),
-            request()
-        );
+        AuditLog::create([
+            'actor_id' => request()->user()->id,
+            'target_user_id' => $user->id,
+            'business_id' => $user->business_id,
+            'auditable_type' => User::class,
+            'auditable_id' => $user->id,
+            'action' => 'admin_client_suspended',
+            'module' => 'admin_client',
+            'old_values' => $oldValues,
+            'new_values' => $user->only(['approved_at', 'approved_by', 'google2fa_enabled']),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
 
         return redirect()
             ->route('developer.admin-clients.index')
@@ -257,16 +290,23 @@ class DeveloperAdminClientController extends Controller
 
         $oldValues = [
             'admin_client_id' => $customer->admin_client_id,
+            'business_id' => $customer->business_id,
         ];
 
         DB::transaction(function () use ($request, $user, $customer, $oldValues) {
+            $business = $this->ensureBusinessForAdminClient($user);
+
             $customer->forceFill([
                 'admin_client_id' => $user->id,
+                'business_id' => $business->id,
             ])->save();
 
             Order::query()
                 ->where('user_id', $customer->id)
-                ->update(['admin_client_id' => $user->id]);
+                ->update([
+                    'admin_client_id' => $user->id,
+                    'business_id' => $business->id,
+                ]);
 
             AuditLog::record(
                 'customer_assigned_to_admin_client',
@@ -276,6 +316,7 @@ class DeveloperAdminClientController extends Controller
                 $oldValues,
                 [
                     'admin_client_id' => $user->id,
+                    'business_id' => $business->id,
                     'admin_client_email' => $user->email,
                     'customer_email' => $customer->email,
                 ],
@@ -286,5 +327,46 @@ class DeveloperAdminClientController extends Controller
         return redirect()
             ->route('developer.admin-clients.index')
             ->with('success', 'Customer account assigned to admin client successfully.');
+    }
+
+    private function ensureBusinessForAdminClient(User $user): Business
+    {
+        if ($user->business_id && $user->business) {
+            return $user->business;
+        }
+
+        $user->loadMissing('adminClientProfile');
+        $businessName = $user->adminClientProfile?->business_name
+            ?: ($user->company ?: $user->name ?: 'Business ' . $user->id);
+
+        $business = Business::firstOrCreate(
+            ['owner_user_id' => $user->id],
+            [
+                'name' => $businessName,
+                'slug' => $this->uniqueBusinessSlug($businessName, $user->id),
+                'status' => $user->approved_at ? Business::STATUS_ACTIVE : Business::STATUS_INACTIVE,
+                'email' => $user->email,
+                'contact_number' => $user->adminClientProfile?->contact_number ?? $user->phone,
+                'address' => $user->adminClientProfile?->business_address,
+            ]
+        );
+
+        $user->forceFill(['business_id' => $business->id])->save();
+
+        return $business;
+    }
+
+    private function uniqueBusinessSlug(string $name, int $adminClientId): string
+    {
+        $base = Str::slug($name) ?: 'business-' . $adminClientId;
+        $slug = $base;
+        $counter = 2;
+
+        while (Business::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }
