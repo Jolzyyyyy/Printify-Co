@@ -599,8 +599,8 @@ html{scroll-behavior:smooth}
 <section id="checkout" class="section checkout-section" data-section-id="checkout" data-page="checkout" data-location-source="data/ph-locations.json">
 <main class="pfy-page">
   <div class="pfy-breadcrumb">
-    <a href="/" onclick="jumpTo('home');return false;">Home</a><i class="fa-solid fa-chevron-right"></i>
-    <a href="/services" onclick="jumpTo('products');return false;">Services</a>
+    <a href="{{ route('home') }}">Home</a><i class="fa-solid fa-chevron-right"></i>
+    <a href="{{ route('services.index') }}">Services</a>
     <span id="checkoutCategoryCrumbWrap" hidden><i class="fa-solid fa-chevron-right"></i><span id="checkoutCategoryCrumb">Selected Service</span></span>
     <span id="checkoutServiceCrumbWrap" hidden><i class="fa-solid fa-chevron-right"></i><span id="checkoutServiceCrumb">Service Option</span></span>
     <i class="fa-solid fa-chevron-right"></i><strong>Checkout</strong>
@@ -615,7 +615,7 @@ html{scroll-behavior:smooth}
     <h2><i class="fa-solid fa-circle-check" style="color:#16a34a"></i> Payment successful!</h2>
     <p>Your order reference is <strong id="successRef">PFY-ORDER</strong>. Your payment was completed and your order is confirmed.</p>
     <div class="pfy-success-actions">
-      <a href="/services" onclick="jumpTo('products');return false;">Back to Services</a>
+      <a href="{{ route('services.index') }}">Back to Services</a>
       <button type="button" onclick="window.print()">Print Confirmation</button>
     </div>
   </section>
@@ -651,17 +651,48 @@ html{scroll-behavior:smooth}
         <section class="pfy-card pfy-card-shipping">
           <div class="pfy-card-head">
             <div class="pfy-card-title"><span class="pfy-card-icon"><i class="fa-solid fa-location-dot"></i></span><div><h2>Shipping Address</h2><p>Where should we deliver your order?</p></div></div>
-            <label class="pfy-section-control"><input type="checkbox" id="differentAddress">Ship to a different address</label>
           </div>
           <div class="pfy-card-body">
+            <div class="pfy-address-book" id="pfyShippingAddressBook">
+              <button class="pfy-address-add" type="button" id="pfyAddressAddBtn" aria-haspopup="dialog" aria-controls="pfyAddressBookModal"><span><i class="fa-solid fa-plus"></i><b>Add address</b></span><i class="fa-solid fa-chevron-right"></i></button>
+              <div class="pfy-address-list" id="pfyAddressBookList" aria-live="polite"></div>
+              <p class="pfy-address-book-hint">Choose a saved address or edit the fields below. Shipping address stays editable even after successful payment.</p>
+            </div>
+            <div class="pfy-address-book-modal" id="pfyAddressBookModal" role="dialog" aria-modal="true" aria-labelledby="pfyAddressBookModalTitle" hidden>
+              <form class="pfy-address-book-dialog" id="pfyAddressBookForm" novalidate>
+                <header class="pfy-address-book-modal-head">
+                  <h3 id="pfyAddressBookModalTitle">Add address</h3>
+                  <button type="button" class="pfy-address-book-close" id="pfyAddressBookClose" aria-label="Close address editor"><i class="fa-solid fa-xmark"></i></button>
+                </header>
+                <div class="pfy-address-book-modal-body">
+                  <input type="hidden" id="pfyAddressBookId">
+                  <div class="pfy-address-book-field full"><label for="pfyAddressBookName">Full Name</label><input type="text" id="pfyAddressBookName" placeholder="Full Name" required></div>
+                  <div class="pfy-address-book-field full"><label for="pfyAddressBookPhone">Phone Number</label><input type="tel" id="pfyAddressBookPhone" placeholder="Phone Number"></div>
+                  <div class="pfy-address-book-field full"><label for="pfyAddressBookStreet">Street Address</label><input type="text" id="pfyAddressBookStreet" placeholder="Street Address" required></div>
+                  <div class="pfy-address-book-field full"><label for="pfyAddressBookApartment">Apartment, suite, etc. (optional)</label><input type="text" id="pfyAddressBookApartment" placeholder="Apartment, suite, etc. (optional)"></div>
+                  <div class="pfy-address-book-field"><label for="pfyAddressBookProvince">State / Province</label><input type="text" id="pfyAddressBookProvince" placeholder="State / Province" required></div>
+                  <div class="pfy-address-book-field"><label for="pfyAddressBookCity">City / Town</label><input type="text" id="pfyAddressBookCity" placeholder="City / Town" required></div>
+                  <div class="pfy-address-book-field"><label for="pfyAddressBookBarangay">Barangay</label><input type="text" id="pfyAddressBookBarangay" placeholder="Barangay" required></div>
+                  <div class="pfy-address-book-field"><label for="pfyAddressBookPostal">Postal Code</label><input type="text" id="pfyAddressBookPostal" placeholder="Postal Code"></div>
+                  <div class="pfy-address-book-field full"><label for="pfyAddressBookCountry">Country</label><input type="text" id="pfyAddressBookCountry" placeholder="Country" value="Philippines" required></div>
+                  <label class="pfy-address-book-default"><span>Set as default shipping address</span><input type="checkbox" id="pfyAddressBookDefault"></label>
+                </div>
+                <footer class="pfy-address-book-modal-actions">
+                  <button type="button" class="pfy-address-book-delete" id="pfyAddressBookDelete" hidden>Delete</button>
+                  <span></span>
+                  <button type="button" class="pfy-address-book-cancel" id="pfyAddressBookCancel">Cancel</button>
+                  <button type="submit" class="pfy-address-book-save">Save address</button>
+                </footer>
+              </form>
+            </div>
             <div class="pfy-field-grid two pfy-apartment-barangay-row">
               <div class="pfy-field full"><label for="street">Street Address</label><input type="text" id="street" placeholder="Street Address" value="{{ old('street', '') }}" autocomplete="street-address" required></div>
               <div class="pfy-field pfy-field-apartment"><label for="apartment">Apartment, suite, etc. (optional)</label><input type="text" id="apartment" placeholder="Apartment, suite, etc. (optional)" value="{{ old('apartment', '') }}"></div>
-              <div class="pfy-field pfy-field-barangay"><label for="barangay">Barangay</label><select id="barangay" data-current="{{ old('barangay', Auth::check() ? Auth::user()->barangay : '') }}" required disabled><option value="">Select barangay</option></select></div>
+              <div class="pfy-field pfy-field-barangay"><label for="barangay">Barangay</label><select id="barangay" data-current="{{ old('barangay', '') }}" required disabled><option value="">Select barangay</option></select></div>
             </div>
             <div class="pfy-field-grid four">
-              <div class="pfy-field"><label for="province">State / Province</label><select id="province" data-current="{{ old('province', Auth::check() ? Auth::user()->region : '') }}" required><option value="">Select state / province</option></select></div>
-              <div class="pfy-field"><label for="city">City / Town</label><select id="city" data-current="{{ old('city', Auth::check() ? Auth::user()->city : '') }}" required disabled><option value="">Select city / town</option></select></div>
+              <div class="pfy-field"><label for="province">State / Province</label><select id="province" data-current="{{ old('province', '') }}" required><option value="">Select state / province</option></select></div>
+              <div class="pfy-field"><label for="city">City / Town</label><select id="city" data-current="{{ old('city', '') }}" required disabled><option value="">Select city / town</option></select></div>
               <div class="pfy-field"><label for="postal">Postal Code</label><input type="text" id="postal" placeholder="Postal Code" value="{{ old('postal', '') }}" required></div>
               <div class="pfy-field"><label for="country">Country</label><select id="country"><option value="Philippines" selected>Philippines</option></select></div>
             </div>
@@ -938,9 +969,9 @@ function safeJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)|
 function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
 function hydrateStoredCheckout(){if(!serverCheckoutDetails||typeof serverCheckoutDetails!=="object")return;const customer=serverCheckoutDetails.customer||{};const address=serverCheckoutDetails.shippingAddress||{};const values={firstName:customer.firstName,lastName:customer.lastName,email:customer.email,phone:customer.phone,street:address.street,apartment:address.apartment,postal:address.postal,country:address.country,notes:serverCheckoutDetails.notes};Object.entries(values).forEach(function(entry){const input=document.getElementById(entry[0]);if(input&&entry[1]!=null&&String(entry[1]).trim()!=="")input.value=entry[1]});[["province",address.province],["city",address.city],["barangay",address.barangay]].forEach(function(entry){const input=document.getElementById(entry[0]);if(input&&entry[1])input.dataset.current=entry[1]})}
 function checkoutReturnStatus(){return (new URLSearchParams(window.location.search).get("payment")||"").toLowerCase()}
-function saveCheckoutFormDraft(){const value=function(id){return document.getElementById(id)?.value||""};saveJson("printifyCheckoutFormDraft",{firstName:value("firstName"),lastName:value("lastName"),email:value("email"),phone:value("phone"),street:value("street"),apartment:value("apartment"),province:value("province"),city:value("city"),barangay:value("barangay"),postal:value("postal"),country:value("country"),notes:value("notes"),differentAddress:Boolean(document.getElementById("differentAddress")?.checked),payment:selectedPayment()})}
+function saveCheckoutFormDraft(){const value=function(id){return document.getElementById(id)?.value||""};saveJson("printifyCheckoutFormDraft",{firstName:value("firstName"),lastName:value("lastName"),email:value("email"),phone:value("phone"),street:value("street"),apartment:value("apartment"),province:value("province"),city:value("city"),barangay:value("barangay"),postal:value("postal"),country:value("country"),notes:value("notes"),payment:selectedPayment()})}
 function restoreCascadingAddress(source){if(!source||typeof source!=="object")return;const province=document.getElementById("province"),city=document.getElementById("city"),barangay=document.getElementById("barangay");if(province&&source.province){province.dataset.current=source.province;province.value=source.province;province.dispatchEvent(new Event("change",{bubbles:true}))}if(city&&source.city){city.dataset.current=source.city;city.value=source.city;city.dispatchEvent(new Event("change",{bubbles:true}))}if(barangay&&source.barangay){barangay.dataset.current=source.barangay;barangay.value=source.barangay;barangay.dispatchEvent(new Event("change",{bubbles:true}))}}
-function hydrateCheckoutReturnDraft(){const status=checkoutReturnStatus();const storedAddress=serverCheckoutDetails&&serverCheckoutDetails.shippingAddress||{};restoreCascadingAddress(storedAddress);if(status!=="success"&&status!=="cancel")return;const draft=safeJson("printifyCheckoutFormDraft","{}");if(!draft||typeof draft!=="object")return;["firstName","lastName","email","phone","street","apartment","postal","country","notes"].forEach(function(id){const field=document.getElementById(id);if(field&&draft[id]!=null)field.value=draft[id]});restoreCascadingAddress(draft);const different=document.getElementById("differentAddress");if(different)different.checked=Boolean(draft.differentAddress);if(draft.payment){const payment=document.querySelector('input[name="payment"][value="'+String(draft.payment)+'"]');if(payment)payment.checked=true}}
+function hydrateCheckoutReturnDraft(){const status=checkoutReturnStatus();const storedAddress=serverCheckoutDetails&&serverCheckoutDetails.shippingAddress||{};restoreCascadingAddress(storedAddress);if(status!=="success"&&status!=="cancel")return;const draft=safeJson("printifyCheckoutFormDraft","{}");if(!draft||typeof draft!=="object")return;["firstName","lastName","email","phone","street","apartment","postal","country","notes"].forEach(function(id){const field=document.getElementById(id);if(field&&draft[id]!=null)field.value=draft[id]});restoreCascadingAddress(draft);if(draft.payment){const payment=document.querySelector('input[name="payment"][value="'+String(draft.payment)+'"]');if(payment)payment.checked=true}}
 function peso(value){return "₱"+Number(value||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}
 function money(value){return Number(value||0).toFixed(2)}
 function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]})}
@@ -949,7 +980,8 @@ function showToast(message,type){if(!els.toast)return;els.toast.textContent=mess
 function makeOrderReference(){return "PFY-"+new Date().getFullYear()+"-"+Date.now().toString(36).toUpperCase().slice(-6)+"-"+Math.random().toString(36).slice(2,5).toUpperCase()}
 function sourceItems(){const checkoutItems=safeJson("printifyCheckoutItems","[]");const active=safeJson("printifyActiveCheckout","null");const cartItems=safeJson("printifyCartItems","[]");const oldCartItems=safeJson("cartItems","[]");if(Array.isArray(checkoutItems)&&checkoutItems.length)return checkoutItems;if(active&&typeof active==="object")return [active];if(Array.isArray(cartItems)&&cartItems.length)return cartItems;if(Array.isArray(oldCartItems)&&oldCartItems.length)return oldCartItems;return []}
 function firstMeta(item){if(Array.isArray(item.meta))return item.meta;const meta=[];if(item.category)meta.push(item.category);if(item.paperSize||item.colorVariation)meta.push([item.paperSize,item.colorVariation].filter(Boolean).join(" - "));if(item.serviceOption)meta.push(item.serviceOption);if(item.fileName)meta.push("File: "+item.fileName);return meta.filter(Boolean)}
-function normalizeCheckoutItem(item,index){const raw=item&&typeof item==="object"?item:{};const qty=Math.max(1,parseInt(raw.qty||raw.quantity||1,10)||1);const lineTotal=normalizeNumber(raw.total||raw.lineTotal||raw.amountTotal);const rawPrice=normalizeNumber(raw.price||raw.unitPrice||raw.unit_price||raw.amount);const price=rawPrice||(lineTotal&&qty?lineTotal/qty:0);const name=raw.name||raw.serviceName||raw.title||raw.summaryTitle||"Print Item";const meta=firstMeta(raw);const image=raw.image||raw.img||raw.thumbnail||raw.previewImage||"";return {id:String(raw.id||"checkout-item-"+index),name:String(name),qty:qty,price:Number(money(price)),lineTotal:Number(money(lineTotal||price*qty)),image:image,meta:meta,raw:raw,fileName:raw.fileName||((raw.fileMeta&&raw.fileMeta.name)||"")}}
+function normalizeImagePath(value){return value?String(value):""}
+function normalizeCheckoutItem(item,index){const raw=item&&typeof item==="object"?item:{};const nested=raw.raw&&typeof raw.raw==="object"?raw.raw:{};const qty=Math.max(1,parseInt(raw.qty||raw.quantity||nested.qty||nested.quantity||1,10)||1);const lineTotal=normalizeNumber(raw.total||raw.lineTotal||raw.amountTotal||nested.total||nested.lineTotal);const rawPrice=normalizeNumber(raw.price||raw.unitPrice||raw.unit_price||raw.amount||nested.price||nested.unitPrice);const price=rawPrice||(lineTotal&&qty?lineTotal/qty:0);const name=raw.name||raw.serviceName||raw.title||raw.summaryTitle||nested.serviceName||nested.name||"Print Item";const meta=firstMeta(Object.assign({},nested,raw));const image=normalizeImagePath(raw.image_path||raw.image||raw.img||raw.thumbnail||raw.previewImage||nested.image_path||nested.image||nested.previewImage||"");return {id:String(raw.id||nested.id||"checkout-item-"+index),name:String(name),qty:qty,price:Number(money(price)),lineTotal:Number(money(lineTotal||price*qty)),image:image,meta:meta,raw:raw,fileName:raw.fileName||((raw.fileMeta&&raw.fileMeta.name)||nested.fileName||"")}}
 function loadItems(){state.items=sourceItems().map(normalizeCheckoutItem).filter(function(item){return item.name&&item.qty>0})}
 function itemCount(){return state.items.reduce(function(sum,item){return sum+item.qty},0)}
 function syncFullName(){const first=(document.getElementById("firstName")?.value||"").trim();const last=(document.getElementById("lastName")?.value||"").trim();const full=document.getElementById("fullName");if(full)full.value=[first,last].filter(Boolean).join(" ").trim()}
@@ -958,7 +990,7 @@ function selectedPayment(){const checked=document.querySelector('input[name="pay
 function calculateTotals(){const subtotal=state.items.reduce(function(sum,item){return sum+item.lineTotal},0);const code=state.promoCode.toUpperCase();let discount=0;if(code==="SAVE10"||code==="DISCOUNT10")discount=subtotal*.10;if(code==="PRINTIFY50")discount=50;discount=Math.min(discount,subtotal);const shipping=selectedShipping().cost;const total=subtotal-discount+shipping;state.totals={subtotal:subtotal,discount:discount,shipping:shipping,tax:0,total:total}}
 function imageMarkup(item){if(item.image)return '<img class="pfy-order-img" src="'+escapeHtml(item.image)+'" alt="'+escapeHtml(item.name)+'">';return '<div class="pfy-order-placeholder"><i class="fa-regular fa-file-lines"></i></div>'}
 function renderItems(){const placeOrderButton=document.getElementById("placeOrderBtn");if(!state.items.length){if(els.emptyState)els.emptyState.style.display="block";if(els.orderContent)els.orderContent.style.display="none";if(placeOrderButton)placeOrderButton.disabled=true;return}if(els.emptyState)els.emptyState.style.display="none";if(els.orderContent)els.orderContent.style.display="block";if(!els.orderItems)return;els.orderItems.innerHTML=state.items.map(function(item){const meta=item.meta.slice(0,4).map(function(line){return '<p>'+escapeHtml(line)+'</p>'}).join("");return '<article class="pfy-order-item">'+imageMarkup(item)+'<div class="pfy-order-info"><h4>'+escapeHtml(item.name)+'</h4><p>Quantity: '+item.qty+' pcs</p>'+meta+'</div><div class="pfy-order-price">'+peso(item.lineTotal)+'</div></article>'}).join("")}
-function renderCheckoutBreadcrumb(){const first=state.items[0]||{};const raw=first.raw&&typeof first.raw==="object"?first.raw:{};const category=raw.categoryTitle||raw.category||first.category||(Array.isArray(first.meta)?first.meta[0]:"");const service=raw.serviceName||raw.title||first.name||"";const serviceKey=raw.serviceKey||raw.slug||first.serviceKey||"text-only";if(els.categoryCrumb&&els.categoryCrumbWrap){els.categoryCrumb.textContent=category||"Selected Service";els.categoryCrumbWrap.hidden=!category;els.categoryCrumb.style.cursor="pointer";els.categoryCrumb.onclick=function(){if(typeof jumpTo==="function")jumpTo("products",{updateUrl:true});else window.location.href="/services"}}if(els.serviceCrumb&&els.serviceCrumbWrap){els.serviceCrumb.textContent=service||"Service Option";els.serviceCrumbWrap.hidden=!service;els.serviceCrumb.style.cursor="pointer";els.serviceCrumb.onclick=function(){if(typeof window.openPrintifyServiceDetail==="function")window.openPrintifyServiceDetail(serviceKey,true);else window.location.href="/service-details?service="+encodeURIComponent(serviceKey)}}}
+function renderCheckoutBreadcrumb(){const first=state.items[0]||{};const raw=first.raw&&typeof first.raw==="object"?first.raw:{};const category=raw.categoryTitle||raw.category||first.category||(Array.isArray(first.meta)?first.meta[0]:"");const service=raw.serviceName||raw.title||first.name||"";const serviceKey=raw.serviceKey||raw.slug||first.serviceKey||"text-only";const bindNav=function(node,url){node.style.cursor="pointer";node.setAttribute("role","link");node.setAttribute("tabindex","0");node.onclick=function(){window.location.href=url};node.onkeydown=function(event){if(event.key==="Enter"||event.key===" "){event.preventDefault();window.location.href=url}}};if(els.categoryCrumb&&els.categoryCrumbWrap){els.categoryCrumb.textContent=category||"Selected Service";els.categoryCrumbWrap.hidden=!category;bindNav(els.categoryCrumb,"/services")}if(els.serviceCrumb&&els.serviceCrumbWrap){els.serviceCrumb.textContent=service||"Service Option";els.serviceCrumbWrap.hidden=!service;bindNav(els.serviceCrumb,"/service-details?service="+encodeURIComponent(serviceKey))}}
 function renderTotals(){calculateTotals();const count=itemCount();if(els.summaryItemCount)els.summaryItemCount.textContent=count+" "+(count===1?"Item":"Items");if(els.subtotal)els.subtotal.textContent=peso(state.totals.subtotal);if(els.discount)els.discount.textContent="-"+peso(state.totals.discount);if(els.shippingCost)els.shippingCost.textContent=state.totals.shipping===0?"₱0.00":peso(state.totals.shipping);if(els.shippingLabel)els.shippingLabel.textContent="Shipping ("+selectedShipping().name+")";if(els.total)els.total.textContent=peso(state.totals.total)}
 function updateStep(step){document.querySelectorAll(".pfy-step").forEach(function(node){const current=Number(node.dataset.step);node.classList.toggle("is-active",current===step);node.classList.toggle("is-done",current<step)})}
 function hasValues(ids){return ids.every(function(id){const input=document.getElementById(id);return input&&input.value.trim()})}
@@ -971,10 +1003,10 @@ function updateRadioCards(){document.querySelectorAll("[data-radio-wrap]").forEa
 function syncPickupAddressState(){const pickup=selectedShipping().type==="pickup";["street","barangay","city","province","postal"].forEach(function(id){const input=document.getElementById(id);if(input)input.required=!pickup})}
 function validateCustomerInfo(){syncFullName();for(const id of ["firstName","lastName","email","phone","street","barangay","city","province","postal"]){const input=document.getElementById(id);if(input&&!input.value.trim()){input.focus();showToast("Please complete all customer and address information first.","error");return false}}if(!state.items.length){showToast("Checkout is empty. Please add a service first.","error");return false}return true}
 function validateDelivery(){if(!selectedShipping().type){showToast("Please select a delivery method.","error");return false}return true}
-function buildCompletedOrder(){syncFullName();return {reference:makeOrderReference(),items:state.items.map(function(item){return item.raw&&Object.keys(item.raw).length?item.raw:item}),totals:state.totals,customer:{fullName:document.getElementById("fullName").value.trim(),firstName:document.getElementById("firstName").value.trim(),lastName:document.getElementById("lastName").value.trim(),email:document.getElementById("email").value.trim(),phone:document.getElementById("phone").value.trim()},shippingAddress:{street:document.getElementById("street").value.trim(),apartment:document.getElementById("apartment").value.trim(),barangay:document.getElementById("barangay").value.trim(),city:document.getElementById("city").value.trim(),province:document.getElementById("province").value.trim(),postal:document.getElementById("postal").value.trim(),country:document.getElementById("country").value},delivery:selectedShipping(),payment:selectedPayment(),notes:els.notes?els.notes.value.trim():"",promoCode:state.promoCode,createdAt:new Date().toISOString(),status:"placed"}}
+function buildCompletedOrder(){syncFullName();return {reference:makeOrderReference(),items:state.items.map(function(item){const raw=item.raw&&typeof item.raw==="object"?Object.assign({},item.raw):{};const image=raw.image_path||raw.image||item.image||"";return Object.assign({},raw,{name:raw.name||item.name,serviceName:raw.serviceName||item.name,qty:item.qty,quantity:item.qty,unitPrice:item.price,price:item.price,lineTotal:item.lineTotal,total:item.lineTotal,image:image,image_path:image,previewImage:raw.previewImage||image,fileName:item.fileName||raw.fileName||null,meta:Array.isArray(item.meta)?item.meta:(raw.meta||[])})}),totals:state.totals,customer:{fullName:document.getElementById("fullName").value.trim(),firstName:document.getElementById("firstName").value.trim(),lastName:document.getElementById("lastName").value.trim(),email:document.getElementById("email").value.trim(),phone:document.getElementById("phone").value.trim()},shippingAddress:{street:document.getElementById("street").value.trim(),apartment:document.getElementById("apartment").value.trim(),barangay:document.getElementById("barangay").value.trim(),city:document.getElementById("city").value.trim(),province:document.getElementById("province").value.trim(),postal:document.getElementById("postal").value.trim(),country:document.getElementById("country").value},delivery:selectedShipping(),payment:selectedPayment(),notes:els.notes?els.notes.value.trim():"",promoCode:state.promoCode,createdAt:new Date().toISOString(),status:state.paymentVerified?"paid":"pending_payment"}}
 function csrfToken(){const meta=document.querySelector('meta[name="csrf-token"]');return meta?meta.getAttribute("content"):""}
 function numericId(value){const parsed=parseInt(String(value??"").replace(/[^0-9-]/g,""),10);return Number.isFinite(parsed)?parsed:0}
-function checkoutPayloadItems(){return state.items.map(function(item,index){const raw=item.raw&&typeof item.raw==="object"?item.raw:{};const rawServiceId=raw.service_id||"";const rawVariationId=raw.variation_id||"";const unitPrice=item.qty?item.lineTotal/item.qty:item.price;return{id:item.id||("checkout-item-"+index),name:item.name,qty:item.qty,unit_price:Number(money(unitPrice)),price:Number(money(unitPrice)),service_code:raw.serviceId||raw.service_item_id||item.id,service_id:/^\d+$/.test(String(rawServiceId))?Number(rawServiceId):0,variation_id:/^\d+$/.test(String(rawVariationId))?Number(rawVariationId):0,service_item_id:raw.service_item_id||raw.serviceItemId||raw.serviceId||item.id,category:raw.categoryTitle||raw.category||"Printing Service",variation_label:[raw.paperSize,raw.colorVariation,raw.serviceOption].filter(Boolean).join(" / "),unit:raw.unit||"piece",image_path:raw.image_path||raw.image||item.image||"",price_type:String(raw.priceMode||raw.price_type||"retail").toLowerCase()==="bulk"?"bulk":"retail"}})}
+function checkoutPayloadItems(){return state.items.map(function(item,index){const raw=item.raw&&typeof item.raw==="object"?item.raw:{};const rawServiceId=raw.service_id||"";const rawVariationId=raw.variation_id||"";const unitPrice=item.qty?item.lineTotal/item.qty:item.price;const image=raw.image_path||raw.image||raw.previewImage||item.image||"";return{id:item.id||("checkout-item-"+index),name:item.name,qty:item.qty,unit_price:Number(money(unitPrice)),price:Number(money(unitPrice)),service_code:raw.serviceId||raw.service_item_id||item.id,service_id:/^\d+$/.test(String(rawServiceId))?Number(rawServiceId):0,variation_id:/^\d+$/.test(String(rawVariationId))?Number(rawVariationId):0,service_item_id:raw.service_item_id||raw.serviceItemId||raw.serviceId||item.id,category:raw.categoryTitle||raw.category||"Printing Service",variation_label:[raw.paperSize,raw.colorVariation,raw.serviceOption].filter(Boolean).join(" / "),unit:raw.unit||"piece",image_path:image,price_type:String(raw.priceMode||raw.price_type||"retail").toLowerCase()==="bulk"?"bulk":"retail"}})}
 async function syncCheckoutSession(){if(typeof fetch!=="function")return;const response=await fetch("{{ route('cart.sync') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({items:checkoutPayloadItems()})});if(!response.ok){const body=await response.text();throw new Error(body||"Unable to prepare checkout session.")}}
 async function startPaymentCheckout(order){const response=await fetch("{{ route('payment.start') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({payment_method:selectedPayment(),checkout:order})});const data=await response.json().catch(function(){return {}});if(!response.ok||!data.redirect_url){const errors=data.errors?Object.values(data.errors).flat().join(" "):"";throw new Error(errors||data.message||"Payment provider did not return a checkout link.")}return data.redirect_url}
 async function finalizePaidOrder(order){const response=await fetch("{{ route('checkout.finalize') }}",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","X-CSRF-TOKEN":csrfToken()},body:JSON.stringify({checkout:order})});const data=await response.json().catch(function(){return {}});if(!response.ok||!data.redirect_url)throw new Error(data.message||"Unable to place the paid order.");return data.redirect_url}
@@ -984,7 +1016,7 @@ function renderAll(){updateRadioCards();syncPickupAddressState();renderItems();r
 let checkoutRenderFingerprint="";
 function currentCheckoutFingerprint(){return [window.location.pathname,window.location.search,localStorage.getItem("printifyCheckoutItems")||"",localStorage.getItem("printifyActiveCheckout")||"",localStorage.getItem("printifyPromoCode")||""].join("|")}
 window.refreshPrintifyCheckout=function(options){const force=Boolean(options&&options.force);const fingerprint=currentCheckoutFingerprint();if(!force&&fingerprint===checkoutRenderFingerprint)return;checkoutRenderFingerprint=fingerprint;hydrateStoredCheckout();hydrateCheckoutReturnDraft();loadItems();state.promoCode=(localStorage.getItem("printifyPromoCode")||"").toUpperCase();const promo=document.getElementById("promoCode");if(state.promoCode&&promo)promo.value=state.promoCode;if(els.successBox)els.successBox.classList.remove("show");if(els.checkoutGrid)els.checkoutGrid.style.display="";renderAll();applyPaymentReturnState();document.body.classList.add("checkout-hydrated")};
-function applyPaymentReturnState(){const params=new URLSearchParams(window.location.search);const status=(params.get("payment")||"").toLowerCase();const returnedReference=params.get("ref")||"";state.paymentVerified=status==="success"&&serverPaymentVerified&&Boolean(serverPaymentReference)&&returnedReference===String(serverPaymentReference);if(state.paymentVerified){const paidMethod=document.querySelector('input[name="payment"][value="'+String(serverPaymentMethod||"")+'"]');if(paidMethod)paidMethod.checked=true;document.querySelectorAll('#firstName,#lastName,#email,#phone,#street,#apartment,#barangay,#province,#city,#postal,#country,input[name="payment"]').forEach(function(field){field.disabled=true});if(els.successBox)els.successBox.classList.remove("show");showToast("Payment successful. Please select your delivery method, then place the order.","success")}else{document.querySelectorAll('input[name="shipping"]').forEach(function(field){field.checked=false});document.querySelectorAll('input[name="payment"]').forEach(function(field){field.checked=false;field.disabled=false});document.querySelectorAll('#firstName,#lastName,#email,#phone,#street,#apartment,#province,#postal,#country').forEach(function(field){field.disabled=false})}updateRadioCards();renderTotals();updateCheckoutState();if(status==="cancel")showToast("Payment was cancelled. You can choose another payment method and try again.","error")}
+function applyPaymentReturnState(){const params=new URLSearchParams(window.location.search);const status=(params.get("payment")||"").toLowerCase();const returnedReference=params.get("ref")||"";state.paymentVerified=status==="success"&&serverPaymentVerified&&Boolean(serverPaymentReference)&&returnedReference===String(serverPaymentReference);if(state.paymentVerified){const paidMethod=document.querySelector('input[name="payment"][value="'+String(serverPaymentMethod||"")+'"]');if(paidMethod)paidMethod.checked=true;document.querySelectorAll('#firstName,#lastName,#email,#phone,input[name="payment"]').forEach(function(field){field.disabled=true});document.querySelectorAll('#street,#apartment,#province,#city,#barangay,#postal,#country').forEach(function(field){field.disabled=false});if(els.successBox)els.successBox.classList.remove("show");showToast("Payment successful. You can still edit your shipping address, then select your delivery method and place the order.","success")}else{document.querySelectorAll('input[name="shipping"]').forEach(function(field){field.checked=false});document.querySelectorAll('input[name="payment"]').forEach(function(field){field.checked=false;field.disabled=false});document.querySelectorAll('#firstName,#lastName,#email,#phone,#street,#apartment,#province,#city,#barangay,#postal,#country').forEach(function(field){field.disabled=false})}updateRadioCards();renderTotals();updateCheckoutState();if(status==="cancel")showToast("Payment was cancelled. You can choose another payment method and try again.","error")}
 document.querySelectorAll('input[name="shipping"], input[name="payment"]').forEach(function(input){input.addEventListener("change",function(){updateRadioCards();syncPickupAddressState();renderTotals();updateCheckoutState()})});
 ["firstName","lastName","email","phone","street","barangay","city","province","postal"].forEach(function(id){const node=document.getElementById(id);if(node){node.addEventListener("input",syncCheckoutStep);node.addEventListener("change",syncCheckoutStep)}});
 if(els.notes)els.notes.addEventListener("input",function(){els.noteCount.textContent=els.notes.value.length+"/250"});
@@ -2428,6 +2460,227 @@ window.addEventListener("hashchange",openCheckoutFromHash);if(document.readyStat
 @media(max-width:760px){#checkout .pfy-sidebar>.pfy-card-payment .pfy-payment-grid{grid-template-columns:1fr 1fr!important}}
 </style>
 
+<style id="checkout-shipping-address-book-styles">
+/* =========================================================
+   SHIPPING ADDRESS BOOK FINAL LOCK
+   - Removes the old extra-address checkbox control
+   - Adds editable saved shipping addresses similar to the reference
+   - Keeps Shipping Address editable after successful payment
+========================================================= */
+#checkout .pfy-address-book{
+  display:grid!important;
+  gap:10px!important;
+  margin:0 0 14px!important;
+  padding:0 0 14px!important;
+  border-bottom:1px solid #eef0f3!important;
+}
+#checkout .pfy-address-add{
+  width:100%!important;
+  min-height:44px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  padding:0 4px 10px!important;
+  border:0!important;
+  border-bottom:1px solid #eef0f3!important;
+  border-radius:0!important;
+  background:#fff!important;
+  color:#111827!important;
+  text-align:left!important;
+  box-shadow:none!important;
+}
+#checkout .pfy-address-add span{display:flex!important;align-items:center!important;gap:11px!important;min-width:0!important}
+#checkout .pfy-address-add i:first-child{font-size:22px!important;color:#6b7280!important}
+#checkout .pfy-address-add b{font-size:13px!important;font-weight:700!important;color:#f4f4f5!important;color:#111827!important}
+#checkout .pfy-address-add>i:last-child{font-size:12px!important;color:#9ca3af!important}
+#checkout .pfy-address-add:hover b,#checkout .pfy-address-add:hover>i:last-child{color:var(--pf-orange)!important}
+#checkout .pfy-address-list{display:grid!important;gap:11px!important}
+#checkout .pfy-address-card{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:10px 12px!important;
+  padding:12px 0 12px!important;
+  border:0!important;
+  border-bottom:1px solid #eef0f3!important;
+  background:#fff!important;
+  text-align:left!important;
+  color:#111827!important;
+}
+#checkout .pfy-address-card.is-selected{background:#fff!important}
+#checkout .pfy-address-card-main{width:100%!important;min-width:0!important;display:block!important;padding:0!important;border:0!important;background:transparent!important;color:inherit!important;text-align:left!important;cursor:pointer!important}
+#checkout .pfy-address-card-name{
+  display:block!important;
+  margin:0 0 7px!important;
+  color:#111827!important;
+  font-size:13px!important;
+  line-height:1.25!important;
+  font-weight:900!important;
+}
+#checkout .pfy-address-card-phone,
+#checkout .pfy-address-card-line{
+  display:block!important;
+  margin:0!important;
+  color:#d1d5db!important;
+  color:#4b5563!important;
+  font-size:11.2px!important;
+  line-height:1.42!important;
+  font-weight:500!important;
+}
+#checkout .pfy-address-card-meta{display:flex!important;align-items:center!important;gap:8px!important;margin-top:7px!important;flex-wrap:wrap!important}
+#checkout .pfy-address-default-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  height:20px!important;
+  padding:0 7px!important;
+  border-radius:3px!important;
+  background:#ededed!important;
+  color:#555!important;
+  font-size:10px!important;
+  line-height:20px!important;
+  font-weight:800!important;
+}
+#checkout .pfy-address-selected-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  height:20px!important;
+  padding:0 7px!important;
+  border-radius:999px!important;
+  background:#fff3ed!important;
+  color:var(--pf-orange)!important;
+  font-size:10px!important;
+  line-height:20px!important;
+  font-weight:800!important;
+}
+#checkout .pfy-address-edit{
+  align-self:start!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#ff2f6d!important;
+  font-size:12px!important;
+  font-weight:900!important;
+}
+#checkout .pfy-address-edit:hover{text-decoration:underline!important}
+#checkout .pfy-address-book-hint{
+  margin:0!important;
+  color:#6b7280!important;
+  font-size:10.5px!important;
+  line-height:1.35!important;
+}
+#checkout .pfy-address-empty{
+  width:100%!important;
+  display:grid!important;
+  gap:4px!important;
+  padding:12px 0!important;
+  border-bottom:1px solid #eef0f3!important;
+  color:#6b7280!important;
+}
+#checkout .pfy-address-empty strong{
+  color:#111827!important;
+  font-size:12.5px!important;
+  font-weight:900!important;
+}
+#checkout .pfy-address-empty span{
+  display:block!important;
+  color:#6b7280!important;
+  font-size:10.5px!important;
+  line-height:1.35!important;
+}
+#checkout .pfy-address-book-modal[hidden]{display:none!important}
+#checkout .pfy-address-book-modal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10070!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:18px!important;
+  background:rgba(0,0,0,.62)!important;
+}
+#checkout .pfy-address-book-dialog{
+  width:min(470px,calc(100vw - 28px))!important;
+  max-height:min(720px,calc(100vh - 32px))!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border-radius:14px!important;
+  border:1px solid rgba(17,24,39,.14)!important;
+  background:#fff!important;
+  color:#111827!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.35)!important;
+}
+#checkout .pfy-address-book-modal-head{
+  min-height:52px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  padding:0 18px!important;
+  border-bottom:1px solid #eceff3!important;
+}
+#checkout .pfy-address-book-modal-head h3{margin:0!important;font-size:16px!important;font-weight:900!important;color:#111827!important}
+#checkout .pfy-address-book-close{width:32px!important;height:32px!important;display:grid!important;place-items:center!important;border:0!important;border-radius:50%!important;background:#fff!important;color:#111827!important}
+#checkout .pfy-address-book-close:hover{background:#f3f4f6!important;color:var(--pf-orange)!important}
+#checkout .pfy-address-book-modal-body{
+  min-height:0!important;
+  overflow:auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  padding:16px 18px!important;
+}
+#checkout .pfy-address-book-field{display:grid!important;gap:5px!important;min-width:0!important}
+#checkout .pfy-address-book-field.full{grid-column:1/-1!important}
+#checkout .pfy-address-book-field label{font-size:10.5px!important;font-weight:800!important;color:#374151!important}
+#checkout .pfy-address-book-field input{
+  width:100%!important;
+  height:42px!important;
+  border:1px solid #dfe3ea!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  color:#111827!important;
+  padding:0 12px!important;
+  font-size:12px!important;
+  outline:0!important;
+  box-shadow:none!important;
+}
+#checkout .pfy-address-book-field input:focus{border-color:var(--pf-orange)!important;box-shadow:0 0 0 3px rgba(255,79,22,.10)!important}
+#checkout .pfy-address-book-default{
+  grid-column:1/-1!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  margin-top:2px!important;
+  padding:10px 12px!important;
+  border:1px solid #e5e7eb!important;
+  border-radius:10px!important;
+  color:#111827!important;
+  font-size:12px!important;
+  font-weight:800!important;
+}
+#checkout .pfy-address-book-default input{width:16px!important;height:16px!important;accent-color:var(--pf-orange)!important}
+#checkout .pfy-address-book-modal-actions{
+  display:grid!important;
+  grid-template-columns:auto 1fr auto auto!important;
+  gap:10px!important;
+  align-items:center!important;
+  padding:13px 18px!important;
+  border-top:1px solid #eceff3!important;
+}
+#checkout .pfy-address-book-modal-actions button{height:38px!important;padding:0 15px!important;border-radius:999px!important;font-size:11.5px!important;font-weight:900!important}
+#checkout .pfy-address-book-delete{border:1px solid #fecaca!important;background:#fff!important;color:#dc2626!important}
+#checkout .pfy-address-book-cancel{border:1px solid #d1d5db!important;background:#fff!important;color:#111827!important}
+#checkout .pfy-address-book-save{border:0!important;background:var(--pf-gradient)!important;color:#111827!important}
+#checkout .pfy-address-book-save:hover{background:#111827!important;color:#fff!important}
+@media(max-width:760px){
+  #checkout .pfy-address-book-modal-body{grid-template-columns:1fr!important}
+  #checkout .pfy-address-book-modal-actions{grid-template-columns:1fr!important}
+  #checkout .pfy-address-book-delete,#checkout .pfy-address-book-cancel,#checkout .pfy-address-book-save{width:100%!important}
+}
+</style>
+
 <script src="{{ asset('js/psgc-cascade.js') }}"></script>
 <script id="checkout-ph-address-cascade">
 (function(){
@@ -2487,6 +2740,218 @@ window.addEventListener("hashchange",openCheckoutFromHash);if(document.readyStat
   populateCities(currentCity,currentBarangay);
   province.addEventListener('change',function(){populateCities('','')});
   city.addEventListener('change',function(){populateBarangays('')});
+})();
+</script>
+
+<script id="checkout-shipping-address-book-script">
+(function(){
+  'use strict';
+  var STORAGE_KEY='printifyAddressBook';
+  var SELECTED_KEY='printifySelectedShippingAddressId';
+  var OLD_SEEDED_KEY=STORAGE_KEY+'SeededShippingV2';
+  var list=document.getElementById('pfyAddressBookList');
+  var addBtn=document.getElementById('pfyAddressAddBtn');
+  var modal=document.getElementById('pfyAddressBookModal');
+  var form=document.getElementById('pfyAddressBookForm');
+  var closeBtn=document.getElementById('pfyAddressBookClose');
+  var cancelBtn=document.getElementById('pfyAddressBookCancel');
+  var deleteBtn=document.getElementById('pfyAddressBookDelete');
+  var title=document.getElementById('pfyAddressBookModalTitle');
+  if(!list||!addBtn||!modal||!form)return;
+
+  function readJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||fallback)}catch(error){return JSON.parse(fallback)}}
+  function writeBook(book){localStorage.setItem(STORAGE_KEY,JSON.stringify(book))}
+  function escapeHtml(value){return String(value==null?'':value).replace(/[&<>"']/g,function(match){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[match]})}
+  function normalizeProvince(value){return ['NCR','National Capital Region','Metro Manila'].includes(value)?'Metro Manila':value}
+  function normalizeAddress(address){
+    var item=Object.assign({id:'address-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6),fullName:'',phone:'',street:'',apartment:'',barangay:'',city:'',province:'',postal:'',country:'Philippines',isDefault:false},address||{});
+    item.id=String(item.id||('address-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6)));
+    item.fullName=String(item.fullName||'').trim();
+    item.phone=String(item.phone||'').trim();
+    item.street=String(item.street||'').trim();
+    item.apartment=String(item.apartment||'').trim();
+    item.barangay=String(item.barangay||'').trim();
+    item.city=String(item.city||'').trim();
+    item.province=normalizeProvince(String(item.province||'').trim());
+    item.postal=String(item.postal||'').trim();
+    item.country=String(item.country||'Philippines').trim()||'Philippines';
+    item.isDefault=Boolean(item.isDefault);
+    return item;
+  }
+  function hasAddressDetails(address){
+    return ['fullName','street','barangay','city','province','postal','phone','apartment'].some(function(key){return String(address[key]||'').trim()!==''});
+  }
+  function isOldSeededSample(address){
+    var id=String(address.id||'').toLowerCase();
+    var name=String(address.fullName||'').toLowerCase();
+    var street=String(address.street||'').toLowerCase();
+    return id==='address-julie-anne-calusa'||id==='address-quiel-asha-calusa'||
+      ((name==='julie anne calusa'||name==='quiel asha l. calusa')&&street.indexOf('u.p. sikatuna bliss 2')!==-1);
+  }
+  function readBook(){
+    var existing=readJson(STORAGE_KEY,'[]');
+    if(!Array.isArray(existing))existing=[];
+    existing=existing.map(normalizeAddress).filter(function(address){return hasAddressDetails(address)&&!isOldSeededSample(address)});
+    localStorage.removeItem(OLD_SEEDED_KEY);
+    if(existing.length&&!existing.some(function(address){return address.isDefault}))existing[0].isDefault=true;
+    if(!existing.length)localStorage.removeItem(SELECTED_KEY);
+    else if(selectedId()&&!existing.some(function(address){return address.id===selectedId()}))localStorage.setItem(SELECTED_KEY,(existing.find(function(address){return address.isDefault})||existing[0]).id);
+    writeBook(existing);
+    return existing;
+  }
+  function selectedId(){return localStorage.getItem(SELECTED_KEY)||''}
+  function selectedAddress(book){
+    var id=selectedId();
+    return book.find(function(address){return address.id===id})||book.find(function(address){return address.isDefault})||book[0]||null;
+  }
+  function addressLine(address){
+    return [address.street,address.apartment,address.barangay,address.city,address.province,address.country].filter(function(value){return String(value||'').trim()!==''}).join(', ');
+  }
+  function checkoutHasAddress(){
+    return ['street','province','city','barangay','postal'].some(function(id){return String(document.getElementById(id)?.value||'').trim()!==''});
+  }
+  function ensureOption(select,value){
+    if(!select||!value)return;
+    var exists=Array.prototype.some.call(select.options,function(option){return option.value===value});
+    if(!exists){var option=document.createElement('option');option.value=value;option.textContent=value;select.appendChild(option)}
+  }
+  function fireFieldEvents(field){
+    if(!field)return;
+    field.dispatchEvent(new Event('input',{bubbles:true}));
+    field.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+  function setValue(id,value){var field=document.getElementById(id);if(!field)return;field.disabled=false;field.value=value||'';fireFieldEvents(field)}
+  function setSelectValue(id,value){
+    var select=document.getElementById(id);
+    if(!select)return;
+    select.disabled=false;
+    ensureOption(select,value);
+    select.dataset.current=value||'';
+    select.value=value||'';
+    fireFieldEvents(select);
+  }
+  function applyAddressToCheckout(address){
+    if(!address)return;
+    setValue('street',address.street);
+    setValue('apartment',address.apartment);
+    setValue('postal',address.postal);
+    setSelectValue('country',address.country||'Philippines');
+    setSelectValue('province',normalizeProvince(address.province||''));
+    setTimeout(function(){
+      setSelectValue('city',address.city||'');
+      setTimeout(function(){
+        setSelectValue('barangay',address.barangay||'');
+      },20);
+    },20);
+  }
+  function selectAddress(id,shouldFill){
+    var book=readBook();
+    var address=book.find(function(item){return item.id===id});
+    if(!address)return;
+    localStorage.setItem(SELECTED_KEY,address.id);
+    renderBook();
+    if(shouldFill!==false)applyAddressToCheckout(address);
+  }
+  function renderBook(){
+    var book=readBook();
+    if(!book.length){
+      list.innerHTML='<div class="pfy-address-empty"><strong>No saved address yet</strong><span>Template muna ito. Lalabas lang dito ang address kapag nag-add at nag-save na si user/customer.</span></div>';
+      return;
+    }
+    var selected=selectedAddress(book);
+    if(selected&&!selectedId())localStorage.setItem(SELECTED_KEY,selected.id);
+    list.innerHTML=book.map(function(address){
+      var isSelected=selected&&selected.id===address.id;
+      return '<article class="pfy-address-card '+(isSelected?'is-selected':'')+'" data-address-id="'+escapeHtml(address.id)+'">'+
+        '<button type="button" class="pfy-address-card-main" data-address-use="'+escapeHtml(address.id)+'">'+
+          '<strong class="pfy-address-card-name">'+escapeHtml(address.fullName||'Unnamed Address')+'</strong>'+
+          '<span class="pfy-address-card-phone">'+escapeHtml(address.phone||'No phone number')+'</span>'+
+          '<span class="pfy-address-card-line">'+escapeHtml(addressLine(address))+'</span>'+
+          '<span class="pfy-address-card-meta">'+(address.isDefault?'<em class="pfy-address-default-badge">Default</em>':'')+(isSelected?'<em class="pfy-address-selected-badge">Selected</em>':'')+'</span>'+
+        '</button>'+
+        '<button type="button" class="pfy-address-edit" data-address-edit="'+escapeHtml(address.id)+'">Edit</button>'+
+      '</article>';
+    }).join('');
+    list.querySelectorAll('[data-address-use]').forEach(function(button){button.addEventListener('click',function(){selectAddress(button.getAttribute('data-address-use'),true)})});
+    list.querySelectorAll('[data-address-edit]').forEach(function(button){button.addEventListener('click',function(){openEditor(button.getAttribute('data-address-edit'))})});
+  }
+  function field(id){return document.getElementById(id)}
+  function setEditorValue(id,value){var input=field(id);if(input)input.value=value||''}
+  function openEditor(id){
+    var book=readBook();
+    var address=id?book.find(function(item){return item.id===id}):null;
+    var fresh=!address;
+    address=normalizeAddress(address||{country:'Philippines'});
+    setEditorValue('pfyAddressBookId',fresh?'':address.id);
+    setEditorValue('pfyAddressBookName',address.fullName);
+    setEditorValue('pfyAddressBookPhone',address.phone);
+    setEditorValue('pfyAddressBookStreet',address.street);
+    setEditorValue('pfyAddressBookApartment',address.apartment);
+    setEditorValue('pfyAddressBookProvince',address.province);
+    setEditorValue('pfyAddressBookCity',address.city);
+    setEditorValue('pfyAddressBookBarangay',address.barangay);
+    setEditorValue('pfyAddressBookPostal',address.postal);
+    setEditorValue('pfyAddressBookCountry',address.country||'Philippines');
+    var defaultInput=field('pfyAddressBookDefault');
+    if(defaultInput)defaultInput.checked=Boolean(address.isDefault||fresh&&!book.length);
+    if(title)title.textContent=fresh?'Add address':'Edit address';
+    if(deleteBtn)deleteBtn.hidden=fresh;
+    modal.hidden=false;
+    document.body.classList.add('pfy-address-book-open');
+    setTimeout(function(){field('pfyAddressBookName')?.focus()},20);
+  }
+  function closeEditor(){modal.hidden=true;document.body.classList.remove('pfy-address-book-open');form.reset()}
+  function saveEditor(event){
+    event.preventDefault();
+    if(!form.reportValidity())return;
+    var id=field('pfyAddressBookId')?.value||'';
+    var book=readBook();
+    var address=normalizeAddress({
+      id:id||('address-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)),
+      fullName:field('pfyAddressBookName')?.value.trim()||'',
+      phone:field('pfyAddressBookPhone')?.value.trim()||'',
+      street:field('pfyAddressBookStreet')?.value.trim()||'',
+      apartment:field('pfyAddressBookApartment')?.value.trim()||'',
+      province:field('pfyAddressBookProvince')?.value.trim()||'',
+      city:field('pfyAddressBookCity')?.value.trim()||'',
+      barangay:field('pfyAddressBookBarangay')?.value.trim()||'',
+      postal:field('pfyAddressBookPostal')?.value.trim()||'',
+      country:field('pfyAddressBookCountry')?.value.trim()||'Philippines',
+      isDefault:Boolean(field('pfyAddressBookDefault')?.checked)
+    });
+    if(address.isDefault)book.forEach(function(item){item.isDefault=false});
+    var index=book.findIndex(function(item){return item.id===address.id});
+    if(index>=0)book[index]=address;else book.push(address);
+    if(book.length&&!book.some(function(item){return item.isDefault}))book[0].isDefault=true;
+    writeBook(book);
+    localStorage.setItem(SELECTED_KEY,address.id);
+    closeEditor();
+    renderBook();
+    applyAddressToCheckout(address);
+  }
+  function deleteCurrent(){
+    var id=field('pfyAddressBookId')?.value||'';
+    if(!id)return;
+    var book=readBook().filter(function(item){return item.id!==id});
+    if(book.length&&!book.some(function(item){return item.isDefault}))book[0].isDefault=true;
+    writeBook(book);
+    var next=selectedAddress(book);
+    if(next)localStorage.setItem(SELECTED_KEY,next.id);else localStorage.removeItem(SELECTED_KEY);
+    closeEditor();
+    renderBook();
+    if(next&&!checkoutHasAddress())applyAddressToCheckout(next);
+  }
+  addBtn.addEventListener('click',function(){openEditor('')});
+  form.addEventListener('submit',saveEditor);
+  if(closeBtn)closeBtn.addEventListener('click',closeEditor);
+  if(cancelBtn)cancelBtn.addEventListener('click',closeEditor);
+  if(deleteBtn)deleteBtn.addEventListener('click',deleteCurrent);
+  modal.addEventListener('mousedown',function(event){if(event.target===modal)closeEditor()});
+  document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!modal.hidden)closeEditor()});
+  renderBook();
+  var initial=selectedAddress(readBook());
+  if(initial&&!checkoutHasAddress())applyAddressToCheckout(initial);
+  document.addEventListener('printify:checkout-opened',function(){renderBook();var current=selectedAddress(readBook());if(current&&!checkoutHasAddress())applyAddressToCheckout(current)});
 })();
 </script>
 

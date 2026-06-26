@@ -1,221 +1,291 @@
 <x-app-layout>
 @once
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700;800&display=swap">
 @endonce
+
+@php
+    /*
+        Security & Privacy is intentionally template-first.
+        No hard-coded customer/device/email/location/IP records are stored here.
+        When backend data is ready, pass these optional arrays from the controller:
+        $securityOverview, $overviewAccessItems, $overviewLoginActivity, $overviewSessions,
+        $accountVerification, $passwordStats, $recoveryMethods, $activeDevices,
+        $loginActivities, $deviceSettings, $privacySummary, $privacyControls, $cookiePreferences.
+    */
+
+    $securityOverview = $securityOverview ?? [];
+    $passwordStats = $passwordStats ?? [];
+    $privacySummary = $privacySummary ?? [];
+
+    $overviewAccessItems = collect($overviewAccessItems ?? [
+        [
+            'key' => 'password',
+            'icon' => 'fa-solid fa-key',
+            'tone' => 'danger',
+            'title' => 'Password',
+            'description' => 'Keep your password strong and unique to protect your account.',
+            'meta_label' => 'Last changed',
+            'meta_value' => data_get($passwordStats, 'last_changed', 'No password record yet'),
+            'status' => data_get($passwordStats, 'status', 'Template only'),
+            'action' => 'Change Password',
+            'target' => 'password',
+            'variant' => 'primary',
+        ],
+        [
+            'key' => 'account_security',
+            'icon' => 'fa-solid fa-lock',
+            'tone' => 'danger',
+            'title' => 'Account Security',
+            'description' => 'Add an extra layer of security to your account.',
+            'meta_label' => 'Status',
+            'meta_value' => data_get($securityOverview, 'account_status', 'No security status yet'),
+            'status' => data_get($securityOverview, 'security_badge', 'Template only'),
+            'action' => 'Manage Security',
+            'target' => null,
+            'variant' => 'outline',
+        ],
+        [
+            'key' => 'email_verification',
+            'icon' => 'fa-regular fa-envelope',
+            'tone' => 'dark',
+            'title' => 'Email Verification',
+            'description' => 'Your verified email will appear here after account verification is connected.',
+            'meta_label' => 'Email address',
+            'meta_value' => data_get($securityOverview, 'email', 'No email record yet'),
+            'status' => data_get($securityOverview, 'email_status', 'No record yet'),
+            'action' => 'Update Email',
+            'target' => null,
+            'variant' => 'outline',
+        ],
+    ]);
+
+    $overviewLoginActivity = collect($overviewLoginActivity ?? []);
+    $overviewSessions = collect($overviewSessions ?? []);
+    $accountVerification = collect($accountVerification ?? []);
+    $activeDevices = collect($activeDevices ?? []);
+    $loginActivities = collect($loginActivities ?? []);
+    $recoveryMethods = collect($recoveryMethods ?? []);
+
+    $deviceSettings = collect($deviceSettings ?? [
+        [
+            'key' => 'session_timeout',
+            'icon' => 'fa-regular fa-clock',
+            'title' => 'Session timeout',
+            'description' => 'Automatically sign out inactive sessions.',
+            'type' => 'select',
+            'value' => 'Not set',
+        ],
+        [
+            'key' => 'new_device_alerts',
+            'icon' => 'fa-regular fa-bell',
+            'title' => 'New device alerts',
+            'description' => 'Email me when a new device signs in.',
+            'type' => 'switch',
+            'enabled' => false,
+        ],
+        [
+            'key' => 'remember_active_devices',
+            'icon' => 'fa-solid fa-shield-halved',
+            'title' => 'Remember active devices',
+            'description' => 'Keep known devices easier to review.',
+            'type' => 'switch',
+            'enabled' => false,
+        ],
+    ]);
+
+    $privacyControls = collect($privacyControls ?? [
+        [
+            'key' => 'profile_visibility',
+            'icon' => 'fa-regular fa-user',
+            'title' => 'Profile Visibility',
+            'description' => 'Allow others to see your profile information.',
+            'enabled' => false,
+        ],
+        [
+            'key' => 'order_visibility',
+            'icon' => 'fa-solid fa-bag-shopping',
+            'title' => 'Order Visibility',
+            'description' => 'Allow others to view your orders and purchase history.',
+            'enabled' => false,
+        ],
+        [
+            'key' => 'personalized_recommendations',
+            'icon' => 'fa-solid fa-wand-magic-sparkles',
+            'title' => 'Personalized Recommendations',
+            'description' => 'Show product recommendations based on your activity.',
+            'enabled' => false,
+        ],
+        [
+            'key' => 'marketing_communications',
+            'icon' => 'fa-regular fa-envelope',
+            'title' => 'Marketing Communications',
+            'description' => 'Receive promotional emails and updates from PrintifyCo.',
+            'enabled' => false,
+        ],
+    ]);
+
+    $cookiePreferences = collect($cookiePreferences ?? [
+        [
+            'key' => 'essential_cookies',
+            'icon' => 'fa-solid fa-cookie',
+            'title' => 'Essential Cookies',
+            'description' => 'Necessary for the website to function properly.',
+            'status' => 'Always Active',
+            'status_tone' => 'plain',
+        ],
+        [
+            'key' => 'analytics_cookies',
+            'icon' => 'fa-solid fa-chart-simple',
+            'title' => 'Analytics Cookies',
+            'description' => 'Help us understand how you use our website.',
+            'status' => 'Not set',
+            'status_tone' => 'gray',
+        ],
+        [
+            'key' => 'marketing_cookies',
+            'icon' => 'fa-solid fa-bullhorn',
+            'title' => 'Marketing Cookies',
+            'description' => 'Used to deliver personalized ads and content.',
+            'status' => 'Not set',
+            'status_tone' => 'gray',
+        ],
+    ]);
+
+    $securityScore = data_get($securityOverview, 'score');
+    $securityScoreWidth = is_numeric($securityScore) ? min(100, max(0, (int) $securityScore)) : 0;
+
+    $passwordScore = data_get($passwordStats, 'score');
+    $passwordScoreWidth = is_numeric($passwordScore) ? min(100, max(0, (int) $passwordScore)) : 0;
+
+    $privacyScore = data_get($privacySummary, 'score');
+    $privacyScoreWidth = is_numeric($privacyScore) ? min(100, max(0, (int) $privacyScore)) : 0;
+@endphp
 
 <style>
 :root{
     --sp-orange:#ff7a00;
     --sp-orange-soft:#fff3e6;
-    --sp-orange-soft2:#fff8f1;
     --sp-green:#16a34a;
     --sp-green-soft:#eaf8ef;
     --sp-red:#ef4444;
     --sp-red-soft:#fff1f1;
     --sp-blue:#2563eb;
-    --sp-purple:#7c3aed;
+    --sp-blue-soft:#eef4ff;
     --sp-ink:#111827;
     --sp-muted:#6b7280;
-    --sp-soft:#f7f9fc;
-    --sp-line:#e5e7eb;
-    --sp-line-dark:#d8dee8;
-    --sp-shadow:0 15px 35px rgba(15,23,42,.07);
-    --sp-shadow-soft:0 8px 24px rgba(15,23,42,.045);
-    --sp-radius:16px;
+    --sp-line:#d8dee8;
+    --sp-line-soft:#e5e7eb;
+    --sp-bg:#ffffff;
+    --sp-radius:12px;
 }
 .security-page{
     min-height:calc(100vh - 70px);
+    padding:0 0 44px;
     background:#fff;
     color:var(--sp-ink);
     font-family:'Inter',system-ui,sans-serif;
-    padding:0 24px 42px;
 }
-.security-wrap{max-width:1320px;margin:0 auto;}
+.security-wrap{
+    width:100%;
+    max-width:1490px;
+    margin:0 auto;
+}
 .security-top{
-    display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
-    padding-top:8px;margin-bottom:18px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+    margin:0 0 14px;
 }
-.security-title-box{display:flex;gap:14px;align-items:flex-start;}
-.security-title-box:before{content:'';width:17px;height:4px;border-radius:999px;background:var(--sp-orange);margin-top:18px;flex:none;}
-.security-title{margin:0;font-family:'Playfair Display',Georgia,serif;font-size:42px;line-height:1.05;font-weight:700;letter-spacing:-.025em;color:#111827;}
-.security-subtitle{margin:8px 0 0;font-size:13px;color:var(--sp-muted);line-height:1.5;}
+.security-title-box{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+}
+.security-title-box:before{
+    content:'\f3ed';
+    font-family:'Font Awesome 6 Free';
+    font-weight:900;
+    width:34px;
+    height:34px;
+    margin-top:4px;
+    display:grid;
+    place-items:center;
+    color:var(--sp-orange);
+    font-size:28px;
+    line-height:1;
+    flex:0 0 auto;
+}
+.security-title{
+    margin:0;
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:40px;
+    line-height:1.1;
+    font-weight:700;
+    color:#111827;
+}
+.security-subtitle{
+    margin:4px 0 0;
+    font-size:12px;
+    line-height:1.45;
+    color:#111827;
+}
 .security-date{
-    display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 16px;
-    border:1px solid var(--sp-line);border-radius:12px;background:#fff;box-shadow:var(--sp-shadow-soft);
-    font-size:13px;font-weight:700;white-space:nowrap;color:#111827;
+    height:42px;
+    min-width:178px;
+    padding:0 15px;
+    border:1px solid #111827;
+    border-radius:8px;
+    background:#fff;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:700;
+    line-height:1;
+    white-space:nowrap;
 }
-.security-date i{font-size:16px;color:#111827;}
-.security-tabs{
-    display:grid;grid-template-columns:repeat(5,1fr);max-width:620px;height:43px;
-    border:1px solid var(--sp-line-dark);border-radius:10px;background:#fff;overflow:hidden;margin-bottom:18px;
+.security-date i,
+.security-date [data-lucide]{
+    width:16px;
+    height:16px;
+    color:#111827;
 }
-.security-tab{
-    border:0;background:#fff;color:#111827;font-size:12px;font-weight:800;cursor:pointer;position:relative;transition:.18s;
-}
-.security-tab:hover{background:#fff8f1;color:var(--sp-orange);}
-.security-tab.active{color:var(--sp-orange);background:#fff;}
-.security-tab.active:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--sp-orange);}
-.sp-panel{display:none;animation:spFade .18s ease;}
-.sp-panel.active{display:block;}
-@keyframes spFade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.sp-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start;}
-.sp-main,.sp-side{display:grid;gap:16px;align-content:start;}
-.sp-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.sp-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
-.sp-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
-.sp-card{
-    background:#fff;border:1px solid var(--sp-line-dark);border-radius:var(--sp-radius);
-    box-shadow:var(--sp-shadow-soft);overflow:hidden;
-}
-.sp-card-pad{padding:20px;}
-.sp-card-title{margin:0;font-family:'Poppins',system-ui,sans-serif;font-size:18px;font-weight:700;line-height:1.25;color:#111827;}
-.sp-card-title.sm{font-size:16px;}
-.sp-card-desc{margin:6px 0 0;color:var(--sp-muted);font-size:13px;line-height:1.45;}
-.sp-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
-.sp-icon{
-    width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:none;
-    background:var(--sp-orange-soft);color:var(--sp-orange);font-size:19px;
-}
-.sp-icon.green{background:var(--sp-green-soft);color:var(--sp-green);}
-.sp-icon.blue{background:#eef4ff;color:var(--sp-blue);}
-.sp-icon.purple{background:#f3efff;color:var(--sp-purple);}
-.sp-icon.red{background:var(--sp-red-soft);color:var(--sp-red);}
-.sp-hero{
-    border:1px solid #ffd8b0;border-radius:var(--sp-radius);background:linear-gradient(95deg,#fff7ee 0%,#fff 55%,#eefaf3 100%);
-    box-shadow:var(--sp-shadow-soft);padding:22px 26px;display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:center;
-}
-.sp-hero-left{display:flex;align-items:center;gap:22px;}
-.sp-shield-big{width:88px;height:88px;border-radius:50%;background:#fff3e6;border:1px solid #ffd8b0;display:grid;place-items:center;color:var(--sp-orange);font-size:38px;box-shadow:0 10px 25px rgba(255,122,0,.12);}
-.sp-hero h2{margin:0;font-family:'Poppins',system-ui,sans-serif;font-size:22px;font-weight:800;}
-.sp-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
-.sp-chip{height:28px;display:inline-flex;align-items:center;gap:7px;border-radius:999px;background:var(--sp-green-soft);color:var(--sp-green);padding:0 12px;font-size:12px;font-weight:800;}
-.sp-score{border-left:1px solid var(--sp-line-dark);padding-left:28px;}
-.sp-score strong{font-size:34px;color:var(--sp-green);line-height:1;}
-.sp-score span{font-size:20px;color:#111827;font-weight:700;}
-.sp-meter{width:100%;height:10px;border-radius:999px;background:#e7edf3;overflow:hidden;margin:12px 0 7px;}
-.sp-meter i{display:block;height:100%;width:90%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:inherit;}
-.sp-link{border:0;background:transparent;color:var(--sp-orange);font-weight:800;font-size:12px;padding:0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none;}
-.sp-btn{
-    min-height:38px;border-radius:10px;border:1px solid var(--sp-orange);background:var(--sp-orange);color:#fff;
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 18px;font-size:12px;font-weight:800;cursor:pointer;text-decoration:none;transition:.18s;
-}
-.sp-btn:hover{background:#111827;border-color:#111827;color:#fff;}
-.sp-btn.outline{background:#fff;color:var(--sp-orange);}
-.sp-btn.soft{background:#fff;color:#111827;border-color:var(--sp-line-dark);}
-.sp-btn.red{background:var(--sp-red);border-color:var(--sp-red);}
-.sp-btn.red-outline{background:#fff;color:var(--sp-red);border-color:#fecaca;}
-.sp-btn.block{width:100%;}
-.sp-status{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;white-space:nowrap;}
-.sp-status.green{background:var(--sp-green-soft);color:var(--sp-green);}
-.sp-status.gray{background:#f3f4f6;color:#64748b;}
-.sp-status.orange{background:#fff3e6;color:var(--sp-orange);}
-.sp-status.red{background:#fff1f1;color:var(--sp-red);}
-.sp-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid #eef1f5;}
-.sp-row:last-child{border-bottom:0;}
-.sp-row-left{display:flex;align-items:center;gap:12px;min-width:0;}
-.sp-row strong,.sp-mini-title{display:block;font-size:13px;font-weight:800;color:#111827;}
-.sp-row small,.sp-mini-desc{display:block;margin-top:4px;font-size:11.5px;color:var(--sp-muted);line-height:1.35;}
-.sp-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;border:1px solid var(--sp-line);border-radius:12px;overflow:hidden;}
-.sp-table th,.sp-table td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--sp-line);font-size:12px;vertical-align:middle;}
-.sp-table th{font-size:10px;text-transform:uppercase;letter-spacing:.045em;color:#4b5563;background:#fbfcfe;font-weight:800;}
-.sp-table tr:last-child td{border-bottom:0;}
-.sp-table td{color:#111827;}
-.sp-table small{display:block;color:var(--sp-muted);font-size:10.5px;margin-top:2px;}
-.sp-device{display:flex;align-items:center;gap:10px;}
-.sp-list{display:grid;gap:10px;margin-top:16px;}
-.sp-setting-row{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--sp-line);background:#fff;border-radius:12px;padding:13px 14px;}
-.sp-switch{position:relative;display:inline-block;width:44px;height:25px;flex:none;}
-.sp-switch input{opacity:0;width:0;height:0;}
-.sp-slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:999px;transition:.18s;}
-.sp-slider:before{content:'';position:absolute;width:19px;height:19px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.15);transition:.18s;}
-.sp-switch input:checked+.sp-slider{background:var(--sp-green);}
-.sp-switch input:checked+.sp-slider:before{transform:translateX(19px);}
-.sp-field{display:grid;gap:7px;margin-top:14px;}
-.sp-field label{font-size:12px;font-weight:800;color:#111827;}
-.sp-input-wrap{position:relative;}
-.sp-input{height:44px;width:100%;border:1px solid var(--sp-line-dark);border-radius:10px;background:#fff;padding:0 44px 0 13px;font-size:13px;color:#111827;outline:none;}
-.sp-input:focus{border-color:var(--sp-orange);box-shadow:0 0 0 4px rgba(255,122,0,.1);}
-.sp-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#64748b;cursor:pointer;}
-.sp-strength{display:flex;align-items:center;gap:7px;margin-top:8px;}
-.sp-strength i{height:4px;flex:1;border-radius:999px;background:var(--sp-green);}
-.sp-strength i.off{background:#e5e7eb;}
-.sp-info-band{border:1px solid var(--sp-line);border-radius:12px;padding:14px;background:#fbfcfe;display:flex;align-items:center;justify-content:space-between;gap:14px;}
-.sp-check-list{display:grid;gap:10px;margin-top:14px;}
-.sp-check{display:flex;align-items:center;gap:10px;font-size:12px;color:#111827;}
-.sp-check i{color:var(--sp-green);}
-.sp-danger{border-color:#fecaca;background:linear-gradient(180deg,#fff7f7,#fff);}
-.sp-danger .sp-card-title{color:#991b1b;}
-.sp-danger-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;}
-.sp-danger-box{border:1px solid #fee2e2;border-radius:14px;padding:16px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:14px;}
-.sp-toast{position:fixed;left:50%;top:95px;z-index:9999;transform:translate(-50%,-12px);opacity:0;pointer-events:none;background:#111827;color:#fff;padding:13px 16px;border-radius:12px;font-weight:800;font-size:12px;box-shadow:0 18px 50px rgba(17,24,39,.25);transition:.2s;}
-.sp-toast.show{opacity:1;transform:translate(-50%,0);}
-@media(max-width:1180px){.sp-layout{grid-template-columns:1fr}.sp-side{grid-template-columns:repeat(2,minmax(0,1fr));}.sp-grid-3,.sp-grid-4{grid-template-columns:repeat(2,minmax(0,1fr));}.sp-hero{grid-template-columns:1fr}.sp-score{border-left:0;border-top:1px solid var(--sp-line-dark);padding:18px 0 0;}}
-@media(max-width:760px){.security-page{padding:0 12px 30px}.security-top{display:grid}.security-tabs{max-width:none;overflow:auto}.sp-grid-2,.sp-grid-3,.sp-grid-4,.sp-side,.sp-danger-row{grid-template-columns:1fr}.sp-table{display:block;overflow-x:auto}.sp-hero-left{align-items:flex-start}.security-title{font-size:34px}.sp-danger-box{display:grid}.sp-btn{width:100%;}.security-date{width:max-content}.sp-card-pad{padding:16px}}
-
-.security-page{padding:0 0 42px;background:#fff;font-family:'Inter',system-ui,sans-serif;letter-spacing:0}
-.security-wrap{max-width:none;margin:0}
-.security-top{padding-top:0;margin-bottom:18px}
-.security-title{font-family:'Playfair Display',Georgia,serif}
-.sp-card-title,.security-tab,.sp-row strong,.sp-mini-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600;letter-spacing:0}
-.sp-card-desc,.sp-row small,.sp-mini-desc,.security-subtitle{font-family:'Inter',system-ui,sans-serif;font-weight:400;letter-spacing:0}
-.sp-card,.sp-hero,.sp-info-band,.sp-setting-row,.sp-danger-box,.sp-table,.security-tabs,.security-date{border-color:#111827}
-.sp-card,.sp-hero,.sp-setting-row,.sp-danger-box,.sp-info-band{transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
-.sp-card:hover,.sp-hero:hover,.sp-setting-row:hover,.sp-danger-box:hover,.sp-info-band:hover{background:#fff8f1;border-color:#111827;box-shadow:0 16px 34px rgba(17,24,39,.08)}
-.sp-clicked{background:#fff3e6!important;border-color:#111827!important}
-.sp-card-pad{padding:18px}
-.sp-main,.sp-side{gap:14px}.sp-grid-2,.sp-grid-3,.sp-grid-4{gap:14px}.sp-layout{gap:18px}
-.sp-btn,.sp-btn.outline,.sp-btn.soft,.sp-btn.red,.sp-btn.red-outline{min-width:138px;height:42px;min-height:42px;border-radius:10px;border:1px solid var(--sp-orange);background:var(--sp-orange);color:#111827;font-family:'Poppins',system-ui,sans-serif;font-size:12px;font-weight:600;padding:0 18px}
-.sp-btn:hover,.sp-btn.outline:hover,.sp-btn.soft:hover,.sp-btn.red:hover,.sp-btn.red-outline:hover{background:#111827;border-color:#111827;color:#fff}
-.sp-btn.block{width:100%}
-.sp-link{min-height:34px;border-radius:9px;padding:0 10px;color:#111827;font-family:'Poppins',system-ui,sans-serif;font-weight:600;transition:background .18s,color .18s}
-.sp-link:hover{background:#111827;color:#fff}
-.security-tab:hover{background:#fff8f1;color:var(--sp-orange)}
-.security-tab.active{color:var(--sp-orange)}
-.sp-switch input:checked+.sp-slider{background:var(--sp-green)}
-.sp-toast{left:50%;top:92px;transform:translate(-50%,-12px);background:#111827;color:#fff;border:1px solid rgba(255,255,255,.08)}
-.sp-toast.show{transform:translate(-50%,0)}
 .security-tabs{
     display:flex;
-    align-items:center;
-    gap:42px;
-    max-width:620px;
+    align-items:flex-end;
+    gap:30px;
     width:100%;
-    height:auto;
-    margin:0 0 18px;
+    margin:0 0 22px;
+    padding:0;
     border:0;
-    border-bottom:1px solid #dfe3ea;
-    border-radius:0;
     background:transparent;
     overflow-x:auto;
-    overflow-y:hidden;
     scrollbar-width:none;
 }
-.security-tabs::-webkit-scrollbar{display:none}
+.security-tabs::-webkit-scrollbar{display:none;}
 .security-tab{
-    flex:0 0 auto;
-    min-width:0;
-    height:43px;
-    padding:0 0 12px;
+    position:relative;
+    height:34px;
+    padding:0;
     border:0;
     border-radius:0;
     background:transparent;
     color:#111827;
     font-family:'Poppins',system-ui,sans-serif;
-    font-size:10.5px;
-    font-weight:700;
-    letter-spacing:.04em;
-    text-transform:uppercase;
+    font-size:11px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:.16s ease;
 }
-.security-tab:hover{
-    background:transparent;
-    color:var(--sp-orange);
-}
-.security-tab.active{
-    background:transparent;
-    color:var(--sp-orange);
-}
+.security-tab:hover,
+.security-tab.active{color:var(--sp-orange);}
 .security-tab.active:after{
+    content:'';
+    position:absolute;
     left:0;
     right:0;
     bottom:-1px;
@@ -223,912 +293,472 @@
     border-radius:999px;
     background:var(--sp-orange);
 }
-.security-page{padding-bottom:32px}
-.security-top{align-items:center;margin-bottom:12px}
-.security-title-box{gap:12px}
-.security-title-box:before{width:16px;height:4px;margin-top:14px}
-.security-title{font-size:34px;line-height:1.08;letter-spacing:-.01em}
-.security-subtitle{margin-top:5px;font-size:11px;line-height:1.35}
-.security-date{
-    height:34px;
-    padding:0 12px;
-    border-radius:10px;
-    border-color:#dfe3ea;
-    font-size:11px;
-    font-weight:700;
-    box-shadow:0 8px 18px rgba(15,23,42,.045);
-}
-.security-date i{font-size:14px}
-.security-tabs{gap:26px;max-width:560px;margin-bottom:14px}
-.security-tab{height:38px;padding-bottom:10px}
-.sp-layout{grid-template-columns:minmax(0,.95fr) 300px;gap:14px}
-.sp-main,.sp-side{gap:11px}
-.sp-grid-2,.sp-grid-3,.sp-grid-4{gap:10px}
-.sp-card{border-radius:12px}
-.sp-card-pad{padding:12px!important}
-.sp-card-title{font-size:15px;line-height:1.2}
-.sp-card-title.sm{font-size:13px}
-.sp-card-desc{font-size:10.5px;line-height:1.32;margin-top:4px}
-.sp-head-row{gap:10px}
-.sp-icon{width:32px;height:32px;border-radius:10px;font-size:14px}
-.sp-shield-big{width:58px;height:58px;font-size:24px}
-.sp-hero{padding:14px 16px;grid-template-columns:minmax(0,1fr) 210px;gap:14px;border-radius:12px}
-.sp-hero-left{gap:14px}
-.sp-hero h2{font-size:17px}
-.sp-chips{gap:7px;margin-top:10px}
-.sp-chip{height:23px;padding:0 9px;font-size:10px}
-.sp-score{padding-left:16px}
-.sp-score strong{font-size:25px}
-.sp-score span{font-size:15px}
-.sp-meter{height:7px;margin:8px 0 5px}
-.sp-row{gap:10px;padding:8px 0}
-.sp-row-left{gap:9px}
-.sp-row strong,.sp-mini-title{font-size:11px}
-.sp-row small,.sp-mini-desc{font-size:9.7px;margin-top:2px;line-height:1.25}
-.sp-list{gap:6px;margin-top:10px}
-.sp-setting-row{gap:10px;border-radius:10px;padding:9px 10px}
-.sp-info-band{border-radius:10px;padding:10px;gap:10px}
-.sp-danger-row{gap:10px;margin-top:10px}
-.sp-danger-box{border-radius:11px;padding:10px;gap:10px}
-.sp-table{margin-top:9px;border-radius:10px}
-.sp-table th,.sp-table td{padding:8px 10px;font-size:10.5px}
-.sp-table th{font-size:8.8px}
-.sp-table small{font-size:9px}
-.sp-device{gap:8px}
-.sp-btn,.sp-btn.outline,.sp-btn.soft,.sp-btn.red,.sp-btn.red-outline{
-    min-width:112px;
-    height:34px;
-    min-height:34px;
-    border-radius:9px;
-    padding:0 12px;
-    font-size:10.5px;
-}
-.sp-link{min-height:28px;font-size:10px;padding:0 8px}
-.sp-status{padding:5px 8px;font-size:9.5px}
-.sp-switch{width:36px;height:20px}
-.sp-slider:before{width:15px;height:15px;left:3px;top:2.5px}
-.sp-switch input:checked+.sp-slider:before{transform:translateX(15px)}
-.sp-field{gap:5px;margin-top:10px}
-.sp-field label{font-size:10.5px}
-.sp-input{height:36px;border-radius:9px;font-size:11px;padding-left:10px}
-.sp-strength{gap:5px;margin-top:6px}
-.sp-check-list{gap:7px;margin-top:10px}
-.sp-check{gap:7px;font-size:10.5px}
-.sp-side .sp-card-pad{padding:11px!important}
-.sp-side .sp-list{gap:5px;margin-top:9px}
-.sp-side .sp-row{padding:7px 0}
-.sp-side h3[style*="margin:0"]{font-size:14px}
-.sp-side [style*="width:86px"]{
-    width:62px!important;
-    height:62px!important;
-    border-width:7px!important;
-    font-size:17px!important;
-}
-.security-wrap{max-width:1240px;margin:0 auto}
-.security-top{padding-top:0;margin-bottom:10px}
-.security-date{
-    height:32px;
-    padding:0 11px;
-    gap:7px;
-    border:1px solid var(--sp-line-dark);
-    border-radius:10px;
+.sp-panel{display:none;animation:spFade .18s ease;}
+.sp-panel.active{display:block;}
+@keyframes spFade{from{opacity:.45;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.sp-card{
     background:#fff;
+    border:1px solid var(--sp-line);
+    border-radius:10px;
+    box-shadow:none;
+    overflow:hidden;
+}
+.sp-card-pad{padding:20px 24px;}
+.sp-card-title{
+    margin:0;
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:16px;
+    font-weight:700;
+    line-height:1.25;
     color:#111827;
-    font-family:'Inter',system-ui,sans-serif;
-    font-size:10.5px;
-    font-weight:800;
 }
-.security-date [data-lucide]{width:14px;height:14px;stroke-width:2.2;color:#111827}
-.security-tabs{
-    gap:24px;
-    max-width:520px;
-    margin-bottom:12px;
-    border-bottom-color:#dfe3ea;
+.sp-card-title.sm{font-size:15px;}
+.sp-card-desc,
+.sp-muted{
+    margin:5px 0 0;
+    color:#111827;
+    font-size:11.5px;
+    line-height:1.45;
 }
-.security-tab{
-    height:34px;
-    padding:0 0 9px;
-    font-size:10px;
-    font-weight:800;
-    letter-spacing:.055em;
-    text-transform:uppercase;
+.sp-section-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
 }
-.sp-layout{grid-template-columns:minmax(0,.88fr) 280px;gap:12px}
-.sp-main,.sp-side{gap:9px}
-.sp-grid-2,.sp-grid-3,.sp-grid-4{gap:9px}
-.sp-card,.sp-hero,.sp-info-band,.sp-setting-row,.sp-danger-box,.sp-table{border-radius:10px}
-.sp-card-pad{padding:10px!important}
-.sp-side .sp-card-pad{padding:9px!important}
-.sp-card-title{font-size:14px;line-height:1.16}
-.sp-card-title.sm{font-size:12px}
-.sp-card-desc{font-size:9.7px;line-height:1.26;margin-top:3px}
-.sp-head-row{gap:8px}
+.sp-title-left,
+.sp-row-left{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    min-width:0;
+}
 .sp-icon{
     width:28px;
     height:28px;
-    border-radius:9px;
-    font-size:12px;
-}
-.sp-shield-big{
-    width:50px;
-    height:50px;
-    border-width:1px;
-    font-size:21px;
-    box-shadow:0 7px 16px rgba(255,122,0,.10);
-}
-.sp-hero{
-    padding:11px 13px;
-    grid-template-columns:minmax(0,1fr) 190px;
-    gap:11px;
-}
-.sp-hero-left{gap:11px}
-.sp-hero h2{font-size:15px}
-.sp-chips{gap:5px;margin-top:7px}
-.sp-chip{height:21px;padding:0 7px;font-size:9px}
-.sp-score{padding-left:12px}
-.sp-score strong{font-size:22px}
-.sp-score span{font-size:12px}
-.sp-meter{height:5px;margin:6px 0 4px}
-.sp-row{gap:8px;padding:6px 0}
-.sp-row-left{gap:7px}
-.sp-row strong,.sp-mini-title{font-size:10px}
-.sp-row small,.sp-mini-desc{font-size:8.8px;margin-top:1px;line-height:1.22}
-.sp-list{gap:4px;margin-top:7px}
-.sp-setting-row{gap:8px;padding:7px 8px}
-.sp-info-band{padding:8px;gap:8px}
-.sp-danger-row{gap:8px;margin-top:8px}
-.sp-danger-box{padding:8px;gap:8px}
-.sp-table{margin-top:7px}
-.sp-table th,.sp-table td{padding:6px 8px;font-size:9.5px}
-.sp-table th{font-size:8px;letter-spacing:.04em}
-.sp-table small{font-size:8.3px}
-.sp-device{gap:6px}
-.sp-btn,.sp-btn.outline,.sp-btn.soft,.sp-btn.red,.sp-btn.red-outline{
-    min-width:96px;
-    height:30px;
-    min-height:30px;
-    border-radius:8px;
-    padding:0 10px;
-    font-size:9.5px;
-}
-.sp-link{min-height:24px;font-size:9px;padding:0 6px}
-.sp-status{padding:4px 7px;font-size:8.8px}
-.sp-switch{width:34px;height:18px}
-.sp-slider:before{width:13px;height:13px;left:3px;top:2.5px}
-.sp-switch input:checked+.sp-slider:before{transform:translateX(15px)}
-.sp-field{gap:4px;margin-top:8px}
-.sp-field label{font-size:9.5px}
-.sp-input{height:32px;border-radius:8px;font-size:10px;padding-left:9px}
-.sp-strength{gap:4px;margin-top:5px}
-.sp-strength i{height:3px}
-.sp-check-list{gap:5px;margin-top:8px}
-.sp-check{gap:6px;font-size:9.5px}
-.sp-side .sp-list{gap:4px;margin-top:7px}
-.sp-side .sp-row{padding:5px 0}
-.sp-side h3[style*="margin:0"]{font-size:12px}
-.sp-side [style*="width:86px"],
-.sp-side [style*="width:94px"],
-[style*="width:86px"],
-[style*="width:94px"]{
-    width:52px!important;
-    height:52px!important;
-    border-width:6px!important;
-    font-size:15px!important;
-}
-[style*="width:220px"]{width:170px!important}
-[style*="margin-top:18px"]{margin-top:10px!important}
-[style*="margin-top:16px"]{margin-top:9px!important}
-[style*="margin-top:14px"]{margin-top:8px!important}
-[style*="margin:16px 0 18px"]{margin:9px 0 10px!important}
-[style*="font-size:32px"]{font-size:22px!important}
-[style*="font-size:12px"]{font-size:9.5px!important}
-@media(max-width:760px){.security-page{padding:0 0 30px}.sp-card-pad{padding:16px}.sp-btn{width:100%}}
-
-/* Final Security & Privacy dashboard-aligned sizing */
-.security-page{
-    padding:0 0 70px!important;
-    background:#fff!important;
-    font-family:'Inter',system-ui,sans-serif!important;
-    letter-spacing:0!important;
-}
-.security-wrap{
-    max-width:none!important;
-    margin:0!important;
-}
-.security-top{
-    padding-top:0!important;
-    margin-bottom:18px!important;
-    gap:18px!important;
-}
-.security-title-box{gap:14px!important}
-.security-title-box:before{
-    width:18px!important;
-    height:4px!important;
-    margin-top:17px!important;
-}
-.security-title{
-    font-family:'Playfair Display',Georgia,serif!important;
-    font-size:42px!important;
-    line-height:1.06!important;
-    font-weight:700!important;
-    letter-spacing:0!important;
-}
-.security-subtitle{
-    margin-top:7px!important;
-    font-family:'Inter',system-ui,sans-serif!important;
-    font-size:13px!important;
-    line-height:1.45!important;
-    font-weight:400!important;
-}
-.security-date{
-    height:42px!important;
-    padding:0 16px!important;
-    border:1px solid #111827!important;
-    border-radius:10px!important;
-    font-size:12px!important;
-    box-shadow:none!important;
-}
-.security-tabs{
-    max-width:620px!important;
-    height:42px!important;
-    gap:30px!important;
-    margin-bottom:20px!important;
-}
-.security-tab{
-    height:42px!important;
-    padding:0 0 10px!important;
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:11px!important;
-    font-weight:600!important;
-    letter-spacing:0!important;
-}
-.sp-layout{
-    grid-template-columns:minmax(0,1fr) 330px!important;
-    gap:24px!important;
-}
-.sp-main,.sp-side{gap:18px!important}
-.sp-grid-2,.sp-grid-3,.sp-grid-4{gap:18px!important}
-.sp-card,.sp-hero,.sp-info-band,.sp-setting-row,.sp-danger-box,.sp-table{
-    border:1px solid #111827!important;
-    border-radius:12px!important;
-    box-shadow:none!important;
-}
-.sp-card:hover,.sp-hero:hover,.sp-info-band:hover,.sp-setting-row:hover,.sp-danger-box:hover{
-    background:rgba(17,24,39,.10)!important;
-    border-color:#111827!important;
-    box-shadow:none!important;
-    transform:none!important;
-}
-.sp-card-pad{padding:18px!important}
-.sp-side .sp-card-pad{padding:16px!important}
-.sp-card-title{
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:17px!important;
-    line-height:1.22!important;
-    font-weight:600!important;
-    letter-spacing:0!important;
-}
-.sp-card-title.sm{font-size:15px!important}
-.sp-card-desc,.sp-row small,.sp-mini-desc,.sp-muted{
-    font-family:'Inter',system-ui,sans-serif!important;
-    font-size:12px!important;
-    line-height:1.45!important;
-    font-weight:400!important;
-    letter-spacing:0!important;
-}
-.sp-row strong,.sp-mini-title{
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:12px!important;
-    font-weight:600!important;
-    letter-spacing:0!important;
-}
-.sp-row{padding:10px 0!important}
-.sp-list{gap:8px!important}
-.sp-icon{
-    width:36px!important;
-    height:36px!important;
-    border-radius:10px!important;
-    font-size:15px!important;
-    background:transparent!important;
-    box-shadow:none!important;
-}
-.sp-shield-big{
-    width:62px!important;
-    height:62px!important;
-    font-size:25px!important;
-}
-.sp-hero{
-    padding:18px!important;
-    grid-template-columns:minmax(0,1fr) 230px!important;
-    gap:18px!important;
-}
-.sp-btn,.sp-link{
-    height:38px!important;
-    min-width:116px!important;
-    border:0!important;
-    border-radius:10px!important;
-    background:#ff7a00!important;
-    color:#111827!important;
-    box-shadow:none!important;
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:11px!important;
-    font-weight:600!important;
-    letter-spacing:0!important;
-}
-.sp-btn:hover,.sp-link:hover{
-    background:#111827!important;
-    color:#fff!important;
-    box-shadow:none!important;
-    transform:none!important;
-}
-.sp-status.green,.sp-check,.sp-check i{color:#16a34a!important}
-.security-page [style*="font-size:32px"]{font-size:28px!important}
-.security-page [style*="font-size:12px"]{font-size:12px!important}
-.security-page [style*="width:86px"],
-.security-page [style*="width:94px"]{
-    width:78px!important;
-    height:78px!important;
-    border-width:8px!important;
-    font-size:20px!important;
-}
-.security-page [style*="width:220px"]{width:210px!important}
-.security-page [style*="margin-top:18px"]{margin-top:16px!important}
-.security-page [style*="margin-top:16px"]{margin-top:14px!important}
-.security-page [style*="margin-top:14px"]{margin-top:12px!important}
-.security-page [style*="margin:16px 0 18px"]{margin:14px 0 16px!important}
-@media(max-width:760px){
-    .security-page{padding:0 0 34px!important}
-    .security-title{font-size:34px!important}
-    .security-top{display:grid!important}
-    .sp-layout,.sp-grid-2,.sp-grid-3,.sp-grid-4{grid-template-columns:1fr!important}
-    .sp-card-pad{padding:16px!important}
-}
-
-/* Final readability pass for Security & Privacy */
-.security-title{font-size:44px!important}
-.security-subtitle{font-size:13.5px!important}
-.security-tab{font-size:12px!important}
-.sp-layout{gap:28px!important}
-.sp-main,.sp-side{gap:20px!important}
-.sp-grid-2,.sp-grid-3,.sp-grid-4{gap:20px!important}
-.sp-card-pad{padding:20px!important}
-.sp-side .sp-card-pad{padding:18px!important}
-.sp-card-title{font-size:18px!important}
-.sp-card-title.sm{font-size:16px!important}
-.sp-card-desc,.sp-row small,.sp-mini-desc,.sp-muted{
-    font-size:13px!important;
-    line-height:1.5!important;
-}
-.sp-row strong,.sp-mini-title{
-    font-size:13px!important;
-}
-.sp-row{padding:11px 0!important}
-.sp-check{font-size:12px!important}
-.sp-btn,.sp-link{
-    height:40px!important;
-    min-width:124px!important;
-}
-.security-page [style*="font-size:12px"]{font-size:12.5px!important}
-@media(max-width:760px){
-    .security-title{font-size:35px!important}
-    .sp-card-title{font-size:17px!important}
-    .sp-card-title.sm{font-size:15px!important}
-}
-
-
-/* =========================================================
-   SCREENSHOT MATCH + PANTAY ENDPOINT LOCK
-   - Same left/right endpoint for every card group
-   - Mixed white/orange buttons with one black hover color
-   - Black borders only, cleaner flat dashboard look
-   - Right sidebar and main column align from top to bottom
-   ========================================================= */
-.security-page{
-    --sp-border:#111827;
-    --sp-gap:28px;
-    padding:0 28px 64px!important;
-    background:#fff!important;
-}
-.security-wrap{
-    width:100%!important;
-    max-width:1540px!important;
-    margin:0 auto!important;
-}
-.security-top{
-    display:flex!important;
-    align-items:flex-start!important;
-    justify-content:space-between!important;
-    gap:24px!important;
-    padding-top:0!important;
-    margin-bottom:18px!important;
-}
-.security-title-box{
-    display:flex!important;
-    align-items:flex-start!important;
-    gap:16px!important;
-}
-.security-title-box:before{
-    content:'\f3ed'!important;
-    font-family:'Font Awesome 6 Free'!important;
-    font-weight:900!important;
-    width:42px!important;
-    height:42px!important;
-    margin-top:2px!important;
-    border-radius:12px!important;
-    background:transparent!important;
-    color:var(--sp-orange)!important;
-    display:grid!important;
-    place-items:center!important;
-    font-size:34px!important;
-    line-height:1!important;
-}
-.security-title{
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:42px!important;
-    font-weight:800!important;
-    line-height:1.05!important;
-    letter-spacing:-.035em!important;
-    color:#050505!important;
-}
-.security-subtitle{
-    margin-top:7px!important;
-    font-size:13px!important;
-    color:#111827!important;
-}
-.security-date{
-    height:52px!important;
-    min-width:218px!important;
-    justify-content:center!important;
-    border:1px solid var(--sp-border)!important;
-    border-radius:8px!important;
-    box-shadow:none!important;
-    font-size:13px!important;
-    background:#fff!important;
-}
-.security-tabs{
-    width:620px!important;
-    max-width:100%!important;
-    height:45px!important;
-    display:flex!important;
-    align-items:flex-end!important;
-    gap:42px!important;
-    margin:0 0 20px 58px!important;
-    border:0!important;
-    border-bottom:0!important;
-    background:transparent!important;
-    overflow:visible!important;
-}
-.security-tab{
-    height:45px!important;
-    padding:0 0 12px!important;
-    border:0!important;
-    background:transparent!important;
-    color:#050505!important;
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:12px!important;
-    font-weight:800!important;
-    letter-spacing:0!important;
-    text-transform:uppercase!important;
-}
-.security-tab:hover,.security-tab.active{color:var(--sp-orange)!important;background:transparent!important;}
-.security-tab.active:after{
-    left:0!important;
-    right:0!important;
-    bottom:2px!important;
-    height:3px!important;
-    border-radius:999px!important;
-    background:var(--sp-orange)!important;
-}
-.sp-layout{
-    display:grid!important;
-    grid-template-columns:minmax(0,1fr) clamp(340px,24vw,420px)!important;
-    gap:var(--sp-gap)!important;
-    align-items:start!important;
-}
-.sp-main,.sp-side{
-    display:grid!important;
-    gap:18px!important;
-    align-content:start!important;
-    min-width:0!important;
-}
-.sp-grid-2,.sp-grid-3,.sp-grid-4{
-    display:grid!important;
-    gap:18px!important;
-    align-items:stretch!important;
-}
-.sp-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
-.sp-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
-.sp-grid-4{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
-.sp-card,.sp-hero,.sp-info-band,.sp-setting-row,.sp-danger-box,.sp-table{
-    border:1px solid var(--sp-border)!important;
-    border-radius:10px!important;
-    box-shadow:none!important;
-    background:#fff!important;
-}
-.sp-card{
-    width:100%!important;
-    height:100%!important;
-    overflow:hidden!important;
-}
-.sp-card-pad{
-    padding:18px 20px!important;
-    height:100%!important;
-}
-.sp-grid-2>.sp-card .sp-card-pad,
-.sp-grid-3>.sp-card .sp-card-pad,
-.sp-grid-4>.sp-card .sp-card-pad{
-    display:flex!important;
-    flex-direction:column!important;
-}
-.sp-grid-2>.sp-card .sp-card-pad>.sp-btn.block:last-child,
-.sp-grid-3>.sp-card .sp-card-pad>.sp-btn.block:last-child,
-.sp-grid-4>.sp-card .sp-card-pad>.sp-btn.block:last-child{
-    margin-top:auto!important;
-}
-.sp-card:hover,.sp-hero:hover,.sp-info-band:hover,.sp-setting-row:hover,.sp-danger-box:hover{
-    background:#fff!important;
-    border-color:var(--sp-border)!important;
-    box-shadow:none!important;
-    transform:none!important;
-}
-.sp-card-title{
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:18px!important;
-    font-weight:800!important;
-    line-height:1.22!important;
-    color:#050505!important;
-}
-.sp-card-title.sm{font-size:16px!important;}
-.sp-card-desc,.sp-row small,.sp-mini-desc{
-    font-size:12.5px!important;
-    line-height:1.42!important;
-    color:#111827!important;
-}
-.sp-row strong,.sp-mini-title{font-size:13px!important;font-weight:800!important;color:#050505!important;}
-.sp-row{padding:12px 0!important;border-bottom:1px solid #d9dee8!important;}
-.sp-row:last-child{border-bottom:0!important;}
-.sp-hero{
-    padding:18px 24px!important;
-    grid-template-columns:minmax(0,1fr) 285px!important;
-    gap:24px!important;
-}
-.sp-hero-left{gap:22px!important;}
-.sp-shield-big{
-    width:84px!important;
-    height:84px!important;
-    border:1px solid #ffd6ad!important;
-    background:#fff8f1!important;
-    color:var(--sp-orange)!important;
-    font-size:36px!important;
-}
-.sp-score{border-left:1px solid #d9dee8!important;padding-left:28px!important;}
-.sp-score strong{font-size:30px!important;color:var(--sp-green)!important;}
-.sp-meter{height:8px!important;}
-.sp-icon{
-    width:38px!important;
-    height:38px!important;
-    border-radius:8px!important;
-    background:transparent!important;
-    color:var(--sp-orange)!important;
-    font-size:20px!important;
-}
-.sp-icon.green{color:var(--sp-green)!important;background:transparent!important;}
-.sp-icon.blue{color:var(--sp-blue)!important;background:transparent!important;}
-.sp-icon.purple{color:var(--sp-purple)!important;background:transparent!important;}
-.sp-icon.red{color:var(--sp-red)!important;background:transparent!important;}
-.sp-head-row{align-items:center!important;}
-.sp-list{gap:0!important;margin-top:14px!important;}
-.sp-info-band{padding:14px 16px!important;}
-.sp-setting-row{padding:14px 16px!important;}
-.sp-table{
-    width:100%!important;
-    margin-top:14px!important;
-    border-collapse:separate!important;
-    border-spacing:0!important;
-}
-.sp-table th,.sp-table td{
-    padding:12px 14px!important;
-    font-size:12px!important;
-    border-bottom:1px solid #d9dee8!important;
-}
-.sp-table th{font-size:10px!important;background:#fff!important;color:#374151!important;}
-.sp-table tr:last-child td{border-bottom:0!important;}
-.sp-btn,.sp-btn.red{
-    min-width:132px!important;
-    height:38px!important;
-    min-height:38px!important;
-    border:1px solid var(--sp-orange)!important;
-    border-radius:7px!important;
-    background:var(--sp-orange)!important;
-    color:#050505!important;
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:12px!important;
-    font-weight:800!important;
-    padding:0 16px!important;
-    box-shadow:none!important;
-}
-.sp-btn.outline,.sp-btn.soft,.sp-btn.red-outline{
-    background:#fff!important;
-    color:#050505!important;
-    border-color:var(--sp-border)!important;
-}
-.sp-btn.block{width:100%!important;min-width:0!important;}
-.sp-btn:hover,.sp-btn.outline:hover,.sp-btn.soft:hover,.sp-btn.red:hover,.sp-btn.red-outline:hover,
-.sp-link:hover{
-    background:#111827!important;
-    border-color:#111827!important;
-    color:#fff!important;
-}
-.sp-link{
-    min-height:38px!important;
-    border:1px solid var(--sp-border)!important;
-    border-radius:7px!important;
-    padding:0 14px!important;
-    background:#fff!important;
-    color:#050505!important;
-    font-family:'Poppins',system-ui,sans-serif!important;
-    font-size:12px!important;
-    font-weight:800!important;
-    text-decoration:none!important;
-}
-.sp-status{font-size:11px!important;font-weight:800!important;}
-.sp-status.green{background:var(--sp-green-soft)!important;color:var(--sp-green)!important;}
-.sp-status.gray{background:#f3f4f6!important;color:#64748b!important;}
-.sp-check,.sp-check i{font-size:12px!important;color:var(--sp-green)!important;}
-.sp-side .sp-card-pad{padding:18px 20px!important;}
-.sp-side .sp-card{height:auto!important;}
-.sp-side [style*="width:86px"],.sp-side [style*="width:94px"],
-.security-page [style*="width:86px"],.security-page [style*="width:94px"]{
-    width:78px!important;
-    height:78px!important;
-    border-width:8px!important;
-    font-size:22px!important;
-}
-.sp-danger{border-color:#ef4444!important;background:#fffafa!important;}
-.sp-danger-box{border-color:#ef4444!important;}
-.sp-danger .sp-card-title{color:#b91c1c!important;}
-.sp-field label{font-size:12px!important;font-weight:800!important;}
-.sp-input{height:40px!important;border:1px solid #111827!important;border-radius:7px!important;}
-.sp-switch{width:42px!important;height:24px!important;}
-.sp-switch input:checked+.sp-slider{background:var(--sp-green)!important;}
-.sp-slider:before{width:18px!important;height:18px!important;left:3px!important;top:3px!important;}
-.sp-switch input:checked+.sp-slider:before{transform:translateX(18px)!important;}
-@media(max-width:1180px){
-    .security-page{padding:0 18px 44px!important;}
-    .security-tabs{margin-left:0!important;}
-    .sp-layout{grid-template-columns:1fr!important;}
-    .sp-side{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
-}
-@media(max-width:760px){
-    .security-top{display:grid!important;}
-    .security-title-box:before{width:34px!important;height:34px!important;font-size:28px!important;}
-    .security-title{font-size:32px!important;}
-    .security-tabs{gap:24px!important;overflow-x:auto!important;}
-    .sp-grid-2,.sp-grid-3,.sp-grid-4,.sp-side{grid-template-columns:1fr!important;}
-    .sp-hero{grid-template-columns:1fr!important;}
-    .sp-score{border-left:0!important;border-top:1px solid #d9dee8!important;padding:16px 0 0!important;}
-}
-
-/* Balanced security section: dashboard spacing, less heavy boxes */
-.security-top{margin-bottom:14px!important}
-.security-tabs{margin-bottom:16px!important}
-.sp-layout{
-    grid-template-columns:minmax(0,1fr) 320px!important;
-    gap:20px!important;
-}
-.sp-main,.sp-side{gap:16px!important}
-.sp-grid-2,.sp-grid-3,.sp-grid-4{gap:16px!important}
-.sp-card-pad{padding:16px!important}
-.sp-side .sp-card-pad{padding:14px!important}
-.sp-hero{padding:16px!important;gap:16px!important}
-.sp-card-title{font-size:17px!important}
-.sp-card-title.sm{font-size:15px!important}
-.sp-card-desc,.sp-row small,.sp-mini-desc,.sp-muted{font-size:12.5px!important}
-.sp-row strong,.sp-mini-title{font-size:12.5px!important}
-.sp-row{padding:9px 0!important}
-.sp-list{gap:7px!important}
-.sp-icon{background:transparent!important}
-.sp-icon.red,.security-page .fa-shield-halved,.security-page .fa-shield,.security-page .fa-lock,.security-page .fa-key{color:#dc2626!important}
-.security-page .fa-envelope,.security-page .fa-at,.security-page .fa-id-card{color:#111827!important}
-.security-page .fa-mobile-screen,.security-page .fa-download{color:#2563eb!important}
-.security-page .fa-location-dot{color:#16a34a!important}
-.security-page .fa-circle-check,.security-page .sp-status.green{color:#16a34a!important}
-.sp-btn.soft,.sp-link{
-    background:#fff!important;
-    color:#111827!important;
-    border:0!important;
-    box-shadow:none!important;
-}
-.sp-btn.soft:hover,.sp-link:hover{
-    background:#111827!important;
-    color:#fff!important;
-}
-/* Match Settings overview scale exactly */
-.security-page{
-    padding:0 0 34px!important;
-}
-.security-wrap{
-    width:100%!important;
-    max-width:none!important;
-}
-.security-top{
-    margin:0 0 12px!important;
-    align-items:flex-start!important;
-}
-.security-title-box:before{
-    width:17px!important;
-    height:4px!important;
-    margin-top:18px!important;
-}
-.security-title{
-    font-size:40px!important;
-    line-height:1.2!important;
-    letter-spacing:0!important;
-}
-.security-subtitle{
-    margin:6px 0 0!important;
-    font-size:12px!important;
-    line-height:1.4!important;
-}
-.security-tabs{
-    display:flex!important;
-    gap:26px!important;
-    height:auto!important;
-    max-width:none!important;
-    border:0!important;
-    border-bottom:1px solid #dfe3ea!important;
-    border-radius:0!important;
-    margin:0 0 16px!important;
-    overflow-x:auto!important;
-}
-.security-tab{
-    height:auto!important;
-    padding:11px 0 12px!important;
-    background:transparent!important;
-    font-size:10.5px!important;
-    font-weight:700!important;
-    letter-spacing:0!important;
-}
-.security-date{
-    height:36px!important;
-    padding:0 13px!important;
-    font-size:11px!important;
-    border-radius:10px!important;
-}
-.sp-layout{
-    grid-template-columns:minmax(0,1fr) 320px!important;
-    gap:18px!important;
-}
-.sp-main,.sp-side{gap:16px!important}
-.sp-grid-2,.sp-grid-3,.sp-grid-4{gap:16px!important}
-.sp-card,.sp-hero,.sp-info-band,.sp-setting-row,.sp-danger-box,.sp-table{
-    border-radius:14px!important;
-}
-.sp-card-pad{
-    padding:15px 17px!important;
-}
-.sp-side .sp-card-pad{
-    padding:15px 17px!important;
-}
-.sp-hero{
-    padding:15px 17px!important;
-    gap:14px!important;
-    grid-template-columns:minmax(0,1fr) 220px!important;
-}
-.sp-card-title{
-    font-size:14.5px!important;
-    line-height:1.35!important;
-}
-.sp-card-title.sm{
-    font-size:13px!important;
-}
-.sp-card-desc,.sp-row small,.sp-mini-desc,.sp-muted,.security-page p{
-    font-size:10.5px!important;
-    line-height:1.42!important;
-}
-.sp-row strong,.sp-mini-title{
-    font-size:11px!important;
-}
+    display:grid;
+    place-items:center;
+    flex:0 0 auto;
+    color:var(--sp-orange);
+    font-size:18px;
+}
+.sp-icon.green{color:var(--sp-green);}
+.sp-icon.red{color:var(--sp-red);}
+.sp-icon.blue{color:var(--sp-blue);}
+.sp-btn,
+.sp-action,
+.sp-link-button{
+    height:35px;
+    min-width:128px;
+    border-radius:10px;
+    border:1px solid #111827;
+    background:#fff;
+    color:#111827;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:0 16px;
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:11px;
+    font-weight:600;
+    text-decoration:none;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:.16s ease;
+}
+.sp-btn.primary,
+.sp-action.primary{
+    border-color:var(--sp-orange);
+    background:var(--sp-orange);
+    color:#111827;
+}
+.sp-btn.pill{border-radius:999px;}
+.sp-btn:hover,
+.sp-action:hover,
+.sp-link-button:hover{
+    background:#111827;
+    border-color:#111827;
+    color:#fff;
+}
+.sp-btn.block{width:100%;min-width:0;}
+.sp-status{
+    min-height:22px;
+    width:max-content;
+    border-radius:999px;
+    padding:4px 10px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    background:#f3f4f6;
+    color:#64748b;
+    font-size:10.5px;
+    font-weight:700;
+    white-space:nowrap;
+}
+.sp-status.green{background:var(--sp-green-soft);color:var(--sp-green);}
+.sp-status.orange{background:var(--sp-orange-soft);color:var(--sp-orange);}
+.sp-status.gray{background:#f3f4f6;color:#64748b;}
+.sp-status.plain{background:transparent;color:#64748b;padding-left:0;padding-right:0;}
 .sp-row{
-    padding:7px 0!important;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:12px 0;
+    border-bottom:1px solid #eef1f5;
 }
-.sp-list{
-    gap:7px!important;
+.sp-row:last-child{border-bottom:0;}
+.sp-mini-title,
+.sp-row strong{
+    display:block;
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.25;
+    color:#111827;
 }
-.sp-setting-row{
-    gap:10px!important;
-    padding:9px 10px!important;
-    border-radius:10px!important;
+.sp-row small,
+.sp-mini-desc{
+    display:block;
+    margin-top:4px;
+    color:#111827;
+    font-size:11px;
+    line-height:1.4;
 }
-.sp-icon{
-    width:28px!important;
-    height:28px!important;
-    border-radius:9px!important;
-    font-size:12.5px!important;
+.sp-empty{
+    min-height:58px;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    color:#6b7280;
+    font-size:11.5px;
+    line-height:1.45;
 }
-.sp-shield-big{
-    width:50px!important;
-    height:50px!important;
-    font-size:21px!important;
+.sp-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    margin-top:18px;
 }
-.sp-btn,.sp-link{
-    height:38px!important;
-    min-width:128px!important;
-    font-size:11px!important;
+.sp-table th,
+.sp-table td{
+    padding:12px 14px;
+    text-align:left;
+    border-bottom:1px solid #dfe3ea;
+    font-size:12px;
+    vertical-align:middle;
+    color:#111827;
 }
-.security-page [style*="width:86px"],
-.security-page [style*="width:94px"]{
-    width:62px!important;
-    height:62px!important;
-    border-width:7px!important;
-    font-size:17px!important;
+.sp-table th{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:#4b5563;
+    font-weight:700;
 }
-.security-page [style*="font-size:32px"]{font-size:22px!important}
-.security-page [style*="font-size:12px"]{font-size:10.5px!important}
-.security-wrap{max-width:1490px!important;margin:0 auto!important}
-.security-top{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:18px!important;margin:0 0 16px!important}
-.security-title-box{gap:10px!important;align-items:flex-start!important}.security-title-box:before{width:18px!important;height:4px!important;margin-top:8px!important;border-radius:999px!important;background:var(--sp-orange)!important;flex:0 0 auto!important}
-.security-title{font-size:40px!important;line-height:1.2!important;letter-spacing:-.02em!important}
-.security-subtitle{margin:4px 0 0!important;font-size:12px!important;line-height:1.45!important;color:#6b7280!important}
-.security-date{height:42px!important;min-width:178px!important;padding:0 15px!important;border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;color:#111827!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;font-size:12px!important;font-weight:700!important;line-height:1!important;white-space:nowrap!important;box-shadow:none!important}
-.security-date i,.security-date [data-lucide]{width:16px!important;height:16px!important;color:#111827!important}
-.sp-layout,.sp-settings-grid,.sp-grid-2,.sp-grid-3,.sp-grid-4{align-items:stretch!important}
-@media(max-width:760px){.security-top{display:grid!important}.security-date{width:100%!important}}
-.security-page{padding:0 0 44px!important;background:#fff!important}
-.security-wrap{max-width:1490px!important;margin:0 auto!important}
-.security-top{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:18px!important;margin:0 0 14px!important}
-.security-title-box{display:flex!important;align-items:flex-start!important;gap:10px!important}
-.security-title-box:before{content:"\f3ed"!important;font-family:"Font Awesome 6 Free"!important;font-weight:900!important;width:34px!important;height:34px!important;margin-top:4px!important;border-radius:50%!important;background:transparent!important;color:#ff7a00!important;display:grid!important;place-items:center!important;font-size:28px!important;line-height:1!important;flex:0 0 auto!important}
-.security-title{font-family:'Playfair Display',Georgia,serif!important;font-size:40px!important;font-weight:700!important;line-height:1.1!important;letter-spacing:0!important;color:#111827!important;margin:0!important}
-.security-subtitle{margin:4px 0 0!important;font:400 12px/1.45 'Inter',system-ui,sans-serif!important;color:#111827!important}
-.security-date{height:42px!important;min-width:178px!important;border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;box-shadow:none!important}
-.security-tabs{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;margin:0 0 22px!important;padding:0!important;gap:30px!important}
-.security-tab{height:34px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#111827!important;padding:0!important;font:600 11px/1 'Poppins',system-ui,sans-serif!important}
-.security-tab.active{color:#ff7a00!important;border-bottom:3px solid #ff7a00!important;background:transparent!important}
-.sp-layout{grid-template-columns:minmax(0,1fr) 350px!important;gap:28px!important;align-items:start!important}
-.sp-main,.sp-side{gap:18px!important}
-.sp-hero,.sp-main>.sp-card,.sp-main>.sp-grid-2>.sp-card,.sp-main>.sp-grid-3>.sp-card,.sp-main>.sp-grid-4>.sp-card,.sp-table{border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;box-shadow:none!important}
-.sp-hero:hover,.sp-main>.sp-card:hover,.sp-main>.sp-grid-2>.sp-card:hover,.sp-main>.sp-grid-3>.sp-card:hover,.sp-main>.sp-grid-4>.sp-card:hover{background:#fff!important;box-shadow:none!important}
-.sp-side>.sp-card{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-.sp-side>.sp-card:hover{background:transparent!important;box-shadow:none!important}
-.sp-card-pad{padding:18px!important}
-.sp-side .sp-card-pad{padding:0 0 18px!important}
-.sp-card-title{font-family:'Poppins',system-ui,sans-serif!important;font-size:17px!important;font-weight:600!important;letter-spacing:0!important}
-.sp-card-title.sm{font-size:15px!important}
-.sp-card-desc,.sp-row small,.sp-mini-desc,.security-page p{font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;font-weight:400!important;letter-spacing:0!important}
-.sp-btn{border:0!important;border-radius:8px!important;background:#ff7a00!important;color:#111827!important;box-shadow:none!important}
-.sp-btn:hover,.sp-btn:focus{background:#111827!important;color:#fff!important;box-shadow:none!important}
-.sp-btn.outline,.sp-link{background:#fff!important;border:0!important;color:#111827!important;box-shadow:none!important}
-.sp-btn.outline:hover,.sp-link:hover{background:#111827!important;color:#fff!important}
-@media(max-width:1180px){.sp-layout{grid-template-columns:1fr!important}.sp-side{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-@media(max-width:760px){.security-page{padding:0 18px 44px!important}.security-top{display:grid!important}.security-title{font-size:32px!important}.sp-layout,.sp-side{grid-template-columns:1fr!important}.security-tabs{overflow:auto!important;gap:22px!important}}
+.sp-table tr:last-child td{border-bottom:0;}
+.sp-table small{display:block;margin-top:3px;font-size:10.5px;color:#6b7280;}
+.sp-device{display:flex;align-items:center;gap:10px;min-width:0;}
+.sp-list{display:grid;gap:0;margin-top:14px;}
+.sp-switch{position:relative;display:inline-block;width:42px;height:24px;flex:0 0 auto;}
+.sp-switch input{opacity:0;width:0;height:0;}
+.sp-slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;transition:.18s;cursor:pointer;}
+.sp-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.18);transition:.18s;}
+.sp-switch input:checked+.sp-slider{background:var(--sp-green);}
+.sp-switch input:checked+.sp-slider:before{transform:translateX(18px);}
+.sp-template-badge{
+    height:25px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:0 10px;
+    border-radius:999px;
+    background:#fff8f1;
+    color:#ff7a00;
+    font-size:10.5px;
+    font-weight:700;
+}
+.sp-toast{
+    position:fixed;
+    left:50%;
+    top:92px;
+    z-index:9999;
+    transform:translate(-50%,-12px);
+    opacity:0;
+    pointer-events:none;
+    background:#111827;
+    color:#fff;
+    padding:13px 16px;
+    border-radius:12px;
+    font-weight:800;
+    font-size:12px;
+    box-shadow:0 18px 50px rgba(17,24,39,.25);
+    transition:.2s;
+}
+.sp-toast.show{opacity:1;transform:translate(-50%,0);}
 
-/* Final Security & Privacy box treatment based on the reference screens */
-#overview-panel .sp-main>.sp-hero{border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;box-shadow:none!important;padding:18px 20px!important}
-#overview-panel .sp-main>.sp-card-title.sm{margin:18px 0 0!important;padding-left:2px!important;font:600 16px/1.25 'Poppins',system-ui,sans-serif!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type,#overview-panel .sp-main>.sp-grid-2:first-of-type{display:grid!important;grid-template-columns:1fr!important;gap:0!important;border:1px solid #111827!important;border-radius:8px!important;background:#fff!important;overflow:hidden!important;box-shadow:none!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type>.sp-card,#overview-panel .sp-main>.sp-grid-2:first-of-type>.sp-card{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;border-bottom:1px solid #e5e7eb!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type>.sp-card:last-child,#overview-panel .sp-main>.sp-grid-2:first-of-type>.sp-card:last-child{border-bottom:0!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type .sp-card-pad,#overview-panel .sp-main>.sp-grid-2:first-of-type .sp-card-pad{min-height:0!important;padding:14px 18px!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type .sp-card-pad{display:grid!important;grid-template-columns:42px minmax(0,1fr) auto!important;align-items:center!important;column-gap:14px!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type .sp-head-row{grid-row:1/span 4!important;margin:0!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type .sp-card-title{margin:0!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type .sp-card-desc,#overview-panel .sp-main>.sp-grid-3:first-of-type p{margin:2px 0!important}
-#overview-panel .sp-main>.sp-grid-3:first-of-type .sp-btn{grid-column:3!important;grid-row:1/span 4!important;align-self:center!important;min-width:150px!important}
-#overview-panel .sp-main>.sp-grid-4:first-of-type{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;border:1px solid #111827!important;border-radius:8px!important;background:#111827!important;overflow:hidden!important}
-#overview-panel .sp-main>.sp-grid-4:first-of-type>.sp-card{border:0!important;border-radius:0!important;border-right:1px solid rgba(255,255,255,.12)!important;background:transparent!important;color:#fff!important;box-shadow:none!important}
-#overview-panel .sp-main>.sp-grid-4:first-of-type>.sp-card:last-child{border-right:0!important}
-#overview-panel .sp-main>.sp-grid-4:first-of-type .sp-card-title,#overview-panel .sp-main>.sp-grid-4:first-of-type .sp-card-desc,#overview-panel .sp-main>.sp-grid-4:first-of-type strong{color:#fff!important}
-#password-panel .sp-main>.sp-card:nth-of-type(1),#password-panel .sp-main>.sp-card:nth-of-type(2){border:1px solid #111827!important;background:#fff!important;box-shadow:none!important}
-#password-panel .sp-main>.sp-card:nth-of-type(1){border-radius:8px 8px 0 0!important;border-bottom:0!important;margin-bottom:0!important}
-#password-panel .sp-main>.sp-card:nth-of-type(2){border-radius:0 0 8px 8px!important;border-top:1px solid #e5e7eb!important;margin-top:0!important}
-#password-panel .sp-main>.sp-grid-2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:0!important;margin-top:18px!important;border:1px solid #111827!important;border-bottom:0!important;border-radius:8px 8px 0 0!important;background:#111827!important;overflow:hidden!important}
-#password-panel .sp-main>.sp-grid-2>.sp-card,#password-panel .sp-main>.sp-grid-2+.sp-card{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#fff!important}
-#password-panel .sp-main>.sp-grid-2>.sp-card:first-child{border-right:1px solid rgba(255,255,255,.12)!important}
-#password-panel .sp-main>.sp-grid-2+.sp-card{margin-top:0!important;border:1px solid #111827!important;border-top:1px solid rgba(255,255,255,.12)!important;border-radius:0 0 8px 8px!important;background:#111827!important}
-#password-panel .sp-main>.sp-grid-2 .sp-card-title,#password-panel .sp-main>.sp-grid-2 .sp-card-desc,#password-panel .sp-main>.sp-grid-2 strong,#password-panel .sp-main>.sp-grid-2 small,#password-panel .sp-main>.sp-grid-2+.sp-card .sp-card-title,#password-panel .sp-main>.sp-grid-2+.sp-card .sp-card-desc,#password-panel .sp-main>.sp-grid-2+.sp-card strong,#password-panel .sp-main>.sp-grid-2+.sp-card small{color:#fff!important}
-#password-panel .sp-main>.sp-grid-2 .sp-row,#password-panel .sp-main>.sp-grid-2+.sp-card .sp-row{border-color:rgba(255,255,255,.12)!important}
-#overview-panel .sp-side>.sp-card,#password-panel .sp-side>.sp-card{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+/* OVERVIEW */
+.overview-reference-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 430px;
+    gap:18px;
+    align-items:start;
+}
+.overview-left,
+.overview-right{display:grid;gap:18px;min-width:0;}
+.overview-main-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:20px 24px 10px;
+}
+.overview-access-list{padding:0 24px;}
+.overview-access-row{
+    display:grid;
+    grid-template-columns:34px minmax(0,1fr) auto;
+    gap:16px;
+    align-items:center;
+    padding:21px 0;
+    border-bottom:1px solid var(--sp-line-soft);
+}
+.overview-access-row:last-child{border-bottom:0;}
+.overview-row-icon{
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    color:var(--sp-red);
+    font-size:18px;
+}
+.overview-row-icon.dark{color:#111827;}
+.overview-bottom-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    border-top:1px solid var(--sp-line);
+}
+.overview-mini-panel{min-width:0;padding:18px 22px;}
+.overview-mini-panel:first-child{border-right:1px solid var(--sp-line);}
+.overview-mini-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:12px;
+}
+.overview-side-card{padding:24px 22px;}
+.overview-secure-head{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.overview-secure-badge{
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    border:1px solid #ffd8b0;
+    background:#fff8f1;
+    color:var(--sp-red);
+    font-size:24px;
+    flex:0 0 auto;
+}
+.overview-chips{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:20px;border-bottom:1px solid var(--sp-line-soft);}
+.overview-chip{height:24px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;padding:0 9px;background:var(--sp-green-soft);color:var(--sp-green);font-size:10px;font-weight:700;}
+.overview-score-box{padding-top:18px;}
+.overview-score-number strong{color:var(--sp-green);font-size:38px;line-height:1;font-family:'Poppins',system-ui,sans-serif;}
+.overview-score-number span{color:#111827;font-size:20px;font-weight:700;}
+.overview-score-meter{width:100%;height:8px;border-radius:999px;background:#e5eaf0;overflow:hidden;margin:12px 0 13px;}
+.overview-score-meter i{display:block;height:100%;border-radius:inherit;background:var(--sp-green);}
+.overview-danger{background:transparent;border:0;border-radius:0;overflow:visible;}
+.overview-danger-inner{padding:0 2px;}
+.overview-danger h3{margin:0;color:var(--sp-red);display:flex;align-items:center;gap:9px;font-family:'Poppins',system-ui,sans-serif;font-size:16px;}
+.overview-danger-line{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 0 0;}
+.overview-danger-action{border:0;background:transparent;color:var(--sp-red);min-width:0;padding:0;}
+
+/* PASSWORD */
+.password-reference-layout{display:block;width:100%;}
+.password-full{display:grid;gap:18px;width:100%;}
+.password-management{padding:22px 24px 16px;}
+.password-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.password-change{border-top:1px solid var(--sp-line);padding:22px 24px 18px;}
+.password-strength-panel{
+    min-height:88px;
+    border:1px solid var(--sp-line);
+    border-radius:10px;
+    padding:14px 20px;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) minmax(210px,280px);
+    gap:28px;
+    align-items:center;
+}
+.password-score-left{display:flex;align-items:center;gap:18px;}
+.password-score-circle{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    border:8px solid var(--sp-green);
+    display:grid;
+    place-items:center;
+    color:var(--sp-green);
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:24px;
+    font-weight:800;
+    line-height:1;
+    text-align:center;
+}
+.password-score-circle small{display:block;margin:2px 0 0;color:#111827;font-size:11px;font-weight:700;}
+.password-strength-name b{display:block;margin-top:2px;color:var(--sp-green);font-family:'Poppins',system-ui,sans-serif;font-size:20px;line-height:1;}
+.password-bars{display:flex;align-items:center;gap:12px;width:100%;}
+.password-bars i{height:5px;flex:1;min-width:38px;border-radius:999px;background:var(--sp-green);}
+.password-bars i.off{background:var(--sp-line);}
+.password-last-changed{justify-self:end;text-align:left;}
+.password-last-changed small{display:block;font-size:11px;color:#111827;}
+.password-last-changed b{display:block;margin-top:6px;font-family:'Poppins',system-ui,sans-serif;font-size:12px;color:#111827;}
+.password-form{margin-top:14px;}
+.password-field{display:grid;gap:7px;margin-top:12px;}
+.password-field label{color:#111827;font-size:12px;font-weight:600;}
+.password-input-wrap{position:relative;}
+.password-input{width:100%;height:40px;border:1px solid var(--sp-line);border-radius:8px;background:#fff;color:#111827;outline:none;padding:0 42px 0 12px;font-size:13px;}
+.password-input:focus{border-color:#111827;box-shadow:0 0 0 3px rgba(17,24,39,.08);}
+.password-eye{width:34px;height:34px;border:0;background:transparent;position:absolute;top:50%;right:5px;transform:translateY(-50%);display:grid;place-items:center;color:#64748b;cursor:pointer;}
+.password-inline-strength{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:7px;}
+.password-inline-strength .password-bars{gap:8px;}
+.password-inline-strength .password-bars i{height:4px;min-width:0;background:var(--sp-line);}
+.password-inline-strength span{font-size:11px;font-weight:700;color:#6b7280;}
+.password-submit-row{display:flex;justify-content:flex-end;margin-top:18px;}
+.password-bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.password-bottom-card{padding:18px 20px;}
+.password-check-list{display:grid;gap:10px;margin-top:14px;}
+.password-check{display:flex;align-items:center;gap:10px;font-size:12px;line-height:1.35;color:#111827;}
+.password-check i{color:var(--sp-green);flex:0 0 auto;}
+.password-recovery-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #eef1f5;}
+.password-recovery-row:last-child{border-bottom:0;}
+.password-edit-button{height:30px;min-width:72px;border:1px solid var(--sp-line);background:#fff;border-radius:8px;padding:0 12px;color:#111827;font-family:'Poppins',system-ui,sans-serif;font-size:11px;font-weight:600;cursor:pointer;}
+.password-edit-button:hover{background:#111827;color:#fff;border-color:#111827;}
+
+/* DEVICES - reference screenshot flow */
+.devices-reference-layout{display:grid;gap:24px;width:100%;}
+.devices-card .sp-card-pad{padding:24px 28px;}
+.devices-summary{
+    display:grid;
+    grid-template-columns:180px repeat(3,minmax(0,1fr));
+    align-items:center;
+    gap:24px;
+    margin-top:28px;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--sp-line);
+}
+.devices-count-box{display:flex;align-items:center;gap:16px;border-right:1px solid var(--sp-line);padding-right:22px;}
+.devices-count-circle{
+    width:74px;
+    height:74px;
+    border-radius:50%;
+    border:8px solid var(--sp-green);
+    display:grid;
+    place-items:center;
+    color:#111827;
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:25px;
+    font-weight:800;
+}
+.devices-feature{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#111827;font-size:12px;font-weight:600;}
+.devices-feature i:first-child{color:var(--sp-green);font-size:18px;}
+.devices-warning-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px;}
+.devices-warning-row p{display:flex;align-items:center;gap:9px;margin:0;color:#111827;font-size:11.5px;line-height:1.45;}
+.devices-warning-row p i{color:var(--sp-red);}
+.devices-activity-settings{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 310px;
+    gap:28px;
+}
+.devices-settings-side{border-left:1px solid var(--sp-line);padding-left:26px;display:grid;gap:18px;align-content:start;}
+.device-setting-row{display:flex;align-items:center;justify-content:space-between;gap:18px;}
+.device-setting-row + .device-setting-row{padding-top:8px;}
+.safety-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:22px;}
+.safety-item{display:flex;align-items:center;gap:16px;}
+.safety-icon{width:36px;height:36px;display:grid;place-items:center;font-size:28px;color:var(--sp-orange);}
+.safety-icon.red{color:var(--sp-red);}
+.safety-icon.dark{color:#111827;}
+
+/* PRIVACY - reference screenshot flow */
+.privacy-reference-layout{display:grid;gap:24px;width:100%;max-width:1120px;}
+.privacy-card .sp-card-pad{padding:24px 28px;}
+.privacy-main-summary{
+    display:grid;
+    grid-template-columns:96px minmax(0,1fr) auto;
+    align-items:center;
+    gap:20px;
+    margin-top:22px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--sp-line);
+}
+.privacy-score-circle{
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    border:8px solid var(--sp-green);
+    display:grid;
+    place-items:center;
+    color:#111827;
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:24px;
+    font-weight:800;
+    line-height:1;
+    text-align:center;
+}
+.privacy-score-circle small{display:block;margin-top:2px;font-size:11px;font-weight:700;color:#111827;}
+.privacy-score-meter{width:100%;max-width:220px;height:7px;border-radius:999px;background:#e5eaf0;overflow:hidden;margin-top:10px;}
+.privacy-score-meter i{display:block;height:100%;border-radius:inherit;background:var(--sp-green);}
+.privacy-controls-list{display:grid;gap:0;margin-top:12px;}
+.privacy-control-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 0;border-bottom:1px solid var(--sp-line-soft);}
+.privacy-control-row:last-child{border-bottom:0;}
+.privacy-control-left{display:flex;align-items:center;gap:18px;min-width:0;}
+.privacy-control-icon{width:28px;height:28px;display:grid;place-items:center;color:#111827;font-size:20px;flex:0 0 auto;}
+.cookie-download-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;}
+.cookie-list{display:grid;gap:0;margin-top:22px;}
+.cookie-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 0;border-bottom:1px solid var(--sp-line-soft);}
+.cookie-row:last-child{border-bottom:0;}
+.cookie-left{display:flex;align-items:center;gap:18px;min-width:0;}
+.cookie-left i{width:28px;text-align:center;font-size:20px;color:#111827;}
+.download-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-top:18px;margin-top:4px;border-top:1px solid var(--sp-line);}
+.data-note-card .sp-card-pad{padding:22px 28px;}
+.data-note-card .sp-title-left{align-items:flex-start;}
+
+@media(max-width:1180px){
+    .overview-reference-layout{grid-template-columns:1fr;}
+    .overview-right{grid-template-columns:1fr 1fr;}
+    .password-strength-panel{grid-template-columns:1fr;gap:16px;}
+    .password-last-changed{justify-self:start;}
+    .password-bottom-grid{grid-template-columns:1fr;}
+    .devices-summary{grid-template-columns:1fr 1fr;}
+    .devices-count-box{border-right:0;border-bottom:1px solid var(--sp-line);padding:0 0 18px;}
+    .devices-activity-settings{grid-template-columns:1fr;}
+    .devices-settings-side{border-left:0;border-top:1px solid var(--sp-line);padding:20px 0 0;}
+    .privacy-reference-layout{max-width:none;}
+}
+@media(max-width:760px){
+    .security-page{padding:0 18px 44px;}
+    .security-top{display:grid;}
+    .security-title{font-size:32px;}
+    .security-date{width:100%;}
+    .overview-bottom-grid,
+    .overview-right,
+    .devices-summary,
+    .safety-grid,
+    .privacy-main-summary{grid-template-columns:1fr;}
+    .overview-mini-panel:first-child{border-right:0;border-bottom:1px solid var(--sp-line);}
+    .overview-access-row{grid-template-columns:30px minmax(0,1fr);}
+    .overview-access-row .sp-action{grid-column:1 / -1;width:100%;}
+    .overview-danger-line,
+    .password-head-row,
+    .password-submit-row,
+    .cookie-download-head,
+    .download-row,
+    .devices-warning-row{display:grid;}
+    .sp-action,.sp-btn,.sp-link-button{width:100%;}
+    .password-recovery-row{grid-template-columns:1fr;}
+    .sp-table{display:block;overflow-x:auto;}
+    .privacy-main-summary{gap:12px;}
+}
 </style>
 
 <div class="security-page">
@@ -1140,7 +770,10 @@
                     <p class="security-subtitle">Manage your account security, privacy settings, and data protection.</p>
                 </div>
             </div>
-            <div class="security-date"><i data-lucide="calendar-days"></i><span>Today is {{ now()->format('M d, Y') }}</span></div>
+            <div class="security-date">
+                <i data-lucide="calendar-days"></i>
+                <span>Today is {{ now()->format('M d, Y') }}</span>
+            </div>
         </div>
 
         <div class="security-tabs" role="tablist" aria-label="Security and Privacy tabs">
@@ -1152,236 +785,647 @@
 
         <!-- OVERVIEW TAB -->
         <section class="sp-panel active" id="overview-panel">
-            <div class="sp-layout">
-                <main class="sp-main">
-                    <section class="sp-hero">
-                        <div class="sp-hero-left">
-                            <div class="sp-shield-big"><i class="fa-solid fa-shield-halved"></i></div>
-                            <div>
-                                <h2>Your Account is Secure</h2>
-                                <p class="sp-card-desc">Great job! You have strong security settings in place.</p>
-                                <div class="sp-chips">
-                                    <span class="sp-chip"><i class="fa-solid fa-check"></i> Strong Password</span>
-                                    <span class="sp-chip"><i class="fa-solid fa-check"></i> Security Verified</span>
-                                    <span class="sp-chip"><i class="fa-solid fa-check"></i> Email Verified</span>
-                                </div>
-                            </div>
+            <div class="overview-reference-layout">
+                <main class="overview-left">
+                    <section class="sp-card">
+                        <div class="overview-main-header">
+                            <span class="sp-icon green"><i class="fa-solid fa-desktop"></i></span>
+                            <h2 class="sp-card-title">Device Access &amp; Sign-in Settings</h2>
                         </div>
-                        <div class="sp-score">
-                            <p class="sp-card-desc">Security Score</p>
-                            <strong>90</strong><span>/100</span>
-                            <div class="sp-meter"><i></i></div>
-                            <button type="button" class="sp-link" onclick="showSpToast('Security recommendations opened.')">View Security Recommendations <i class="fa-solid fa-chevron-right"></i></button>
+
+                        <div class="overview-access-list">
+                            @foreach($overviewAccessItems as $item)
+                                <div class="overview-access-row">
+                                    <span class="overview-row-icon {{ data_get($item, 'tone') === 'dark' ? 'dark' : '' }}"><i class="{{ data_get($item, 'icon') }}"></i></span>
+                                    <div>
+                                        <h4 class="sp-mini-title">{{ data_get($item, 'title') }}</h4>
+                                        <p class="sp-mini-desc">{{ data_get($item, 'description') }}</p>
+                                        <div style="margin-top:8px">
+                                            <span class="sp-status {{ data_get($item, 'status_tone', 'gray') }}">{{ data_get($item, 'status', 'Template only') }}</span>
+                                        </div>
+                                        <small class="sp-mini-desc"><b>{{ data_get($item, 'meta_label') }}:</b> {{ data_get($item, 'meta_value', 'No record yet') }}</small>
+                                    </div>
+                                    <button type="button" class="sp-action {{ data_get($item, 'variant') === 'primary' ? 'primary' : '' }}" @if(data_get($item, 'target')) data-tab-jump="{{ data_get($item, 'target') }}" @endif>
+                                        {{ data_get($item, 'action', 'Manage') }}
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="overview-bottom-grid">
+                            <section class="overview-mini-panel">
+                                <div class="overview-mini-head">
+                                    <div class="sp-title-left">
+                                        <span class="sp-icon"><i class="fa-regular fa-clock"></i></span>
+                                        <div>
+                                            <h3 class="sp-card-title sm">Login Activity</h3>
+                                            <p class="sp-card-desc">Recent login records will appear here once backend tracking is connected.</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="sp-link-button" data-tab-jump="devices">View All <i class="fa-solid fa-chevron-right"></i></button>
+                                </div>
+
+                                <div class="sp-list">
+                                    @forelse($overviewLoginActivity as $activity)
+                                        <div class="sp-row">
+                                            <div>
+                                                <strong>{{ data_get($activity, 'location', 'Unknown location') }}</strong>
+                                                <small>{{ data_get($activity, 'browser', 'Unknown browser') }}</small>
+                                            </div>
+                                            <span class="sp-status {{ data_get($activity, 'status_tone', 'green') }}">{{ data_get($activity, 'status', 'Recorded') }}</span>
+                                        </div>
+                                    @empty
+                                        <div class="sp-empty">No login activity recorded yet. This section is ready for backend data.</div>
+                                    @endforelse
+                                </div>
+                            </section>
+
+                            <section class="overview-mini-panel">
+                                <div class="overview-mini-head">
+                                    <div class="sp-title-left">
+                                        <span class="sp-icon blue"><i class="fa-regular fa-id-badge"></i></span>
+                                        <div>
+                                            <h3 class="sp-card-title sm">Active Sessions</h3>
+                                            <p class="sp-card-desc">Signed-in sessions will be listed here after authentication tracking is added.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="sp-list">
+                                    @forelse($overviewSessions as $session)
+                                        <div class="sp-row">
+                                            <div class="sp-row-left">
+                                                <span class="sp-icon blue"><i class="{{ data_get($session, 'icon', 'fa-solid fa-display') }}"></i></span>
+                                                <div>
+                                                    <strong>{{ data_get($session, 'device', 'Device') }}</strong>
+                                                    <small>{{ data_get($session, 'meta', 'Session details') }}</small>
+                                                </div>
+                                            </div>
+                                            @if(data_get($session, 'can_sign_out', false))
+                                                <button type="button" class="sp-action">Sign Out</button>
+                                            @else
+                                                <span class="sp-status green">{{ data_get($session, 'status', 'Active') }}</span>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <div class="sp-empty">No active session record yet. Device sessions will appear here after backend connection.</div>
+                                    @endforelse
+                                </div>
+                            </section>
                         </div>
                     </section>
 
-                    <h3 class="sp-card-title sm"><i class="fa-solid fa-lock" style="color:var(--sp-orange);margin-right:8px"></i>Device Access &amp; Sign-in Settings</h3>
-                    <div class="sp-grid-3">
-                        <section class="sp-card"><div class="sp-card-pad">
-                            <div class="sp-head-row"><span class="sp-icon"><i class="fa-solid fa-key"></i></span></div>
-                            <h3 class="sp-card-title sm" style="margin-top:12px">Password</h3>
-                            <p class="sp-card-desc">Keep your password strong and unique to protect your account.</p>
-                            <p style="margin:16px 0 18px;font-size:12px;color:#111827">Last changed<br><b>May 25, 2026</b></p>
-                            <button type="button" class="sp-btn block" data-tab-jump="password">Change Password</button>
-                        </div></section>
-                        <section class="sp-card"><div class="sp-card-pad">
-                            <div class="sp-head-row"><span class="sp-icon blue"><i class="fa-solid fa-lock"></i></span></div>
-                            <h3 class="sp-card-title sm" style="margin-top:12px">Account Security</h3>
-                            <p class="sp-card-desc">Add an extra layer of security to your account.</p>
-                            <div style="margin:14px 0"><span class="sp-status green">Enabled</span></div>
-                            <p class="sp-card-desc"><b>Status:</b> Verified Login</p>
-                            <button type="button" class="sp-btn outline block" style="margin-top:18px">Manage Security</button>
-                        </div></section>
-                        <section class="sp-card"><div class="sp-card-pad">
-                            <div class="sp-head-row"><span class="sp-icon green"><i class="fa-regular fa-envelope"></i></span></div>
-                            <h3 class="sp-card-title sm" style="margin-top:12px">Email Verification</h3>
-                            <p class="sp-card-desc">Your email is verified. We’ll use this to secure your account.</p>
-                            <div style="margin:14px 0"><span class="sp-status green"><i class="fa-solid fa-check"></i> Verified</span></div>
-                            <p class="sp-card-desc">allaeyra8@gmail.com</p>
-                            <button type="button" class="sp-btn outline block" style="margin-top:18px">Update Email</button>
-                        </div></section>
-                    </div>
-
-                    <h3 class="sp-card-title sm"><i class="fa-solid fa-desktop" style="color:var(--sp-orange);margin-right:8px"></i>Device Access</h3>
-                    <div class="sp-grid-2">
-                        <section class="sp-card"><div class="sp-card-pad">
-                            <div class="sp-head-row"><div><h3 class="sp-card-title sm">Login Activity</h3><p class="sp-card-desc">Review your recent login activity.</p></div><button type="button" class="sp-link" data-tab-jump="devices">View All <i class="fa-solid fa-chevron-right"></i></button></div>
-                            <div class="sp-list">
-                                <div class="sp-row"><div><b>Quezon City, Philippines</b><small>Chrome on Windows</small></div><span class="sp-status green">Current Session</span></div>
-                                <div class="sp-row"><div><b>Quezon City, Philippines</b><small>Safari on iPhone</small></div><small>May 31, 2026 10:43 AM</small></div>
-                                <div class="sp-row"><div><b>Makati City, Philippines</b><small>Chrome on Windows</small></div><small>May 29, 2026 09:15 PM</small></div>
+                    <section class="overview-danger">
+                        <div class="overview-danger-inner">
+                            <h3><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h3>
+                            <p class="sp-card-desc">These account actions are placeholders until backend account controls are connected.</p>
+                            <div class="overview-danger-line">
+                                <div class="sp-row-left">
+                                    <span class="sp-icon red"><i class="fa-solid fa-user-xmark"></i></span>
+                                    <div>
+                                        <strong class="sp-mini-title">Deactivate Account</strong>
+                                        <small class="sp-mini-desc">Temporarily deactivate your account after backend confirmation is available.</small>
+                                    </div>
+                                </div>
+                                <button type="button" class="sp-action overview-danger-action">Deactivate Account <i class="fa-solid fa-chevron-right"></i></button>
                             </div>
-                        </div></section>
-                        <section class="sp-card"><div class="sp-card-pad">
-                            <h3 class="sp-card-title sm">Active Sessions</h3><p class="sp-card-desc">You are currently signed in on these devices.</p>
-                            <div class="sp-list">
-                                <div class="sp-row"><div class="sp-row-left"><span class="sp-icon blue"><i class="fa-brands fa-windows"></i></span><div><strong>Windows • Chrome</strong><small>Quezon City • Jun 02, 2026 11:24 AM</small></div></div><span class="sp-status green">Current Device</span></div>
-                                <div class="sp-row"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-mobile-screen"></i></span><div><strong>iPhone • Safari</strong><small>May 31, 2026 10:43 AM</small></div></div><button type="button" class="sp-btn red-outline">Sign Out</button></div>
-                            </div>
-                        </div></section>
-                    </div>
-
-                    <section class="sp-card sp-danger"><div class="sp-card-pad">
-                        <h3 class="sp-card-title sm"><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone</h3>
-                        <p class="sp-card-desc">These actions are permanent and cannot be undone.</p>
-                        <div class="sp-danger-row">
-                            <div class="sp-danger-box"><div class="sp-row-left"><span class="sp-icon red"><i class="fa-solid fa-user-xmark"></i></span><div><strong>Deactivate Account</strong><small>Temporarily deactivate your account.</small></div></div><button class="sp-btn red-outline">Deactivate Account</button></div>
                         </div>
-                    </div></section>
+                    </section>
                 </main>
-                <aside class="sp-side">
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Account Verification</h3><p class="sp-card-desc">Your identity verification status.</p><div class="sp-list"><div class="sp-row"><div class="sp-row-left"><i class="fa-regular fa-envelope"></i><div><strong>Email Address</strong><small>allaeyra8@gmail.com</small></div></div><span class="sp-status green">Verified</span></div><div class="sp-row"><div class="sp-row-left"><i class="fa-solid fa-mobile-screen"></i><div><strong>Phone Number</strong><small>+63 945 346 46</small></div></div><span class="sp-status green">Verified</span></div><div class="sp-row"><div class="sp-row-left"><i class="fa-regular fa-id-card"></i><div><strong>Identity Verification</strong><small>Verified on May 25, 2026</small></div></div><span class="sp-status green">Verified</span></div></div></div></section>
+
+                <aside class="overview-right">
+                    <section class="sp-card overview-side-card">
+                        <div class="overview-secure-head">
+                            <span class="overview-secure-badge"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <h3 class="sp-card-title">Account Security Template</h3>
+                                <p class="sp-card-desc">Security score and recommendations will update once real account checks are connected.</p>
+                            </div>
+                        </div>
+                        <div class="overview-chips">
+                            <span class="overview-chip"><i class="fa-solid fa-check"></i> Password check ready</span>
+                            <span class="overview-chip"><i class="fa-solid fa-check"></i> Verification check ready</span>
+                            <span class="overview-chip"><i class="fa-solid fa-check"></i> Email check ready</span>
+                        </div>
+                        <div class="overview-score-box">
+                            <p class="sp-card-desc">Security Score</p>
+                            <div class="overview-score-number"><strong>{{ $securityScore ?? '—' }}</strong><span>/100</span></div>
+                            <div class="overview-score-meter"><i style="width:{{ $securityScoreWidth }}%"></i></div>
+                            <button type="button" class="sp-link-button">View Security Recommendations <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </section>
+
+                    <section class="sp-card overview-side-card">
+                        <h3 class="sp-card-title">Account Verification</h3>
+                        <p class="sp-card-desc">Verified contact and identity records will appear here once backend verification is connected.</p>
+                        <div class="sp-list">
+                            @forelse($accountVerification as $verification)
+                                <div class="sp-row">
+                                    <div class="sp-row-left">
+                                        <span class="sp-icon {{ data_get($verification, 'tone', '') }}"><i class="{{ data_get($verification, 'icon', 'fa-regular fa-id-card') }}"></i></span>
+                                        <div>
+                                            <strong>{{ data_get($verification, 'title', 'Verification') }}</strong>
+                                            <small>{{ data_get($verification, 'value', 'No value') }}</small>
+                                        </div>
+                                    </div>
+                                    <span class="sp-status {{ data_get($verification, 'status_tone', 'green') }}">{{ data_get($verification, 'status', 'Verified') }}</span>
+                                </div>
+                            @empty
+                                <div class="sp-empty">No verification records yet. This is only a visual template.</div>
+                            @endforelse
+                        </div>
+                    </section>
                 </aside>
             </div>
         </section>
 
         <!-- PASSWORD TAB -->
         <section class="sp-panel" id="password-panel">
-            <div class="sp-layout">
-                <main class="sp-main">
-                    <section class="sp-card"><div class="sp-card-pad">
-                        <div class="sp-head-row"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-lock"></i></span><div><h2 class="sp-card-title">Password Management</h2><p class="sp-card-desc">A strong password helps keep your account safe and secure.</p></div></div><button type="button" class="sp-btn soft"><i class="fa-regular fa-lightbulb"></i> Password Tips</button></div>
-                        <div class="sp-info-band" style="margin-top:18px"><div><small>Password strength</small><br><b style="color:var(--sp-green)">Strong</b></div><div class="sp-strength" style="width:220px"><i></i><i></i><i></i><i></i><i class="off"></i></div><div><small>Last changed</small><br><b>May 31, 2026 12:56 PM</b></div></div>
-                    </div></section>
+            <div class="password-reference-layout">
+                <main class="password-full">
+                    <section class="sp-card">
+                        <div class="password-management">
+                            <div class="password-head-row">
+                                <div class="sp-title-left">
+                                    <span class="sp-icon red"><i class="fa-solid fa-lock"></i></span>
+                                    <div>
+                                        <h2 class="sp-card-title">Password Management</h2>
+                                        <p class="sp-card-desc">A strong password helps keep your account safe and secure.</p>
+                                    </div>
+                                </div>
+                                <button type="button" class="sp-btn pill">Password Tips</button>
+                            </div>
 
-                    <section class="sp-card"><div class="sp-card-pad">
-                        <div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-key"></i></span><div><h2 class="sp-card-title">Change Password</h2><p class="sp-card-desc">Use a strong password that you don’t use on other websites.</p></div></div>
-                        <form method="POST" action="{{ route('password.change') }}">
-                            @csrf
-                            @method('put')
-                            <div class="sp-field"><label for="current_password">Current Password</label><div class="sp-input-wrap"><input id="current_password" class="sp-input" type="password" name="current_password" value="••••••••••••" autocomplete="current-password"><button class="sp-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button></div></div>
-                            <div class="sp-field"><label for="password">New Password</label><div class="sp-input-wrap"><input id="password" class="sp-input" type="password" name="password" value="••••••••••" autocomplete="new-password"><button class="sp-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button></div><div class="sp-strength"><i></i><i></i><i></i><i></i><i class="off"></i><span style="font-size:12px;color:var(--sp-green);font-weight:800">Strong</span></div><p class="sp-card-desc">Use 8 or more characters with a mix of letters, numbers &amp; symbols.</p></div>
-                            <div class="sp-field"><label for="password_confirmation">Confirm New Password</label><div class="sp-input-wrap"><input id="password_confirmation" class="sp-input" type="password" name="password_confirmation" value="••••••••••" autocomplete="new-password"><button class="sp-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button></div></div>
-                            <div style="display:flex;justify-content:flex-end;margin-top:18px"><button type="submit" class="sp-btn">Update Password</button></div>
-                        </form>
-                    </div></section>
+                            <div class="password-strength-panel">
+                                <div class="password-score-left">
+                                    <div class="password-score-circle">{{ $passwordScore ?? '—' }}<small>/100</small></div>
+                                    <div class="password-strength-name">
+                                        <span class="sp-card-desc">Password strength</span>
+                                        <b>{{ data_get($passwordStats, 'label', 'No record yet') }}</b>
+                                    </div>
+                                </div>
+                                <div class="password-bars" aria-label="Password strength meter">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="{{ $passwordScoreWidth >= ($i * 20) ? '' : 'off' }}"></i>
+                                    @endfor
+                                </div>
+                                <div class="password-last-changed">
+                                    <small>Last changed</small>
+                                    <b>{{ data_get($passwordStats, 'last_changed', 'No password record yet') }}</b>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="sp-grid-2">
-                        <section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-shield-halved"></i></span><div><h3 class="sp-card-title sm">Password Requirements</h3><p class="sp-card-desc">Your password must include:</p></div></div><div class="sp-check-list"><span class="sp-check"><i class="fa-solid fa-circle-check"></i> At least 8 characters long</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i> At least one number (0–9)</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i> At least one special character (!@#$%^&amp;*)</span></div></div></section>
-                        <section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-arrows-rotate"></i></span><div><h3 class="sp-card-title sm">Recovery Options</h3><p class="sp-card-desc">Use these options to recover your account.</p></div></div><div class="sp-row"><div class="sp-row-left"><span class="sp-icon"><i class="fa-regular fa-envelope"></i></span><div><strong>Recovery Email</strong><small>allaeyra8@gmail.com</small></div></div><span class="sp-status green">Verified</span><button class="sp-btn soft">Edit</button></div><div class="sp-row"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-mobile-screen"></i></span><div><strong>Recovery Phone</strong><small>+63 945 346 46</small></div></div><span class="sp-status green">Verified</span><button class="sp-btn soft">Edit</button></div></div></section>
+                        <div class="password-change">
+                            <div class="sp-title-left">
+                                <span class="sp-icon red"><i class="fa-solid fa-key"></i></span>
+                                <div>
+                                    <h2 class="sp-card-title">Change Password</h2>
+                                    <p class="sp-card-desc">Use a strong password that you don't use on other websites.</p>
+                                </div>
+                            </div>
+
+                            <form class="password-form" method="POST" action="{{ Route::has('password.change') ? route('password.change') : '#' }}">
+                                @csrf
+                                @if(Route::has('password.change'))
+                                    @method('put')
+                                @endif
+
+                                <div class="password-field">
+                                    <label for="current_password">Current Password</label>
+                                    <div class="password-input-wrap">
+                                        <input id="current_password" class="password-input" type="password" name="current_password" placeholder="••••••••••••" autocomplete="current-password">
+                                        <button class="password-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="password-field">
+                                    <label for="password">New Password</label>
+                                    <div class="password-input-wrap">
+                                        <input id="password" class="password-input" type="password" name="password" placeholder="••••••••••" autocomplete="new-password">
+                                        <button class="password-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button>
+                                    </div>
+                                    <div class="password-inline-strength">
+                                        <div class="password-bars" aria-label="New password strength meter"><i></i><i></i><i></i><i></i><i></i></div>
+                                        <span>Template only</span>
+                                    </div>
+                                    <p class="sp-card-desc">Use 8 or more characters with a mix of letters, numbers &amp; symbols.</p>
+                                </div>
+
+                                <div class="password-field">
+                                    <label for="password_confirmation">Confirm New Password</label>
+                                    <div class="password-input-wrap">
+                                        <input id="password_confirmation" class="password-input" type="password" name="password_confirmation" placeholder="••••••••••" autocomplete="new-password">
+                                        <button class="password-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="password-submit-row">
+                                    <button type="submit" class="sp-btn primary pill">Update Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <div class="password-bottom-grid">
+                        <section class="sp-card password-bottom-card">
+                            <div class="sp-title-left">
+                                <span class="sp-icon red"><i class="fa-solid fa-shield-halved"></i></span>
+                                <div>
+                                    <h3 class="sp-card-title sm">Password Requirements</h3>
+                                    <p class="sp-card-desc">Your password must include:</p>
+                                </div>
+                            </div>
+                            <div class="password-check-list">
+                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> At least 8 characters long</span>
+                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> At least one number (0–9)</span>
+                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> At least one special character (!@#$%^&amp;*)</span>
+                            </div>
+                        </section>
+
+                        <section class="sp-card password-bottom-card">
+                            <div class="sp-title-left">
+                                <span class="sp-icon"><i class="fa-solid fa-arrows-rotate"></i></span>
+                                <div>
+                                    <h3 class="sp-card-title sm">Recovery Options</h3>
+                                    <p class="sp-card-desc">Recovery records will appear here after backend verification is connected.</p>
+                                </div>
+                            </div>
+                            <div class="password-check-list">
+                                @forelse($recoveryMethods as $method)
+                                    <div class="password-recovery-row">
+                                        <div class="sp-row-left">
+                                            <span class="sp-icon blue"><i class="{{ data_get($method, 'icon', 'fa-regular fa-envelope') }}"></i></span>
+                                            <div>
+                                                <strong class="sp-mini-title">{{ data_get($method, 'title', 'Recovery Method') }}</strong>
+                                                <small class="sp-mini-desc">{{ data_get($method, 'value', 'No value') }}</small>
+                                            </div>
+                                        </div>
+                                        <span class="sp-status {{ data_get($method, 'status_tone', 'green') }}">{{ data_get($method, 'status', 'Verified') }}</span>
+                                        <button type="button" class="password-edit-button">Edit</button>
+                                    </div>
+                                @empty
+                                    <div class="sp-empty">No recovery email or phone record yet. This card is only a template.</div>
+                                @endforelse
+                            </div>
+                        </section>
+
+                        <section class="sp-card password-bottom-card">
+                            <div class="sp-title-left">
+                                <span class="sp-icon green"><i class="fa-solid fa-shield"></i></span>
+                                <div>
+                                    <h3 class="sp-card-title sm">Password Best Practices</h3>
+                                    <p class="sp-card-desc">Keep your sign-in details safe.</p>
+                                </div>
+                            </div>
+                            <div class="password-check-list">
+                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Use a unique password for your account</span>
+                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Avoid using personal information</span>
+                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Change your password regularly</span>
+                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Don't share your password with anyone</span>
+                            </div>
+                        </section>
                     </div>
-
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-shield" style="color:var(--sp-orange);margin-right:8px"></i>Password Best Practices</h3><div class="sp-grid-4" style="margin-top:14px"><span class="sp-check" style="color:#6b7280"><i style="color:var(--sp-orange)" class="fa-solid fa-circle"></i> Use a unique password for your account</span><span class="sp-check" style="color:#6b7280"><i style="color:var(--sp-orange)" class="fa-solid fa-circle"></i> Avoid using personal information</span><span class="sp-check" style="color:#6b7280"><i style="color:var(--sp-orange)" class="fa-solid fa-circle"></i> Change your password regularly</span><span class="sp-check" style="color:#6b7280"><i style="color:var(--sp-orange)" class="fa-solid fa-circle"></i> Don’t share your password with anyone</span></div></div></section>
                 </main>
-                <aside class="sp-side">
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Password Health</h3><div class="sp-row-left" style="margin-top:18px"><div style="width:94px;height:94px;border-radius:50%;border:12px solid var(--sp-green);display:grid;place-items:center;color:var(--sp-green);font-size:26px;font-weight:800">94<br><small style="font-size:12px;color:#111827">/100</small></div><div><h3 style="margin:0;color:var(--sp-green)">Excellent</h3><p class="sp-card-desc">Great job! Your password is strong and secure.</p></div></div><div class="sp-list"><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Strong password</span><b style="color:var(--sp-green);font-size:12px">Yes</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Recently updated</span><b style="color:var(--sp-green);font-size:12px">Yes</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Unique password</span><b style="color:var(--sp-green);font-size:12px">Yes</b></div></div></div></section>
-                </aside>
-            </div>
-        </section>
-
-        <!-- SECURITY TAB -->
-        <section class="sp-panel" id="twofa-panel">
-            <div class="sp-layout">
-                <main class="sp-main">
-                    <section class="sp-card"><div class="sp-card-pad"><div class="sp-head-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-lock"></i></span><div><h2 class="sp-card-title">Account Security</h2><p class="sp-card-desc">Keep your customer account protected with strong sign-in details and updated recovery information.</p></div></div><span class="sp-status green"><i class="fa-solid fa-circle-check"></i> Verified</span></div></div></section>
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-users" style="color:var(--sp-orange);margin-right:8px"></i>Recovery Methods</h3><p class="sp-card-desc">These options can be used to recover your account if you lose access.</p><div class="sp-list"><div class="sp-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-mobile-screen"></i></span><div><strong>Recovery Phone</strong><small>+63 912 ••• ••• 46</small></div></div><span class="sp-status green">Verified</span><button class="sp-btn soft">Edit</button></div><div class="sp-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-regular fa-envelope"></i></span><div><strong>Recovery Email</strong><small>allieyra8@gmail.com</small></div></div><span class="sp-status green">Verified</span><button class="sp-btn soft">Edit</button></div></div></div></section>
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-laptop" style="color:var(--sp-orange);margin-right:8px"></i>Active Devices</h3><p class="sp-card-desc">Devices with recent account access.</p><table class="sp-table"><thead><tr><th>Device</th><th>Browser</th><th>Location</th><th>Added On</th><th>Action</th></tr></thead><tbody><tr><td><div class="sp-device"><i class="fa-solid fa-laptop"></i><div><b>Windows • Chrome</b><small>Windows 11</small></div></div></td><td>Chrome 125</td><td>Quezon City, Metro Manila<small>Philippines</small></td><td>Jun 02, 2026 11:24 AM</td><td><button class="sp-btn red-outline">Remove</button></td></tr><tr><td><div class="sp-device"><i class="fa-solid fa-mobile-screen"></i><div><b>iPhone • Safari</b><small>iOS 17.5</small></div></div></td><td>Safari</td><td>Quezon City, Metro Manila<small>Philippines</small></td><td>Jun 01, 2026 8:16 PM</td><td><button class="sp-btn red-outline">Remove</button></td></tr><tr><td><div class="sp-device"><i class="fa-solid fa-desktop"></i><div><b>MacOS • Chrome</b><small>macOS 14.4</small></div></div></td><td>Chrome 124</td><td>Manila, Metro Manila<small>Philippines</small></td><td>May 31, 2026 4:03 PM</td><td><button class="sp-btn red-outline">Remove</button></td></tr></tbody></table></div></section>
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-circle-info" style="color:var(--sp-orange);margin-right:8px"></i>Security Tips</h3><div class="sp-grid-4" style="margin-top:14px"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Use a strong password</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Keep recovery details updated</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Review active devices</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Contact support for suspicious activity</span></div></div></section>
-                </main>
-                <aside class="sp-side"><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Protection Status</h3><p class="sp-card-desc">Your account is well protected.</p><div class="sp-row-left" style="margin-top:16px"><div style="width:86px;height:86px;border-radius:50%;border:10px solid var(--sp-green);display:grid;place-items:center;color:var(--sp-green);font-size:22px"><i class="fa-solid fa-shield-halved"></i></div><div><h3 style="margin:0">Strong</h3><p class="sp-card-desc">Your account is protected.</p></div></div><div class="sp-list"><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Strong password</span><b style="color:var(--sp-green);font-size:12px">Good</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Recovery email</span><b style="color:var(--sp-green);font-size:12px">Verified</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Recovery phone</span><b style="color:var(--sp-green);font-size:12px">Verified</b></div></div></div></section><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Account Verification</h3><p class="sp-card-desc">Your identity and contact details.</p><div class="sp-list"><div class="sp-row"><div class="sp-row-left"><i class="fa-regular fa-envelope"></i><div><strong>Email Address</strong><small>allieyra8@gmail.com</small></div></div><span class="sp-status green">Verified</span></div><div class="sp-row"><div class="sp-row-left"><i class="fa-solid fa-mobile-screen"></i><div><strong>Phone Number</strong><small>+63 945 346 46</small></div></div><span class="sp-status green">Verified</span></div><div class="sp-row"><div class="sp-row-left"><i class="fa-regular fa-id-card"></i><div><strong>Identity Verification</strong><small>Verified on May 25, 2026</small></div></div><span class="sp-status green">Verified</span></div><button class="sp-link">View all verification details <i class="fa-solid fa-chevron-right"></i></button></div></div></section><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Security Help</h3><p class="sp-card-desc">Need help with account access?</p><div class="sp-list"><div class="sp-row-left"><span class="sp-icon blue"><i class="fa-solid fa-lock-open"></i></span><div><strong>Can’t access your account?</strong><small>Use a recovery method or contact support.</small></div></div><div class="sp-row-left"><span class="sp-icon blue"><i class="fa-regular fa-circle-question"></i></span><div><strong>Need more assistance?</strong><small>Contact our support team for help.</small></div></div><button class="sp-link">Go to Help Center <i class="fa-solid fa-arrow-up-right-from-square"></i></button></div></div></section></aside>
             </div>
         </section>
 
         <!-- DEVICES TAB -->
         <section class="sp-panel" id="devices-panel">
-            <div class="sp-layout">
-                <main class="sp-main">
-                    <section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-desktop"></i></span><div><h2 class="sp-card-title">Active Devices &amp; Sessions</h2><p class="sp-card-desc">These are the devices currently signed in to your account.</p></div></div><div class="sp-grid-3" style="margin-top:18px"><div><h2 style="margin:0;font-size:32px">3</h2><b>Active Devices</b><p class="sp-card-desc">Your account is secure.</p></div><span class="sp-check"><i class="fa-solid fa-circle-check"></i> All devices are verified</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i> Secure sessions</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i> Regular monitoring</span></div></div></section>
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-display" style="color:var(--sp-orange);margin-right:8px"></i>Active Sessions / Devices</h3><p class="sp-card-desc">Manage the devices that are currently signed in to your account.</p><table class="sp-table"><thead><tr><th>Device</th><th>Browser</th><th>Location</th><th>Last Active</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td><div class="sp-device"><i class="fa-solid fa-laptop"></i><div><b>Windows • Chrome</b><small>Windows 11</small></div></div></td><td><i class="fa-brands fa-chrome" style="color:#16a34a"></i> Chrome 125.0</td><td>Quezon City, Metro Manila<small>Philippines</small></td><td>Just now</td><td><span class="sp-status green">This device</span></td><td>—</td></tr><tr><td><div class="sp-device"><i class="fa-solid fa-mobile-screen"></i><div><b>iPhone • Safari</b><small>iOS 17.5</small></div></div></td><td><i class="fa-brands fa-safari" style="color:#2563eb"></i> Safari 17.5</td><td>Quezon City, Metro Manila<small>Philippines</small></td><td>Jun 01, 2026 8:16 PM</td><td><span class="sp-status green">Active</span></td><td><button class="sp-btn outline">Sign Out</button></td></tr><tr><td><div class="sp-device"><i class="fa-solid fa-laptop"></i><div><b>MacOS • Chrome</b><small>macOS 14.4</small></div></div></td><td><i class="fa-brands fa-chrome" style="color:#16a34a"></i> Chrome 124.0</td><td>Manila, Metro Manila<small>Philippines</small></td><td>May 31, 2026 4:03 PM</td><td><span class="sp-status green">Active</span></td><td><button class="sp-btn outline">Sign Out</button></td></tr></tbody></table><div class="sp-head-row" style="margin-top:14px"><p class="sp-card-desc"><i class="fa-solid fa-shield-halved"></i> Didn’t recognize a device? Sign out of unfamiliar sessions and change your password.</p><button class="sp-btn">Sign Out All Other Sessions</button></div></div></section>
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-chart-line" style="color:var(--sp-orange);margin-right:8px"></i>Recent Login Activity</h3><p class="sp-card-desc">Review your most recent account access.</p><table class="sp-table"><thead><tr><th>Date &amp; Time</th><th>Device / Browser</th><th>Location</th><th>IP Address</th><th>Status</th></tr></thead><tbody><tr><td>Jun 02, 2026 11:24 AM</td><td>Windows • Chrome</td><td>Quezon City, Metro Manila</td><td>112.201.45.67</td><td><span class="sp-status green">Current</span></td></tr><tr><td>Jun 01, 2026 8:16 PM</td><td>iPhone • Safari</td><td>Quezon City, Metro Manila</td><td>112.201.45.67</td><td><span class="sp-status green">Success</span></td></tr><tr><td>May 31, 2026 4:03 PM</td><td>MacOS • Chrome</td><td>Manila, Metro Manila</td><td>112.200.12.24</td><td><span class="sp-status green">Success</span></td></tr><tr><td>May 30, 2026 9:11 AM</td><td>Android • Chrome</td><td>Cebu City, Cebu</td><td>112.198.77.19</td><td><span class="sp-status green">Success</span></td></tr></tbody></table></div></section>
-                    <div class="sp-grid-2"><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-gear" style="color:var(--sp-orange);margin-right:8px"></i>Device Security Settings</h3><div class="sp-list"><div class="sp-setting-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-regular fa-clock"></i></span><div><strong>Session timeout</strong><small>Automatically sign out inactive sessions.</small></div></div><button class="sp-btn soft">30 days <i class="fa-solid fa-chevron-down"></i></button></div><div class="sp-setting-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-regular fa-bell"></i></span><div><strong>New device alerts</strong><small>Email me when a new device signs in.</small></div></div><label class="sp-switch"><input checked type="checkbox"><span class="sp-slider"></span></label></div><div class="sp-setting-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-shield-halved"></i></span><div><strong>Remember active devices</strong><small>Keep known devices easier to review.</small></div></div><label class="sp-switch"><input checked type="checkbox"><span class="sp-slider"></span></label></div></div></div></section><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-display" style="color:var(--sp-orange);margin-right:8px"></i>Manage Devices</h3><p class="sp-card-desc">Take control of your active sessions and devices.</p><div class="sp-list"><div class="sp-setting-row"><div><strong>Review and remove devices</strong><small>See a full list of devices and sign out any no longer used.</small></div><i class="fa-solid fa-chevron-right"></i></div><div class="sp-setting-row"><div><strong>Sign out all other sessions</strong><small>Immediately sign out all devices except this one.</small></div><i class="fa-solid fa-chevron-right"></i></div><button class="sp-btn block">Sign Out All Other Sessions</button></div></div></section></div>
-                </main>
-                <aside class="sp-side"><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Safety Reminder</h3><p class="sp-card-desc">Follow these tips to keep your account secure.</p><div class="sp-list"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-lock"></i></span><div><strong>Always log out</strong><small>Log out of shared or public devices.</small></div></div><div class="sp-row-left"><span class="sp-icon"><i class="fa-regular fa-eye"></i></span><div><strong>Review unknown logins</strong><small>Check login activity regularly.</small></div></div><div class="sp-row-left"><span class="sp-icon blue"><i class="fa-regular fa-envelope"></i></span><div><strong>Enable alerts</strong><small>Keep new device alerts on.</small></div></div></div></div></section></aside>
+            <div class="devices-reference-layout">
+                <section class="sp-card devices-card">
+                    <div class="sp-card-pad">
+                        <div class="sp-title-left">
+                            <span class="sp-icon green"><i class="fa-solid fa-desktop"></i></span>
+                            <div>
+                                <h2 class="sp-card-title">Active Devices &amp; Sessions</h2>
+                                <p class="sp-card-desc">These are the devices currently signed in to your account.</p>
+                            </div>
+                        </div>
+
+                        <div class="devices-summary">
+                            <div class="devices-count-box">
+                                <div class="devices-count-circle">{{ $activeDevices->count() }}</div>
+                                <div>
+                                    <strong class="sp-mini-title">Active<br>Devices</strong>
+                                    <small class="sp-mini-desc">{{ $activeDevices->count() ? 'Backend device records loaded.' : 'No device record yet.' }}</small>
+                                </div>
+                            </div>
+                            <div class="devices-feature"><span><i class="fa-regular fa-circle-check"></i> Regular monitoring</span><i class="fa-solid fa-chevron-down"></i></div>
+                            <div class="devices-feature"><span><i class="fa-regular fa-circle-check"></i> Device verification ready</span><i class="fa-solid fa-chevron-down"></i></div>
+                            <div class="devices-feature"><span><i class="fa-regular fa-circle-check"></i> Secure sessions</span><i class="fa-solid fa-chevron-down"></i></div>
+                        </div>
+
+                        <table class="sp-table" aria-label="Active devices and sessions">
+                            <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Browser</th>
+                                    <th>Location</th>
+                                    <th>Last Active</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($activeDevices as $device)
+                                    <tr>
+                                        <td>
+                                            <div class="sp-device">
+                                                <i class="{{ data_get($device, 'icon', 'fa-solid fa-display') }}"></i>
+                                                <div>
+                                                    <b>{{ data_get($device, 'name', 'Device') }}</b>
+                                                    <small>{{ data_get($device, 'os', 'Operating system') }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ data_get($device, 'browser', 'Browser') }}</td>
+                                        <td>{{ data_get($device, 'location', 'Location') }}<small>{{ data_get($device, 'country', '') }}</small></td>
+                                        <td>{{ data_get($device, 'last_active', 'Last active') }}</td>
+                                        <td><span class="sp-status {{ data_get($device, 'status_tone', 'green') }}">{{ data_get($device, 'status', 'Active') }}</span></td>
+                                        <td>
+                                            @if(data_get($device, 'is_current', false))
+                                                —
+                                            @else
+                                                <button type="button" class="sp-btn">Sign Out</button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="sp-empty">No device/session records yet. Connected devices will appear here once backend session tracking is added.</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+
+                        <div class="devices-warning-row">
+                            <p><i class="fa-solid fa-shield-halved"></i> Didn’t recognize a device? Sign out controls will work once backend sessions are connected.</p>
+                            <button type="button" class="sp-btn primary pill">Sign Out All Other Sessions</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="sp-card devices-card">
+                    <div class="sp-card-pad">
+                        <div class="devices-activity-settings">
+                            <div>
+                                <div class="sp-title-left">
+                                    <span class="sp-icon"><i class="fa-solid fa-chart-line"></i></span>
+                                    <div>
+                                        <h3 class="sp-card-title">Recent Login Activity &amp; Device Security Settings</h3>
+                                        <p class="sp-card-desc">Review your most recent account access and manage security preferences.</p>
+                                    </div>
+                                </div>
+                                <table class="sp-table" aria-label="Recent login activity">
+                                    <thead>
+                                        <tr>
+                                            <th>Date &amp; Time</th>
+                                            <th>Device / Browser</th>
+                                            <th>Location</th>
+                                            <th>IP Address</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($loginActivities as $activity)
+                                            <tr>
+                                                <td>{{ data_get($activity, 'datetime', 'Date and time') }}</td>
+                                                <td>{{ data_get($activity, 'device_browser', 'Device / Browser') }}</td>
+                                                <td>{{ data_get($activity, 'location', 'Location') }}</td>
+                                                <td>{{ data_get($activity, 'ip_address', 'IP address') }}</td>
+                                                <td><span class="sp-status {{ data_get($activity, 'status_tone', 'green') }}">{{ data_get($activity, 'status', 'Success') }}</span></td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5">
+                                                    <div class="sp-empty">No login activity yet. Login history will appear here after backend tracking is connected.</div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <aside class="devices-settings-side">
+                                @foreach($deviceSettings as $setting)
+                                    <div class="device-setting-row">
+                                        <div class="sp-row-left">
+                                            <span class="sp-icon green"><i class="{{ data_get($setting, 'icon') }}"></i></span>
+                                            <div>
+                                                <strong class="sp-mini-title">{{ data_get($setting, 'title') }}</strong>
+                                                <small class="sp-mini-desc">{{ data_get($setting, 'description') }}</small>
+                                            </div>
+                                        </div>
+                                        @if(data_get($setting, 'type') === 'select')
+                                            <button type="button" class="sp-btn">{{ data_get($setting, 'value', 'Not set') }} <i class="fa-solid fa-chevron-down"></i></button>
+                                        @else
+                                            <label class="sp-switch" title="Template toggle only">
+                                                <input type="checkbox" data-template-switch @checked(data_get($setting, 'enabled', false))>
+                                                <span class="sp-slider"></span>
+                                            </label>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </aside>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="sp-card devices-card">
+                    <div class="sp-card-pad">
+                        <div class="sp-title-left">
+                            <span class="sp-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <h3 class="sp-card-title">Safety Reminder</h3>
+                                <p class="sp-card-desc">Follow these tips to keep your account secure.</p>
+                            </div>
+                        </div>
+                        <div class="safety-grid">
+                            <div class="safety-item">
+                                <span class="safety-icon red"><i class="fa-solid fa-lock"></i></span>
+                                <div>
+                                    <strong class="sp-mini-title">Always log out</strong>
+                                    <small class="sp-mini-desc">Log out of shared or public devices.</small>
+                                </div>
+                            </div>
+                            <div class="safety-item">
+                                <span class="safety-icon"><i class="fa-regular fa-eye"></i></span>
+                                <div>
+                                    <strong class="sp-mini-title">Review unknown logins</strong>
+                                    <small class="sp-mini-desc">Check login activity regularly.</small>
+                                </div>
+                            </div>
+                            <div class="safety-item">
+                                <span class="safety-icon dark"><i class="fa-regular fa-envelope"></i></span>
+                                <div>
+                                    <strong class="sp-mini-title">Enable alerts</strong>
+                                    <small class="sp-mini-desc">Keep new device alerts on.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </section>
 
         <!-- PRIVACY TAB -->
         <section class="sp-panel" id="privacy-panel">
-            <div class="sp-layout">
-                <main class="sp-main">
-                    <section class="sp-card"><div class="sp-card-pad"><div class="sp-head-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-shield-halved"></i></span><div><h2 class="sp-card-title">Privacy Controls</h2><p class="sp-card-desc">You’re in control of how your personal data is used and shared. Adjust your privacy settings to match your preferences.</p></div></div><div style="text-align:right"><span class="sp-status green"><i class="fa-solid fa-circle-check"></i> Well Managed</span><p class="sp-card-desc">Last reviewed: May 31, 2026</p></div></div></div></section>
-                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-regular fa-user" style="color:var(--sp-orange);margin-right:8px"></i>Data &amp; Privacy Settings</h3><p class="sp-card-desc">Manage how your data is used and who can see it.</p><div class="sp-list"><div class="sp-setting-row"><div class="sp-row-left"><i class="fa-regular fa-user"></i><div><strong>Profile Visibility</strong><small>Allow others to see your profile information.</small></div></div><label class="sp-switch"><input checked type="checkbox"><span class="sp-slider"></span></label></div><div class="sp-setting-row"><div class="sp-row-left"><i class="fa-solid fa-bag-shopping"></i><div><strong>Order Visibility</strong><small>Allow others to view your orders and purchase history.</small></div></div><label class="sp-switch"><input checked type="checkbox"><span class="sp-slider"></span></label></div><div class="sp-setting-row"><div class="sp-row-left"><i class="fa-solid fa-wand-magic-sparkles"></i><div><strong>Personalized Recommendations</strong><small>Show product recommendations based on your activity.</small></div></div><label class="sp-switch"><input type="checkbox"><span class="sp-slider"></span></label></div><div class="sp-setting-row"><div class="sp-row-left"><i class="fa-regular fa-envelope"></i><div><strong>Marketing Communications</strong><small>Receive promotional emails and updates from PrintifyCo.</small></div></div><label class="sp-switch"><input type="checkbox"><span class="sp-slider"></span></label></div></div></div></section>
-                    <section class="sp-card"><div class="sp-card-pad"><div class="sp-head-row"><div><h3 class="sp-card-title sm"><i class="fa-solid fa-cookie-bite" style="color:var(--sp-orange);margin-right:8px"></i>Cookie Preferences</h3><p class="sp-card-desc">Manage how we use cookies to improve your experience.</p></div><button class="sp-btn outline">Manage Cookies</button></div><div class="sp-list"><div class="sp-row"><div class="sp-row-left"><i class="fa-solid fa-cookie"></i><div><strong>Essential Cookies</strong><small>Necessary for the website to function properly.</small></div></div><b style="font-size:12px;color:#64748b">Always Active</b></div><div class="sp-row"><div class="sp-row-left"><i class="fa-solid fa-chart-simple"></i><div><strong>Analytics Cookies</strong><small>Help us understand how you use our website.</small></div></div><span class="sp-status green">Enabled</span></div><div class="sp-row"><div class="sp-row-left"><i class="fa-solid fa-bullhorn"></i><div><strong>Marketing Cookies</strong><small>Used to deliver personalized ads and content.</small></div></div><span class="sp-status gray">Disabled</span></div></div></div></section>
-                    <div class="sp-grid-2"><section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-download"></i></span><div><h3 class="sp-card-title sm">Download My Data</h3><p class="sp-card-desc">Request a copy of your personal data that we have collected and stored.</p></div></div><button class="sp-btn outline block" style="margin-top:16px">Request Data Export</button></div></section><section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon"><i class="fa-regular fa-clock"></i></span><div><h3 class="sp-card-title sm">Data Retention</h3><p class="sp-card-desc">Review how long we keep your data and your rights related to retention.</p></div></div><button class="sp-btn outline block" style="margin-top:16px">Review Policy</button></div></section></div>
-                </main>
-                <aside class="sp-side"><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Privacy Summary</h3><div class="sp-row-left" style="margin-top:16px"><div style="width:86px;height:86px;border-radius:50%;border:10px solid var(--sp-green);display:grid;place-items:center;color:var(--sp-green);font-size:24px"><i class="fa-solid fa-lock"></i></div><div><h3 style="margin:0">Well Managed</h3><p class="sp-card-desc">Your settings are up to date.</p></div></div><div class="sp-list"><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Privacy settings optimized</span><b style="color:var(--sp-green);font-size:12px">Good</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Consents updated</span><b style="color:var(--sp-green);font-size:12px">Good</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Data protection enabled</span><b style="color:var(--sp-green);font-size:12px">Good</b></div></div></div></section><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Data Protection Note</h3><p class="sp-card-desc">We use industry-standard security measures to protect your personal data. You can manage your privacy preferences at any time.</p></div></section></aside>
+            <div class="privacy-reference-layout">
+                <section class="sp-card privacy-card">
+                    <div class="sp-card-pad">
+                        <div class="sp-title-left">
+                            <span class="sp-icon red"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <h2 class="sp-card-title">Privacy Controls &amp; Data &amp; Privacy Settings</h2>
+                                <p class="sp-card-desc">You’re in control of how your personal data is used and shared. Adjust your privacy settings to match your preferences.</p>
+                            </div>
+                        </div>
+
+                        <div class="privacy-main-summary">
+                            <div class="privacy-score-circle">{{ $privacyScore ?? '—' }}<small>/100</small></div>
+                            <div>
+                                <strong class="sp-mini-title">{{ data_get($privacySummary, 'label', 'No saved privacy review yet') }}</strong>
+                                <small class="sp-mini-desc">{{ data_get($privacySummary, 'description', 'Privacy score and saved preferences will appear after backend settings are connected.') }}</small>
+                                <div class="privacy-score-meter"><i style="width:{{ $privacyScoreWidth }}%"></i></div>
+                            </div>
+                            <div style="text-align:right">
+                                <small class="sp-mini-desc">Last reviewed: {{ data_get($privacySummary, 'last_reviewed', 'No record yet') }}</small>
+                            </div>
+                        </div>
+
+                        <div class="privacy-controls-list">
+                            @foreach($privacyControls as $control)
+                                <div class="privacy-control-row">
+                                    <div class="privacy-control-left">
+                                        <span class="privacy-control-icon"><i class="{{ data_get($control, 'icon') }}"></i></span>
+                                        <div>
+                                            <strong class="sp-mini-title">{{ data_get($control, 'title') }}</strong>
+                                            <small class="sp-mini-desc">{{ data_get($control, 'description') }}</small>
+                                        </div>
+                                    </div>
+                                    <label class="sp-switch" title="Template toggle only">
+                                        <input type="checkbox" data-template-switch @checked(data_get($control, 'enabled', false))>
+                                        <span class="sp-slider"></span>
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </section>
+
+                <section class="sp-card privacy-card">
+                    <div class="sp-card-pad">
+                        <div class="cookie-download-head">
+                            <div class="sp-title-left">
+                                <span class="sp-icon"><i class="fa-solid fa-cookie-bite"></i></span>
+                                <div>
+                                    <h3 class="sp-card-title">Cookie Preferences &amp; Download My Data</h3>
+                                    <p class="sp-card-desc">Manage how we use cookies to improve your experience and request a copy of your data.</p>
+                                </div>
+                            </div>
+                            <button type="button" class="sp-btn">Manage Cookies</button>
+                        </div>
+
+                        <div class="cookie-list">
+                            @foreach($cookiePreferences as $cookie)
+                                <div class="cookie-row">
+                                    <div class="cookie-left">
+                                        <i class="{{ data_get($cookie, 'icon') }}"></i>
+                                        <div>
+                                            <strong class="sp-mini-title">{{ data_get($cookie, 'title') }}</strong>
+                                            <small class="sp-mini-desc">{{ data_get($cookie, 'description') }}</small>
+                                        </div>
+                                    </div>
+                                    <span class="sp-status {{ data_get($cookie, 'status_tone', 'gray') }}">{{ data_get($cookie, 'status', 'Not set') }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="download-row">
+                            <div class="cookie-left">
+                                <i class="fa-solid fa-download" style="color:var(--sp-blue)"></i>
+                                <div>
+                                    <strong class="sp-mini-title">Download My Data</strong>
+                                    <small class="sp-mini-desc">Request a copy of your personal data that we have collected and stored.</small>
+                                </div>
+                            </div>
+                            <button type="button" class="sp-btn">Request Data Export</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="sp-card data-note-card">
+                    <div class="sp-card-pad">
+                        <div class="sp-title-left">
+                            <span class="sp-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div>
+                                <h3 class="sp-card-title">Data Protection Note</h3>
+                                <p class="sp-card-desc">We use industry-standard security measures to protect your personal data.</p>
+                                <p class="sp-card-desc">You can manage your privacy preferences at any time.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </section>
     </div>
-    <div id="spToast" class="sp-toast">Updated.</div>
+
+    <div id="spToast" class="sp-toast">Template only. Backend is not connected yet.</div>
 </div>
 
 <script>
 (function(){
-    const securitySaveRoute = @json(Route::has('settings.save') ? route('settings.save') : '');
-    const securityCsrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || @json(csrf_token());
     const tabs = document.querySelectorAll('.security-tab');
     const panels = document.querySelectorAll('.sp-panel');
-    async function persistSecuritySetting(key, value, label){
-        localStorage.setItem('printify_security_' + key, String(value));
-        if(securitySaveRoute){
-            try{
-                const response = await fetch(securitySaveRoute, {
-                    method:'POST',
-                    headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':securityCsrf},
-                    body:JSON.stringify({group:'security_privacy', key, value})
-                });
-                if(response.ok){
-                    showSpToast((label || 'Security setting') + ' saved successfully.');
-                    return;
-                }
-            }catch(error){
-                console.warn('Security setting backend sync skipped.', error);
-            }
-        }
-        showSpToast((label || 'Security setting') + ' saved locally.');
+    const tabNames = ['overview', 'password', 'devices', 'privacy'];
+
+    function showSpToast(message){
+        const toast = document.getElementById('spToast');
+        if(!toast) return;
+        toast.textContent = message || 'Template only. Backend is not connected yet.';
+        toast.classList.add('show');
+        clearTimeout(window.spToastTimer);
+        window.spToastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
     }
+    window.showSpToast = showSpToast;
+
     function activateTab(name){
+        if(!tabNames.includes(name)) name = 'overview';
         tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === name));
         panels.forEach(panel => panel.classList.toggle('active', panel.id === name + '-panel'));
         history.replaceState(null, '', window.location.pathname + '#' + name);
         window.scrollTo({top:0, behavior:'smooth'});
     }
+
     tabs.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
     document.querySelectorAll('[data-tab-jump]').forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tabJump)));
+
     const hash = (window.location.hash || '').replace('#','');
-    if(['overview','password','twofa','devices','privacy'].includes(hash)) activateTab(hash);
+    if(tabNames.includes(hash)) activateTab(hash);
 
     document.querySelectorAll('[data-toggle-pass]').forEach(btn => {
         btn.addEventListener('click', function(){
-            const input = this.closest('.sp-input-wrap').querySelector('input');
+            const input = this.closest('.password-input-wrap')?.querySelector('input');
+            if(!input) return;
             input.type = input.type === 'password' ? 'text' : 'password';
             this.innerHTML = input.type === 'password' ? '<i class="fa-regular fa-eye"></i>' : '<i class="fa-regular fa-eye-slash"></i>';
         });
     });
 
-    window.showSpToast = function(message){
-        const toast = document.getElementById('spToast');
-        if(!toast) return;
-        toast.textContent = message || 'Updated.';
-        toast.classList.add('show');
-        clearTimeout(window.spToastTimer);
-        window.spToastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
-    }
-
-    document.querySelectorAll('.sp-switch input').forEach((input, index) => {
-        const key = 'printify_security_switch_' + index;
-        const saved = localStorage.getItem(key);
-        if(saved !== null) input.checked = saved === '1';
+    document.querySelectorAll('[data-template-switch]').forEach(input => {
         input.addEventListener('change', () => {
-            localStorage.setItem(key, input.checked ? '1' : '0');
-            persistSecuritySetting('switch_' + index, input.checked ? 'enabled' : 'disabled', input.checked ? 'Preference enabled' : 'Preference disabled');
+            showSpToast('Template only. This preference is not saved yet. Connect backend saving first.');
         });
     });
 
-    document.querySelectorAll('.sp-btn,.sp-link,.sp-setting-row').forEach(el => {
-        el.addEventListener('click', event => {
+    document.querySelectorAll('.sp-btn,.sp-action,.sp-link-button,.password-edit-button').forEach(button => {
+        button.addEventListener('click', event => {
             const target = event.currentTarget;
             if(target.matches('[data-tab-jump],[data-toggle-pass]') || target.type === 'submit' || target.closest('form')) return;
-            const label = (target.textContent || 'Security setting').replace(/\s+/g,' ').trim();
-            if(target.classList.contains('sp-setting-row')) target.classList.add('sp-clicked');
-            persistSecuritySetting('action_' + label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''), new Date().toISOString(), label || 'Security setting');
-            setTimeout(() => target.classList.remove('sp-clicked'), 180);
+            showSpToast('Template only. No data is saved until backend functions are connected.');
         });
     });
 })();

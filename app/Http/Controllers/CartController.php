@@ -310,7 +310,7 @@ class CartController extends Controller
                 'price'           => $unitPrice,
                 'price_type'      => $priceType,
                 'qty'             => (int) $i['qty'],
-                'image_path'      => $service?->image_path ?? $i['image_path'] ?? null,
+                'image_path'      => $variation?->variation_image_path ?: ($service?->image_path ?: ($i['image_path'] ?? null)),
                 'selected'        => (bool) ($i['selected'] ?? true),
                 'file_name'       => $i['file_name'] ?? ($old['file_name'] ?? null),
                 'file_meta'       => $i['file_meta'] ?? ($old['file_meta'] ?? null),
@@ -325,6 +325,7 @@ class CartController extends Controller
                 $cart[$key]['file_name'] ??= $row['file_name'];
                 $cart[$key]['file_meta'] ??= $row['file_meta'];
                 $cart[$key]['attachment_path'] ??= $row['attachment_path'];
+                $cart[$key]['image_path'] ??= $row['image_path'];
             } else {
                 $cart[$key] = $row;
             }

@@ -1,10 +1,140 @@
-<x-app-layout> @once <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700&display=swap"> @endonce @php $settingsUser = auth()->user(); $settingsPhoto = $settingsUser->profile_photo_url ?? $settingsUser->profile_photo ?? null; $settingsName = $settingsUser->name ?? ''; $settingsEmail = $settingsUser->email ?? ''; $settingsPhone = $settingsUser->phone ?? ''; $settingsBirthdate = $settingsUser->birthdate ?? ''; $settingsCompany = $settingsUser->company ?? ''; $settingsCustomerId = $settingsUser ? 'CUST-'.str_pad((string) $settingsUser->id, 5, '0', STR_PAD_LEFT) : 'Not set';
+<x-app-layout> @once <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700&display=swap"> @endonce
+
+<style>
+/* === SUBSIDEBAR ALIGNMENT FIX === */
+.st-settings-shell{
+    display:flex;
+    gap:6px;
+    align-items:flex-start;
+}
+
+.st-subsidebar{
+    padding-left:4px;
+    padding-right:4px;
+    margin-left:0;
+    width:180px;
+}
+
+.st-subsidebar-head{
+    margin-top:0px;
+    padding-top:4px;
+}
+
+.st-top{
+    align-items:flex-start;
+}
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
+
+/* ===== FINAL GLOBAL LEFT ALIGN FIX ===== */
+.st-page{
+    padding-left:0 !important;
+    margin-left:0 !important;
+}
+
+.dashboard-wrapper,
+.main-wrapper,
+.page-wrapper,
+.container,
+.container-fluid{
+    padding-left:0 !important;
+    margin-left:0 !important;
+    max-width:100% !important;
+}
+
+body{
+    margin:0;
+}
+
+</style>
+
+ @php $settingsUser = auth()->user(); $settingsPhoto = $settingsUser->profile_photo_url ?? $settingsUser->profile_photo ?? null; $settingsName = $settingsUser->name ?? ''; $settingsEmail = $settingsUser->email ?? ''; $settingsPhone = $settingsUser->phone ?? ''; $settingsBirthdate = $settingsUser->birthdate ?? ''; $settingsCompany = $settingsUser->company ?? ''; $settingsCustomerId = $settingsUser ? 'CUST-'.str_pad((string) $settingsUser->id, 5, '0', STR_PAD_LEFT) : 'Not set';
 $settingsLanguage = $settingsUser->language ?? 'English';
 $settingsLanguageDisplay = strtolower((string) $settingsLanguage) === 'en' ? 'English' : $settingsLanguage;
 $settingsRegion = $settingsUser->region ?? 'Philippines';
 $settingsTimezone = $settingsUser->timezone ?? config('app.timezone', 'Asia/Manila');
 $settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Manila' : $settingsTimezone; @endphp
 <div class="st-page">
+<div class="st-settings-shell">
+<aside class="st-subsidebar" aria-label="Settings submenu">
+<div class="st-subsidebar-head">
+<h2>Settings</h2>
+<p>Manage your account, alerts, preferences, security, and help options.</p>
+</div>
+<nav class="st-subnav" aria-label="Settings sections">
+<button type="button" class="st-subitem active" data-tab-jump="overview" data-sub-key="settings">
+<span class="st-subicon"><i class="fa-solid fa-gear"></i></span>
+<span>SETTINGS</span>
+</button>
+<button type="button" class="st-subitem" data-tab-jump="notifications" data-sub-key="notification">
+<span class="st-subicon"><i class="fa-regular fa-bell"></i></span>
+<span>NOTIFICATION</span>
+</button>
+<button type="button" class="st-subitem" data-tab-jump="preferences" data-sub-key="preferences">
+<span class="st-subicon"><i class="fa-solid fa-sliders"></i></span>
+<span>PREFERENCES</span>
+</button>
+<button type="button" class="st-subitem" data-tab-jump="security" data-sub-key="security-privacy">
+<span class="st-subicon"><i class="fa-solid fa-shield-halved"></i></span>
+<span>SECURITY &amp; PRIVACY</span>
+</button>
+<a class="st-subitem" href="{{ Route::has('help-center') ? route('help-center') : url('/help-center') }}" data-sub-key="help-center">
+<span class="st-subicon"><i class="fa-regular fa-circle-question"></i></span>
+<span>HELP-CENTER</span>
+</a>
+</nav>
+</aside>
 <div class="st-wrap">
 <div class="st-top">
 <div class="st-title-wrap">
@@ -443,23 +573,23 @@ $settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Ma
 <style id="settings-overview-css">
 /* OVERVIEW CSS + GLOBAL SETTINGS CSS. Kept complete here para buo pa rin UI ng lahat ng tabs. */
 :root{ --st-bg:#fff;--st-card:#fff;--st-line:#111827;--st-line2:#dfe3ea;--st-text:#111827;--st-muted:#6b7280; --st-soft:#9a9a9a;--st-orange:#ff7a00;--st-orange2:#ff7a00;--st-orange3:#fff3e6;--st-green:#16a34a; --st-green-bg:#eef8f2;--st-danger:#d74343;--st-gray-hover:#f4f4f4;--st-gray-active:#e4e4e4;--st-gray-dark:#d2d2d2;--st-shadow:0 10px 26px rgba(35,25,12,.045);--st-radius:14px } .st-page{min-height:calc(100vh - 70px);background:#fff!important;padding:0 0 34px;color:var(--st-text);font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:400;letter-spacing:0} .st-wrap{width:100%;max-width:1490px;margin:0 auto;background:#fff!important} .st-top{margin:0 0 12px} .st-title{margin:0;font-family:'Playfair Display',Georgia,serif;font-size:40px;line-height:1.2;font-weight:700;text-transform:none;letter-spacing:-.02em;color:#111827} .st-subtitle{margin:6px 0 0;font-size:12px;color:#666;font-weight:400} .st-tabs{display:flex;gap:26px;align-items:center;border-bottom:1px solid var(--st-line2);margin:0 0 16px;overflow-x:auto;scrollbar-width:none} .st-tabs::-webkit-scrollbar{display:none} .st-tab{appearance:none;border:0;background:transparent;position:relative;padding:11px 0 12px;color:#252525;text-transform:uppercase;font-size:10.5px;font-weight:700;letter-spacing:.04em;cursor:pointer;white-space:nowrap;transition:.18s ease} .st-tab:hover,.st-tab.active{color:var(--st-orange2)} .st-tab.active:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--st-orange);border-radius:99px} .st-panel{display:none} .st-panel.active{display:block} .st-grid{display:grid;grid-template-columns:minmax(0,1.26fr) minmax(360px,.74fr);gap:17px;align-items:start} .st-stack{display:flex;flex-direction:column;gap:16px} .st-right-slim{width:96%;max-width:650px} .st-card{background:var(--st-card);border:1px solid #111827;border-radius:var(--st-radius);box-shadow:var(--st-shadow);overflow:hidden;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease} .st-card:hover{background:rgba(17,24,39,.10);border-color:#111827;box-shadow:0 18px 42px rgba(15,23,42,.11);transform:none} .st-body{padding:15px 17px} .st-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px} .st-card-title{margin:0;font-family:'Poppins',system-ui,sans-serif;font-size:14.5px;font-weight:600;letter-spacing:.022em;text-transform:none;color:#111827;line-height:1.35} .st-card-desc{margin:4px 0 0;color:#7b7b7b;font-size:10.5px;font-weight:400}
-.st-btn{appearance:none;border:1px solid var(--st-orange);background:var(--st-orange);color:#000;border-radius:10px;height:42px;min-width:132px;padding:0 17px;font-size:12px;font-weight:700;letter-spacing:.014em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s ease;white-space:nowrap} .st-btn:hover,.st-btn:focus-visible{background:#111827;border-color:#111827;color:#fff;box-shadow:0 12px 24px rgba(17,24,39,.20);transform:none;outline:none}.st-btn:active,.st-btn.is-clicked{background:#111827;border-color:#111827;color:#fff;box-shadow:none;transform:none} .st-link{border:0;background:transparent;color:var(--st-orange2);font-size:10px;font-weight:650;cursor:pointer;padding:0} .st-link:hover,.st-link:focus-visible{background:var(--st-gray-hover);color:#222;text-decoration:none;outline:none}.st-link:active,.st-link.is-clicked{background:var(--st-gray-active);color:#111} .st-ico{width:18px;height:18px;color:#555;display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px} .st-ico i{font-size:14px} .st-orange-ico{width:28px;height:28px;border-radius:9px;background:var(--st-orange3);color:var(--st-orange2);border:1px solid #f3dfcb;display:flex;align-items:center;justify-content:center;flex:0 0 auto} .st-orange-ico i{font-size:12.5px} .st-badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:8.5px;font-weight:650;line-height:1} .st-badge.green{background:var(--st-green-bg);border:1px solid #d5ecdd;color:var(--st-green)} .st-badge.orange{background:#fff6ed;border:1px solid #efd3b3;color:var(--st-orange2)} .st-profile{display:grid;grid-template-columns:minmax(0,1fr) minmax(285px,.8fr);gap:16px} .st-profile-left{display:flex;align-items:center;gap:18px} .st-avatar-wrap{position:relative;flex:0 0 auto} .st-avatar{width:108px;height:108px;border-radius:50%;object-fit:cover;border:4px solid #fff;outline:3px solid var(--st-orange);box-shadow:0 18px 34px rgba(255,122,0,.22);background:radial-gradient(circle at 32% 25%,#ff9a37,#ff5a00 54%,#e04800)} .st-camera{position:absolute;right:-2px;bottom:5px;width:36px;height:36px;border-radius:50%;background:var(--st-orange);border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:none;cursor:pointer} .st-camera:hover,.st-camera:focus-visible{background:#111827;color:#fff;border-color:#fff;outline:none}.st-camera:active,.st-camera.is-clicked{background:#111827;color:#fff} .st-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap} .st-name{margin:0;font-size:15px;font-weight:750} .st-info{margin-top:6px;color:#737373;font-size:11px;font-weight:400} .st-info strong{color:#333;font-weight:600} .st-copy{border:0;background:transparent;color:#888;margin-left:5px;padding:0;cursor:pointer} .st-copy:hover{color:var(--st-orange2)} .st-profile-right{border-left:1px solid var(--st-line);padding-left:17px;display:flex;flex-direction:column;justify-content:center;gap:14px} .st-detail{display:flex;justify-content:space-between;gap:12px;align-items:flex-start} .st-detail-left{display:flex;gap:10px} .st-label{margin:0;color:#858585;font-size:10.5px;font-weight:500} .st-value{margin:2px 0 0;color:#333;font-size:11px;font-weight:600} .st-address-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px} .st-box{position:relative;background:#fff;border:1px solid var(--st-line);border-radius:13px;padding:13px;min-height:105px;transition:.18s ease}
+.st-btn{appearance:none;border:1px solid var(--st-orange);background:var(--st-orange);color:#000;border-radius:10px;height:42px;min-width:132px;padding:0 17px;font-size:12px;font-weight:700;letter-spacing:.014em;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.18s ease;white-space:nowrap} .st-btn:hover,.st-btn:focus-visible{background:#111827;border-color:#111827;color:#fff;box-shadow:0 12px 24px rgba(17,24,39,.20);transform:none;outline:none}.st-btn:active,.st-btn.is-clicked{background:#111827;border-color:#111827;color:#fff;box-shadow:none;transform:none} .st-link{border:0;background:transparent;color:var(--st-orange2);font-size:10px;font-weight:650;cursor:pointer;padding:0} .st-link:hover,.st-link:focus-visible{background:var(--st-gray-hover);color:#222;text-decoration:none;outline:none}.st-link:active,.st-link.is-clicked{background:var(--st-gray-active);color:#111} .st-ico{width:18px;height:18px;color:#555;display:inline-flex;align-items:center;justify-content:center;flex:0 0 18px} .st-ico i{font-size:14px} .st-orange-ico{width:28px;height:28px;border-radius:9px;background:var(--st-orange3);color:var(--st-orange2);border:1px solid #f3dfcb;display:flex;align-items:center;justify-content:center;flex:0 0 auto} .st-orange-ico i{font-size:12.5px} .st-badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:8.5px;font-weight:650;line-height:1} .st-badge.green{background:var(--st-green-bg);border:1px solid #d5ecdd;color:var(--st-green)} .st-badge.orange{background:#fff6ed;border:1px solid #efd3b3;color:var(--st-orange2)} .st-profile{display:grid;grid-template-columns:minmax(0,1fr) minmax(285px,.8fr);gap:16px} .st-profile-left{display:flex;align-items:center;gap:18px} .st-avatar-wrap{position:relative;flex:0 0 auto} .st-avatar{width:108px;height:108px;border-radius:50%;object-fit:cover;border:4px solid #fff;outline:3px solid var(--st-orange);box-shadow:0 18px 34px rgba(255,122,0,.22);background:radial-gradient(circle at 32% 25%,#ff9a37,#ff5a00 54%,#e04800)} .st-camera{position:absolute;right:-2px;bottom:5px;width:36px;height:36px;border-radius:50%;background:var(--st-orange);border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:none;cursor:pointer} .st-camera:hover,.st-camera:focus-visible{background:#111827;color:#fff;border-color:#fff;outline:none}.st-camera:active,.st-camera.is-clicked{background:#111827;color:#fff} .st-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap} .st-name{margin:0;font-size:15px;font-weight:750} .st-info{margin-top:6px;color:#737373;font-size:11px;font-weight:400} .st-info strong{color:#333;font-weight:600} .st-copy{border:0;background:transparent;color:#888;margin-left:5px;padding:0;cursor:pointer} .st-copy:hover{color:var(--st-orange2)} .st-profile-right{border-left:1px solid var(--st-line);padding-left:17px;display:flex;flex-direction:column;justify-content:center;gap:6px} .st-detail{display:flex;justify-content:space-between;gap:12px;align-items:flex-start} .st-detail-left{display:flex;gap:10px} .st-label{margin:0;color:#858585;font-size:10.5px;font-weight:500} .st-value{margin:2px 0 0;color:#333;font-size:11px;font-weight:600} .st-address-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px} .st-box{position:relative;background:#fff;border:1px solid var(--st-line);border-radius:13px;padding:13px;min-height:105px;transition:.18s ease}
 .st-box:hover{border-color:#e2e2e2;box-shadow:none} .st-box-title{margin:7px 0 0;font-size:11px;font-weight:700} .st-box-text{margin:7px 0 0;color:#696969;font-size:10px;line-height:1.48;font-weight:400} .st-kebab{position:absolute;right:9px;top:9px;border:0;background:transparent;color:#8b8b8b;cursor:pointer;width:22px;height:22px} .st-kebab:hover,.st-kebab:focus-visible{background:var(--st-gray-hover);border-radius:8px;color:#222;outline:none}.st-kebab:active,.st-kebab.is-clicked{background:var(--st-gray-active);color:#111;border-radius:8px} .st-add-box{border:1px dashed #ded9d3;background:#fff;border-radius:13px;min-height:105px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;font-size:10.5px;font-weight:650;color:#222;cursor:pointer;transition:.18s ease} .st-add-box:hover,.st-add-box:focus-visible{border-color:var(--st-gray-dark);background:var(--st-gray-hover);color:#222;outline:none;transform:none}.st-add-box:active,.st-add-box.is-clicked{background:var(--st-gray-active);border-color:#c8c8c8;color:#111;transform:none} .st-add-circle{width:28px;height:28px;border-radius:50%;border:1px solid #ded9d3;background:#fff;display:flex;align-items:center;justify-content:center;color:#222} .st-add-box:hover .st-add-circle,.st-add-box:focus-visible .st-add-circle{border-color:var(--st-gray-dark);color:#222;background:#fff} .st-two{display:grid;grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:16px} .st-list{display:flex;flex-direction:column;gap:9px} .st-pay-item{border:1px solid var(--st-line);background:#fff;border-radius:12px;min-height:52px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;gap:9px;transition:.18s ease;min-width:0} .st-pay-item:hover{border-color:var(--st-gray-dark);background:var(--st-gray-hover)} .st-pay-left{display:flex;align-items:center;gap:9px;min-width:0;overflow:hidden} .st-card-logo{width:43px;height:29px;border:1px solid var(--st-line);border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 43px} .st-card-logo.visa{background:#2157f3;border-color:#2157f3;color:#fff} .st-card-logo.master i:first-child{color:#e6483f;margin-right:-7px} .st-card-logo.master i:last-child{color:#f4a51c} .st-card-logo i{font-size:24px} .st-pay-text{min-width:0;overflow:hidden} .st-pay-title{margin:0;color:#222;font-size:10.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .st-pay-sub{margin:3px 0 0;color:#858585;font-size:9.4px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .st-mini{border-radius:999px;border:1px solid #d6efdf;background:var(--st-green-bg);color:var(--st-green);padding:3px 7px;font-size:8px;font-weight:650;white-space:nowrap;flex:0 0 auto} .st-mini.orange{border-color:#f0d4b4;background:#fff7ef;color:var(--st-orange2)} .st-pay-bottom{display:grid;grid-template-columns:minmax(0,1fr) 118px;gap:9px} .st-add-payment{border:1px dashed #ded9d3;background:#fff;border-radius:12px;min-height:63px;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#202020;font-size:9.2px;font-weight:650;line-height:1.2;cursor:pointer;transition:.18s ease;text-align:center;white-space:normal}
-.st-add-payment:hover,.st-add-payment:focus-visible{border-color:var(--st-gray-dark);background:var(--st-gray-hover);color:#222;outline:none;transform:none}.st-add-payment:active,.st-add-payment.is-clicked{background:var(--st-gray-active);border-color:#c8c8c8;color:#111;transform:none} .st-notif-item{display:flex;align-items:center;justify-content:space-between;gap:11px;padding:4.5px 0} .st-notif-left{display:flex;gap:9px;min-width:0} .st-notif-title{margin:0;color:#222;font-size:10.5px;font-weight:700} .st-notif-sub{margin:3px 0 0;color:#858585;font-size:9.2px;font-weight:400;line-height:1.25} .st-comm-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid #f0f1f3;transition:.18s} .st-comm-item:last-child{border-bottom:0}.st-comm-item:hover{background:rgba(17,24,39,.10);margin-left:-8px;margin-right:-8px;padding-left:8px;padding-right:8px;border-radius:10px} .st-comm-left{display:flex;align-items:flex-start;gap:10px;min-width:0}.st-comm-title{margin:0;color:#111827;font-family:'Poppins',system-ui,sans-serif;font-size:11px;font-weight:600;letter-spacing:.018em}.st-comm-sub{margin:3px 0 0;color:#858585;font-size:9.7px;font-weight:400;line-height:1.35} .st-switch{position:relative;width:36px;height:20px;flex:0 0 auto} .st-switch input{display:none} .st-slider{position:absolute;inset:0;border-radius:99px;background:#ddd;cursor:pointer;transition:.18s} .st-slider:before{content:"";position:absolute;width:15px;height:15px;border-radius:50%;left:3px;top:2.5px;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.16);transition:.18s} .st-switch input:checked+.st-slider{background:var(--st-green)} .st-switch input:checked+.st-slider:before{transform:translateX(15px)} .st-manage{margin-top:9px;width:100%;border:0;background:transparent;text-align:left;color:#222;font-size:9.5px;font-weight:650;cursor:pointer} .st-manage:hover{color:var(--st-orange2)} .st-quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px} .st-quick{border:1px solid var(--st-line);background:#fff;border-radius:11px;padding:9px 9px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;min-height:59px;cursor:pointer;transition:.18s ease;min-width:0} .st-quick:hover,.st-quick:focus-visible{background:var(--st-gray-hover);border-color:var(--st-gray-dark);box-shadow:none;transform:none;outline:none}.st-quick:active,.st-quick.is-clicked{background:var(--st-gray-active);border-color:#c8c8c8;color:#111;box-shadow:none;transform:none} .st-quick-left{display:flex;align-items:flex-start;gap:8px;min-width:0} .st-quick-title{margin:0;color:#222;font-size:10px;font-weight:700;line-height:1.15} .st-quick-sub{margin:3px 0 0;color:#898989;font-size:8.5px;font-weight:400;line-height:1.25} .st-chev{color:#777;font-size:12px;flex:0 0 auto} .st-quick:hover .st-chev,.st-quick:hover .st-orange-ico,.st-quick:focus-visible .st-chev,.st-quick:focus-visible .st-orange-ico{color:#222} .st-pref-row,.st-activity-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #f1f1f1} .st-pref-row:last-child,.st-activity-row:last-child{border-bottom:0} .st-pref-left,.st-activity-left{display:flex;align-items:center;gap:10px} .st-pref-label,.st-act-label{font-size:10.5px;font-weight:650;color:#222} .st-select{border:0;background:transparent;color:#5f5f5f;font-size:10.3px;font-weight:400;outline:none;min-width:150px;text-align:right;cursor:pointer}
+.st-add-payment:hover,.st-add-payment:focus-visible{border-color:var(--st-gray-dark);background:var(--st-gray-hover);color:#222;outline:none;transform:none}.st-add-payment:active,.st-add-payment.is-clicked{background:var(--st-gray-active);border-color:#c8c8c8;color:#111;transform:none} .st-notif-item{display:flex;align-items:center;justify-content:space-between;gap:11px;padding:4.5px 0} .st-notif-left{display:flex;gap:9px;min-width:0} .st-notif-title{margin:0;color:#222;font-size:10.5px;font-weight:700} .st-notif-sub{margin:3px 0 0;color:#858585;font-size:9.2px;font-weight:400;line-height:1.25} .st-comm-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid #f0f1f3;transition:.18s} .st-comm-item:last-child{border-bottom:0}.st-comm-item:hover{background:rgba(17,24,39,.10);margin-left:-8px;margin-right:-8px;padding-left:4px;padding-right:4px;border-radius:10px} .st-comm-left{display:flex;align-items:flex-start;gap:10px;min-width:0}.st-comm-title{margin:0;color:#111827;font-family:'Poppins',system-ui,sans-serif;font-size:11px;font-weight:600;letter-spacing:.018em}.st-comm-sub{margin:3px 0 0;color:#858585;font-size:9.7px;font-weight:400;line-height:1.35} .st-switch{position:relative;width:36px;height:20px;flex:0 0 auto} .st-switch input{display:none} .st-slider{position:absolute;inset:0;border-radius:99px;background:#ddd;cursor:pointer;transition:.18s} .st-slider:before{content:"";position:absolute;width:15px;height:15px;border-radius:50%;left:3px;top:2.5px;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.16);transition:.18s} .st-switch input:checked+.st-slider{background:var(--st-green)} .st-switch input:checked+.st-slider:before{transform:translateX(15px)} .st-manage{margin-top:9px;width:100%;border:0;background:transparent;text-align:left;color:#222;font-size:9.5px;font-weight:650;cursor:pointer} .st-manage:hover{color:var(--st-orange2)} .st-quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px} .st-quick{border:1px solid var(--st-line);background:#fff;border-radius:11px;padding:9px 9px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;min-height:59px;cursor:pointer;transition:.18s ease;min-width:0} .st-quick:hover,.st-quick:focus-visible{background:var(--st-gray-hover);border-color:var(--st-gray-dark);box-shadow:none;transform:none;outline:none}.st-quick:active,.st-quick.is-clicked{background:var(--st-gray-active);border-color:#c8c8c8;color:#111;box-shadow:none;transform:none} .st-quick-left{display:flex;align-items:flex-start;gap:8px;min-width:0} .st-quick-title{margin:0;color:#222;font-size:10px;font-weight:700;line-height:1.15} .st-quick-sub{margin:3px 0 0;color:#898989;font-size:8.5px;font-weight:400;line-height:1.25} .st-chev{color:#777;font-size:12px;flex:0 0 auto} .st-quick:hover .st-chev,.st-quick:hover .st-orange-ico,.st-quick:focus-visible .st-chev,.st-quick:focus-visible .st-orange-ico{color:#222} .st-pref-row,.st-activity-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #f1f1f1} .st-pref-row:last-child,.st-activity-row:last-child{border-bottom:0} .st-pref-left,.st-activity-left{display:flex;align-items:center;gap:10px} .st-pref-label,.st-act-label{font-size:10.5px;font-weight:650;color:#222} .st-select{border:0;background:transparent;color:#5f5f5f;font-size:10.3px;font-weight:400;outline:none;min-width:150px;text-align:right;cursor:pointer}
 .st-act-val{text-align:right;color:#626262;font-size:10.4px;font-weight:400} .st-privacy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px} .st-privacy{border:1px solid var(--st-line);border-radius:13px;background:#fff;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:9px;text-align:left;cursor:pointer;transition:.18s ease} .st-privacy:hover,.st-privacy:focus-visible{background:var(--st-gray-hover);border-color:var(--st-gray-dark);transform:none;outline:none}.st-privacy:active,.st-privacy.is-clicked{background:var(--st-gray-active);border-color:#c8c8c8;transform:none} .st-privacy-left{display:flex;align-items:flex-start;gap:10px} .st-privacy-title{margin:0;font-size:10.5px;font-weight:700;color:#222} .st-privacy-sub{margin:3px 0 0;font-size:8.8px;font-weight:400;color:#858585} .st-settings-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start} .st-setting-main,.st-setting-side{display:flex;flex-direction:column;gap:16px} .st-sec-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:16px;padding:17px 18px;border-bottom:1px solid #e8ebf0;background:#fff;transition:.18s ease} .st-sec-row:last-child{border-bottom:0} .st-sec-row:hover,.st-privacy-panel-row:hover,.st-setting-action:hover{background:rgba(17,24,39,.10)} .st-sec-row .st-orange-ico{width:40px;height:40px;border-radius:14px} .st-sec-title{margin:0;font-family:'Poppins',system-ui,sans-serif;font-size:13px;font-weight:600;color:#111827} .st-sec-sub{margin:4px 0 0;font-size:10.5px;color:#6b7280;font-weight:400;line-height:1.35} .st-outline-btn{appearance:none;border:1px solid var(--st-orange);background:#fff;color:var(--st-orange);border-radius:10px;height:38px;min-width:128px;padding:0 15px;font-family:'Poppins',system-ui,sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:.18s ease} .st-outline-btn:hover,.st-outline-btn:focus-visible{background:#111827;border-color:#111827;color:#fff;outline:none} .st-score-ring{width:142px;height:142px;margin:10px auto 14px;border-radius:50%;background:conic-gradient(var(--st-orange) 0 331deg,#e5e7eb 331deg 360deg);display:grid;place-items:center} .st-score-inner{width:106px;height:106px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center} .st-score-inner strong{font-family:'Poppins',system-ui,sans-serif;font-size:30px;line-height:1;color:#111827} .st-score-inner span{font-size:11px;font-weight:700;color:var(--st-green)} .st-check-line{display:flex;align-items:center;gap:10px;font-size:11px;color:#334155;padding:6px 0} .st-check-line i{color:var(--st-green)} .st-side-list{display:flex;flex-direction:column;gap:9px} .st-side-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;background:#fff} .st-side-row:hover{background:rgba(17,24,39,.08)} .st-table-lite{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-top:12px} .st-table-lite-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr) minmax(0,1fr);gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid #edf0f4;font-size:10.5px;color:#475569} .st-table-lite-row:last-child{border-bottom:0} .st-table-lite-row strong{color:#111827;font-weight:650} .st-tip-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:13px}
-.st-tip{display:flex;gap:10px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:12px;padding:11px;background:#fff} .st-privacy-panel-row{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:center;padding:17px;border-bottom:1px solid #e8ebf0;background:#fff;transition:.18s ease} .st-privacy-panel-row:last-child{border-bottom:0} .st-privacy-control{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0} .st-privacy-control select{height:38px;border:1px solid #dfe3ea;border-radius:10px;background:#fff;padding:0 12px;font-size:11px;font-weight:650;min-width:140px} .st-status-pill{border-radius:999px;padding:5px 9px;font-size:9px;font-weight:700;background:#edf8f1;color:var(--st-green);white-space:nowrap} .st-status-pill.gray{background:#f2f4f7;color:#64748b} .st-wide-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px} .st-summary-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff} .st-summary-item{display:flex;align-items:center;gap:9px;border-right:1px solid #eef1f5;padding-right:8px} .st-summary-item:last-child{border-right:0} .st-setting-action{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #eef1f5;padding:12px 0;cursor:pointer;transition:.18s ease} .st-setting-action:last-child{border-bottom:0} .st-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px} .st-field{display:flex;flex-direction:column;gap:6px} .st-field label{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#777;font-weight:650} .st-input,.st-textarea{width:100%;border:1px solid var(--st-line2);background:#fff;border-radius:11px;padding:10px 11px;color:#222;font-size:11.5px;font-weight:400;outline:none} .st-input:focus,.st-textarea:focus{border-color:var(--st-gray-dark);box-shadow:0 0 0 3px rgba(0,0,0,.06)} .st-textarea{min-height:100px;resize:vertical} .st-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px} .st-modal{position:fixed;inset:0;z-index:9999;display:none} .st-modal.active{display:block} .st-modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.33);backdrop-filter:blur(4px)} .st-modal-shell{position:relative;min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center} .st-modal-card{width:100%;max-width:545px;background:#fff;border-radius:18px;border:1px solid var(--st-line);box-shadow:0 20px 60px rgba(0,0,0,.16);overflow:hidden} .st-modal-head{padding:15px 17px;border-bottom:1px solid #f1f1f1;display:flex;align-items:flex-start;justify-content:space-between;gap:10px} .st-modal-title{margin:0;font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.06em} .st-modal-desc{margin:4px 0 0;color:#868686;font-size:10.5px;font-weight:400} .st-close{width:33px;height:33px;border-radius:50%;border:1px solid var(--st-line);background:#fff;color:#666;cursor:pointer;font-size:18px} .st-close:hover,.st-close:focus-visible{background:var(--st-gray-hover);color:#222;border-color:var(--st-gray-dark);outline:none}.st-close:active,.st-close.is-clicked{background:var(--st-gray-active);color:#111} .st-modal-body{padding:17px}
-.st-toast{position:fixed;left:50%;top:110px;background:#242424;color:#fff;border-radius:12px;padding:12px 15px;font-size:12px;font-weight:700;box-shadow:0 18px 50px rgba(17,24,39,.24);opacity:0;transform:translate(-50%,-12px);pointer-events:none;transition:.2s;z-index:10000} .st-toast.show{opacity:1;transform:translate(-50%,0)} .st-footer{margin:16px 0 0;text-align:center;color:#bfbfbf;font-size:8.5px;font-weight:650;letter-spacing:.16em;text-transform:uppercase} .st-page button,.st-page select,.st-page input,.st-page textarea{font-family:inherit} .st-page button,.st-page .st-select{transform:none!important} .st-tab,.st-btn,.st-link,.st-camera,.st-kebab,.st-add-box,.st-add-payment,.st-quick,.st-privacy,.st-close,.st-select{transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease} .st-tab:hover,.st-tab:focus-visible{background:var(--st-gray-hover);color:#222;outline:none} .st-tab:active,.st-tab.is-clicked{background:var(--st-gray-active);color:#111;transform:none} .st-tab.active:hover{color:var(--st-orange2)} .st-link{border-radius:8px;min-height:24px;padding:0 7px;display:inline-flex;align-items:center;justify-content:center} .st-pref-row{border-radius:10px;padding-left:8px;padding-right:8px;transition:background-color .16s ease,border-color .16s ease} .st-pref-row:hover,.st-pref-row:focus-within,.st-pref-row.is-clicked{background:var(--st-gray-hover)} .st-pref-row:active{background:var(--st-gray-active)} .st-right-slim .st-body{padding:13px 15px} .st-right-slim .st-head{margin-bottom:9px} .st-right-slim .st-card-desc{margin-top:2px;line-height:1.35} .st-right-slim .st-comm-item{padding:5.5px 0} .st-right-slim .st-comm-left{gap:8px} .st-right-slim .st-comm-sub{margin-top:2px;font-size:9.2px;line-height:1.25} .st-right-slim .st-pref-row,.st-right-slim .st-activity-row{padding-top:7px;padding-bottom:7px} .st-right-slim .st-orange-ico{width:27px;height:27px} .st-select{border-radius:8px;padding:5px 7px} .st-select:hover,.st-select:focus{background:var(--st-gray-hover);color:#222} .st-orange-ico{transition:background-color .16s ease,border-color .16s ease,color .16s ease} .st-quick:hover .st-orange-ico,.st-privacy:hover .st-orange-ico,.st-pref-row:hover .st-orange-ico{background:#fff;border-color:var(--st-gray-dark);color:#222} .st-clickable-cover{background:var(--st-gray-active)!important;border-color:#c8c8c8!important;color:#111!important;transform:none!important;box-shadow:none!important} @media(max-width:1320px){.st-grid{grid-template-columns:minmax(0,1.15fr) minmax(350px,.85fr)}.st-right-slim{width:100%}} @media(max-width:1260px){.st-grid,.st-profile,.st-two,.st-settings-grid{grid-template-columns:1fr}.st-profile-right{border-left:0;border-top:1px solid var(--st-line);padding-left:0;padding-top:14px}.st-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.st-right-slim{max-width:none}} @media(max-width:860px){.st-page{padding:16px 12px 28px}.st-address-grid,.st-privacy-grid,.st-form-grid,.st-quick-grid,.st-tip-grid,.st-summary-strip,.st-wide-actions{grid-template-columns:1fr}.st-profile-left{align-items:flex-start;flex-direction:column}.st-select{min-width:120px}.st-tabs{gap:20px}.st-pay-bottom{grid-template-columns:1fr}.st-sec-row,.st-privacy-panel-row{grid-template-columns:1fr}.st-outline-btn,.st-btn{width:100%}} .st-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:0 0 16px}
+.st-tip{display:flex;gap:10px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:12px;padding:11px;background:#fff} .st-privacy-panel-row{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:center;padding:17px;border-bottom:1px solid #e8ebf0;background:#fff;transition:.18s ease} .st-privacy-panel-row:last-child{border-bottom:0} .st-privacy-control{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0} .st-privacy-control select{height:38px;border:1px solid #dfe3ea;border-radius:10px;background:#fff;padding:0 12px;font-size:11px;font-weight:650;min-width:140px} .st-status-pill{border-radius:999px;padding:5px 9px;font-size:9px;font-weight:700;background:#edf8f1;color:var(--st-green);white-space:nowrap} .st-status-pill.gray{background:#f2f4f7;color:#64748b} .st-wide-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px} .st-summary-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;border:1px solid #e5e7eb;border-radius:12px;padding:12px;background:#fff} .st-summary-item{display:flex;align-items:center;gap:9px;border-right:1px solid #eef1f5;padding-right:4px} .st-summary-item:last-child{border-right:0} .st-setting-action{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #eef1f5;padding:12px 0;cursor:pointer;transition:.18s ease} .st-setting-action:last-child{border-bottom:0} .st-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px} .st-field{display:flex;flex-direction:column;gap:6px} .st-field label{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#777;font-weight:650} .st-input,.st-textarea{width:100%;border:1px solid var(--st-line2);background:#fff;border-radius:11px;padding:10px 11px;color:#222;font-size:11.5px;font-weight:400;outline:none} .st-input:focus,.st-textarea:focus{border-color:var(--st-gray-dark);box-shadow:0 0 0 3px rgba(0,0,0,.06)} .st-textarea{min-height:100px;resize:vertical} .st-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px} .st-modal{position:fixed;inset:0;z-index:9999;display:none} .st-modal.active{display:block} .st-modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.33);backdrop-filter:blur(4px)} .st-modal-shell{position:relative;min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center} .st-modal-card{width:100%;max-width:545px;background:#fff;border-radius:18px;border:1px solid var(--st-line);box-shadow:0 20px 60px rgba(0,0,0,.16);overflow:hidden} .st-modal-head{padding:15px 17px;border-bottom:1px solid #f1f1f1;display:flex;align-items:flex-start;justify-content:space-between;gap:10px} .st-modal-title{margin:0;font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.06em} .st-modal-desc{margin:4px 0 0;color:#868686;font-size:10.5px;font-weight:400} .st-close{width:33px;height:33px;border-radius:50%;border:1px solid var(--st-line);background:#fff;color:#666;cursor:pointer;font-size:18px} .st-close:hover,.st-close:focus-visible{background:var(--st-gray-hover);color:#222;border-color:var(--st-gray-dark);outline:none}.st-close:active,.st-close.is-clicked{background:var(--st-gray-active);color:#111} .st-modal-body{padding:17px}
+.st-toast{position:fixed;left:50%;top:110px;background:#242424;color:#fff;border-radius:12px;padding:12px 15px;font-size:12px;font-weight:700;box-shadow:0 18px 50px rgba(17,24,39,.24);opacity:0;transform:translate(-50%,-12px);pointer-events:none;transition:.2s;z-index:10000} .st-toast.show{opacity:1;transform:translate(-50%,0)} .st-footer{margin:16px 0 0;text-align:center;color:#bfbfbf;font-size:8.5px;font-weight:650;letter-spacing:.16em;text-transform:uppercase} .st-page button,.st-page select,.st-page input,.st-page textarea{font-family:inherit} .st-page button,.st-page .st-select{transform:none!important} .st-tab,.st-btn,.st-link,.st-camera,.st-kebab,.st-add-box,.st-add-payment,.st-quick,.st-privacy,.st-close,.st-select{transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease} .st-tab:hover,.st-tab:focus-visible{background:var(--st-gray-hover);color:#222;outline:none} .st-tab:active,.st-tab.is-clicked{background:var(--st-gray-active);color:#111;transform:none} .st-tab.active:hover{color:var(--st-orange2)} .st-link{border-radius:8px;min-height:24px;padding:0 7px;display:inline-flex;align-items:center;justify-content:center} .st-pref-row{border-radius:10px;padding-left:4px;padding-right:4px;transition:background-color .16s ease,border-color .16s ease} .st-pref-row:hover,.st-pref-row:focus-within,.st-pref-row.is-clicked{background:var(--st-gray-hover)} .st-pref-row:active{background:var(--st-gray-active)} .st-right-slim .st-body{padding:13px 15px} .st-right-slim .st-head{margin-bottom:9px} .st-right-slim .st-card-desc{margin-top:2px;line-height:1.35} .st-right-slim .st-comm-item{padding:5.5px 0} .st-right-slim .st-comm-left{gap:8px} .st-right-slim .st-comm-sub{margin-top:2px;font-size:9.2px;line-height:1.25} .st-right-slim .st-pref-row,.st-right-slim .st-activity-row{padding-top:7px;padding-bottom:7px} .st-right-slim .st-orange-ico{width:27px;height:27px} .st-select{border-radius:8px;padding:5px 7px} .st-select:hover,.st-select:focus{background:var(--st-gray-hover);color:#222} .st-orange-ico{transition:background-color .16s ease,border-color .16s ease,color .16s ease} .st-quick:hover .st-orange-ico,.st-privacy:hover .st-orange-ico,.st-pref-row:hover .st-orange-ico{background:#fff;border-color:var(--st-gray-dark);color:#222} .st-clickable-cover{background:var(--st-gray-active)!important;border-color:#c8c8c8!important;color:#111!important;transform:none!important;box-shadow:none!important} @media(max-width:1320px){.st-grid{grid-template-columns:minmax(0,1.15fr) minmax(350px,.85fr)}.st-right-slim{width:100%}} @media(max-width:1260px){.st-grid,.st-profile,.st-two,.st-settings-grid{grid-template-columns:1fr}.st-profile-right{border-left:0;border-top:1px solid var(--st-line);padding-left:0;padding-top:14px}.st-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.st-right-slim{max-width:none}} @media(max-width:860px){.st-page{padding:16px 12px 28px}.st-address-grid,.st-privacy-grid,.st-form-grid,.st-quick-grid,.st-tip-grid,.st-summary-strip,.st-wide-actions{grid-template-columns:1fr}.st-profile-left{align-items:flex-start;flex-direction:column}.st-select{min-width:120px}.st-tabs{gap:20px}.st-pay-bottom{grid-template-columns:1fr}.st-sec-row,.st-privacy-panel-row{grid-template-columns:1fr}.st-outline-btn,.st-btn{width:100%}} .st-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:0 0 16px}
 .st-title-wrap{display:flex;align-items:flex-start;gap:10px}.st-title-wrap:before{content:'';width:18px;height:4px;margin-top:8px;border-radius:999px;background:var(--st-orange);flex:0 0 auto} .st-date{height:42px;min-width:178px;padding:0 15px;border:1px solid #111827;border-radius:8px;background:#fff;color:#111827;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;line-height:1;white-space:nowrap} .st-date i{font-size:15px;color:#111827}.st-wrap{max-width:1490px!important}.st-grid,.st-settings-grid{align-items:stretch} @media(max-width:860px){.st-top{display:grid}.st-date{width:100%}} /* Settings UI alignment update */ .st-page{padding:0 38px 38px} .st-wrap{max-width:1480px!important} .st-card,.st-main-box{border:1px solid #111827;border-radius:14px;background:#fff;box-shadow:none} .st-card:hover,.st-main-box:hover{background:rgba(17,24,39,.09);box-shadow:none;border-color:#111827} .st-plain{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important} .st-plain:hover{background:transparent!important;box-shadow:none!important} .st-plain .st-body{padding:0} .st-section-line{height:1px;background:#111827;margin:17px 0} .st-soft-line{height:1px;background:#e5e7eb;margin:10px 0} .st-no-box-list{display:flex;flex-direction:column;gap:9px} .st-no-box-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #e8ebf0} .st-no-box-item:last-child{border-bottom:0} .st-stat-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .st-stat-tile{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #edf0f4} .st-action-list{display:flex;flex-direction:column;gap:0} .st-channel-row{display:grid;grid-template-columns:minmax(0,1.2fr) 84px 84px 84px 34px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #e8ebf0} .st-channel-row:last-child{border-bottom:0} .st-channel-head{font-size:9px;text-transform:uppercase;color:#64748b;font-weight:700;text-align:center} .st-inline-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 7px;background:#edf8f1;color:var(--st-green);font-size:8px;font-weight:700} .st-setting-side .st-plain .st-body{padding:0 0 10px} .st-setting-side .st-plain{padding:0} #panel-overview .st-stack>.st-card:nth-of-type(1) .st-body{padding-bottom:17px} #panel-overview .st-two{border:1px solid #111827;border-radius:14px;padding:15px;background:#fff} #panel-overview .st-two>.st-card{border:0!important;background:transparent!important;box-shadow:none!important} #panel-overview .st-two>.st-card .st-body{padding:0} #panel-overview>.st-grid{grid-template-columns:minmax(0,1.15fr) minmax(350px,.85fr)!important;gap:17px!important;align-items:start!important} #panel-overview>.st-grid>.st-stack{min-width:0;width:100%;display:flex!important;flex-direction:column!important;gap:16px!important} #panel-overview .overview-profile-box, #panel-overview .overview-payment-box{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important} #panel-overview .overview-profile-box:hover, #panel-overview .overview-payment-box:hover{background:#fff!important} #panel-overview .overview-profile-box .st-section-line{margin-left:-17px;margin-right:-17px}
-#panel-overview .overview-payment-box{display:grid!important;grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr)!important;gap:0!important;padding:15px!important} #panel-overview .overview-payment-box>.st-card{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important} #panel-overview .overview-payment-box>.st-card:first-child{border-right:1px solid #e5e7eb!important;padding-right:15px} #panel-overview .overview-payment-box>.st-card:last-child{padding-left:15px} #panel-overview .overview-payment-box>.st-card .st-body{padding:0!important} #panel-overview .overview-plain-panel{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important} #panel-overview .overview-plain-panel:hover{background:transparent!important} #panel-overview .overview-plain-panel>.st-body{padding:0!important} #panel-overview .overview-quick-panel .st-head{margin-bottom:10px} #panel-overview .overview-quick-panel .st-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important} #panel-overview .overview-quick-panel .st-quick, #panel-overview .overview-privacy-panel .st-privacy{border:0!important;border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;min-height:52px!important;padding:8px 0!important} #panel-overview .overview-quick-panel .st-quick:hover, #panel-overview .overview-privacy-panel .st-privacy:hover{background:rgba(17,24,39,.08)!important;border-radius:10px!important;padding-left:8px!important;padding-right:8px!important} #panel-overview .overview-comm-panel{max-width:none!important;width:100%!important} #panel-overview .overview-activity-panel{max-width:none!important;width:100%!important} #panel-overview .overview-prefs-panel{max-width:none!important;width:100%!important} #panel-overview .overview-prefs-panel .st-pref-row, #panel-overview .overview-activity-panel .st-activity-row{border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;padding-left:0!important;padding-right:0!important} #panel-profile .st-profile-grid{grid-template-columns:minmax(0,1fr) 340px!important;gap:18px!important} #panel-profile .st-profile-side .st-card{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important} #panel-profile .st-profile-side .st-card>.st-body{padding:0!important} #panel-security .st-settings-grid, #panel-notifications .st-notif-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:16px!important;align-items:start!important} #panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:14px!important} #panel-profile .st-profile-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start} #panel-profile .st-profile-side{display:flex;flex-direction:column;gap:16px} #panel-profile .st-card-title,#panel-security .st-card-title,#panel-notifications .st-card-title,#panel-payments .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600} #panel-profile .st-card:first-child,#panel-profile .st-connected-card,#panel-security .st-setting-main>.st-card:first-child,#panel-security .st-login-tips-box,#panel-notifications .st-card:first-child,#panel-payments .st-billing-box{border-color:#111827} #panel-security .st-setting-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important}
+#panel-overview .overview-payment-box{display:grid!important;grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr)!important;gap:0!important;padding:15px!important} #panel-overview .overview-payment-box>.st-card{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important} #panel-overview .overview-payment-box>.st-card:first-child{border-right:1px solid #e5e7eb!important;padding-right:15px} #panel-overview .overview-payment-box>.st-card:last-child{padding-left:15px} #panel-overview .overview-payment-box>.st-card .st-body{padding:0!important} #panel-overview .overview-plain-panel{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important} #panel-overview .overview-plain-panel:hover{background:transparent!important} #panel-overview .overview-plain-panel>.st-body{padding:0!important} #panel-overview .overview-quick-panel .st-head{margin-bottom:10px} #panel-overview .overview-quick-panel .st-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important} #panel-overview .overview-quick-panel .st-quick, #panel-overview .overview-privacy-panel .st-privacy{border:0!important;border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;min-height:52px!important;padding:8px 0!important} #panel-overview .overview-quick-panel .st-quick:hover, #panel-overview .overview-privacy-panel .st-privacy:hover{background:rgba(17,24,39,.08)!important;border-radius:10px!important;padding-left:4px!important;padding-right:4px!important} #panel-overview .overview-comm-panel{max-width:none!important;width:100%!important} #panel-overview .overview-activity-panel{max-width:none!important;width:100%!important} #panel-overview .overview-prefs-panel{max-width:none!important;width:100%!important} #panel-overview .overview-prefs-panel .st-pref-row, #panel-overview .overview-activity-panel .st-activity-row{border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;padding-left:0!important;padding-right:0!important} #panel-profile .st-profile-grid{grid-template-columns:minmax(0,1fr) 340px!important;gap:18px!important} #panel-profile .st-profile-side .st-card{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important} #panel-profile .st-profile-side .st-card>.st-body{padding:0!important} #panel-security .st-settings-grid, #panel-notifications .st-notif-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:16px!important;align-items:start!important} #panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:6px!important} #panel-profile .st-profile-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start} #panel-profile .st-profile-side{display:flex;flex-direction:column;gap:16px} #panel-profile .st-card-title,#panel-security .st-card-title,#panel-notifications .st-card-title,#panel-payments .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600} #panel-profile .st-card:first-child,#panel-profile .st-connected-card,#panel-security .st-setting-main>.st-card:first-child,#panel-security .st-login-tips-box,#panel-notifications .st-card:first-child,#panel-payments .st-billing-box{border-color:#111827} #panel-security .st-setting-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important}
 #panel-security .st-setting-side>.st-card .st-body{padding:0} #panel-security .st-setting-side .st-side-row{border:0!important;border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;padding-left:0;padding-right:0} #panel-security .st-tip{border:0;border-bottom:1px solid #e8ebf0;border-radius:0;background:transparent} #panel-notifications .st-notif-layout,#panel-payments .st-pay-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start} #panel-notifications .st-notif-side,#panel-payments .st-pay-side{display:flex;flex-direction:column;gap:16px} #panel-notifications .st-notif-side>.st-card,#panel-payments .st-pay-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important} #panel-notifications .st-notif-side>.st-card .st-body,#panel-payments .st-pay-side>.st-card .st-body{padding:0} .st-btn,.st-outline-btn{border:0!important;background:var(--st-orange)!important;color:#000!important;height:42px;min-width:132px} .st-btn:hover,.st-outline-btn:hover,.st-btn:focus-visible,.st-outline-btn:focus-visible{background:#111827!important;color:#fff!important} .st-switch input:checked+.st-slider{background:#16a34a!important} @media(max-width:1260px){#panel-profile .st-profile-grid,#panel-notifications .st-notif-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr}.st-channel-row{grid-template-columns:minmax(0,1fr) 56px 56px 56px 24px}} @media(max-width:860px){.st-page{padding:16px 14px 30px}.st-stat-row{grid-template-columns:1fr}.st-channel-row{grid-template-columns:1fr 1fr 1fr}.st-channel-head{text-align:left}} /* Overview uses the original two-column boxed stack. */ #panel-overview>.st-grid{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(350px,.85fr)!important;gap:17px!important;align-items:start!important} #panel-overview>.st-grid>.st-stack{display:flex!important;flex-direction:column!important;gap:16px!important} #panel-overview .overview-profile-box,#panel-overview .overview-payment-box,#panel-overview .overview-privacy-panel,#panel-overview .overview-quick-panel,#panel-overview .overview-comm-panel,#panel-overview .overview-prefs-panel,#panel-overview .overview-activity-panel{grid-column:auto!important;grid-row:auto!important} #panel-overview .overview-profile-box{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important} #panel-overview .overview-payment-box{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:0!important;padding:15px!important} #panel-overview .overview-payment-box>.st-card{border:0!important;background:transparent!important;box-shadow:none!important} #panel-overview .overview-payment-box>.st-card:first-child{border-right:1px solid #e5e7eb!important;padding-right:15px!important} #panel-overview .overview-payment-box>.st-card:last-child{padding-left:15px!important} #panel-overview .overview-plain-panel{border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important} #panel-overview .overview-plain-panel>.st-body{padding:0!important} #panel-overview .overview-quick-panel .st-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important} #panel-overview .overview-quick-panel .st-quick,
 #panel-overview .overview-privacy-panel .st-privacy{border:0!important;border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;padding:8px 0!important;min-height:50px!important} #panel-overview .overview-comm-panel .st-comm-item, #panel-overview .overview-prefs-panel .st-pref-row, #panel-overview .overview-activity-panel .st-activity-row{padding:8px 0!important;border-bottom:1px solid #e8ebf0!important} #panel-overview .overview-profile-box .st-address-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important} #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{min-height:104px!important} #panel-security .st-sec-row{padding:11px 14px!important;grid-template-columns:44px minmax(0,1fr) auto!important} #panel-security .st-sec-row .st-orange-ico{width:34px!important;height:34px!important;border-radius:11px!important} #panel-security .st-setting-side .st-score-ring, #panel-notifications .st-notif-side .st-score-ring{width:98px!important;height:98px!important;margin:8px auto!important} #panel-security .st-setting-side .st-score-inner, #panel-notifications .st-notif-side .st-score-inner{width:74px!important;height:74px!important} #panel-security .st-setting-side .st-score-inner strong, #panel-notifications .st-notif-side .st-score-inner strong{font-size:22px!important} #panel-security .st-setting-side .st-check-line, #panel-notifications .st-notif-side .st-no-box-item, #panel-notifications .st-notif-side .st-setting-action{padding:6px 0!important;font-size:10.5px!important} #panel-security .st-login-tips-box .st-body{padding:12px 14px!important} #panel-security .st-tip-grid{gap:8px!important} #panel-security .st-tip{padding:8px!important} #panel-notifications .st-card:first-child .st-body{padding:12px 14px!important} #panel-notifications .st-summary-strip{gap:6px!important} #panel-notifications .st-summary-item{gap:7px!important} #panel-notifications .st-channel-row{padding:7px 0!important;grid-template-columns:minmax(0,1.2fr) 58px 58px 58px 24px!important} #panel-notifications .st-channel-row .st-orange-ico{width:30px!important;height:30px!important} #panel-notifications .st-channel-row .st-sec-title{font-size:11px!important} #panel-notifications .st-channel-row .st-sec-sub{font-size:9px!important;margin-top:2px!important} .st-profile-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);gap:16px;align-items:center} .st-profile-hero-main{display:flex;align-items:center;gap:15px;min-width:0} .st-profile-hero-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border-left:1px solid #e5e7eb;padding-left:16px} .st-profile-mini{display:flex;align-items:flex-start;gap:8px;min-width:0} .st-profile-mini .st-orange-ico{width:26px;height:26px;border-radius:8px} .st-profile-mini strong{display:block;font-size:10.5px;font-weight:700;color:#111827} .st-profile-mini span{display:block;font-size:9.5px;color:#6b7280;margin-top:2px} .st-profile-block-title{display:flex;align-items:center;gap:8px;margin:14px 0 10px} .st-profile-block-title .st-orange-ico{width:24px;height:24px} #panel-profile .st-form-grid{gap:10px!important} #panel-profile .st-field label{font-size:8.8px!important} #panel-profile .st-input{height:38px!important;padding:8px 10px!important;font-size:10.5px!important} #panel-profile .st-summary-strip .st-summary-item{padding:8px 10px;border:1px solid #e5e7eb;border-radius:10px}
 @media(max-width:1260px){.st-profile-hero{grid-template-columns:1fr}.st-profile-hero-meta{border-left:0;border-top:1px solid #e5e7eb;padding-left:0;padding-top:12px}} #panel-overview .overview-profile-box .st-body{padding:13px 15px!important} #panel-overview .overview-profile-box .st-address-grid{gap:9px!important} #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{min-height:86px!important;padding:10px!important;border-radius:11px!important} #panel-overview .overview-profile-box .st-box-text{font-size:9px!important;line-height:1.35!important;margin-top:5px!important} #panel-overview .overview-profile-box .st-box-title{font-size:10px!important;margin-top:5px!important} #panel-overview .overview-profile-box .st-add-circle{width:24px!important;height:24px!important} #panel-overview .overview-profile-box .st-section-line{margin-top:12px!important;margin-bottom:12px!important} #panel-overview .overview-payment-box{padding:12px!important} #panel-overview .overview-payment-box .st-list{gap:7px!important} #panel-overview .overview-payment-box .st-pay-item{min-height:44px!important;padding:7px 9px!important} #panel-overview .overview-payment-box .st-card-logo{width:38px!important;height:25px!important} #panel-overview .overview-payment-box .st-notif-item{padding:3px 0!important} #panel-profile .st-profile-side{gap:10px!important} #panel-profile .st-profile-side .st-head{margin-bottom:6px!important} #panel-profile .st-profile-side .st-no-box-list{gap:3px!important} #panel-profile .st-profile-side .st-no-box-item{padding:5px 0!important} #panel-profile .st-profile-side .st-btn{height:36px!important} #panel-profile .st-profile-side .st-score-ring{width:88px!important;height:88px!important;margin:6px auto!important} #panel-profile .st-profile-side .st-score-inner{width:66px!important;height:66px!important} #panel-profile .st-profile-side .st-score-inner strong{font-size:20px!important} #panel-security .st-setting-side{gap:8px!important} #panel-security .st-setting-side .st-card-title, #panel-notifications .st-notif-side .st-card-title{font-size:13px!important} #panel-security .st-setting-side .st-card-desc, #panel-notifications .st-notif-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important} #panel-security .st-setting-side .st-side-list, #panel-notifications .st-notif-side .st-no-box-list{gap:3px!important;margin-top:7px!important} #panel-security .st-setting-side .st-side-row, #panel-security .st-setting-side .st-setting-action, #panel-notifications .st-notif-side .st-setting-action, #panel-notifications .st-notif-side .st-no-box-item{padding:5px 0!important} #panel-security .st-setting-side .st-btn, #panel-notifications .st-notif-side .st-btn{height:36px!important;margin-top:8px!important} #panel-notifications .st-notif-side{gap:8px!important} #panel-notifications .st-card:first-child .st-body{padding:10px 12px!important} #panel-notifications .st-channel-row{padding:5px 0!important} #panel-notifications .st-summary-strip{margin-bottom:8px!important}
 @media(min-width:981px){#panel-overview>.st-grid{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(350px,.85fr)!important;gap:17px!important;align-items:start!important}#panel-overview>.st-grid>.st-stack{display:flex!important;flex-direction:column!important;gap:16px!important}#panel-overview .overview-profile-box,#panel-overview .overview-payment-box,#panel-overview .overview-privacy-panel,#panel-overview .overview-quick-panel,#panel-overview .overview-comm-panel,#panel-overview .overview-prefs-panel,#panel-overview .overview-activity-panel{grid-column:auto!important;grid-row:auto!important}} @media(max-width:980px){#panel-overview>.st-grid{grid-template-columns:1fr!important}#panel-overview .overview-payment-box{grid-template-columns:1fr!important}} #panel-overview .overview-privacy-panel, #panel-overview .overview-quick-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important} #panel-overview .overview-privacy-panel>.st-body, #panel-overview .overview-quick-panel>.st-body, #panel-overview .overview-comm-panel>.st-body, #panel-overview .overview-prefs-panel>.st-body, #panel-overview .overview-activity-panel>.st-body{padding:13px 15px!important} #panel-overview .overview-quick-panel .st-quick, #panel-overview .overview-privacy-panel .st-privacy{border:1px solid #111827!important;border-radius:11px!important;background:#fff!important;padding:9px!important;min-height:56px!important} #panel-overview .overview-payment-box{padding:0!important;gap:16px!important} #panel-overview .overview-payment-box>.st-card .st-body{padding:13px 15px!important} #panel-profile .st-profile-grid, #panel-security .st-settings-grid, #panel-notifications .st-notif-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:16px!important;align-items:start!important} #panel-profile .st-profile-side, #panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:8px!important} #panel-profile .st-profile-side .st-card-title, #panel-security .st-setting-side .st-card-title, #panel-notifications .st-notif-side .st-card-title{font-size:13px!important} #panel-profile .st-profile-side .st-card-desc, #panel-security .st-setting-side .st-card-desc, #panel-notifications .st-notif-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important} .st-page{padding:0 0 34px!important} .st-wrap{max-width:1490px!important;margin:0 auto!important;width:100%!important} .st-top{margin-top:0!important} #panel-overview>.st-grid{grid-template-columns:minmax(0,1.2fr) minmax(360px,.8fr)!important} #panel-overview>.st-grid{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(350px,.85fr)!important;gap:17px!important;align-items:start!important} #panel-overview>.st-grid>.st-stack{display:flex!important;flex-direction:column!important;gap:16px!important;min-width:0!important;width:100%!important} #panel-overview .overview-profile-box, #panel-overview .overview-payment-box, #panel-overview .overview-privacy-panel, #panel-overview .overview-quick-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel{grid-column:auto!important;grid-row:auto!important} @media(max-width:760px){#panel-overview>.st-grid{grid-template-columns:1fr!important}}
-/* Settings tab grouping: Notifications style applied to all remaining tabs */ .st-section-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start} .st-section-main,.st-section-side{display:flex;flex-direction:column;gap:12px;min-width:0} .st-main-group{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important} .st-main-group:hover{background:#fff!important;box-shadow:none!important;border-color:#111827!important} .st-main-group>.st-body{padding:13px 15px!important} .st-plain-panel{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important} .st-plain-panel:hover{background:transparent!important;box-shadow:none!important} .st-plain-panel>.st-body{padding:0!important} .st-line-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:11px;align-items:center;padding:9px 0;border-bottom:1px solid #e8ebf0;background:transparent} .st-line-row:last-child{border-bottom:0} .st-line-row:hover{background:rgba(17,24,39,.08);margin-left:-8px;margin-right:-8px;padding-left:8px;padding-right:8px;border-radius:10px} .st-row-actions{display:flex;align-items:center;gap:7px;justify-content:flex-end;flex-wrap:wrap} .st-mini-tabs{display:flex;align-items:center;gap:26px;border-bottom:1px solid #e8ebf0;margin:2px 0 8px;padding-bottom:8px} .st-mini-tabs span{font-size:10px;font-weight:700;color:#64748b} .st-mini-tabs .active{color:#111827} .st-map-mini{height:72px;border-radius:10px;background:linear-gradient(135deg,#eaf8ef,#eef4ff);display:flex;align-items:center;justify-content:center;color:var(--st-green);font-size:24px;min-width:190px} .st-tip-inline{display:flex;align-items:center;gap:9px;border-radius:10px;background:#f3f8ff;color:#2563eb;font-size:10.5px;padding:9px 10px;margin-top:9px} .st-right-metric{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #e8ebf0;font-size:11px} .st-right-metric:last-child{border-bottom:0} .st-section-layout .st-section-side .st-score-ring{width:98px!important;height:98px!important;margin:8px auto!important} .st-section-layout .st-section-side .st-score-inner{width:74px!important;height:74px!important} .st-section-layout .st-section-side .st-score-inner strong{font-size:22px!important} .st-section-layout .st-section-side .st-card-title{font-size:13px!important} .st-section-layout .st-section-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important} #panel-payments .st-billing-box{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important} #panel-payments .st-pay-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important} #panel-payments .st-pay-side>.st-card>.st-body{padding:0!important} #panel-addresses .st-address-grid{grid-template-columns:1fr!important;gap:0!important} #panel-addresses .st-address-row{grid-template-columns:38px minmax(0,1fr) minmax(190px,auto)} #panel-preferences .st-section-main .st-plain-panel, #panel-privacy .st-section-main .st-plain-panel{border:0!important;background:transparent!important} #panel-privacy .st-privacy-panel-row{padding:12px 0!important;grid-template-columns:210px minmax(0,1fr)!important} #panel-privacy .st-privacy-panel-row:first-child{padding-top:0!important} #panel-privacy .st-privacy-panel-row:last-child{padding-bottom:0!important}
-@media(max-width:1260px){.st-section-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr!important}.st-map-mini{min-width:0}} @media(max-width:860px){.st-section-layout{gap:14px}.st-mini-tabs{gap:14px;flex-wrap:wrap}.st-line-row,#panel-addresses .st-address-row{grid-template-columns:1fr}.st-row-actions{justify-content:flex-start}.st-map-mini{width:100%}#panel-privacy .st-privacy-panel-row{grid-template-columns:1fr!important}} /* Keep Overview bottom panels in the right column, matching the original Settings UI */ @media(min-width:1261px){ #panel-overview>.st-grid{display:grid!important;grid-template-columns:minmax(0,1fr) 540px!important;gap:18px!important;align-items:start!important} #panel-overview>.st-grid>.st-stack:first-child{grid-column:1!important;grid-row:1!important;min-width:0!important;width:100%!important} #panel-overview>.st-grid>.st-stack:nth-child(2){grid-column:2!important;grid-row:1!important;min-width:0!important;width:100%!important;max-width:540px!important;align-self:start!important} #panel-overview .overview-quick-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel{width:100%!important;max-width:none!important} #panel-overview .overview-quick-panel .st-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important} } @media(max-width:1260px){ #panel-overview>.st-grid{grid-template-columns:1fr!important} #panel-overview>.st-grid>.st-stack:nth-child(2){max-width:none!important;width:100%!important} } /* ========================================================= FINAL REQUEST SYNC: Settings reference UI, buttons, boxes, icon colors, hover behavior, and consistent spacing ========================================================= */ .st-page, .st-wrap{ background:#fff!important; } .st-wrap{ max-width:1490px!important; padding:0 18px 34px!important; } .st-top{ margin:0 0 14px!important; align-items:flex-start!important; } .st-title{ font-family:'Playfair Display',Georgia,serif!important; font-size:30px!important; line-height:1.1!important; letter-spacing:-.02em!important; text-transform:uppercase!important; } .st-subtitle{ margin-top:4px!important; font-size:11px!important; color:#6b7280!important; } .st-title-wrap:before{ display:none!important; } .st-tabs{ gap:28px!important; margin-bottom:16px!important; border-bottom:1px solid #e5e7eb!important; } .st-tab{ padding:10px 0 11px!important; border-radius:0!important; font-size:10px!important; color:#111827!important; background:transparent!important; transform:none!important; } .st-tab:hover, .st-tab:focus-visible{ color:var(--st-orange)!important; background:transparent!important; transform:none!important; } .st-tab.active{ color:var(--st-orange)!important; } .st-tab.active:after{ height:2px!important; background:var(--st-orange)!important; } /* Main overview layout like the supplied Settings reference */ @media(min-width:1261px){ #panel-overview>.st-grid{ grid-template-columns:minmax(0,1.12fr) minmax(420px,.88fr)!important; gap:22px!important; align-items:start!important; } #panel-overview>.st-grid>.st-stack:nth-child(2){ max-width:none!important; width:100%!important; } } .st-stack{ gap:18px!important; } .st-body{ padding:15px 16px!important; } .st-head{ align-items:flex-start!important; margin-bottom:12px!important; } .st-card-title{ font-family:'Poppins',system-ui,sans-serif!important; font-size:13px!important; font-weight:700!important; letter-spacing:.02em!important;
+/* Settings tab grouping: Notifications style applied to all remaining tabs */ .st-section-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start} .st-section-main,.st-section-side{display:flex;flex-direction:column;gap:12px;min-width:0} .st-main-group{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important} .st-main-group:hover{background:#fff!important;box-shadow:none!important;border-color:#111827!important} .st-main-group>.st-body{padding:13px 15px!important} .st-plain-panel{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important} .st-plain-panel:hover{background:transparent!important;box-shadow:none!important} .st-plain-panel>.st-body{padding:0!important} .st-line-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:11px;align-items:center;padding:9px 0;border-bottom:1px solid #e8ebf0;background:transparent} .st-line-row:last-child{border-bottom:0} .st-line-row:hover{background:rgba(17,24,39,.08);margin-left:-8px;margin-right:-8px;padding-left:4px;padding-right:4px;border-radius:10px} .st-row-actions{display:flex;align-items:center;gap:7px;justify-content:flex-end;flex-wrap:wrap} .st-mini-tabs{display:flex;align-items:center;gap:26px;border-bottom:1px solid #e8ebf0;margin:2px 0 8px;padding-bottom:8px} .st-mini-tabs span{font-size:10px;font-weight:700;color:#64748b} .st-mini-tabs .active{color:#111827} .st-map-mini{height:72px;border-radius:10px;background:linear-gradient(135deg,#eaf8ef,#eef4ff);display:flex;align-items:center;justify-content:center;color:var(--st-green);font-size:24px;min-width:190px} .st-tip-inline{display:flex;align-items:center;gap:9px;border-radius:10px;background:#f3f8ff;color:#2563eb;font-size:10.5px;padding:9px 10px;margin-top:9px} .st-right-metric{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #e8ebf0;font-size:11px} .st-right-metric:last-child{border-bottom:0} .st-section-layout .st-section-side .st-score-ring{width:98px!important;height:98px!important;margin:8px auto!important} .st-section-layout .st-section-side .st-score-inner{width:74px!important;height:74px!important} .st-section-layout .st-section-side .st-score-inner strong{font-size:22px!important} .st-section-layout .st-section-side .st-card-title{font-size:13px!important} .st-section-layout .st-section-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important} #panel-payments .st-billing-box{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important} #panel-payments .st-pay-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important} #panel-payments .st-pay-side>.st-card>.st-body{padding:0!important} #panel-addresses .st-address-grid{grid-template-columns:1fr!important;gap:0!important} #panel-addresses .st-address-row{grid-template-columns:38px minmax(0,1fr) minmax(190px,auto)} #panel-preferences .st-section-main .st-plain-panel, #panel-privacy .st-section-main .st-plain-panel{border:0!important;background:transparent!important} #panel-privacy .st-privacy-panel-row{padding:12px 0!important;grid-template-columns:210px minmax(0,1fr)!important} #panel-privacy .st-privacy-panel-row:first-child{padding-top:0!important} #panel-privacy .st-privacy-panel-row:last-child{padding-bottom:0!important}
+@media(max-width:1260px){.st-section-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr!important}.st-map-mini{min-width:0}} @media(max-width:860px){.st-section-layout{gap:6px}.st-mini-tabs{gap:6px;flex-wrap:wrap}.st-line-row,#panel-addresses .st-address-row{grid-template-columns:1fr}.st-row-actions{justify-content:flex-start}.st-map-mini{width:100%}#panel-privacy .st-privacy-panel-row{grid-template-columns:1fr!important}} /* Keep Overview bottom panels in the right column, matching the original Settings UI */ @media(min-width:1261px){ #panel-overview>.st-grid{display:grid!important;grid-template-columns:minmax(0,1fr) 540px!important;gap:18px!important;align-items:start!important} #panel-overview>.st-grid>.st-stack:first-child{grid-column:1!important;grid-row:1!important;min-width:0!important;width:100%!important} #panel-overview>.st-grid>.st-stack:nth-child(2){grid-column:2!important;grid-row:1!important;min-width:0!important;width:100%!important;max-width:540px!important;align-self:start!important} #panel-overview .overview-quick-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel{width:100%!important;max-width:none!important} #panel-overview .overview-quick-panel .st-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important} } @media(max-width:1260px){ #panel-overview>.st-grid{grid-template-columns:1fr!important} #panel-overview>.st-grid>.st-stack:nth-child(2){max-width:none!important;width:100%!important} } /* ========================================================= FINAL REQUEST SYNC: Settings reference UI, buttons, boxes, icon colors, hover behavior, and consistent spacing ========================================================= */ .st-page, .st-wrap{ background:#fff!important; } .st-wrap{ max-width:1490px!important; padding:0 18px 34px!important; } .st-top{ margin:0 0 14px!important; align-items:flex-start!important; } .st-title{ font-family:'Playfair Display',Georgia,serif!important; font-size:30px!important; line-height:1.1!important; letter-spacing:-.02em!important; text-transform:uppercase!important; } .st-subtitle{ margin-top:4px!important; font-size:11px!important; color:#6b7280!important; } .st-title-wrap:before{ display:none!important; } .st-tabs{ gap:28px!important; margin-bottom:16px!important; border-bottom:1px solid #e5e7eb!important; } .st-tab{ padding:10px 0 11px!important; border-radius:0!important; font-size:10px!important; color:#111827!important; background:transparent!important; transform:none!important; } .st-tab:hover, .st-tab:focus-visible{ color:var(--st-orange)!important; background:transparent!important; transform:none!important; } .st-tab.active{ color:var(--st-orange)!important; } .st-tab.active:after{ height:2px!important; background:var(--st-orange)!important; } /* Main overview layout like the supplied Settings reference */ @media(min-width:1261px){ #panel-overview>.st-grid{ grid-template-columns:minmax(0,1.12fr) minmax(420px,.88fr)!important; gap:22px!important; align-items:start!important; } #panel-overview>.st-grid>.st-stack:nth-child(2){ max-width:none!important; width:100%!important; } } .st-stack{ gap:18px!important; } .st-body{ padding:15px 16px!important; } .st-head{ align-items:flex-start!important; margin-bottom:12px!important; } .st-card-title{ font-family:'Poppins',system-ui,sans-serif!important; font-size:13px!important; font-weight:700!important; letter-spacing:.02em!important;
 text-transform:uppercase!important; color:#111827!important; } .st-card-desc{ color:#6b7280!important; font-size:9.8px!important; line-height:1.35!important; } /* Box logic: main grouped boxes have subtle/black borders, requested plain sections have no outer box */ #panel-overview .overview-profile-box, #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-profile .st-card:first-child, #panel-security .st-setting-main>.st-card:first-child, #panel-notifications .st-card:first-child, #panel-payments .st-billing-box, .st-main-group{ border:1px solid rgba(17,24,39,.55)!important; border-radius:12px!important; background:#fff!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; overflow:hidden!important; } #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; } #panel-overview .overview-comm-panel>.st-body, #panel-overview .overview-prefs-panel>.st-body, #panel-overview .overview-activity-panel>.st-body, #panel-overview .overview-privacy-panel>.st-body, .st-plain>.st-body, .st-plain-panel>.st-body{ padding:0!important; } .st-card:hover, .st-main-group:hover, .st-plain:hover, .st-plain-panel:hover, #panel-overview .overview-profile-box:hover, #panel-overview .overview-payment-box:hover, #panel-overview .overview-quick-panel:hover, #panel-overview .overview-comm-panel:hover, #panel-overview .overview-prefs-panel:hover, #panel-overview .overview-activity-panel:hover, #panel-overview .overview-privacy-panel:hover{ background:#fff!important; border-color:inherit!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; transform:none!important; backdrop-filter:none!important; } #panel-overview .overview-comm-panel:hover, #panel-overview .overview-prefs-panel:hover, #panel-overview .overview-activity-panel:hover, #panel-overview .overview-privacy-panel:hover, .st-plain:hover, .st-plain-panel:hover{ box-shadow:none!important; } /* Buttons: orange buttons match reference and hover black. Non-orange buttons stay white/transparent and hover black. */ .st-btn, .st-page .st-btn{ height:34px!important; min-width:112px!important; padding:0 15px!important; border:1px solid transparent!important; border-radius:999px!important; background:linear-gradient(90deg,var(--st-orange),#ffab0a)!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:600!important; letter-spacing:0!important; box-shadow:none!important; transform:none!important; } .st-btn:hover, .st-btn:focus-visible, .st-btn:active, .st-btn.is-clicked, .st-btn.st-clickable-cover{ background:#111827!important; border-color:#111827!important; color:#fff!important; box-shadow:none!important; transform:none!important; outline:none!important; } .st-outline-btn, .st-page .st-outline-btn, .st-link, .st-close, .st-kebab, .st-add-box, .st-add-payment, .st-quick, .st-privacy, .st-setting-action, .st-select, .st-date{ box-shadow:none!important; transform:none!important; } .st-outline-btn, .st-page .st-outline-btn{ height:34px!important;
 min-width:112px!important; padding:0 14px!important; border:1px solid #111827!important; border-radius:999px!important; background:#fff!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:600!important; } .st-outline-btn:hover, .st-outline-btn:focus-visible, .st-outline-btn:active, .st-outline-btn.is-clicked{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:none!important; } .st-link{ min-height:24px!important; padding:0 8px!important; border:1px solid transparent!important; border-radius:999px!important; background:transparent!important; color:var(--st-orange)!important; font-size:9.5px!important; font-weight:700!important; } .st-link:hover, .st-link:focus-visible, .st-link:active, .st-link.is-clicked{ background:#111827!important; border-color:#111827!important; color:#fff!important; text-decoration:none!important; outline:none!important; } .st-close{ border:1px solid #e5e7eb!important; background:#fff!important; color:#111827!important; } .st-close:hover, .st-close:focus-visible, .st-close:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; } .st-date{ height:38px!important; min-width:176px!important; border:1px solid #111827!important; border-radius:8px!important; background:#fff!important; color:#111827!important; font-size:11px!important; font-weight:600!important; } .st-date:hover, .st-date:focus-visible{ background:#111827!important; color:#fff!important; } .st-date:hover i, .st-date:focus-visible i{ color:#fff!important; } /* Quick cards and privacy controls: subtle rows; hover black without moving */ .st-quick, .st-privacy, .st-setting-action{ border:1px solid rgba(17,24,39,.13)!important; border-radius:9px!important; background:#fff!important; color:#111827!important; } .st-quick:hover, .st-quick:focus-visible, .st-quick:active, .st-quick.is-clicked, .st-privacy:hover, .st-privacy:focus-visible, .st-privacy:active, .st-privacy.is-clicked, .st-setting-action:hover, .st-setting-action:focus-visible, .st-setting-action:active, .st-setting-action.is-clicked{ background:#111827!important; border-color:#111827!important; color:#fff!important; transform:none!important; outline:none!important; } .st-quick:hover .st-quick-title, .st-quick:hover .st-quick-sub, .st-quick:hover .st-chev, .st-quick:focus-visible .st-quick-title, .st-quick:focus-visible .st-quick-sub, .st-quick:focus-visible .st-chev, .st-privacy:hover .st-privacy-title, .st-privacy:hover .st-privacy-sub, .st-privacy:hover .st-chev, .st-setting-action:hover span, .st-setting-action:hover i{ color:#fff!important; } .st-add-box, .st-add-payment{ border:1px dashed rgba(17,24,39,.28)!important; border-radius:10px!important; background:#fff!important; color:#111827!important; } .st-add-box:hover, .st-add-box:focus-visible, .st-add-payment:hover, .st-add-payment:focus-visible{ background:#111827!important; border-color:#111827!important; color:#fff!important; transform:none!important; } .st-add-box:hover .st-add-circle, .st-add-payment:hover .st-add-circle{ background:#fff!important; border-color:#fff!important; color:#111827!important; } /* Consistent icon color system */ .st-orange-ico, .st-profile-mini .st-orange-ico, .st-summary-item .st-orange-ico, .st-comm-left .st-orange-ico, .st-privacy-left .st-orange-ico{ background:#fff3e6!important; border:1px solid #f3dfcb!important; color:var(--st-orange)!important; }
-.st-ico{ color:#64748b!important; } .st-camera{ background:var(--st-orange)!important; border-color:#fff!important; color:#fff!important; } .st-camera:hover, .st-camera:focus-visible{ background:#111827!important; color:#fff!important; } .st-quick:hover .st-orange-ico, .st-privacy:hover .st-orange-ico, .st-comm-item:hover .st-orange-ico, .st-pref-row:hover .st-orange-ico, .st-setting-action:hover .st-orange-ico{ background:#fff!important; border-color:#fff!important; color:#111827!important; } /* Overview section spacing/positions */ #panel-overview .overview-profile-box .st-body{ padding:14px 16px!important; } #panel-overview .overview-profile-box .st-head, #panel-overview .overview-quick-panel .st-head, #panel-overview .overview-activity-panel .st-head, #panel-overview .overview-comm-panel .st-head{ margin-bottom:10px!important; } #panel-overview .overview-profile-box .st-profile{ grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr)!important; gap:14px!important; } #panel-overview .overview-profile-box .st-avatar{ width:102px!important; height:102px!important; } #panel-overview .overview-profile-box .st-section-line{ height:1px!important; background:#e5e7eb!important; margin:15px 0!important; } #panel-overview .overview-profile-box .st-address-grid{ gap:10px!important; } #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{ border-color:rgba(17,24,39,.16)!important; min-height:96px!important; } #panel-overview .overview-payment-box{ display:grid!important; grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; gap:0!important; padding:0!important; } #panel-overview .overview-payment-box>.st-card:first-child{ border-right:1px solid #e5e7eb!important; } #panel-overview .overview-payment-box>.st-card .st-body{ padding:14px 16px!important; } #panel-overview .overview-quick-panel{ border-color:rgba(17,24,39,.16)!important; } #panel-overview .overview-quick-panel .st-quick-grid{ grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:9px!important; } #panel-overview .overview-quick-panel .st-quick{ min-height:56px!important; padding:9px!important; } #panel-overview .overview-comm-panel .st-list, #panel-overview .overview-prefs-panel> .st-body > div, #panel-overview .overview-activity-panel> .st-body > div:last-child{ margin-top:8px!important; } .st-comm-item, .st-pref-row, .st-activity-row, .st-no-box-item, .st-right-metric{ border-bottom:1px solid #e8ebf0!important; border-radius:0!important; background:transparent!important; margin:0!important; padding:8px 0!important; transform:none!important; } .st-comm-item:hover, .st-pref-row:hover, .st-activity-row:hover, .st-no-box-item:hover, .st-right-metric:hover{ background:transparent!important; margin:0!important; padding-left:0!important; padding-right:0!important; transform:none!important; } .st-privacy-grid{ grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:10px!important; } #panel-overview .overview-privacy-panel .st-privacy{ min-height:54px!important; padding:9px!important; } /* Toggles consistent green/off gray */ .st-switch{ width:36px!important; height:20px!important; } .st-slider{ background:#d1d5db!important; } .st-switch input:checked+.st-slider{ background:#16a34a!important; } .st-switch input:checked+.st-slider:before{ transform:translateX(15px)!important; } /* Forms and modals: transparent cancel / green save where applicable */ .st-input, .st-textarea{ border:1px solid rgba(17,24,39,.16)!important;
+.st-ico{ color:#64748b!important; } .st-camera{ background:var(--st-orange)!important; border-color:#fff!important; color:#fff!important; } .st-camera:hover, .st-camera:focus-visible{ background:#111827!important; color:#fff!important; } .st-quick:hover .st-orange-ico, .st-privacy:hover .st-orange-ico, .st-comm-item:hover .st-orange-ico, .st-pref-row:hover .st-orange-ico, .st-setting-action:hover .st-orange-ico{ background:#fff!important; border-color:#fff!important; color:#111827!important; } /* Overview section spacing/positions */ #panel-overview .overview-profile-box .st-body{ padding:14px 16px!important; } #panel-overview .overview-profile-box .st-head, #panel-overview .overview-quick-panel .st-head, #panel-overview .overview-activity-panel .st-head, #panel-overview .overview-comm-panel .st-head{ margin-bottom:10px!important; } #panel-overview .overview-profile-box .st-profile{ grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr)!important; gap:6px!important; } #panel-overview .overview-profile-box .st-avatar{ width:102px!important; height:102px!important; } #panel-overview .overview-profile-box .st-section-line{ height:1px!important; background:#e5e7eb!important; margin:15px 0!important; } #panel-overview .overview-profile-box .st-address-grid{ gap:10px!important; } #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{ border-color:rgba(17,24,39,.16)!important; min-height:96px!important; } #panel-overview .overview-payment-box{ display:grid!important; grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; gap:0!important; padding:0!important; } #panel-overview .overview-payment-box>.st-card:first-child{ border-right:1px solid #e5e7eb!important; } #panel-overview .overview-payment-box>.st-card .st-body{ padding:14px 16px!important; } #panel-overview .overview-quick-panel{ border-color:rgba(17,24,39,.16)!important; } #panel-overview .overview-quick-panel .st-quick-grid{ grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:9px!important; } #panel-overview .overview-quick-panel .st-quick{ min-height:56px!important; padding:9px!important; } #panel-overview .overview-comm-panel .st-list, #panel-overview .overview-prefs-panel> .st-body > div, #panel-overview .overview-activity-panel> .st-body > div:last-child{ margin-top:8px!important; } .st-comm-item, .st-pref-row, .st-activity-row, .st-no-box-item, .st-right-metric{ border-bottom:1px solid #e8ebf0!important; border-radius:0!important; background:transparent!important; margin:0!important; padding:8px 0!important; transform:none!important; } .st-comm-item:hover, .st-pref-row:hover, .st-activity-row:hover, .st-no-box-item:hover, .st-right-metric:hover{ background:transparent!important; margin:0!important; padding-left:0!important; padding-right:0!important; transform:none!important; } .st-privacy-grid{ grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:10px!important; } #panel-overview .overview-privacy-panel .st-privacy{ min-height:54px!important; padding:9px!important; } /* Toggles consistent green/off gray */ .st-switch{ width:36px!important; height:20px!important; } .st-slider{ background:#d1d5db!important; } .st-switch input:checked+.st-slider{ background:#16a34a!important; } .st-switch input:checked+.st-slider:before{ transform:translateX(15px)!important; } /* Forms and modals: transparent cancel / green save where applicable */ .st-input, .st-textarea{ border:1px solid rgba(17,24,39,.16)!important;
 border-radius:10px!important; background:#fff!important; } .st-input:focus, .st-textarea:focus{ border-color:#111827!important; box-shadow:0 0 0 3px rgba(17,24,39,.08)!important; } .st-modal-card{ border:1px solid #111827!important; border-radius:16px!important; } .st-modal .st-actions .st-btn:first-child{ background:#fff!important; border:1px solid #111827!important; color:#111827!important; } .st-modal .st-actions .st-btn:first-child:hover, .st-modal .st-actions .st-btn:first-child:focus-visible{ background:#111827!important; border-color:#111827!important; color:#fff!important; } .st-modal .st-actions .st-btn[type="submit"], #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn[onclick*="Save"], #panel-preferences .st-head .st-btn[onclick*="Save"]{ background:#16a34a!important; border-color:#16a34a!important; color:#fff!important; } .st-modal .st-actions .st-btn[type="submit"]:hover, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn[onclick*="Save"]:hover, #panel-preferences .st-head .st-btn[onclick*="Save"]:hover{ background:#111827!important; border-color:#111827!important; color:#fff!important; } /* Reduce visual redundancy in side panels */ .st-section-side .st-card-title, .st-setting-side .st-card-title, .st-notif-side .st-card-title, .st-pay-side .st-card-title{ font-size:12.5px!important; } .st-section-side .st-card-desc, .st-setting-side .st-card-desc, .st-notif-side .st-card-desc, .st-pay-side .st-card-desc{ font-size:9.5px!important; } .st-section-side .st-no-box-list, .st-setting-side .st-side-list, .st-notif-side .st-no-box-list, .st-pay-side .st-no-box-list{ gap:0!important; } /* Never move items on hover */ .st-page *, .st-page *:hover, .st-page *:focus, .st-page *:active{ transform:none!important; } @media(max-width:1260px){ #panel-overview>.st-grid, #panel-overview .overview-payment-box, .st-grid, .st-settings-grid, .st-section-layout, .st-profile, .st-two{ grid-template-columns:1fr!important; } #panel-overview .overview-payment-box>.st-card:first-child{ border-right:0!important; border-bottom:1px solid #e5e7eb!important; } } @media(max-width:860px){ .st-wrap{padding:0 12px 28px!important;} .st-tabs{gap:18px!important;} .st-privacy-grid, #panel-overview .overview-quick-panel .st-quick-grid, .st-address-grid, .st-form-grid, .st-summary-strip{ grid-template-columns:1fr!important; } .st-btn, .st-outline-btn, .st-date{width:100%!important;} } /* ========================================================= FINAL OVERVIEW REQUEST PATCH - 2026-06-08 Layout follows My Profile button/font/hover flow: left = Profile+Address boxed, Payment/Notifications plain, Quick/Activity plain; right = Privacy, Communication, Preferences plain. ========================================================= */ #panel-overview>.st-grid{ display:grid!important; grid-template-columns:minmax(0,1.08fr) minmax(360px,.72fr)!important; gap:22px!important; align-items:start!important; } #panel-overview .overview-left-stack, #panel-overview .overview-right-stack{ display:flex!important; flex-direction:column!important; gap:18px!important; min-width:0!important; width:100%!important; } #panel-overview .overview-right-stack{ max-width:520px!important; justify-self:stretch!important; } #panel-overview .overview-profile-box{ border:1.5px solid #111827!important; border-radius:14px!important; background:#fff!important; box-shadow:none!important; overflow:hidden!important; }
 #panel-overview .overview-profile-box:hover{ background:#fff!important; border-color:#111827!important; box-shadow:none!important; } #panel-overview .overview-profile-box>.st-body{ padding:16px!important; } #panel-overview .overview-profile-box .st-section-line{ height:1px!important; background:#111827!important; opacity:1!important; margin:16px 0!important; } #panel-overview .overview-profile-box .st-address-grid{ display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:12px!important; align-items:stretch!important; } #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{ border:1px solid #d9dee7!important; border-radius:12px!important; background:#fff!important; min-height:118px!important; padding:12px!important; box-shadow:none!important; } #panel-overview .overview-profile-box .st-box:hover, #panel-overview .overview-profile-box .st-add-box:hover{ border-color:#111827!important; background:#fff!important; } #panel-overview .overview-profile-box .st-box-text{ font-size:9.6px!important; line-height:1.42!important; color:#5f6673!important; word-break:break-word!important; } /* Plain overview panels: no outside box for payment/notification, quick, activity, privacy, communication, preferences */ #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; padding:0!important; } #panel-overview .overview-payment-box:hover, #panel-overview .overview-quick-panel:hover, #panel-overview .overview-activity-panel:hover, #panel-overview .overview-privacy-panel:hover, #panel-overview .overview-comm-panel:hover, #panel-overview .overview-prefs-panel:hover{ background:transparent!important; border-color:transparent!important; box-shadow:none!important; } #panel-overview .overview-payment-box>.st-card, #panel-overview .overview-quick-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel{ border:0!important; background:transparent!important; box-shadow:none!important; } #panel-overview .overview-payment-box>.st-card>.st-body, #panel-overview .overview-quick-panel>.st-body, #panel-overview .overview-activity-panel>.st-body, #panel-overview .overview-privacy-panel>.st-body, #panel-overview .overview-comm-panel>.st-body, #panel-overview .overview-prefs-panel>.st-body{ padding:0!important; } #panel-overview .overview-payment-box{ display:grid!important; grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important; gap:18px!important; } #panel-overview .overview-payment-box>.st-card:first-child{ border-right:0!important; padding-right:0!important; } #panel-overview .overview-payment-box>.st-card:last-child{ padding-left:0!important; } #panel-overview .overview-payment-box .st-list, #panel-overview .overview-comm-panel .st-list{ margin-top:10px!important; } #panel-overview .st-notif-item, #panel-overview .st-comm-item, #panel-overview .st-pref-row, #panel-overview .st-activity-row{ border-bottom:1px solid #e8ebf0!important; padding:9px 0!important; margin:0!important; background:transparent!important; border-radius:0!important; }
 #panel-overview .st-notif-item:last-child, #panel-overview .st-comm-item:last-child, #panel-overview .st-pref-row:last-child, #panel-overview .st-activity-row:last-child{ border-bottom:0!important; } #panel-overview .st-notif-item:hover, #panel-overview .st-comm-item:hover, #panel-overview .st-pref-row:hover, #panel-overview .st-activity-row:hover{ background:transparent!important; padding-left:0!important; padding-right:0!important; } #panel-overview .overview-quick-panel .st-quick-grid{ display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:10px!important; } #panel-overview .overview-privacy-panel .st-privacy-grid{ display:grid!important; grid-template-columns:1fr!important; gap:8px!important; } #panel-overview .overview-quick-panel .st-quick, #panel-overview .overview-privacy-panel .st-privacy{ border:1px solid #e5e7eb!important; border-radius:10px!important; background:#fff!important; min-height:54px!important; padding:9px!important; box-shadow:none!important; } #panel-overview .overview-quick-panel .st-quick:hover, #panel-overview .overview-quick-panel .st-quick:focus-visible, #panel-overview .overview-privacy-panel .st-privacy:hover, #panel-overview .overview-privacy-panel .st-privacy:focus-visible{ background:#111827!important; border-color:#111827!important; color:#fff!important; } #panel-overview .overview-quick-panel .st-quick:hover .st-quick-title, #panel-overview .overview-quick-panel .st-quick:hover .st-quick-sub, #panel-overview .overview-quick-panel .st-quick:hover .st-chev, #panel-overview .overview-privacy-panel .st-privacy:hover .st-privacy-title, #panel-overview .overview-privacy-panel .st-privacy:hover .st-privacy-sub, #panel-overview .overview-privacy-panel .st-privacy:hover .st-chev{ color:#fff!important; } /* My Profile-like buttons and hover behavior */ .st-btn, .st-page .st-btn, .st-outline-btn, .st-page .st-outline-btn{ height:36px!important; min-width:118px!important; padding:0 16px!important; border-radius:10px!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:600!important; letter-spacing:.01em!important; box-shadow:none!important; transform:none!important; } .st-btn, .st-page .st-btn{ border:1px solid var(--st-orange)!important; background:var(--st-orange)!important; color:#111827!important; } .st-outline-btn, .st-page .st-outline-btn{ border:1px solid var(--st-orange)!important; background:#fff!important; color:var(--st-orange)!important; } .st-btn:hover, .st-btn:focus-visible, .st-btn:active, .st-outline-btn:hover, .st-outline-btn:focus-visible, .st-outline-btn:active, .st-link:hover, .st-link:focus-visible, .st-link:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:none!important; transform:none!important; } .st-link{ min-height:24px!important; padding:0 8px!important; border-radius:8px!important; color:var(--st-orange)!important; background:transparent!important; } /* Icons and toggles consistency */ #panel-overview .st-orange-ico, #panel-overview .st-ico{ color:var(--st-orange)!important; } #panel-overview .st-orange-ico{ background:#fff3e6!important; border:1px solid #f3dfcb!important; } #panel-overview .overview-quick-panel .st-quick:hover .st-orange-ico, #panel-overview .overview-privacy-panel .st-privacy:hover .st-ico, #panel-overview .overview-privacy-panel .st-privacy:hover .st-orange-ico{ background:#fff!important; border-color:#fff!important;
@@ -472,9 +602,9 @@ padding:16px!important; } #panel-overview .overview-profile-box .st-section-line
 min-width:166px!important; border-radius:999px!important; cursor:pointer!important; } .st-page .st-date i{color:#111827!important;} .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-page .st-date:active, .st-page .st-link:hover, .st-page .st-link:focus-visible, .st-page .st-link:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:0!important; box-shadow:none!important; transform:none!important; } .st-page .st-date:hover i, .st-page .st-date:focus-visible i, .st-page .st-btn:hover i, .st-page .st-outline-btn:hover i{color:#fff!important;} /* Icons/toggles consistency */ #panel-overview .st-orange-ico{ background:#fff3e6!important; border:1px solid #f3dfcb!important; color:#ff7a00!important; } #panel-overview .st-ico{ color:#ff7a00!important; } #panel-overview .overview-quick-panel .st-quick:hover .st-orange-ico, #panel-overview .overview-privacy-panel .st-privacy:hover .st-ico, #panel-overview .overview-privacy-panel .st-privacy:hover .st-orange-ico{ background:#fff!important; border-color:#fff!important; color:#111827!important; } .st-switch input:checked+.st-slider{background:#16a34a!important;} .st-slider{background:#d1d5db!important;} @media(max-width:1260px){ #panel-overview>.st-grid{ grid-template-columns:1fr!important; } #panel-overview .overview-right-stack{ width:100%!important; max-width:100%!important; justify-self:stretch!important; } } @media(max-width:860px){ .st-page .st-date, .st-page .st-btn, .st-page .st-outline-btn{ width:100%!important; min-width:0!important; } } /* ========================================================= FINAL POLISH: exact overview order, right-side width, consistent buttons/date, and unified score rings ========================================================= */ :root{ --st-primary-orange:#ff7a00; --st-primary-orange-2:#ffab0a; --st-action-hover:#111827; } /* Overview columns: right side narrower, all cards end evenly */ @media(min-width:1261px){ #panel-overview > .st-grid{ grid-template-columns:minmax(0,1fr) 455px!important; gap:22px!important; align-items:start!important; } #panel-overview .overview-left-stack, #panel-overview .overview-right-stack{ width:100%!important; max-width:none!important; display:flex!important; flex-direction:column!important; gap:18px!important; } #panel-overview .overview-right-stack > .st-card, #panel-overview .overview-right-stack > .st-card.st-right-slim, #panel-overview .overview-left-stack > .st-card, #panel-overview .overview-left-stack > .st-card.st-right-slim{ width:100%!important; max-width:none!important; margin-left:0!important; margin-right:0!important; box-sizing:border-box!important; } } @media(max-width:1260px){ #panel-overview > .st-grid{grid-template-columns:1fr!important;} #panel-overview .overview-right-stack, #panel-overview .overview-left-stack{width:100%!important;max-width:none!important;} } /* Requested no-box panels stay clean but keep exact aligned width */ #panel-overview .overview-notif-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-quick-panel, #panel-overview .overview-privacy-panel, #panel-overview .overview-payment-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel{ width:100%!important; max-width:none!important;
 box-sizing:border-box!important; } #panel-overview .overview-notif-panel, #panel-overview .overview-comm-panel, #panel-overview .overview-payment-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel{ border:0!important; background:transparent!important; box-shadow:none!important; border-radius:0!important; overflow:visible!important; } #panel-overview .overview-notif-panel > .st-body, #panel-overview .overview-comm-panel > .st-body, #panel-overview .overview-payment-panel > .st-body, #panel-overview .overview-prefs-panel > .st-body, #panel-overview .overview-activity-panel > .st-body{ padding:0!important; } #panel-overview .overview-privacy-panel, #panel-overview .overview-quick-panel{ border:0!important; background:transparent!important; box-shadow:none!important; border-radius:0!important; overflow:visible!important; } #panel-overview .overview-privacy-panel > .st-body, #panel-overview .overview-quick-panel > .st-body{ padding:0!important; } /* Right-side cards/cards lists: same endpoint and comfortable size */ #panel-overview .overview-right-stack .st-privacy-grid, #panel-overview .overview-right-stack .st-quick-grid{ grid-template-columns:1fr!important; gap:9px!important; } #panel-overview .overview-left-stack .st-quick-grid{ grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:10px!important; } #panel-overview .overview-right-stack .st-privacy, #panel-overview .overview-right-stack .st-quick, #panel-overview .overview-left-stack .st-quick, #panel-overview .overview-left-stack .st-privacy{ width:100%!important; min-height:54px!important; padding:10px!important; box-sizing:border-box!important; } #panel-overview .overview-payment-panel .st-pay-bottom{ grid-template-columns:1fr!important; } #panel-overview .overview-payment-panel .st-add-payment{ min-height:50px!important; } /* Buttons and Date: one consistent My Profile-style button system */ .st-page .st-btn, .st-page .st-outline-btn, .st-page .st-date, .st-modal .st-actions .st-btn, #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn, #panel-preferences .st-head .st-btn{ height:36px!important; min-width:120px!important; padding:0 16px!important; border-radius:999px!important; border:1px solid transparent!important; background:linear-gradient(90deg,var(--st-primary-orange),var(--st-primary-orange-2))!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; letter-spacing:.01em!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:7px!important; box-shadow:none!important; transform:none!important; white-space:nowrap!important; cursor:pointer!important; } .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-outline-btn.is-clicked, .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-modal .st-actions .st-btn:hover, .st-modal .st-actions .st-btn:focus-visible, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn:hover, #panel-preferences .st-head .st-btn:hover{ background:var(--st-action-hover)!important; border-color:var(--st-action-hover)!important; color:#fff!important; box-shadow:none!important; outline:none!important; transform:none!important; } .st-page .st-date i,
 .st-page .st-date span{color:inherit!important;} .st-modal .st-actions .st-btn:first-child{ background:#fff!important; border-color:#111827!important; color:#111827!important; } .st-modal .st-actions .st-btn:first-child:hover, .st-modal .st-actions .st-btn:first-child:focus-visible{ background:#111827!important; border-color:#111827!important; color:#fff!important; } .st-page .st-link{ color:var(--st-primary-orange)!important; border-radius:999px!important; } .st-page .st-link:hover, .st-page .st-link:focus-visible{ background:#111827!important; color:#fff!important; } /* Unified Profile Completion / Security Score / Notification Summary rings */ .st-score-ring, #panel-profile .st-profile-side .st-score-ring, #panel-security .st-setting-side .st-score-ring, #panel-notifications .st-notif-side .st-score-ring, .st-section-layout .st-section-side .st-score-ring{ width:112px!important; height:112px!important; margin:10px auto 12px!important; border-radius:50%!important; background:conic-gradient(var(--st-primary-orange) 0 331deg,#f1f5f9 331deg 360deg)!important; display:grid!important; place-items:center!important; box-shadow:0 8px 22px rgba(255,122,0,.14)!important; } .st-score-inner, #panel-profile .st-profile-side .st-score-inner, #panel-security .st-setting-side .st-score-inner, #panel-notifications .st-notif-side .st-score-inner, .st-section-layout .st-section-side .st-score-inner{ width:82px!important; height:82px!important; border-radius:50%!important; background:#fff!important; display:grid!important; place-items:center!important; text-align:center!important; border:1px solid #fff3e6!important; } .st-score-inner strong, #panel-profile .st-profile-side .st-score-inner strong, #panel-security .st-setting-side .st-score-inner strong, #panel-notifications .st-notif-side .st-score-inner strong, .st-section-layout .st-section-side .st-score-inner strong{ font-family:'Poppins',system-ui,sans-serif!important; font-size:24px!important; line-height:1!important; color:#111827!important; font-weight:800!important; } .st-score-inner span, #panel-profile .st-profile-side .st-score-inner span, #panel-security .st-setting-side .st-score-inner span, #panel-notifications .st-notif-side .st-score-inner span, .st-section-layout .st-section-side .st-score-inner span{ color:var(--st-primary-orange)!important; font-size:10px!important; font-weight:800!important; text-transform:uppercase!important; letter-spacing:.03em!important; } /* Keep switch colors consistent */ .st-switch input:checked + .st-slider{background:#16a34a!important;} .st-slider{background:#d1d5db!important;} @media(max-width:860px){ #panel-overview .overview-left-stack .st-quick-grid{grid-template-columns:1fr!important;} .st-page .st-btn, .st-page .st-outline-btn, .st-page .st-date{width:100%!important;} } /* ========================================================= FINAL FIX V5: exact overview alignment + icon-only colors ========================================================= */ @media(min-width:1261px){ #panel-overview>.st-grid{ grid-template-columns:minmax(0,1fr) 430px!important; gap:24px!important; align-items:start!important; } #panel-overview .overview-right-stack{ width:430px!important; max-width:430px!important; min-width:430px!important; display:flex!important; flex-direction:column!important; gap:18px!important; } #panel-overview .overview-left-stack{ min-width:0!important; width:100%!important; } } @media(max-width:1260px){
-#panel-overview>.st-grid{grid-template-columns:1fr!important;} #panel-overview .overview-right-stack{width:100%!important;max-width:none!important;min-width:0!important;} } #panel-overview .overview-right-stack>*, #panel-overview .overview-right-stack .st-card, #panel-overview .overview-right-stack .st-body, #panel-overview .overview-right-stack .st-list, #panel-overview .overview-right-stack .st-privacy-grid, #panel-overview .overview-right-stack .st-quick-grid, #panel-overview .overview-right-stack .st-pay-bottom{ width:100%!important; max-width:100%!important; box-sizing:border-box!important; } #panel-overview .overview-right-stack .st-right-slim{max-width:none!important;width:100%!important;} #panel-overview .overview-right-stack .st-head{width:100%!important;box-sizing:border-box!important;} #panel-overview .overview-right-stack .st-card-title, #panel-overview .overview-left-stack .st-card-title{ background:transparent!important; color:#111827!important; display:block!important; padding:0!important; } /* Address Book: remove bulky individual boxes while keeping clean columns */ #panel-overview .overview-profile-box .st-address-grid{ display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:14px!important; align-items:stretch!important; } #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; padding:6px 8px 8px 0!important; min-height:96px!important; border-right:1px solid #e5e7eb!important; } #panel-overview .overview-profile-box .st-address-grid>*:last-child{ border-right:0!important; padding-right:0!important; } #panel-overview .overview-profile-box .st-box:hover, #panel-overview .overview-profile-box .st-add-box:hover{ background:transparent!important; border-color:#e5e7eb!important; color:#111827!important; } #panel-overview .overview-profile-box .st-add-box{ justify-content:center!important; text-align:center!important; } #panel-overview .overview-profile-box .st-add-box:hover .st-add-circle{ background:transparent!important; color:var(--st-orange)!important; border-color:#d1d5db!important; } /* Saved Payment Methods: no card/box look, just aligned rows */ #panel-overview .overview-payment-panel .st-pay-item, #panel-overview .overview-payment-panel .st-add-payment{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; padding:9px 0!important; min-height:52px!important; border-bottom:1px solid #e8ebf0!important; width:100%!important; } #panel-overview .overview-payment-panel .st-pay-item:hover, #panel-overview .overview-payment-panel .st-add-payment:hover{ background:transparent!important; border-color:#e8ebf0!important; color:#111827!important; } #panel-overview .overview-payment-panel .st-pay-bottom{ display:block!important; } #panel-overview .overview-payment-panel .st-add-payment{ display:flex!important; flex-direction:row!important; justify-content:center!important; gap:8px!important; border-bottom:0!important; border-top:1px dashed #d1d5db!important; margin-top:8px!important; } #panel-overview .overview-payment-panel .st-add-payment br{display:none!important;} #panel-overview .overview-payment-panel .st-card-logo{ border:1px solid #d1d5db!important; border-radius:7px!important; } /* Quick Settings back on right: compact, same endpoint */
+#panel-overview>.st-grid{grid-template-columns:1fr!important;} #panel-overview .overview-right-stack{width:100%!important;max-width:none!important;min-width:0!important;} } #panel-overview .overview-right-stack>*, #panel-overview .overview-right-stack .st-card, #panel-overview .overview-right-stack .st-body, #panel-overview .overview-right-stack .st-list, #panel-overview .overview-right-stack .st-privacy-grid, #panel-overview .overview-right-stack .st-quick-grid, #panel-overview .overview-right-stack .st-pay-bottom{ width:100%!important; max-width:100%!important; box-sizing:border-box!important; } #panel-overview .overview-right-stack .st-right-slim{max-width:none!important;width:100%!important;} #panel-overview .overview-right-stack .st-head{width:100%!important;box-sizing:border-box!important;} #panel-overview .overview-right-stack .st-card-title, #panel-overview .overview-left-stack .st-card-title{ background:transparent!important; color:#111827!important; display:block!important; padding:0!important; } /* Address Book: remove bulky individual boxes while keeping clean columns */ #panel-overview .overview-profile-box .st-address-grid{ display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:6px!important; align-items:stretch!important; } #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; padding:6px 8px 8px 0!important; min-height:96px!important; border-right:1px solid #e5e7eb!important; } #panel-overview .overview-profile-box .st-address-grid>*:last-child{ border-right:0!important; padding-right:0!important; } #panel-overview .overview-profile-box .st-box:hover, #panel-overview .overview-profile-box .st-add-box:hover{ background:transparent!important; border-color:#e5e7eb!important; color:#111827!important; } #panel-overview .overview-profile-box .st-add-box{ justify-content:center!important; text-align:center!important; } #panel-overview .overview-profile-box .st-add-box:hover .st-add-circle{ background:transparent!important; color:var(--st-orange)!important; border-color:#d1d5db!important; } /* Saved Payment Methods: no card/box look, just aligned rows */ #panel-overview .overview-payment-panel .st-pay-item, #panel-overview .overview-payment-panel .st-add-payment{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; padding:9px 0!important; min-height:52px!important; border-bottom:1px solid #e8ebf0!important; width:100%!important; } #panel-overview .overview-payment-panel .st-pay-item:hover, #panel-overview .overview-payment-panel .st-add-payment:hover{ background:transparent!important; border-color:#e8ebf0!important; color:#111827!important; } #panel-overview .overview-payment-panel .st-pay-bottom{ display:block!important; } #panel-overview .overview-payment-panel .st-add-payment{ display:flex!important; flex-direction:row!important; justify-content:center!important; gap:8px!important; border-bottom:0!important; border-top:1px dashed #d1d5db!important; margin-top:8px!important; } #panel-overview .overview-payment-panel .st-add-payment br{display:none!important;} #panel-overview .overview-payment-panel .st-card-logo{ border:1px solid #d1d5db!important; border-radius:7px!important; } /* Quick Settings back on right: compact, same endpoint */
 #panel-overview .overview-right-stack .overview-quick-panel{ width:100%!important; max-width:100%!important; } #panel-overview .overview-right-stack .overview-quick-panel .st-quick-grid{ grid-template-columns:1fr!important; gap:0!important; } #panel-overview .overview-right-stack .overview-quick-panel .st-quick{ width:100%!important; border:0!important; border-bottom:1px solid #e8ebf0!important; border-radius:0!important; background:transparent!important; min-height:52px!important; padding:8px 0!important; } #panel-overview .overview-right-stack .overview-quick-panel .st-quick:hover, #panel-overview .overview-right-stack .overview-quick-panel .st-quick:focus-visible{ background:transparent!important; color:#111827!important; border-color:#e8ebf0!important; } #panel-overview .overview-right-stack .overview-quick-panel .st-quick:hover .st-quick-title, #panel-overview .overview-right-stack .overview-quick-panel .st-quick:hover .st-quick-sub, #panel-overview .overview-right-stack .overview-quick-panel .st-quick:hover .st-chev{ color:inherit!important; } /* Icon-only colors: no background shape, varied colors per function */ #panel-overview .st-orange-ico, #panel-overview .st-ico, #panel-profile .st-score-ring ~ .st-no-box-list .st-orange-ico, #panel-security .st-orange-ico, #panel-notifications .st-orange-ico{ background:transparent!important; border:0!important; border-radius:0!important; width:22px!important; height:22px!important; flex:0 0 22px!important; color:var(--st-orange)!important; } #panel-overview .st-orange-ico i, #panel-overview .st-ico i{font-size:14px!important;} #panel-overview .fa-user,#panel-overview .fa-phone{color:#ff7a00!important;} #panel-overview .fa-lock,#panel-overview .fa-shield-halved,#panel-overview .fa-user-shield{color:#16a34a!important;} #panel-overview .fa-bell,#panel-overview .fa-comment-dots,#panel-overview .fa-envelope,#panel-overview .fa-headset{color:#2563eb!important;} #panel-overview .fa-credit-card,#panel-overview .fa-cc-visa,#panel-overview .fa-peso-sign{color:#7c3aed!important;} #panel-overview .fa-truck-fast,#panel-overview .fa-location-dot,#panel-overview .fa-route{color:#ea580c!important;} #panel-overview .fa-folder-open,#panel-overview .fa-download{color:#0891b2!important;} #panel-overview .fa-link,#panel-overview .fa-globe{color:#db2777!important;} #panel-overview .fa-calendar,#panel-overview .fa-calendar-days,#panel-overview .fa-clock{color:#64748b!important;} #panel-overview .fa-bullhorn,#panel-overview .fa-percent{color:#dc2626!important;} #panel-overview .fa-lightbulb,#panel-overview .fa-sun{color:#ca8a04!important;} #panel-overview .fa-circle-plus,#panel-overview .fa-plus{color:#f97316!important;} #panel-overview .st-quick:hover .st-orange-ico, #panel-overview .st-privacy:hover .st-ico, #panel-overview .st-comm-item:hover .st-orange-ico, #panel-overview .st-pref-row:hover .st-orange-ico{ background:transparent!important; border:0!important; } /* Keep all right-side row endpoints perfectly aligned */ #panel-overview .overview-right-stack .st-privacy, #panel-overview .overview-right-stack .st-pay-item, #panel-overview .overview-right-stack .st-add-payment, #panel-overview .overview-right-stack .st-pref-row, #panel-overview .overview-right-stack .st-quick, #panel-overview .overview-right-stack .st-comm-item{ margin-left:0!important; margin-right:0!important; padding-left:0!important; padding-right:0!important; box-sizing:border-box!important; }
-#panel-overview .overview-right-stack .st-privacy-grid{ grid-template-columns:1fr!important; gap:8px!important; } #panel-overview .overview-right-stack .st-privacy{ border:1px solid #e5e7eb!important; border-radius:10px!important; padding:10px 12px!important; background:#fff!important; } #panel-overview .overview-right-stack .st-privacy:hover{ background:#fff!important; color:#111827!important; } #panel-overview .overview-right-stack .st-privacy:hover .st-privacy-title, #panel-overview .overview-right-stack .st-privacy:hover .st-privacy-sub, #panel-overview .overview-right-stack .st-privacy:hover .st-chev{color:inherit!important;} /* Button/calendar consistency restored */ .st-btn, .st-outline-btn, .st-date{ height:38px!important; min-width:122px!important; border-radius:999px!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; transform:none!important; box-shadow:none!important; } .st-btn{ background:linear-gradient(90deg,#ff7a00,#ff9d00)!important; border:1px solid #ff7a00!important; color:#111827!important; } .st-date{ background:linear-gradient(90deg,#ff7a00,#ff9d00)!important; border:1px solid #ff7a00!important; color:#111827!important; justify-content:center!important; } .st-date i{color:#111827!important;} .st-btn:hover,.st-btn:focus-visible,.st-btn:active, .st-outline-btn:hover,.st-outline-btn:focus-visible,.st-outline-btn:active, .st-date:hover,.st-date:focus-visible,.st-date:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:none!important; } .st-date:hover i,.st-date:focus-visible i,.st-date:active i{color:#fff!important;} /* Score circles equalized */ #panel-profile .st-score-ring, #panel-security .st-score-ring, #panel-notifications .st-score-ring{ width:108px!important; height:108px!important; margin:8px auto 12px!important; background:conic-gradient(#ff7a00 0 331deg,#e5e7eb 331deg 360deg)!important; } #panel-profile .st-score-inner, #panel-security .st-score-inner, #panel-notifications .st-score-inner{ width:80px!important; height:80px!important; background:#fff!important; } #panel-profile .st-score-inner strong, #panel-security .st-score-inner strong, #panel-notifications .st-score-inner strong{ font-size:23px!important; color:#111827!important; } #panel-profile .st-score-inner span, #panel-security .st-score-inner span, #panel-notifications .st-score-inner span{ color:#16a34a!important; font-size:9.5px!important; font-weight:700!important; } /* ========================================================= V6 EXACT UI FIXES: tighter content gap, readable text, plain status text, consistent icon colors, original orange ========================================================= */ :root{ --st-orange:#ff7a00!important; --st-orange2:#ff7a00!important; --st-orange3:#fff3e6!important; --st-green:#16a34a!important; } /* Make the main left/right content closer without making the right column too wide */ @media(min-width:1261px){ #panel-overview>.st-grid{ grid-template-columns:minmax(0,1fr) 390px!important; gap:14px!important; column-gap:14px!important; align-items:start!important; } #panel-overview>.st-grid>.st-stack:first-child{ width:100%!important; max-width:none!important; } #panel-overview>.st-grid>.overview-right-stack, #panel-overview>.st-grid>.st-stack:nth-child(2){ width:390px!important; max-width:390px!important; min-width:390px!important; justify-self:end!important; } } @media(min-width:1440px){
+#panel-overview .overview-right-stack .st-privacy-grid{ grid-template-columns:1fr!important; gap:8px!important; } #panel-overview .overview-right-stack .st-privacy{ border:1px solid #e5e7eb!important; border-radius:10px!important; padding:10px 12px!important; background:#fff!important; } #panel-overview .overview-right-stack .st-privacy:hover{ background:#fff!important; color:#111827!important; } #panel-overview .overview-right-stack .st-privacy:hover .st-privacy-title, #panel-overview .overview-right-stack .st-privacy:hover .st-privacy-sub, #panel-overview .overview-right-stack .st-privacy:hover .st-chev{color:inherit!important;} /* Button/calendar consistency restored */ .st-btn, .st-outline-btn, .st-date{ height:38px!important; min-width:122px!important; border-radius:999px!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; transform:none!important; box-shadow:none!important; } .st-btn{ background:linear-gradient(90deg,#ff7a00,#ff9d00)!important; border:1px solid #ff7a00!important; color:#111827!important; } .st-date{ background:linear-gradient(90deg,#ff7a00,#ff9d00)!important; border:1px solid #ff7a00!important; color:#111827!important; justify-content:center!important; } .st-date i{color:#111827!important;} .st-btn:hover,.st-btn:focus-visible,.st-btn:active, .st-outline-btn:hover,.st-outline-btn:focus-visible,.st-outline-btn:active, .st-date:hover,.st-date:focus-visible,.st-date:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; outline:none!important; } .st-date:hover i,.st-date:focus-visible i,.st-date:active i{color:#fff!important;} /* Score circles equalized */ #panel-profile .st-score-ring, #panel-security .st-score-ring, #panel-notifications .st-score-ring{ width:108px!important; height:108px!important; margin:8px auto 12px!important; background:conic-gradient(#ff7a00 0 331deg,#e5e7eb 331deg 360deg)!important; } #panel-profile .st-score-inner, #panel-security .st-score-inner, #panel-notifications .st-score-inner{ width:80px!important; height:80px!important; background:#fff!important; } #panel-profile .st-score-inner strong, #panel-security .st-score-inner strong, #panel-notifications .st-score-inner strong{ font-size:23px!important; color:#111827!important; } #panel-profile .st-score-inner span, #panel-security .st-score-inner span, #panel-notifications .st-score-inner span{ color:#16a34a!important; font-size:9.5px!important; font-weight:700!important; } /* ========================================================= V6 EXACT UI FIXES: tighter content gap, readable text, plain status text, consistent icon colors, original orange ========================================================= */ :root{ --st-orange:#ff7a00!important; --st-orange2:#ff7a00!important; --st-orange3:#fff3e6!important; --st-green:#16a34a!important; } /* Make the main left/right content closer without making the right column too wide */ @media(min-width:1261px){ #panel-overview>.st-grid{ grid-template-columns:minmax(0,1fr) 390px!important; gap:6px!important; column-gap:6px!important; align-items:start!important; } #panel-overview>.st-grid>.st-stack:first-child{ width:100%!important; max-width:none!important; } #panel-overview>.st-grid>.overview-right-stack, #panel-overview>.st-grid>.st-stack:nth-child(2){ width:390px!important; max-width:390px!important; min-width:390px!important; justify-self:end!important; } } @media(min-width:1440px){
 #panel-overview>.st-grid{ grid-template-columns:minmax(0,1fr) 410px!important; gap:16px!important; column-gap:16px!important; } #panel-overview>.st-grid>.overview-right-stack, #panel-overview>.st-grid>.st-stack:nth-child(2){ width:410px!important; max-width:410px!important; min-width:410px!important; } } /* Right-side endpoints must always align */ #panel-overview .overview-right-stack{ display:flex!important; flex-direction:column!important; gap:18px!important; align-items:stretch!important; } #panel-overview .overview-right-stack>*, #panel-overview .overview-privacy-panel, #panel-overview .overview-payment-panel, #panel-overview .overview-quick-panel, #panel-overview .overview-prefs-panel{ width:100%!important; max-width:100%!important; margin-left:0!important; margin-right:0!important; } /* Make small-looking text readable again */ .st-page{ font-size:12px!important; } .st-card-title{ font-size:14px!important; line-height:1.25!important; font-weight:700!important; } .st-card-desc, .st-sec-sub, .st-box-text, .st-pay-sub, .st-notif-sub, .st-comm-sub, .st-quick-sub, .st-privacy-sub{ font-size:10.5px!important; line-height:1.35!important; } .st-sec-title, .st-box-title, .st-pay-title, .st-notif-title, .st-comm-title, .st-quick-title, .st-privacy-title, .st-pref-label, .st-act-label{ font-size:11.5px!important; line-height:1.25!important; } .st-label{font-size:11px!important;} .st-value{font-size:11.5px!important;} .st-info{font-size:11.5px!important;} .st-name{font-size:16px!important;} .st-tab{font-size:10.5px!important;} /* Restore the original orange button/date color. No gradient change anymore. */ .st-btn, .st-page .st-btn, .st-outline-btn.st-orange-btn{ background:#ff7a00!important; border-color:#ff7a00!important; color:#111827!important; border-radius:999px!important; height:38px!important; min-width:128px!important; padding:0 18px!important; font-size:11.2px!important; font-weight:700!important; } .st-btn:hover, .st-btn:focus-visible, .st-btn:active, .st-btn.is-clicked, .st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; } .st-outline-btn, .st-page .st-outline-btn{ background:#fff!important; border:1px solid #ff7a00!important; color:#ff7a00!important; border-radius:999px!important; height:38px!important; min-width:128px!important; padding:0 18px!important; font-size:11.2px!important; font-weight:700!important; } .st-outline-btn:hover, .st-outline-btn:focus-visible, .st-outline-btn:active{ background:#111827!important; border-color:#111827!important; color:#fff!important; } .st-date{ background:#ff7a00!important; border-color:#ff7a00!important; color:#111827!important; border-radius:999px!important; height:38px!important; min-width:190px!important; font-size:11.5px!important; font-weight:700!important; } .st-date i{color:#111827!important;} .st-date:hover, .st-date:focus-visible{ background:#111827!important; border-color:#111827!important; color:#fff!important; } .st-date:hover i, .st-date:focus-visible i{color:#fff!important;} /* Plain text badges/statuses: no background shape, only colored text + inline hover */ .st-badge, .st-mini, .st-status-pill, .st-inline-pill{ background:transparent!important; border:0!important; box-shadow:none!important; border-radius:0!important; padding:0!important; min-height:auto!important; line-height:1.25!important; font-size:10.5px!important; font-weight:700!important;
 display:inline-flex!important; align-items:center!important; gap:4px!important; text-decoration:none!important; } .st-badge.green, .st-mini, .st-status-pill, .st-inline-pill{color:#16a34a!important;} .st-badge.orange, .st-mini.orange, .st-status-pill.orange{color:#ff7a00!important;} .st-mini.gray, .st-status-pill.gray{color:#64748b!important;} .st-badge:hover, .st-mini:hover, .st-status-pill:hover, .st-inline-pill:hover{ background:transparent!important; text-decoration:underline!important; text-underline-offset:3px!important; } .st-act-val .st-mini, .st-pay-item .st-mini, .st-box .st-mini{ white-space:nowrap!important; } /* Add a clean inline hover for manage session / small action links */ .st-link{ background:transparent!important; border:0!important; color:#ff7a00!important; border-radius:0!important; padding:0!important; min-height:auto!important; font-size:10.5px!important; font-weight:700!important; } .st-link:hover, .st-link:focus-visible, .st-link:active, .st-link.is-clicked{ background:transparent!important; border:0!important; color:#111827!important; text-decoration:underline!important; text-underline-offset:3px!important; } /* Icons: icon color only, no bg-shape. Consistent by icon type everywhere. */ .st-orange-ico, .st-ico, .st-profile-mini .st-orange-ico, .st-summary-item .st-orange-ico, .st-comm-left .st-orange-ico, .st-privacy-left .st-orange-ico, .st-quick-left .st-orange-ico, .st-pref-left .st-orange-ico{ background:transparent!important; border:0!important; border-radius:0!important; width:22px!important; height:22px!important; min-width:22px!important; flex:0 0 22px!important; color:#64748b!important; box-shadow:none!important; } .st-orange-ico i, .st-ico i{ font-size:14px!important; } /* Message / communication icons always blue */ .st-page .fa-envelope, .st-page .fa-comment-dots, .st-page .fa-message, .st-page .fa-bell, .st-page .fa-paper-plane, .st-page .fa-headset{ color:#2563eb!important; } /* Phone always green */ .st-page .fa-phone, .st-page .fa-mobile-screen, .st-page .fa-mobile-screen-button{ color:#16a34a!important; } /* Calendar/date always slate */ .st-page .fa-calendar, .st-page .fa-calendar-days, .st-page .fa-clock{ color:#64748b!important; } /* Security/privacy always green */ .st-page .fa-shield-halved, .st-page .fa-shield, .st-page .fa-user-shield, .st-page .fa-lock, .st-page .fa-circle-check, .st-page .fa-check{ color:#16a34a!important; } /* Payment always violet/blue */ .st-page .fa-credit-card, .st-page .fa-cc-visa, .st-page .fa-receipt, .st-page .fa-file-invoice, .st-page .fa-wallet, .st-page .fa-peso-sign{ color:#7c3aed!important; } /* Address/location/delivery always orange */ .st-page .fa-location-dot, .st-page .fa-house, .st-page .fa-building, .st-page .fa-store, .st-page .fa-truck-fast, .st-page .fa-route, .st-page .fa-box{ color:#ff7a00!important; } /* Marketing/promos always red */ .st-page .fa-bullhorn, .st-page .fa-percent, .st-page .fa-gift, .st-page .fa-triangle-exclamation{ color:#ef4444!important; } /* Data/download/preferences */ .st-page .fa-download{color:#0891b2!important;} .st-page .fa-globe{color:#0ea5e9!important;} .st-page .fa-sun, .st-page .fa-palette{color:#f59e0b!important;} .st-page .fa-user, .st-page .fa-address-card{color:#ff7a00!important;} .st-page .fa-folder-open, .st-page .fa-link{color:#7c3aed!important;} /* Do not turn colored icons into white/black on hover; keep their semantic color. */ .st-quick:hover .st-orange-ico,
 .st-privacy:hover .st-orange-ico, .st-comm-item:hover .st-orange-ico, .st-pref-row:hover .st-orange-ico, .st-setting-action:hover .st-orange-ico, .st-add-box:hover .st-add-circle, .st-add-payment:hover .st-add-circle{ background:transparent!important; border:0!important; } /* Cleaner rows while maintaining endpoint alignment */ #panel-overview .overview-payment-panel .st-pay-item, #panel-overview .overview-privacy-panel .st-privacy, #panel-overview .overview-quick-panel .st-quick, #panel-overview .overview-prefs-panel .st-pref-row{ width:100%!important; box-sizing:border-box!important; } #panel-overview .overview-payment-panel .st-pay-item{ min-height:50px!important; padding:9px 0!important; } #panel-overview .overview-quick-panel .st-quick, #panel-overview .overview-privacy-panel .st-privacy{ padding:10px 0!important; min-height:56px!important; } #panel-overview .overview-quick-panel .st-quick:hover, #panel-overview .overview-privacy-panel .st-privacy:hover{ background:transparent!important; border-color:#e5e7eb!important; } #panel-overview .overview-quick-panel .st-quick:hover .st-quick-title, #panel-overview .overview-quick-panel .st-quick:hover .st-quick-sub, #panel-overview .overview-privacy-panel .st-privacy:hover .st-privacy-title, #panel-overview .overview-privacy-panel .st-privacy:hover .st-privacy-sub{ color:#111827!important; } /* Keep address book clean but readable */ #panel-overview .overview-profile-box .st-address-grid{ gap:0!important; } #panel-overview .overview-profile-box .st-box, #panel-overview .overview-profile-box .st-add-box{ padding:12px 14px!important; min-height:116px!important; } #panel-overview .overview-profile-box .st-box:not(:last-child), #panel-overview .overview-profile-box .st-add-box:not(:last-child){ border-right:1px solid #e5e7eb!important; } /* Switches remain consistent green */ .st-switch input:checked+.st-slider{background:#16a34a!important;} .st-slider{background:#cfd5dd!important;} @media(max-width:1260px){ #panel-overview>.st-grid{gap:18px!important;} #panel-overview>.st-grid>.overview-right-stack, #panel-overview>.st-grid>.st-stack:nth-child(2){ width:100%!important;max-width:none!important;min-width:0!important; } } /* ========================================================= V7 FINAL CORRECTION: balanced left/right spacing, plain inline status text, cleaned Address Book placement, original orange buttons, no black bg on text links ========================================================= */ :root{ --st-orange:#ff7a00!important; --st-orange2:#ff7a00!important; --st-orange3:#fff3e6!important; } /* Give a little more breathing room between left and right, but keep endpoints aligned */ @media(min-width:1261px){ #panel-overview>.st-grid{ grid-template-columns:minmax(0,1fr) 405px!important; gap:26px!important; column-gap:26px!important; align-items:start!important; } #panel-overview>.st-grid>.overview-right-stack, #panel-overview>.st-grid>.st-stack:nth-child(2){ width:405px!important; max-width:405px!important; min-width:405px!important; justify-self:end!important; } } @media(min-width:1440px){ #panel-overview>.st-grid{ grid-template-columns:minmax(0,1fr) 420px!important; gap:28px!important; column-gap:28px!important; } #panel-overview>.st-grid>.overview-right-stack, #panel-overview>.st-grid>.st-stack:nth-child(2){ width:420px!important; max-width:420px!important; min-width:420px!important; } } /* Make text more readable without making the UI bulky */ .st-page{font-size:12.5px!important;}
@@ -644,14 +774,235 @@ display:inline-flex!important; align-items:center!important; gap:4px!important; 
 }
 
 #panel-addresses .st-row-actions{justify-content:center!important;}
-    #panel-addresses .st-map-mini{width:100%!important;}
+#panel-addresses .st-map-mini{width:100%!important;}
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
 }
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
+</style>
+<style id="settings-subsidebar-css">
+/* SETTINGS SECOND SUBSIDEBAR: placed inside Settings main content, below the dashboard/header area. */
+.st-settings-shell{
+    width:100%;
+    max-width:1490px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:250px minmax(0,1fr);
+    gap:34px;
+    align-items:start;
+    background:#fff;
+    padding:0 18px 34px;
+    box-sizing:border-box;
+}
+.st-settings-shell .st-wrap{
+    max-width:none!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    min-width:0!important;
+}
+.st-subsidebar{
+    position:sticky;
+    top:18px;
+    align-self:start;
+    min-height:calc(100vh - 140px);
+    background:#fff;
+    border-right:1px solid #e5e7eb;
+    padding:28px 22px 28px 0;
+    box-sizing:border-box;
+}
+.st-subsidebar-head{margin:0 0 28px;}
+.st-subsidebar-head h2{
+    margin:0 0 18px;
+    font-family:'Poppins',system-ui,sans-serif;
+    font-size:20px;
+    font-weight:800;
+    color:#111827;
+    letter-spacing:-.02em;
+}
+.st-subsidebar-head p{
+    margin:0;
+    max-width:190px;
+    color:#6b7280;
+    font-size:11.5px;
+    line-height:1.65;
+    font-weight:400;
+}
+.st-subnav{display:flex;flex-direction:column;gap:8px;}
+.st-subitem{
+    width:100%;
+    min-height:46px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border:0;
+    border-left:4px solid transparent;
+    border-radius:0 12px 12px 0;
+    background:transparent;
+    color:#111827;
+    padding:0 12px 0 14px;
+    font-family:'Inter',system-ui,sans-serif;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.015em;
+    text-align:left;
+    text-decoration:none;
+    cursor:pointer;
+    box-sizing:border-box;
+    transition:background .16s ease,color .16s ease,border-color .16s ease;
+}
+.st-subitem:hover,
+.st-subitem:focus-visible{
+    background:#f9fafb!important;
+    color:#ff7a00!important;
+    border-left-color:#ff7a00!important;
+    outline:none!important;
+    text-decoration:none!important;
+}
+.st-subitem.active,
+.st-subitem.active:hover,
+.st-subitem.active:focus-visible{
+    background:#fff7ed!important;
+    color:#ff7a00!important;
+    border-left-color:#ff7a00!important;
+}
+.st-subitem.st-clickable-cover,
+.st-subitem.is-clicked{
+    background:#fff7ed!important;
+    color:#ff7a00!important;
+    border-left-color:#ff7a00!important;
+}
+.st-subicon{
+    width:24px;
+    height:24px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 24px;
+    color:inherit;
+}
+.st-subicon i{font-size:17px;color:inherit!important;}
+@media(max-width:1180px){
+    .st-settings-shell{grid-template-columns:220px minmax(0,1fr);gap:24px;}
+    .st-subsidebar{padding-right:16px;}
+}
+@media(max-width:980px){
+    .st-settings-shell{display:block;padding:0 14px 30px;}
+    .st-subsidebar{position:static;min-height:0;border-right:0;border-bottom:1px solid #e5e7eb;padding:0 0 16px;margin:0 0 18px;}
+    .st-subsidebar-head{display:none;}
+    .st-subnav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+    .st-subitem{border-left:0;border-bottom:3px solid transparent;border-radius:10px;justify-content:flex-start;padding:0 12px;}
+    .st-subitem:hover,.st-subitem:focus-visible,.st-subitem.active{border-left-color:transparent!important;border-bottom-color:#ff7a00!important;}
+}
+@media(max-width:560px){.st-subnav{grid-template-columns:1fr;}}
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
 </style>
 
 {{-- OVERVIEW JS --}}
 <script id="settings-overview-js">
 /* OVERVIEW JS + GLOBAL SETTINGS JS. Complete script kept once only para hindi maduplicate listeners/functions. */
-const settingsSaveRoute=@json(Route::has('settings.save') ? route('settings.save') : ''); const settingsProfileRoute=@json(Route::has('profile.update') ? route('profile.update') : ''); const settingsDisplayEmail=@json($settingsEmail ?: 'Not set'); const settingsDisplayPhone=@json($settingsPhone ?: 'Not set'); const settingsCsrf=document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || @json(csrf_token()); document.addEventListener('DOMContentLoaded',function(){ const tabs=document.querySelectorAll('.st-tab'),panels=document.querySelectorAll('.st-panel'),jumps=document.querySelectorAll('[data-tab-jump]'),opens=document.querySelectorAll('[data-modal-open]'),closes=document.querySelectorAll('[data-modal-close]'); function activateTab(name,updateUrl=true){tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===name));panels.forEach(p=>p.classList.remove('active'));const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');if(updateUrl)history.replaceState(null,'',window.location.pathname+'#'+name);window.scrollTo({top:0,behavior:'smooth'})} tabs.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab))); jumps.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tabJump))); opens.forEach(b=>b.addEventListener('click',()=>openSettingsModal(b.dataset.modalOpen))); closes.forEach(b=>b.addEventListener('click',closeAllSettingsModals)); document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllSettingsModals()}); document.querySelectorAll('.st-select[data-setting-name]').forEach(select=>{ const key='printify_setting_'+select.dataset.settingName.toLowerCase().replace(/\s+/g,'_'); const saved=localStorage.getItem(key); if(saved){Array.from(select.options).forEach(o=>{if(o.value===saved||o.text===saved)select.value=o.value})} select.addEventListener('change',()=>{localStorage.setItem(key,select.value);persistSettingsValue('preferences',key,select.value,select.dataset.settingName)}); }); document.querySelectorAll('button,.st-select').forEach(el=>{
+const settingsSaveRoute=@json(Route::has('settings.save') ? route('settings.save') : ''); const settingsProfileRoute=@json(Route::has('profile.update') ? route('profile.update') : ''); const settingsDisplayEmail=@json($settingsEmail ?: 'Not set'); const settingsDisplayPhone=@json($settingsPhone ?: 'Not set'); const settingsCsrf=document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || @json(csrf_token()); document.addEventListener('DOMContentLoaded',function(){ const tabs=document.querySelectorAll('.st-tab'),panels=document.querySelectorAll('.st-panel'),subItems=document.querySelectorAll('.st-subitem[data-sub-key]'),jumps=document.querySelectorAll('[data-tab-jump]'),opens=document.querySelectorAll('[data-modal-open]'),closes=document.querySelectorAll('[data-modal-close]'); function getSubKey(name){if(name==='notifications')return 'notification';if(name==='preferences')return 'preferences';if(name==='security'||name==='privacy')return 'security-privacy';return 'settings'} function activateTab(name,updateUrl=true){tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===name));panels.forEach(p=>p.classList.remove('active'));const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');const subKey=getSubKey(name);subItems.forEach(b=>b.classList.toggle('active',b.dataset.subKey===subKey));if(updateUrl)history.replaceState(null,'',window.location.pathname+'#'+name);window.scrollTo({top:0,behavior:'auto'})} tabs.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab))); jumps.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tabJump))); opens.forEach(b=>b.addEventListener('click',()=>openSettingsModal(b.dataset.modalOpen))); closes.forEach(b=>b.addEventListener('click',closeAllSettingsModals)); document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllSettingsModals()}); document.querySelectorAll('.st-select[data-setting-name]').forEach(select=>{ const key='printify_setting_'+select.dataset.settingName.toLowerCase().replace(/\s+/g,'_'); const saved=localStorage.getItem(key); if(saved){Array.from(select.options).forEach(o=>{if(o.value===saved||o.text===saved)select.value=o.value})} select.addEventListener('change',()=>{localStorage.setItem(key,select.value);persistSettingsValue('preferences',key,select.value,select.dataset.settingName)}); }); document.querySelectorAll('button,.st-select').forEach(el=>{
 el.addEventListener('click',()=>{el.classList.add('is-clicked','st-clickable-cover');setTimeout(()=>el.classList.remove('is-clicked','st-clickable-cover'),180)}) }); document.querySelectorAll('.st-pref-row').forEach(row=>{ row.addEventListener('click',e=>{if(e.target.tagName.toLowerCase()==='select')return;const s=row.querySelector('select');if(s){s.focus();row.classList.add('is-clicked');setTimeout(()=>row.classList.remove('is-clicked'),180)}}) }); const initialTab=(window.location.hash||'').replace('#','');if(initialTab&&document.getElementById('panel-'+initialTab))activateTab(initialTab,false); window.activateSettingsTab=activateTab; }); function openSettingsModal(id){const m=document.getElementById(id);if(!m)return;m.classList.add('active');document.body.style.overflow='hidden'} function closeAllSettingsModals(){document.querySelectorAll('.st-modal').forEach(m=>m.classList.remove('active'));document.body.style.overflow=''} function splitSettingsName(name){const parts=(name||'').trim().split(/\s+/).filter(Boolean);return{first_name:parts.shift()||'',last_name:parts.join(' ')}} function setProfileDisplays(data){const fallback='Not set';profileDisplayName.textContent=data.name||fallback;profileDisplayEmail.textContent=data.email||fallback;profileDisplayPhone.textContent=data.phone||fallback;profileDisplayBirth.textContent=data.birthdate||fallback;profileDisplayCompany.textContent=data.company||fallback} async function saveSettingsProfilePayload(payload){if(!settingsProfileRoute){showSettingsToast('Profile save route is unavailable.');return false}try{const response=await fetch(settingsProfileRoute,{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':settingsCsrf},body:JSON.stringify(payload)});if(!response.ok)throw new Error('Profile save failed');return true}catch(e){console.warn('Profile save failed.',e);showSettingsToast('Profile was not saved. Please check the details.');return false}} async function saveProfileModal(e){e.preventDefault();const n=profileNameInput.value.trim(),em=profileEmailInput.value.trim(),p=profilePhoneInput.value.trim(),b=profileBirthInput.value.trim(),c=profileCompanyInput.value.trim(),parts=splitSettingsName(n);const payload={name:n,first_name:parts.first_name,last_name:parts.last_name,email:em,phone:p,birthdate:b,company:c};if(!await saveSettingsProfilePayload(payload))return;setProfileDisplays(payload);const panelInputs=document.querySelectorAll('#panel-profile .st-input');if(panelInputs.length){panelInputs[0].value=n;panelInputs[1].value=em;panelInputs[2].value=p;panelInputs[3].value=c}updateOverviewAddress('Home Address',profilePrimaryAddressInput?.value||'');updateOverviewAddress('Work',profileWorkAddressInput?.value||'');window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:{name:n,initials:n? n.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase():''}}));closeAllSettingsModals();showSettingsToast('Profile and address details updated successfully.')}
 async function saveProfilePanelSettings(){const inputs=document.querySelectorAll('#panel-profile .st-input');if(!inputs.length)return;const n=inputs[0].value.trim(),em=inputs[1].value.trim(),p=inputs[2].value.trim(),c=inputs[3].value.trim(),b=profileBirthInput.value.trim(),parts=splitSettingsName(n);const payload={name:n,first_name:parts.first_name,last_name:parts.last_name,email:em,phone:p,birthdate:b,company:c};if(!await saveSettingsProfilePayload(payload))return;profileNameInput.value=n;profileEmailInput.value=em;profilePhoneInput.value=p;profileCompanyInput.value=c;setProfileDisplays(payload);window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:{name:n,initials:n? n.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase():''}}));showSettingsToast('Profile settings saved.')} function saveGenericSettings(e,msg){e.preventDefault();closeAllSettingsModals();showSettingsToast(msg||'Settings saved successfully.')} async function persistSettingsValue(group,key,value,label){ localStorage.setItem('printify_setting_'+group+'_'+key,value); if(settingsSaveRoute){ try{ const response=await fetch(settingsSaveRoute,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':settingsCsrf},body:JSON.stringify({group,key,value})}); if(response.ok){showSettingsToast((label||'Setting')+' saved successfully.');return} }catch(e){console.warn('Settings backend sync skipped.',e)} } showSettingsToast((label||'Setting')+' saved locally.'); } function toggleSettingMessage(input,label){const key=label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');const value=input.checked?'enabled':'disabled';localStorage.setItem('printify_toggle_'+key,value);persistSettingsValue('toggles',key,value,label)} function copySettingsText(text){if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showSettingsToast('Copied: '+text)).catch(()=>showSettingsToast('Copy failed.'))}else showSettingsToast('Copied: '+text)} function openPhotoPicker(){const input=document.getElementById('settingsPhotoInput');if(input)input.click()} document.addEventListener('change',function(e){if(e.target&&e.target.id==='settingsPhotoInput'&&e.target.files&&e.target.files[0]){const reader=new FileReader();reader.onload=function(ev){document.querySelectorAll('.st-avatar').forEach(img=>img.src=ev.target.result);window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:{photo:ev.target.result}}));showSettingsToast('Profile photo preview updated. Save from My Profile to keep it on every device.')};reader.readAsDataURL(e.target.files[0])}}); function openUtilityModal(title,desc,body){const t=document.getElementById('settingsUtilityTitle'),d=document.getElementById('settingsUtilityDesc'),b=document.getElementById('settingsUtilityBody');if(t)t.textContent=title;if(d)d.textContent=desc;if(b)b.innerHTML=body;openSettingsModal('settingsUtilityModal')} function openPaymentActions(label){openUtilityModal(label+' Actions','Manage this saved payment method.','<div class="st-list"><button type="button" class="st-btn" onclick="showSettingsToast(\''+label+' set as primary.\');closeAllSettingsModals()">Set as Primary</button><button type="button" class="st-btn" onclick="closeAllSettingsModals();openSettingsModal(\'paymentModal\')">Update Payment</button><button type="button" class="st-btn" onclick="showSettingsToast(\''+label+' removed.\');closeAllSettingsModals()">Remove Payment</button></div>')}
 function openSavedFilesPanel(){openUtilityModal('Saved Designs / Files','Access uploaded design files connected to your account.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Business Card Layout</p><p class="st-pay-sub">Ready for reorder · PDF</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Business Card Layout opened.\')">Open</button></div><div class="st-pay-item"><div><p class="st-pay-title">Sticker Draft</p><p class="st-pay-sub">Last updated recently · PNG</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Sticker Draft opened.\')">Open</button></div></div>')} function openConnectedAccountsPanel(){openUtilityModal('Connected Accounts','Link or review accounts connected to your Printify & Co. profile.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Google</p><p class="st-pay-sub">Connected for sign-in.</p></div><span class="st-mini">Connected</span></div><div class="st-pay-item"><div><p class="st-pay-title">Facebook</p><p class="st-pay-sub">Not linked.</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Facebook linking started.\')">Connect</button></div></div>')} function openActivityLogPanel(){openUtilityModal('Account Activity','Recent account activity and security events.','<div class="st-list"><div class="st-activity-row"><div class="st-activity-left"><span class="st-ico"><i class="fa-regular fa-clock"></i></span><span class="st-act-label">Login</span></div><div class="st-act-val">May 29, 2026 8:15 AM</div></div><div class="st-activity-row"><div class="st-activity-left"><span class="st-ico"><i class="fa-solid fa-user-pen"></i></span><span class="st-act-label">Profile Viewed</span></div><div class="st-act-val">Today</div></div></div>')} function openSessionManagerPanel(){openUtilityModal('Active Sessions','Manage devices currently signed in to your account.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Chrome on Windows</p><p class="st-pay-sub">Makati City · Current device</p></div><span class="st-mini">Active</span></div><div class="st-pay-item"><div><p class="st-pay-title">Mobile Browser</p><p class="st-pay-sub">Last active recently</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Mobile browser session removed.\')">Remove</button></div></div>')} function openRecoveryPanel(){openUtilityModal('Recovery Options','Manage recovery email, phone, and backup access.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Recovery Email</p><p class="st-pay-sub">'+settingsDisplayEmail+'</p></div><span class="st-mini">Verified</span></div><div class="st-pay-item"><div><p class="st-pay-title">Recovery Phone</p><p class="st-pay-sub">'+settingsDisplayPhone+'</p></div><span class="st-mini">Verified</span></div><button type="button" class="st-btn" onclick="persistSettingsValue(\'security\',\'recovery_reviewed\',new Date().toISOString(),\'Recovery options\');closeAllSettingsModals()">Save Recovery Review</button></div>')}
@@ -1002,52 +1353,71 @@ document.addEventListener('DOMContentLoaded', function(){
 {{-- PROFILE CSS --}}
 <style id="settings-profile-css">
 /* PROFILE CSS: section-specific overrides/rules. */
-#panel-profile .st-profile-grid{grid-template-columns:minmax(0,1fr) 340px!important;gap:18px!important}
-#panel-profile .st-profile-side .st-card{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important}
-#panel-profile .st-profile-side .st-card>.st-body{padding:0!important}
-#panel-profile .st-profile-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-#panel-profile .st-profile-side{display:flex;flex-direction:column;gap:16px}
-#panel-profile .st-card-title,#panel-security .st-card-title,#panel-notifications .st-card-title,#panel-payments .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600}
-#panel-profile .st-card:first-child,#panel-profile .st-connected-card,#panel-security .st-setting-main>.st-card:first-child,#panel-security .st-login-tips-box,#panel-notifications .st-card:first-child,#panel-payments .st-billing-box{border-color:#111827}
-@media(max-width:1260px){#panel-profile .st-profile-grid,#panel-notifications .st-notif-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr}
-#panel-profile .st-form-grid{gap:10px!important}
-#panel-profile .st-field label{font-size:8.8px!important}
-#panel-profile .st-input{height:38px!important;padding:8px 10px!important;font-size:10.5px!important}
-#panel-profile .st-summary-strip .st-summary-item{padding:8px 10px;border:1px solid #e5e7eb;border-radius:10px}
-#panel-profile .st-profile-side{gap:10px!important}
-#panel-profile .st-profile-side .st-head{margin-bottom:6px!important}
-#panel-profile .st-profile-side .st-no-box-list{gap:3px!important}
-#panel-profile .st-profile-side .st-no-box-item{padding:5px 0!important}
-#panel-profile .st-profile-side .st-btn{height:36px!important}
-#panel-profile .st-profile-side .st-score-ring{width:88px!important;height:88px!important;margin:6px auto!important}
-#panel-profile .st-profile-side .st-score-inner{width:66px!important;height:66px!important}
-#panel-profile .st-profile-side .st-score-inner strong{font-size:20px!important}
-#panel-profile .st-profile-grid, #panel-security .st-settings-grid, #panel-notifications .st-notif-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:16px!important;align-items:start!important}
-#panel-profile .st-profile-side, #panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:8px!important}
-#panel-profile .st-profile-side .st-card-title, #panel-security .st-setting-side .st-card-title, #panel-notifications .st-notif-side .st-card-title{font-size:13px!important}
-#panel-profile .st-profile-side .st-card-desc, #panel-security .st-setting-side .st-card-desc, #panel-notifications .st-notif-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important}
-/* Box logic: main grouped boxes have subtle/black borders, requested plain sections have no outer box */ #panel-overview .overview-profile-box, #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-profile .st-card:first-child, #panel-security .st-setting-main>.st-card:first-child, #panel-notifications .st-card:first-child, #panel-payments .st-billing-box, .st-main-group{ border:1px solid rgba(17,24,39,.55)!important; border-radius:12px!important; background:#fff!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; overflow:hidden!important; }
-#panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; }
-.st-modal .st-actions .st-btn[type="submit"], #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn[onclick*="Save"], #panel-preferences .st-head .st-btn[onclick*="Save"]{ background:#16a34a!important; border-color:#16a34a!important; color:#fff!important; }
-.st-modal .st-actions .st-btn[type="submit"]:hover, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn[onclick*="Save"]:hover, #panel-preferences .st-head .st-btn[onclick*="Save"]:hover{ background:#111827!important; border-color:#111827!important; color:#fff!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
-#panel-profile .st-input, #panel-preferences .st-input, #panel-privacy select{ min-height:38px!important; font-size:10.5px!important; border-radius:10px!important; }
-/* Buttons and Date: one consistent My Profile-style button system */ .st-page .st-btn, .st-page .st-outline-btn, .st-page .st-date, .st-modal .st-actions .st-btn, #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn, #panel-preferences .st-head .st-btn{ height:36px!important; min-width:120px!important; padding:0 16px!important; border-radius:999px!important; border:1px solid transparent!important; background:linear-gradient(90deg,var(--st-primary-orange),var(--st-primary-orange-2))!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; letter-spacing:.01em!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:7px!important; box-shadow:none!important; transform:none!important; white-space:nowrap!important; cursor:pointer!important; }
-.st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-outline-btn.is-clicked, .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-modal .st-actions .st-btn:hover, .st-modal .st-actions .st-btn:focus-visible, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn:hover, #panel-preferences .st-head .st-btn:hover{ background:var(--st-action-hover)!important; border-color:var(--st-action-hover)!important; color:#fff!important; box-shadow:none!important; outline:none!important; transform:none!important; }
-/* Unified Profile Completion / Security Score / Notification Summary rings */ .st-score-ring, #panel-profile .st-profile-side .st-score-ring, #panel-security .st-setting-side .st-score-ring, #panel-notifications .st-notif-side .st-score-ring, .st-section-layout .st-section-side .st-score-ring{ width:112px!important; height:112px!important; margin:10px auto 12px!important; border-radius:50%!important; background:conic-gradient(var(--st-primary-orange) 0 331deg,#f1f5f9 331deg 360deg)!important; display:grid!important; place-items:center!important; box-shadow:0 8px 22px rgba(255,122,0,.14)!important; }
-.st-score-inner, #panel-profile .st-profile-side .st-score-inner, #panel-security .st-setting-side .st-score-inner, #panel-notifications .st-notif-side .st-score-inner, .st-section-layout .st-section-side .st-score-inner{ width:82px!important; height:82px!important; border-radius:50%!important; background:#fff!important; display:grid!important; place-items:center!important; text-align:center!important; border:1px solid #fff3e6!important; }
-.st-score-inner strong, #panel-profile .st-profile-side .st-score-inner strong, #panel-security .st-setting-side .st-score-inner strong, #panel-notifications .st-notif-side .st-score-inner strong, .st-section-layout .st-section-side .st-score-inner strong{ font-family:'Poppins',system-ui,sans-serif!important; font-size:24px!important; line-height:1!important; color:#111827!important; font-weight:800!important; }
-.st-score-inner span, #panel-profile .st-profile-side .st-score-inner span, #panel-security .st-setting-side .st-score-inner span, #panel-notifications .st-notif-side .st-score-inner span, .st-section-layout .st-section-side .st-score-inner span{ color:var(--st-primary-orange)!important; font-size:10px!important; font-weight:800!important; text-transform:uppercase!important; letter-spacing:.03em!important; }
-/* Icon-only colors: no background shape, varied colors per function */ #panel-overview .st-orange-ico, #panel-overview .st-ico, #panel-profile .st-score-ring ~ .st-no-box-list .st-orange-ico, #panel-security .st-orange-ico, #panel-notifications .st-orange-ico{ background:transparent!important; border:0!important; border-radius:0!important; width:22px!important; height:22px!important; flex:0 0 22px!important; color:var(--st-orange)!important; }
-/* Score circles equalized */ #panel-profile .st-score-ring, #panel-security .st-score-ring, #panel-notifications .st-score-ring{ width:108px!important; height:108px!important; margin:8px auto 12px!important; background:conic-gradient(#ff7a00 0 331deg,#e5e7eb 331deg 360deg)!important; }
-#panel-profile .st-score-inner, #panel-security .st-score-inner, #panel-notifications .st-score-inner{ width:80px!important; height:80px!important; background:#fff!important; }
-#panel-profile .st-score-inner strong, #panel-security .st-score-inner strong, #panel-notifications .st-score-inner strong{ font-size:23px!important; color:#111827!important; }
-#panel-profile .st-score-inner span, #panel-security .st-score-inner span, #panel-notifications .st-score-inner span{ color:#16a34a!important; font-size:9.5px!important; font-weight:700!important; }
-#panel-profile .st-card-title,
-#panel-profile .st-card-desc,
-#panel-profile .st-input,
-#panel-profile .st-textarea,
+#panel-profile .st-profile-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start;}
+#panel-profile .st-profile-side{display:flex;flex-direction:column;gap:6px;}
+#panel-profile .st-profile-side .st-card{border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;}
+#panel-profile .st-profile-side .st-card>.st-body{padding:0!important;}
+#panel-profile .st-form-grid{gap:10px!important;}
+#panel-profile .st-field label{font-size:8.8px!important;}
+#panel-profile .st-input{height:38px!important;padding:8px 10px!important;font-size:10.5px!important;}
+#panel-profile .st-summary-strip .st-summary-item{padding:8px 10px;border:1px solid #e5e7eb;border-radius:10px;}
+#panel-profile .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600;font-size:12.5px!important;letter-spacing:.025em!important;}
+#panel-profile .st-card-desc{font-size:9.5px!important;line-height:1.35!important;}
+#panel-profile .st-card:first-child,#panel-profile .st-connected-card{border-color:#111827;}
+@media(max-width:1260px){#panel-profile .st-profile-grid{grid-template-columns:1fr!important;}}
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
 </style>
 
 {{-- PROFILE JS --}}
@@ -1318,7 +1688,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <style id="settings-security-css">
 /* SECURITY CSS: section-specific overrides/rules. */
 #panel-security .st-settings-grid, #panel-notifications .st-notif-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:16px!important;align-items:start!important}
-#panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:14px!important}
+#panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:6px!important}
 #panel-profile .st-card-title,#panel-security .st-card-title,#panel-notifications .st-card-title,#panel-payments .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600}
 #panel-profile .st-card:first-child,#panel-profile .st-connected-card,#panel-security .st-setting-main>.st-card:first-child,#panel-security .st-login-tips-box,#panel-notifications .st-card:first-child,#panel-payments .st-billing-box{border-color:#111827}
 #panel-security .st-setting-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important}
@@ -1359,6 +1729,59 @@ document.addEventListener('DOMContentLoaded', function(){
 #panel-profile .st-score-inner span, #panel-security .st-score-inner span, #panel-notifications .st-score-inner span{ color:#16a34a!important; font-size:9.5px!important; font-weight:700!important; }
 #panel-security .st-card-title,
 #panel-security .st-card-desc,
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
 </style>
 
 {{-- SECURITY JS --}}
@@ -1523,60 +1946,77 @@ document.addEventListener('DOMContentLoaded', function(){
 {{-- NOTIFICATIONS CSS --}}
 <style id="settings-notifications-css">
 /* NOTIFICATIONS CSS: section-specific overrides/rules. */
-#panel-security .st-settings-grid, #panel-notifications .st-notif-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:16px!important;align-items:start!important}
-#panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:14px!important}
-#panel-profile .st-card-title,#panel-security .st-card-title,#panel-notifications .st-card-title,#panel-payments .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600}
-#panel-profile .st-card:first-child,#panel-profile .st-connected-card,#panel-security .st-setting-main>.st-card:first-child,#panel-security .st-login-tips-box,#panel-notifications .st-card:first-child,#panel-payments .st-billing-box{border-color:#111827}
-#panel-notifications .st-notif-layout,#panel-payments .st-pay-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-#panel-notifications .st-notif-side,#panel-payments .st-pay-side{display:flex;flex-direction:column;gap:16px}
-#panel-notifications .st-notif-side>.st-card,#panel-payments .st-pay-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important}
-#panel-notifications .st-notif-side>.st-card .st-body,#panel-payments .st-pay-side>.st-card .st-body{padding:0}
-@media(max-width:1260px){#panel-profile .st-profile-grid,#panel-notifications .st-notif-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr}
-#panel-security .st-setting-side .st-score-ring, #panel-notifications .st-notif-side .st-score-ring{width:98px!important;height:98px!important;margin:8px auto!important}
-#panel-security .st-setting-side .st-score-inner, #panel-notifications .st-notif-side .st-score-inner{width:74px!important;height:74px!important}
-#panel-security .st-setting-side .st-score-inner strong, #panel-notifications .st-notif-side .st-score-inner strong{font-size:22px!important}
-#panel-security .st-setting-side .st-check-line, #panel-notifications .st-notif-side .st-no-box-item, #panel-notifications .st-notif-side .st-setting-action{padding:6px 0!important;font-size:10.5px!important}
-#panel-notifications .st-card:first-child .st-body{padding:12px 14px!important}
-#panel-notifications .st-summary-strip{gap:6px!important}
-#panel-notifications .st-summary-item{gap:7px!important}
-#panel-notifications .st-channel-row{padding:7px 0!important;grid-template-columns:minmax(0,1.2fr) 58px 58px 58px 24px!important}
-#panel-notifications .st-channel-row .st-orange-ico{width:30px!important;height:30px!important}
-#panel-notifications .st-channel-row .st-sec-title{font-size:11px!important}
-#panel-notifications .st-channel-row .st-sec-sub{font-size:9px!important;margin-top:2px!important}
-#panel-security .st-setting-side .st-card-title, #panel-notifications .st-notif-side .st-card-title{font-size:13px!important}
-#panel-security .st-setting-side .st-card-desc, #panel-notifications .st-notif-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important}
-#panel-security .st-setting-side .st-side-list, #panel-notifications .st-notif-side .st-no-box-list{gap:3px!important;margin-top:7px!important}
-#panel-security .st-setting-side .st-side-row, #panel-security .st-setting-side .st-setting-action, #panel-notifications .st-notif-side .st-setting-action, #panel-notifications .st-notif-side .st-no-box-item{padding:5px 0!important}
-#panel-security .st-setting-side .st-btn, #panel-notifications .st-notif-side .st-btn{height:36px!important;margin-top:8px!important}
-#panel-notifications .st-notif-side{gap:8px!important}
-#panel-notifications .st-card:first-child .st-body{padding:10px 12px!important}
-#panel-notifications .st-channel-row{padding:5px 0!important}
-#panel-notifications .st-summary-strip{margin-bottom:8px!important}
-#panel-profile .st-profile-grid, #panel-security .st-settings-grid, #panel-notifications .st-notif-layout{grid-template-columns:minmax(0,1fr) 300px!important;gap:16px!important;align-items:start!important}
-#panel-profile .st-profile-side, #panel-security .st-setting-side, #panel-notifications .st-notif-side{gap:8px!important}
-#panel-profile .st-profile-side .st-card-title, #panel-security .st-setting-side .st-card-title, #panel-notifications .st-notif-side .st-card-title{font-size:13px!important}
-#panel-profile .st-profile-side .st-card-desc, #panel-security .st-setting-side .st-card-desc, #panel-notifications .st-notif-side .st-card-desc{font-size:9.5px!important;line-height:1.25!important}
-/* Box logic: main grouped boxes have subtle/black borders, requested plain sections have no outer box */ #panel-overview .overview-profile-box, #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-profile .st-card:first-child, #panel-security .st-setting-main>.st-card:first-child, #panel-notifications .st-card:first-child, #panel-payments .st-billing-box, .st-main-group{ border:1px solid rgba(17,24,39,.55)!important; border-radius:12px!important; background:#fff!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; overflow:hidden!important; }
-#panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; }
-.st-modal .st-actions .st-btn[type="submit"], #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn[onclick*="Save"], #panel-preferences .st-head .st-btn[onclick*="Save"]{ background:#16a34a!important; border-color:#16a34a!important; color:#fff!important; }
-.st-modal .st-actions .st-btn[type="submit"]:hover, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn[onclick*="Save"]:hover, #panel-preferences .st-head .st-btn[onclick*="Save"]:hover{ background:#111827!important; border-color:#111827!important; color:#fff!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
-/* Buttons and Date: one consistent My Profile-style button system */ .st-page .st-btn, .st-page .st-outline-btn, .st-page .st-date, .st-modal .st-actions .st-btn, #panel-profile .st-actions .st-btn, #panel-notifications .st-head .st-btn, #panel-preferences .st-head .st-btn{ height:36px!important; min-width:120px!important; padding:0 16px!important; border-radius:999px!important; border:1px solid transparent!important; background:linear-gradient(90deg,var(--st-primary-orange),var(--st-primary-orange-2))!important; color:#111827!important; font-family:'Poppins',system-ui,sans-serif!important; font-size:10.5px!important; font-weight:700!important; letter-spacing:.01em!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; gap:7px!important; box-shadow:none!important; transform:none!important; white-space:nowrap!important; cursor:pointer!important; }
-.st-page .st-btn:hover, .st-page .st-btn:focus-visible, .st-page .st-btn:active, .st-page .st-btn.is-clicked, .st-page .st-outline-btn:hover, .st-page .st-outline-btn:focus-visible, .st-page .st-outline-btn:active, .st-page .st-outline-btn.is-clicked, .st-page .st-date:hover, .st-page .st-date:focus-visible, .st-modal .st-actions .st-btn:hover, .st-modal .st-actions .st-btn:focus-visible, #panel-profile .st-actions .st-btn:hover, #panel-notifications .st-head .st-btn:hover, #panel-preferences .st-head .st-btn:hover{ background:var(--st-action-hover)!important; border-color:var(--st-action-hover)!important; color:#fff!important; box-shadow:none!important; outline:none!important; transform:none!important; }
-/* Unified Profile Completion / Security Score / Notification Summary rings */ .st-score-ring, #panel-profile .st-profile-side .st-score-ring, #panel-security .st-setting-side .st-score-ring, #panel-notifications .st-notif-side .st-score-ring, .st-section-layout .st-section-side .st-score-ring{ width:112px!important; height:112px!important; margin:10px auto 12px!important; border-radius:50%!important; background:conic-gradient(var(--st-primary-orange) 0 331deg,#f1f5f9 331deg 360deg)!important; display:grid!important; place-items:center!important; box-shadow:0 8px 22px rgba(255,122,0,.14)!important; }
-.st-score-inner, #panel-profile .st-profile-side .st-score-inner, #panel-security .st-setting-side .st-score-inner, #panel-notifications .st-notif-side .st-score-inner, .st-section-layout .st-section-side .st-score-inner{ width:82px!important; height:82px!important; border-radius:50%!important; background:#fff!important; display:grid!important; place-items:center!important; text-align:center!important; border:1px solid #fff3e6!important; }
-.st-score-inner strong, #panel-profile .st-profile-side .st-score-inner strong, #panel-security .st-setting-side .st-score-inner strong, #panel-notifications .st-notif-side .st-score-inner strong, .st-section-layout .st-section-side .st-score-inner strong{ font-family:'Poppins',system-ui,sans-serif!important; font-size:24px!important; line-height:1!important; color:#111827!important; font-weight:800!important; }
-.st-score-inner span, #panel-profile .st-profile-side .st-score-inner span, #panel-security .st-setting-side .st-score-inner span, #panel-notifications .st-notif-side .st-score-inner span, .st-section-layout .st-section-side .st-score-inner span{ color:var(--st-primary-orange)!important; font-size:10px!important; font-weight:800!important; text-transform:uppercase!important; letter-spacing:.03em!important; }
-/* Icon-only colors: no background shape, varied colors per function */ #panel-overview .st-orange-ico, #panel-overview .st-ico, #panel-profile .st-score-ring ~ .st-no-box-list .st-orange-ico, #panel-security .st-orange-ico, #panel-notifications .st-orange-ico{ background:transparent!important; border:0!important; border-radius:0!important; width:22px!important; height:22px!important; flex:0 0 22px!important; color:var(--st-orange)!important; }
-/* Score circles equalized */ #panel-profile .st-score-ring, #panel-security .st-score-ring, #panel-notifications .st-score-ring{ width:108px!important; height:108px!important; margin:8px auto 12px!important; background:conic-gradient(#ff7a00 0 331deg,#e5e7eb 331deg 360deg)!important; }
-#panel-profile .st-score-inner, #panel-security .st-score-inner, #panel-notifications .st-score-inner{ width:80px!important; height:80px!important; background:#fff!important; }
-#panel-profile .st-score-inner strong, #panel-security .st-score-inner strong, #panel-notifications .st-score-inner strong{ font-size:23px!important; color:#111827!important; }
-#panel-profile .st-score-inner span, #panel-security .st-score-inner span, #panel-notifications .st-score-inner span{ color:#16a34a!important; font-size:9.5px!important; font-weight:700!important; }
-#panel-notifications .st-notif-side .st-action-list .st-setting-action,
-#panel-notifications .st-notif-side .st-action-list .st-setting-action:hover,
-#panel-notifications .st-card-title,
-#panel-notifications .st-card-desc,
+#panel-notifications .st-notif-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start;}
+#panel-notifications .st-notif-side{display:flex;flex-direction:column;gap:16px;}
+#panel-notifications .st-notif-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important;}
+#panel-notifications .st-notif-side>.st-card .st-body{padding:0!important;}
+#panel-notifications .st-card:first-child{border-color:#111827;}
+#panel-notifications .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600;font-size:12.5px!important;letter-spacing:.025em!important;}
+#panel-notifications .st-card-desc{font-size:9.5px!important;line-height:1.35!important;}
+#panel-notifications .st-summary-strip{gap:6px!important;margin-bottom:8px!important;}
+#panel-notifications .st-summary-item{gap:7px!important;}
+#panel-notifications .st-channel-row{padding:7px 0!important;grid-template-columns:minmax(0,1.2fr) 58px 58px 58px 24px!important;}
+#panel-notifications .st-channel-row .st-orange-ico{width:30px!important;height:30px!important;}
+#panel-notifications .st-channel-row .st-sec-title{font-size:11px!important;}
+#panel-notifications .st-channel-row .st-sec-sub{font-size:9px!important;margin-top:2px!important;}
+#panel-notifications .st-notif-side .st-no-box-item,#panel-notifications .st-notif-side .st-setting-action{padding:6px 0!important;font-size:10.5px!important;}
+#panel-notifications .st-notif-side .st-action-list .st-setting-action{border:0!important;border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;padding:10px 0!important;}
+#panel-notifications .st-notif-side .st-action-list .st-setting-action:hover{background:transparent!important;color:#ff7a00!important;}
+@media(max-width:1260px){#panel-notifications .st-notif-layout{grid-template-columns:1fr!important;}#panel-notifications .st-channel-row{grid-template-columns:minmax(0,1fr) 56px 56px 56px 24px!important;}}
+@media(max-width:860px){#panel-notifications .st-channel-row{grid-template-columns:1fr 1fr 1fr!important;}}
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
 </style>
 
 {{-- NOTIFICATIONS JS --}}
@@ -1817,25 +2257,69 @@ document.addEventListener('DOMContentLoaded', function(){
 {{-- PAYMENTS CSS --}}
 <style id="settings-payments-css">
 /* PAYMENTS CSS: section-specific overrides/rules. */
-#panel-profile .st-card-title,#panel-security .st-card-title,#panel-notifications .st-card-title,#panel-payments .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600}
-#panel-profile .st-card:first-child,#panel-profile .st-connected-card,#panel-security .st-setting-main>.st-card:first-child,#panel-security .st-login-tips-box,#panel-notifications .st-card:first-child,#panel-payments .st-billing-box{border-color:#111827}
-#panel-notifications .st-notif-layout,#panel-payments .st-pay-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-#panel-notifications .st-notif-side,#panel-payments .st-pay-side{display:flex;flex-direction:column;gap:16px}
-#panel-notifications .st-notif-side>.st-card,#panel-payments .st-pay-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important}
-#panel-notifications .st-notif-side>.st-card .st-body,#panel-payments .st-pay-side>.st-card .st-body{padding:0}
-@media(max-width:1260px){#panel-profile .st-profile-grid,#panel-notifications .st-notif-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr}
-#panel-payments .st-billing-box{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important}
-#panel-payments .st-pay-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important}
-#panel-payments .st-pay-side>.st-card>.st-body{padding:0!important}
-@media(max-width:1260px){.st-section-layout,#panel-payments .st-pay-layout{grid-template-columns:1fr!important}
-/* Box logic: main grouped boxes have subtle/black borders, requested plain sections have no outer box */ #panel-overview .overview-profile-box, #panel-overview .overview-payment-box, #panel-overview .overview-quick-panel, #panel-profile .st-card:first-child, #panel-security .st-setting-main>.st-card:first-child, #panel-notifications .st-card:first-child, #panel-payments .st-billing-box, .st-main-group{ border:1px solid rgba(17,24,39,.55)!important; border-radius:12px!important; background:#fff!important; box-shadow:0 8px 22px rgba(15,23,42,.045)!important; overflow:hidden!important; }
-#panel-overview .overview-comm-panel, #panel-overview .overview-prefs-panel, #panel-overview .overview-activity-panel, #panel-overview .overview-privacy-panel, #panel-profile .st-profile-side .st-card, #panel-security .st-setting-side>.st-card, #panel-notifications .st-notif-side>.st-card, #panel-payments .st-pay-side>.st-card, .st-plain, .st-plain-panel{ border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; overflow:visible!important; }
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
-#panel-payments .st-pay-side .st-action-list .st-setting-action{
-#panel-payments .st-pay-side .st-action-list .st-setting-action:hover{
-#panel-payments .st-card-title,
-#panel-payments .st-card-desc,
+#panel-payments .st-pay-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start;}
+#panel-payments .st-pay-side{display:flex;flex-direction:column;gap:16px;}
+#panel-payments .st-pay-side>.st-card{border:0!important;background:transparent!important;box-shadow:none!important;}
+#panel-payments .st-pay-side>.st-card>.st-body{padding:0!important;}
+#panel-payments .st-billing-box{border:1px solid #111827!important;border-radius:14px!important;background:#fff!important;}
+#panel-payments .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600;font-size:12.5px!important;letter-spacing:.025em!important;}
+#panel-payments .st-card-desc{font-size:9.5px!important;line-height:1.35!important;}
+#panel-payments .st-pay-side .st-action-list .st-setting-action{border:0!important;border-bottom:1px solid #e8ebf0!important;border-radius:0!important;background:transparent!important;padding:10px 0!important;}
+#panel-payments .st-pay-side .st-action-list .st-setting-action:hover{background:transparent!important;color:#ff7a00!important;}
+@media(max-width:1260px){#panel-payments .st-pay-layout{grid-template-columns:1fr!important;}}
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
 </style>
 
 {{-- PAYMENTS JS --}}
@@ -2000,6 +2484,59 @@ document.addEventListener('DOMContentLoaded', function(){
 #panel-preferences .st-card-title,
 #panel-preferences .st-card-desc,
 #panel-preferences .st-input,
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
 </style>
 
 {{-- PREFERENCES JS --}}
@@ -2333,6 +2870,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <p class="st-footer">Printify & Co. Client Portal v1.0</p>
 </div>
 </div>
+</div>
 
 <!-- PRIVACY / UTILITY MODAL HTML -->
 <div id="settingsUtilityModal" class="st-modal">
@@ -2357,17 +2895,66 @@ document.addEventListener('DOMContentLoaded', function(){
 {{-- PRIVACY CSS --}}
 <style id="settings-privacy-css">
 /* PRIVACY CSS: section-specific overrides/rules. */
-#panel-preferences .st-section-main .st-plain-panel, #panel-privacy .st-section-main .st-plain-panel{border:0!important;background:transparent!important}
-#panel-privacy .st-privacy-panel-row{padding:12px 0!important;grid-template-columns:210px minmax(0,1fr)!important}
-#panel-privacy .st-privacy-panel-row:first-child{padding-top:0!important}
-#panel-privacy .st-privacy-panel-row:last-child{padding-bottom:0!important}
-#panel-privacy .st-privacy-panel-row{grid-template-columns:1fr!important}
-/* Profile settings tab: same compact flow as My Profile */ #panel-profile .st-card-title, #panel-security .st-card-title, #panel-notifications .st-card-title, #panel-payments .st-card-title, #panel-preferences .st-card-title, #panel-privacy .st-card-title{ font-size:12.5px!important; letter-spacing:.025em!important; }
-#panel-profile .st-card-desc, #panel-security .st-card-desc, #panel-notifications .st-card-desc, #panel-payments .st-card-desc, #panel-preferences .st-card-desc, #panel-privacy .st-card-desc{ font-size:9.5px!important; line-height:1.35!important; }
-#panel-profile .st-input, #panel-preferences .st-input, #panel-privacy select{ min-height:38px!important; font-size:10.5px!important; border-radius:10px!important; }
-#panel-privacy .st-card-title{
-#panel-privacy .st-card-desc{
-#panel-privacy select{
+#panel-preferences .st-section-main .st-plain-panel,#panel-privacy .st-section-main .st-plain-panel{border:0!important;background:transparent!important;}
+#panel-privacy .st-privacy-panel-row{padding:12px 0!important;grid-template-columns:1fr!important;}
+#panel-privacy .st-privacy-panel-row:first-child{padding-top:0!important;}
+#panel-privacy .st-privacy-panel-row:last-child{padding-bottom:0!important;}
+#panel-privacy .st-card-title{font-family:'Poppins',system-ui,sans-serif;font-weight:600;font-size:12.5px!important;letter-spacing:.025em!important;}
+#panel-privacy .st-card-desc{font-size:9.5px!important;line-height:1.35!important;}
+#panel-privacy select{min-height:38px!important;font-size:10.5px!important;border-radius:10px!important;}
+
+/* EXTRA COMPACT FIX */
+.st-subsidebar{
+    transform: translateY(-6px);
+}
+
+.st-subsidebar-head h2{
+    font-size:16px;
+    margin-bottom:2px;
+}
+
+.st-subsidebar-head p{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.st-subitem{
+    padding:8px 10px;
+    font-size:13px;
+}
+
+
+/* FINAL TOP ALIGNMENT FIX */
+.st-settings-shell{
+    align-items:flex-start !important;
+}
+
+/* pull sidebar upward more */
+.st-subsidebar{
+    transform: translateY(-14px) !important;
+}
+
+/* remove any top spacing in header */
+.st-subsidebar-head{
+    margin-top:0 !important;
+    padding-top:0 !important;
+}
+
+/* align main title with sidebar head */
+.st-top{
+    margin-top:-10px;
+}
+
+/* tighten page top spacing */
+.st-page{
+    padding-top:10px;
+}
+
+/* ensure main title aligns visually */
+.st-title-wrap{
+    margin-top:-6px;
+}
+
 </style>
 
 {{-- PRIVACY JS --}}
@@ -2376,5 +2963,250 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 
+
+
+{{-- =========================================================
+   FINAL ALIGNMENT PATCH - 2026-06-25
+   Bawas top/left space, dikit sa main sidebar/header,
+   stable layout: no transform/jumping/hover shifting.
+   ========================================================= --}}
+<style id="settings-final-alignment-patch">
+:root{
+    --st-final-left-pad:4px;
+    --st-final-right-pad:12px;
+    --st-final-top-nudge:-10px;
+    --st-final-subsidebar-width:206px;
+    --st-final-shell-gap:16px;
+}
+
+/* Pull the whole settings area slightly closer to the main header. */
+.st-page{
+    padding-top:0!important;
+    margin-top:var(--st-final-top-nudge)!important;
+    overflow-x:hidden!important;
+    background:#fff!important;
+}
+
+/* Remove the wide blank space beside the main sidebar. */
+.st-settings-shell{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0 var(--st-final-right-pad) 34px var(--st-final-left-pad)!important;
+    display:grid!important;
+    grid-template-columns:var(--st-final-subsidebar-width) minmax(0,1fr)!important;
+    gap:var(--st-final-shell-gap)!important;
+    column-gap:var(--st-final-shell-gap)!important;
+    align-items:start!important;
+    box-sizing:border-box!important;
+    background:#fff!important;
+}
+
+/* Main content starts immediately after the sub-sidebar, no extra centering gap. */
+.st-settings-shell .st-wrap{
+    max-width:none!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+}
+
+/* Sub-sidebar: fixed visual width, closer to top, no transform/sticky jumping. */
+.st-subsidebar{
+    position:relative!important;
+    top:auto!important;
+    transform:none!important;
+    width:var(--st-final-subsidebar-width)!important;
+    min-width:var(--st-final-subsidebar-width)!important;
+    max-width:var(--st-final-subsidebar-width)!important;
+    min-height:calc(100vh - 118px)!important;
+    margin:0!important;
+    padding:0 12px 24px 0!important;
+    border-right:1px solid #e5e7eb!important;
+    background:#fff!important;
+    box-sizing:border-box!important;
+}
+
+.st-subsidebar-head{
+    margin:0 0 18px!important;
+    padding:0!important;
+}
+.st-subsidebar-head h2{
+    margin:0 0 8px!important;
+    font-size:18px!important;
+    line-height:1.15!important;
+    font-weight:800!important;
+}
+.st-subsidebar-head p{
+    max-width:176px!important;
+    margin:0!important;
+    font-size:11px!important;
+    line-height:1.42!important;
+}
+.st-subnav{
+    gap:6px!important;
+}
+.st-subitem{
+    min-height:40px!important;
+    padding:0 10px 0 10px!important;
+    gap:9px!important;
+    border-left:4px solid transparent!important;
+    border-radius:0 10px 10px 0!important;
+    font-size:10.6px!important;
+    line-height:1.1!important;
+    transform:none!important;
+    box-sizing:border-box!important;
+}
+.st-subicon{
+    width:20px!important;
+    height:20px!important;
+    flex:0 0 20px!important;
+}
+.st-subicon i{
+    font-size:14px!important;
+}
+
+/* Settings header sits level with the sub-sidebar, close to the dashboard header. */
+.st-top{
+    margin:0 0 10px!important;
+    padding:0!important;
+    align-items:flex-start!important;
+}
+.st-title-wrap{
+    margin:0!important;
+    padding:0!important;
+    align-items:flex-start!important;
+}
+.st-title-wrap:before{
+    margin-top:8px!important;
+}
+.st-title{
+    margin:0!important;
+}
+.st-subtitle{
+    margin-top:4px!important;
+}
+.st-tabs{
+    margin:0 0 12px!important;
+    padding:0!important;
+}
+
+/* Stop hover/click layout shifts. Colors can change, positions cannot. */
+.st-page *,
+.st-page *::before,
+.st-page *::after{
+    transform:none!important;
+    scroll-behavior:auto!important;
+}
+.st-card:hover,
+.st-btn:hover,
+.st-outline-btn:hover,
+.st-date:hover,
+.st-tab:hover,
+.st-subitem:hover,
+.st-subitem:focus-visible,
+.st-subitem.active,
+.st-quick:hover,
+.st-privacy:hover,
+.st-setting-action:hover,
+.st-notif-item:hover,
+.st-comm-item:hover,
+.st-pref-row:hover,
+.st-activity-row:hover,
+.st-pay-item:hover{
+    transform:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-shadow:none!important;
+}
+.st-notif-item:hover,
+.st-comm-item:hover,
+.st-pref-row:hover,
+.st-activity-row:hover,
+.st-pay-item:hover,
+.st-setting-action:hover{
+    padding-left:0!important;
+    padding-right:0!important;
+}
+
+/* Keep the active sub-sidebar item stable; border already has reserved width. */
+.st-subitem:hover,
+.st-subitem:focus-visible{
+    background:#f9fafb!important;
+    color:#ff7a00!important;
+    border-left-color:#ff7a00!important;
+}
+.st-subitem.active,
+.st-subitem.active:hover,
+.st-subitem.active:focus-visible{
+    background:#fff7ed!important;
+    color:#ff7a00!important;
+    border-left-color:#ff7a00!important;
+}
+
+/* Responsive: still close to the edges, but safe on tablets/mobile. */
+@media(max-width:1180px){
+    .st-settings-shell{
+        grid-template-columns:190px minmax(0,1fr)!important;
+        gap:14px!important;
+        padding-left:4px!important;
+        padding-right:10px!important;
+    }
+    .st-subsidebar{
+        width:190px!important;
+        min-width:190px!important;
+        max-width:190px!important;
+        padding-right:10px!important;
+    }
+}
+@media(max-width:980px){
+    .st-page{
+        margin-top:0!important;
+        padding-top:0!important;
+    }
+    .st-settings-shell{
+        display:block!important;
+        padding:0 10px 30px!important;
+    }
+    .st-subsidebar{
+        position:relative!important;
+        width:100%!important;
+        min-width:0!important;
+        max-width:none!important;
+        min-height:0!important;
+        padding:0 0 12px!important;
+        margin:0 0 14px!important;
+        border-right:0!important;
+        border-bottom:1px solid #e5e7eb!important;
+    }
+    .st-subnav{
+        display:grid!important;
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+        gap:8px!important;
+    }
+    .st-subitem{
+        border-left:0!important;
+        border-bottom:3px solid transparent!important;
+        border-radius:10px!important;
+        min-height:42px!important;
+    }
+    .st-subitem:hover,
+    .st-subitem:focus-visible,
+    .st-subitem.active{
+        border-left-color:transparent!important;
+        border-bottom-color:#ff7a00!important;
+    }
+}
+@media(max-width:560px){
+    .st-settings-shell{
+        padding-left:8px!important;
+        padding-right:8px!important;
+    }
+    .st-subnav{
+        grid-template-columns:1fr!important;
+    }
+}
+</style>
 
 </x-app-layout>

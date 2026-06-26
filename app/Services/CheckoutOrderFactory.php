@@ -42,6 +42,7 @@ class CheckoutOrderFactory
                 'lalamove_quotation_id' => data_get($checkout, 'delivery.quotationId'),
                 'lalamove_status' => $deliveryType === 'lalamove' ? 'PENDING_PAYMENT' : null,
                 'delivery_booking_status' => 'waiting_for_payment',
+                'delivery_tracking_number' => $this->makeTrackingNumber(),
             ]);
 
             foreach ($cartItems as $item) {
@@ -65,6 +66,7 @@ class CheckoutOrderFactory
         $variation = $this->resolveVariation($item);
         $service = $variation?->service ?: Service::find((int) ($item['service_id'] ?? 0));
         $serviceCode = (string) ($item['service_item_id'] ?? 'CHECKOUT-' . Str::slug((string) ($item['name'] ?? 'print-item')));
+        $itemImage = trim((string) ($item['image_path'] ?? ''));
         if (!$service) {
             $service = Service::firstOrCreate(
                 ['service_item_id' => $serviceCode],
@@ -75,10 +77,18 @@ class CheckoutOrderFactory
                     'bulk_price' => ($item['price_type'] ?? 'retail') === 'bulk' ? $item['price'] : 0,
                     'unit' => $item['unit'] ?? 'piece',
                     'description' => 'Checkout catalog snapshot',
-                    'image_path' => $item['image_path'] ?? null,
+                    'image_path' => $itemImage !== '' ? $itemImage : null,
                     'is_active' => true,
                 ]
             );
+        }
+        if ($variation && $itemImage !== '' && $variation->variation_image_path !== $itemImage) {
+            $variation->forceFill(['variation_image_path' => $itemImage])->save();
+        }
+        if ($service && !$variation && $itemImage !== '' && $service->image_path !== $itemImage) {
+            $service->forceFill(['image_path' => $itemImage])->save();
+        } elseif ($service && !$service->image_path && $itemImage !== '') {
+            $service->forceFill(['image_path' => $itemImage])->save();
         }
 
         $quantity = max(1, (int) ($item['qty'] ?? 1));
@@ -127,6 +137,13 @@ class CheckoutOrderFactory
         do $reference = 'PFY-' . now()->format('Ymd') . '-' . Str::upper(Str::random(6));
         while (Order::where('order_reference', $reference)->exists());
         return $reference;
+    }
+
+    private function makeTrackingNumber(): string
+    {
+        do $trackingNumber = 'PFY-TRK-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5));
+        while (Order::where('delivery_tracking_number', $trackingNumber)->exists());
+        return $trackingNumber;
     }
 
     private function formatDeliveryAddress(array $address): string

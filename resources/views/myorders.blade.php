@@ -18,7 +18,19 @@
         $status = trim((string) ($status ?: 'Pending Payment'));
         return $status === '' ? 'Pending Payment' : ucwords(str_replace(['_', '-'], ' ', $status));
     };
-    $statusCount = fn($keys) => $orderRows->filter(fn($o) => in_array($statusKey($o->status ?? ''), $keys, true))->count();
+    $paidLike = fn($order) => $order && (
+        $order->paid_at
+        || filled($order->payment_reference)
+        || str_contains(strtolower((string) $order->status), 'paid')
+        || str_contains(strtolower((string) $order->status), 'complete')
+    );
+    $orderStatusKey = function ($order) use ($statusKey, $paidLike) {
+        $key = $statusKey($order->status ?? '');
+        return $paidLike($order) && in_array($key, ['', 'pending', 'pending-payment', 'unpaid'], true)
+            ? 'processing'
+            : $key;
+    };
+    $statusCount = fn($keys) => $orderRows->filter(fn($o) => in_array($orderStatusKey($o), $keys, true))->count();
     $fallbackProducts = ['Custom T-Shirt','Photo Mug','Canvas Tote Bag','Embroidered Cap','Wall Poster','Custom Hoodie','Phone Case'];
     $productVisual = function ($name, $status = '') {
         $text = strtolower((string) $name . ' ' . (string) $status);
@@ -53,6 +65,19 @@
             ?? $item?->service_option
             ?? 'Custom Print Service';
     };
+    $imageUrl = function (?string $path) {
+        $path = trim((string) $path);
+        if ($path === '') return null;
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) return $path;
+        if (str_starts_with($path, 'images/')) return asset($path);
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
+            ? \Illuminate\Support\Facades\Storage::url($path)
+            : asset($path);
+    };
+    $productImage = function ($order) use ($safeOrderItems, $imageUrl) {
+        $item = $safeOrderItems($order)->first();
+        return $imageUrl($item?->serviceVariation?->variation_image_path ?: $item?->service?->image_path);
+    };
     $itemCount = function ($order) use ($safeOrderItems) {
         $items = $safeOrderItems($order);
         return max(1, (int) ($order->items_count ?? $items->count() ?: 1));
@@ -77,22 +102,26 @@
             default => 1,
         };
     };
-    $orderPayload = $orderRows->values()->map(function ($order, $index) use ($productName, $productMeta, $itemCount, $moneyValue, $displayStatus, $statusClass, $statusStep, $productVisual) {
+    $selectedImage = $selectedOrder ? $productImage($selectedOrder) : null;
+    $selectedEffectiveStatus = $selectedOrder ? $orderStatusKey($selectedOrder) : '';
+    $orderPayload = $orderRows->values()->map(function ($order, $index) use ($productName, $productMeta, $itemCount, $moneyValue, $displayStatus, $statusClass, $statusStep, $productVisual, $productImage, $orderStatusKey) {
         $name = $productName($order, $index);
         $visual = $productVisual($name, $order->status ?? '');
+        $effectiveStatus = $orderStatusKey($order);
         return [
             'id' => $order->id,
             'ref' => '#ORD-' . str_pad((string) $order->id, 5, '0', STR_PAD_LEFT),
             'product' => $name,
             'meta' => $productMeta($order),
+            'image' => $productImage($order),
             'items' => $itemCount($order),
             'date' => optional($order->created_at)->format('M d, Y'),
             'time' => optional($order->created_at)->format('h:i A'),
             'amount' => $moneyValue($order),
             'amountText' => '₱' . number_format($moneyValue($order), 2),
-            'status' => $displayStatus($order->status ?? 'Pending Payment'),
-            'statusClass' => $statusClass($order->status ?? ''),
-            'step' => $statusStep($order->status ?? ''),
+            'status' => $displayStatus($effectiveStatus),
+            'statusClass' => $statusClass($effectiveStatus),
+            'step' => $statusStep($effectiveStatus),
             'icon' => $visual['icon'],
             'tone' => $visual['tone'],
             'url' => route('myorders.show', $order->id),
@@ -102,6 +131,8 @@
 
 <style>
 :root{--co-orange:#FE7B09;--co-orange-2:#FFAB0A;--co-ink:#111827;--co-muted:#6b7280;--co-line:#111827;--co-soft:#f7f7f8;--co-shadow:0 12px 30px rgba(15,23,42,.07);--co-shadow2:0 18px 42px rgba(15,23,42,.11);--co-radius:14px;--co-green:#16a34a;--co-blue:#2563eb;--co-purple:#7c3aed;--co-red:#ef4444;--co-yellow:#f59e0b}
+.co-thumb.has-image,.co-selected-img.has-image{background:#f8fafc!important;color:inherit!important;overflow:hidden!important}
+.co-thumb.has-image img,.co-selected-img.has-image img{width:100%!important;height:100%!important;display:block!important;object-fit:cover!important}
 .co-page{background:#fff;color:var(--co-ink);font-family:'Inter',system-ui,sans-serif;font-weight:400;letter-spacing:0;min-height:calc(100vh - 70px)}
 .co-wrap{max-width:1490px;margin:0 auto}.co-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:0 0 16px}.co-title-wrap{display:flex;align-items:flex-start;gap:10px}.co-title-wrap:before{content:'';width:18px;height:4px;margin-top:8px;border-radius:999px;background:var(--co-orange);flex:0 0 auto}.co-title{margin:0 0 3px;font-family:'Playfair Display',Georgia,serif;font-size:40px;font-weight:700;line-height:1.2;letter-spacing:-.02em;color:#111827}.co-sub{margin:0;color:var(--co-muted);font-size:12px;font-weight:400;line-height:1.45}.co-head-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}.co-date{height:42px;min-width:178px;padding:0 15px;border:1px solid #111827;border-radius:8px;background:#fff;color:#111827;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;line-height:1;white-space:nowrap}.co-date i{font-size:15px}
 .co-btn{height:40px;min-width:124px;border:1px solid var(--co-orange);border-radius:10px;background:var(--co-orange);color:#000!important;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.014em;cursor:pointer;transition:.18s;text-decoration:none;position:relative;z-index:2}.co-btn:hover,.co-btn:focus{background:#111827!important;border-color:#111827!important;color:#fff!important;box-shadow:0 12px 24px rgba(17,24,39,.20);outline:0}.co-icon-btn{width:34px;height:34px;border:1px solid #dfe3ea;border-radius:10px;background:#fff;color:#111827;display:inline-grid;place-items:center;cursor:pointer;transition:.18s}.co-icon-btn:hover,.co-icon-btn:focus{background:#111827;border-color:#111827;color:#fff}
@@ -860,7 +891,7 @@
                                 <tr data-order-row data-index="{{ $loop->index }}" data-status="{{ $row['statusClass'] }}" data-search="{{ strtolower($row['ref'].' '.$row['product'].' '.$row['meta'].' '.$row['status']) }}">
                                     <td><input class="co-check" type="checkbox" onclick="event.stopPropagation()"></td>
                                     <td><span class="co-ref">{{ $row['ref'] }}</span><span class="co-small">{{ $row['items'] }} {{ \Illuminate\Support\Str::plural('item', $row['items']) }}</span></td>
-                                    <td><div class="co-product"><span class="co-thumb co-tone-{{ $row['tone'] }}"><i class="{{ $row['icon'] }}"></i></span><div><span class="co-product-name">{{ $row['product'] }}</span><span class="co-product-meta">{{ $row['meta'] }}</span></div></div></td>
+                                    <td><div class="co-product"><span class="co-thumb {{ $row['image'] ? 'has-image' : 'co-tone-'.$row['tone'] }}">@if($row['image'])<img src="{{ $row['image'] }}" alt="{{ $row['product'] }}">@else<i class="{{ $row['icon'] }}"></i>@endif</span><div><span class="co-product-name">{{ $row['product'] }}</span><span class="co-product-meta">{{ $row['meta'] }}</span></div></div></td>
                                     <td>{{ $row['date'] }}<span class="co-small">{{ $row['time'] }}</span></td>
                                     <td><span class="co-amount">{{ $row['amountText'] }}</span></td>
                                     <td><span class="co-pill {{ $row['statusClass'] }}">{{ $row['status'] }}</span></td>
@@ -899,7 +930,7 @@
                 <div class="co-body co-selected" id="selectedOrderPanel">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2 class="co-card-title">Selected Order</h2><span class="co-pill" id="selectedRef">{{ $selectedOrder ? '#ORD-' . str_pad((string) $selectedOrder->id, 5, '0', STR_PAD_LEFT) : '#ORD-00000' }}</span></div>
                     <div class="co-selected-top">
-                        <div class="co-selected-img co-tone-{{ $selectedOrder ? $productVisual($productName($selectedOrder, 0), $selectedOrder->status ?? '')['tone'] : 'orange' }}" id="selectedIconBox"><i id="selectedIcon" class="{{ $selectedOrder ? $productVisual($productName($selectedOrder, 0), $selectedOrder->status ?? '')['icon'] : 'fa-regular fa-file-lines' }}"></i></div>
+                        <div class="co-selected-img {{ $selectedImage ? 'has-image' : 'co-tone-'.($selectedOrder ? $productVisual($productName($selectedOrder, 0), $selectedOrder->status ?? '')['tone'] : 'orange') }}" id="selectedIconBox">@if($selectedImage)<img src="{{ $selectedImage }}" alt="{{ $selectedOrder ? $productName($selectedOrder, 0) : 'Selected order' }}">@else<i id="selectedIcon" class="{{ $selectedOrder ? $productVisual($productName($selectedOrder, 0), $selectedOrder->status ?? '')['icon'] : 'fa-regular fa-file-lines' }}"></i>@endif</div>
                         <div><h3 class="co-selected-title" id="selectedProduct">{{ $selectedOrder ? $productName($selectedOrder, 0) : 'No selected order' }}</h3><p class="co-card-desc" id="selectedMeta">{{ $selectedOrder ? $productMeta($selectedOrder) : 'Choose an order to preview details.' }}</p><p class="co-card-desc" id="selectedDate">{{ $selectedOrder ? optional($selectedOrder->created_at)->format('M d, Y, h:i A') : '' }}</p></div>
                     </div>
                     <div class="co-price-line"><span class="co-selected-price" id="selectedAmount">{{ $selectedOrder ? '₱' . number_format($moneyValue($selectedOrder), 2) : '₱0.00' }}</span><span class="co-pill {{ $selectedOrder ? $statusClass($selectedOrder->status ?? '') : '' }}" id="selectedStatus">{{ $selectedOrder ? $displayStatus($selectedOrder->status ?? '') : 'No Order' }}</span></div>
@@ -929,13 +960,14 @@
 const orderData=@json($orderPayload);
 function orderToast(msg){const t=document.getElementById('orderToast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.orderToastTimer);window.orderToastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
 function peso(value){return '₱'+Number(value||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
+function escapeAttr(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 const statusMeta={all:{title:'Orders',hint:'Showing all order tracking records for your account.'},pending:{title:'Pending Payment Orders',hint:'Orders waiting for payment confirmation and next processing step.'},production:{title:'In Production Orders',hint:'Orders currently approved, queued, or being printed.'},shipped:{title:'Shipped Orders',hint:'Orders already dispatched or moving through delivery.'},delivered:{title:'Delivered Orders',hint:'Completed orders with finished delivery tracking.'},cancelled:{title:'Cancelled Orders',hint:'Cancelled or rejected order records for review.'}};
 function updateSectionHeader(status,count){const meta=statusMeta[status]||statusMeta.all;setText('ordersSectionTitle',meta.title);setText('ordersSectionHint',meta.hint);setText('ordersSectionCount',count+' visible');document.querySelectorAll('[data-stat-card]').forEach(card=>card.classList.toggle('active',card.dataset.statCard===status))}
 function filterOrders(selectFirst=false){const q=(document.getElementById('orderSearch')?.value||'').toLowerCase();const s=document.getElementById('statusFilter')?.value||'all';let count=0,firstVisible=null;document.querySelectorAll('[data-order-row]').forEach(row=>{const okText=row.dataset.search.includes(q);const okStatus=s==='all'||row.dataset.status===s;const show=okText&&okStatus;row.style.display=show?'':'none';if(show){count++;if(!firstVisible)firstVisible=row}});updateSectionHeader(s,count);document.getElementById('filterEmptyState')?.classList.toggle('show',count===0);if(selectFirst){firstVisible?selectOrder(Number(firstVisible.dataset.index)):clearSelectedOrder(s)}orderToast(count+' order'+(count===1?'':'s')+' visible.')}
 function applyStatFilter(status){const filter=document.getElementById('statusFilter');if(filter)filter.value=status;filterOrders(true);orderToast(status==='all'?'Showing all orders.':'Showing '+(statusMeta[status]?.title||status)+' records.')}
 function setText(id,value){const el=document.getElementById(id);if(el)el.textContent=value}
-function selectOrder(index){const order=orderData[index];if(!order)return;document.querySelectorAll('[data-order-row]').forEach(row=>row.classList.toggle('active',Number(row.dataset.index)===Number(index)));setText('selectedRef',order.ref);setText('selectedProduct',order.product);setText('selectedMeta',order.meta+' · '+order.items+' item'+(order.items===1?'':'s'));setText('selectedDate',(order.date||'')+', '+(order.time||''));setText('selectedAmount',order.amountText);setText('selectedStatus',order.status);const status=document.getElementById('selectedStatus');if(status){status.className='co-pill '+order.statusClass}const iconBox=document.getElementById('selectedIconBox');if(iconBox){iconBox.className='co-selected-img co-tone-'+(order.tone||'orange')}const icon=document.getElementById('selectedIcon');if(icon){icon.className=order.icon||'fa-regular fa-file-lines'}const progress=document.getElementById('selectedProgress');if(progress){progress.style.setProperty('--progress',((order.step-1)*21.5)+'%');progress.querySelectorAll('.co-step').forEach((step,i)=>{step.classList.toggle('done',i+1<order.step);step.classList.toggle('current',i+1===order.step)})}setText('selectedSubtotal',peso(Math.max(0,order.amount-250-(order.amount*.12))));setText('selectedTax',peso(order.amount*.12));setText('selectedTotal',order.amountText);const link=document.getElementById('selectedDetailsLink');if(link)link.dataset.href=order.url;localStorage.setItem('printify_selected_order',JSON.stringify(order));orderToast(order.ref+' selected.')}
-function clearSelectedOrder(status){const meta=statusMeta[status]||statusMeta.all;document.querySelectorAll('[data-order-row]').forEach(row=>row.classList.remove('active'));setText('selectedRef','No order');setText('selectedProduct',meta.title);setText('selectedMeta','No order tracking record is available under this status.');setText('selectedDate','');setText('selectedAmount',peso(0));setText('selectedStatus','No Match');const statusEl=document.getElementById('selectedStatus');if(statusEl)statusEl.className='co-pill';const iconBox=document.getElementById('selectedIconBox');if(iconBox)iconBox.className='co-selected-img co-tone-orange';const icon=document.getElementById('selectedIcon');if(icon)icon.className='fa-solid fa-route';const progress=document.getElementById('selectedProgress');if(progress){progress.style.setProperty('--progress','0%');progress.querySelectorAll('.co-step').forEach(step=>{step.classList.remove('done','current')})}setText('selectedSubtotal',peso(0));setText('selectedTax',peso(0));setText('selectedTotal',peso(0));const link=document.getElementById('selectedDetailsLink');if(link)link.dataset.href=''}
+function selectOrder(index){const order=orderData[index];if(!order)return;document.querySelectorAll('[data-order-row]').forEach(row=>row.classList.toggle('active',Number(row.dataset.index)===Number(index)));setText('selectedRef',order.ref);setText('selectedProduct',order.product);setText('selectedMeta',order.meta+' · '+order.items+' item'+(order.items===1?'':'s'));setText('selectedDate',(order.date||'')+', '+(order.time||''));setText('selectedAmount',order.amountText);setText('selectedStatus',order.status);const status=document.getElementById('selectedStatus');if(status){status.className='co-pill '+order.statusClass}const iconBox=document.getElementById('selectedIconBox');if(iconBox){if(order.image){iconBox.className='co-selected-img has-image';iconBox.innerHTML='<img src="'+escapeAttr(order.image)+'" alt="'+escapeAttr(order.product||'Selected order')+'">'}else{iconBox.className='co-selected-img co-tone-'+(order.tone||'orange');iconBox.innerHTML='<i id="selectedIcon" class="'+escapeAttr(order.icon||'fa-regular fa-file-lines')+'"></i>'}}const progress=document.getElementById('selectedProgress');if(progress){progress.style.setProperty('--progress',((order.step-1)*21.5)+'%');progress.querySelectorAll('.co-step').forEach((step,i)=>{step.classList.toggle('done',i+1<order.step);step.classList.toggle('current',i+1===order.step)})}setText('selectedSubtotal',peso(Math.max(0,order.amount-250-(order.amount*.12))));setText('selectedTax',peso(order.amount*.12));setText('selectedTotal',order.amountText);const link=document.getElementById('selectedDetailsLink');if(link)link.dataset.href=order.url;localStorage.setItem('printify_selected_order',JSON.stringify(order));orderToast(order.ref+' selected.')}
+function clearSelectedOrder(status){const meta=statusMeta[status]||statusMeta.all;document.querySelectorAll('[data-order-row]').forEach(row=>row.classList.remove('active'));setText('selectedRef','No order');setText('selectedProduct',meta.title);setText('selectedMeta','No order tracking record is available under this status.');setText('selectedDate','');setText('selectedAmount',peso(0));setText('selectedStatus','No Match');const statusEl=document.getElementById('selectedStatus');if(statusEl)statusEl.className='co-pill';const iconBox=document.getElementById('selectedIconBox');if(iconBox){iconBox.className='co-selected-img co-tone-orange';iconBox.innerHTML='<i id="selectedIcon" class="fa-solid fa-route"></i>'}const progress=document.getElementById('selectedProgress');if(progress){progress.style.setProperty('--progress','0%');progress.querySelectorAll('.co-step').forEach(step=>{step.classList.remove('done','current')})}setText('selectedSubtotal',peso(0));setText('selectedTax',peso(0));setText('selectedTotal',peso(0));const link=document.getElementById('selectedDetailsLink');if(link)link.dataset.href=''}
 function openSelectedDetails(){const link=document.getElementById('selectedDetailsLink'),href=link?.dataset?.href;if(!href){orderToast('Please select an order first.');return}window.location.href=href}
 function toggleAllOrders(input){document.querySelectorAll('tbody .co-check').forEach(cb=>cb.checked=input.checked);orderToast(input.checked?'Visible orders selected.':'Selection cleared.')}
 function focusOrderSearch(){const el=document.getElementById('orderSearch');if(el){el.focus();el.select()}orderToast('Search an order ID or product.')}

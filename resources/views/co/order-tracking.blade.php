@@ -16,9 +16,27 @@
     $money = fn ($value) => '₱' . number_format((float) $value, 2);
     $orderNo = fn ($order) => $order->order_reference ?: 'ORD-' . str_pad((string) $order->id, 6, '0', STR_PAD_LEFT);
     $itemFor = fn ($order) => optional($order->items ?? collect())->first();
+    $imageUrl = function (?string $path) {
+        $path = trim((string) $path);
+        if ($path === '') return null;
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) return $path;
+        if (str_starts_with($path, 'images/')) return asset($path);
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
+            ? \Illuminate\Support\Facades\Storage::url($path)
+            : asset($path);
+    };
+    $itemImage = fn ($item) => $imageUrl($item?->serviceVariation?->variation_image_path ?: $item?->service?->image_path);
 
     $statusKey = function ($order) {
         $value = strtolower((string) ($order->lalamove_status ?: $order->status ?: 'pending'));
+        $paid = $order->paid_at
+            || filled($order->payment_reference)
+            || str_contains(strtolower((string) $order->status), 'paid')
+            || str_contains(strtolower((string) $order->status), 'complete');
+
+        if ($paid && !str_contains($value, 'cancel') && !str_contains($value, 'fail')) {
+            $value = 'paid_' . $value;
+        }
 
         return match (true) {
             str_contains($value, 'cancel') || str_contains($value, 'fail') => 'cancelled',
@@ -601,6 +619,15 @@ button{cursor:pointer}
 .mo-paper .short{
   width:62%;
 }
+.mo-thumb-img{
+  width:92px;
+  height:92px;
+  border:1px solid #e5e7eb;
+  border-radius:6px;
+  object-fit:cover;
+  display:block;
+  background:#f8fafc;
+}
 .mo-pages{
   display:inline-flex;
   margin-top:6px;
@@ -995,21 +1022,26 @@ button{cursor:pointer}
           $paperSize = $variation?->product_size ?: $variationLabel;
           $printOption = $variation?->finish_type ?: ($item?->price_type ? str($item->price_type)->title()->toString() : null);
           $fileType = $file?->original_name ? strtoupper(pathinfo($file->original_name, PATHINFO_EXTENSION) ?: 'FILE') : null;
+          $thumbUrl = $itemImage($item);
         @endphp
 
         <article class="mo-card" data-order-card data-status="{{ $statusKey($order) }}" data-created="{{ optional($order->created_at)->timestamp ?? 0 }}" data-total="{{ (float) $order->total_price }}" data-href="{{ $detailUrl }}" tabindex="0" role="link" aria-label="Track order {{ $orderNo($order) }}">
           <div class="mo-thumb">
-            <div class="mo-paper" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span class="short"></span>
-              <span></span>
-              <span></span>
-              <span class="short"></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+            @if($thumbUrl)
+              <img class="mo-thumb-img" src="{{ $thumbUrl }}" alt="{{ $serviceName }}">
+            @else
+              <div class="mo-paper" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span class="short"></span>
+                <span></span>
+                <span></span>
+                <span class="short"></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            @endif
             <span class="mo-pages">{{ $quantity }} {{ $quantity === 1 ? 'page' : 'pages' }}</span>
           </div>
 

@@ -21,7 +21,15 @@
     $total = (float) ($order->total_price ?? ($subtotal + $deliveryFee));
     $money = fn ($value) => '₱' . number_format((float) $value, 2);
     $orderNo = $order->order_reference ?: 'ORD-' . str_pad((string) $order->id, 6, '0', STR_PAD_LEFT);
-    $rawStatusSource = (string) ($order->lalamove_status ?: $order->delivery_booking_status ?: $order->delivery_status ?: $order->status ?: 'pending');
+    $paidOrder = $order->paid_at
+        || filled($order->payment_reference)
+        || str_contains(strtolower((string) $order->status), 'paid')
+        || str_contains(strtolower((string) $order->status), 'complete');
+    $statusFallback = $paidOrder ? 'paid' : ($order->status ?: 'pending');
+    $rawStatusSource = (string) ($order->lalamove_status ?: $order->delivery_booking_status ?: $order->delivery_status ?: $statusFallback);
+    if ($paidOrder && !str_contains(strtolower($rawStatusSource), 'cancel') && !str_contains(strtolower($rawStatusSource), 'fail')) {
+        $rawStatusSource = 'paid_' . $rawStatusSource;
+    }
     $rawStatus = strtolower(str_replace([' ', '-'], '_', $rawStatusSource));
     $trackingStep = match (true) {
         str_contains($rawStatus, 'cancel') || str_contains($rawStatus, 'fail') || str_contains($rawStatus, 'expired') => 1,
@@ -87,14 +95,26 @@
     $primarySize = $variation?->product_size ?: $primaryVariationLabel;
     $primaryFinish = $variation?->finish_type ?: data_get($order->checkout_details, 'items.0.printOption');
     $serviceId = $item?->service_item_id ?: $variation?->service_item_id ?: $orderNo;
+    $imageUrl = function (?string $path) {
+        $path = trim((string) $path);
+        if ($path === '') return null;
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) return $path;
+        if (str_starts_with($path, 'images/')) return asset($path);
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path)
+            ? \Illuminate\Support\Facades\Storage::url($path)
+            : asset($path);
+    };
+    $itemImage = fn ($line) => $imageUrl($line?->serviceVariation?->variation_image_path ?: $line?->service?->image_path);
+    $primaryImage = $itemImage($item);
     $fileType = $file?->original_name ? strtoupper(pathinfo($file->original_name, PATHINFO_EXTENSION) ?: ($file->mime ?: 'File')) : 'No file attached';
-    $trackingNumber = $order->delivery_tracking_number ?: $order->lalamove_order_id ?: null;
+    $courierTrackingNumber = $order->delivery_tracking_number ?: $order->lalamove_order_id;
+    $trackingNumber = $courierTrackingNumber ?: ('PFY-TRK-' . str_pad((string) $order->id, 6, '0', STR_PAD_LEFT));
     $trackingUrl = $order->delivery_tracking_url ?: $order->lalamove_share_link;
     $lalamoveConfigured = filled(config('services.lalamove.api_key')) && filled(config('services.lalamove.api_secret'));
     $lalamoveHasCoordinates = filled($order->delivery_latitude) && filled($order->delivery_longitude);
     $lalamoveBackendStatus = match (true) {
         $deliveryType !== 'lalamove' => 'Not required for this delivery method',
-        (bool) $trackingNumber => 'Live tracking connected',
+        (bool) $courierTrackingNumber => 'Live tracking connected',
         !$lalamoveConfigured => 'Lalamove setup needs API credentials',
         !$lalamoveHasCoordinates => 'Waiting for drop-off map coordinates',
         str_contains($rawStatus, 'fail') => 'Booking failed - retry available',
@@ -498,6 +518,16 @@ button{cursor:pointer}
   height:3px;
   border-radius:8px;
   background:rgba(17,24,39,.12);
+}
+.ot-paper-img{
+  width:74px;
+  height:94px;
+  margin:0 auto;
+  border:1px solid #e5e7eb;
+  border-radius:6px;
+  object-fit:cover;
+  display:block;
+  background:#f8fafc;
 }
 .ot-pages{
   display:inline-flex;
@@ -1151,6 +1181,15 @@ button{cursor:pointer}
   border-radius:8px;
   background:rgba(17,24,39,.12);
 }
+.ot-side-thumb-img{
+  width:58px;
+  height:74px;
+  border:1px solid #e5e7eb;
+  border-radius:6px;
+  object-fit:cover;
+  display:block;
+  background:#f8fafc;
+}
 .ot-side-item+.ot-side-item{
   margin-top:12px;
   padding-top:12px;
@@ -1408,9 +1447,13 @@ button{cursor:pointer}
 
     <section class="ot-hero">
       <div style="text-align:center">
-        <div class="ot-paper" aria-hidden="true">
-          <span></span><span></span><span style="width:65%"></span><span></span><span></span><span style="width:55%"></span><span></span><span></span>
-        </div>
+        @if($primaryImage)
+          <img class="ot-paper-img" src="{{ $primaryImage }}" alt="{{ $primaryServiceName }}">
+        @else
+          <div class="ot-paper" aria-hidden="true">
+            <span></span><span></span><span style="width:65%"></span><span></span><span></span><span style="width:55%"></span><span></span><span></span>
+          </div>
+        @endif
         <span class="ot-pages">{{ $quantity }} {{ $quantity === 1 ? 'page' : 'pages' }}</span>
       </div>
 
@@ -1595,9 +1638,14 @@ button{cursor:pointer}
                   $lineName = $line->service_name ?: $line->service?->name ?: 'Print Service';
                   $lineLabel = $line->variation_label ?: $lineVariation?->variation_label;
                   $lineServiceId = $line->service_item_id ?: $lineVariation?->service_item_id;
+                  $lineImage = $itemImage($line);
                 @endphp
                 <div class="ot-side-item">
-                  <div class="ot-side-thumb" aria-hidden="true"><span></span><span></span><span style="width:65%"></span><span></span><span></span></div>
+                  @if($lineImage)
+                    <img class="ot-side-thumb-img" src="{{ $lineImage }}" alt="{{ $lineName }}">
+                  @else
+                    <div class="ot-side-thumb" aria-hidden="true"><span></span><span></span><span style="width:65%"></span><span></span><span></span></div>
+                  @endif
                   <div>
                     <strong class="ot-item-name">{{ $lineName }}</strong>
                     <div class="ot-item-meta">
