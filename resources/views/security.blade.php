@@ -895,7 +895,7 @@
                                         <h4 class="sp-mini-title">{{ data_get($item, 'title') }}</h4>
                                         <p class="sp-mini-desc">{{ data_get($item, 'description') }}</p>
                                         <div style="margin-top:8px">
-                                            <span class="sp-status {{ data_get($item, 'status_tone', 'gray') }}">{{ data_get($item, 'status', 'Template only') }}</span>
+                                            <span class="sp-status {{ data_get($item, 'status_tone', 'gray') }}">{{ data_get($item, 'status', 'Not available') }}</span>
                                         </div>
                                         <small class="sp-mini-desc"><b>{{ data_get($item, 'meta_label') }}:</b> {{ data_get($item, 'meta_value', 'No record yet') }}</small>
                                     </div>
@@ -1196,7 +1196,7 @@
         </section>
     </div>
 
-    <div id="spToast" class="sp-toast">Template only. Backend is not connected yet.</div>
+    <div id="spToast" class="sp-toast">This customer setting is not available yet.</div>
 </div>
 
 <script>
@@ -1208,7 +1208,7 @@
     function showSpToast(message){
         const toast = document.getElementById('spToast');
         if(!toast) return;
-        toast.textContent = message || 'Template only. Backend is not connected yet.';
+        toast.textContent = message || 'This customer setting is not available yet.';
         toast.classList.add('show');
         clearTimeout(window.spToastTimer);
         window.spToastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
@@ -1240,7 +1240,7 @@
 
     document.querySelectorAll('[data-template-switch]').forEach(input => {
         input.addEventListener('change', () => {
-            showSpToast('Template only. This preference is not saved yet. Connect backend saving first.');
+            showSpToast('This preference is not saved yet.');
         });
     });
 
@@ -1248,7 +1248,7 @@
         button.addEventListener('click', event => {
             const target = event.currentTarget;
             if(target.matches('[data-tab-jump],[data-toggle-pass]') || target.type === 'submit' || target.closest('form')) return;
-            showSpToast('Template only. No data is saved until backend functions are connected.');
+            showSpToast('No account data was changed.');
         });
     });
 })();

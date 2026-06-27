@@ -170,8 +170,10 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
     })->name('notifications');
 
     // 3. SETTINGS
-    Route::get('/settings', function() {
-        return view('settings'); 
+    Route::get('/settings', function(Request $request) {
+        return view('settings', [
+            'initialSettingsTab' => $request->query('tab', 'overview'),
+        ]);
     })->name('settings');
     Route::post('/settings/save', function(Request $request) {
         $data = $request->validate([
@@ -180,9 +182,15 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
             'group' => ['nullable', 'string', 'max:60'],
         ]);
 
-        $settings = session('customer_settings', []);
+        $user = $request->user();
+        $settings = $user?->preferences ?? session('customer_settings', []);
         $group = $data['group'] ?? 'general';
         $settings[$group][$data['key']] = $data['value'];
+
+        if ($user) {
+            $user->forceFill(['preferences' => $settings])->save();
+        }
+
         session(['customer_settings' => $settings]);
 
         return response()->json([
@@ -191,6 +199,11 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
             'settings' => $settings[$group],
         ]);
     })->name('settings.save');
+    Route::get('/preferences', function() {
+        return view('settings', [
+            'initialSettingsTab' => 'preferences',
+        ]);
+    })->name('preferences');
 
     // 4. SECURITY
     Route::get('/security', function() {

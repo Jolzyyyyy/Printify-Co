@@ -99,12 +99,60 @@ body{
 
 </style>
 
- @php $settingsUser = auth()->user(); $settingsPhoto = $settingsUser->profile_photo_url ?? $settingsUser->profile_photo ?? null; $settingsName = $settingsUser->name ?? ''; $settingsEmail = $settingsUser->email ?? ''; $settingsPhone = $settingsUser->phone ?? ''; $settingsBirthdate = $settingsUser->birthdate ?? ''; $settingsCompany = $settingsUser->company ?? ''; $settingsCustomerId = $settingsUser ? 'CUST-'.str_pad((string) $settingsUser->id, 5, '0', STR_PAD_LEFT) : 'Not set';
-$settingsLanguage = $settingsUser->language ?? 'English';
+ @php
+$settingsUser = auth()->user();
+$settingsPhoto = $settingsUser->profile_photo_url ?? $settingsUser->profile_photo ?? null;
+$settingsName = $settingsUser->name ?? '';
+$settingsEmail = $settingsUser->email ?? '';
+$settingsPhone = $settingsUser->phone ?? '';
+$settingsBirthdate = $settingsUser->birthdate ?? '';
+$settingsCompany = $settingsUser->company ?? '';
+$settingsCustomerId = $settingsUser ? 'CUST-'.str_pad((string) $settingsUser->id, 5, '0', STR_PAD_LEFT) : 'Not set';
+$settingsPreferences = $settingsUser?->preferences ?? [];
+$settingsPreference = fn ($group, $key, $default = null) => data_get($settingsPreferences, $group.'.'.$key, $default);
+$settingsLanguage = $settingsPreference('preferences', 'language', 'English');
 $settingsLanguageDisplay = strtolower((string) $settingsLanguage) === 'en' ? 'English' : $settingsLanguage;
-$settingsRegion = $settingsUser->region ?? 'Philippines';
-$settingsTimezone = $settingsUser->timezone ?? config('app.timezone', 'Asia/Manila');
-$settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Manila' : $settingsTimezone; @endphp
+$settingsRegion = $settingsPreference('preferences', 'region', $settingsUser->region ?: 'Philippines');
+$settingsTimezone = $settingsPreference('preferences', 'timezone', config('app.timezone', 'Asia/Manila'));
+$settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Manila' : $settingsTimezone;
+$settingsTheme = $settingsPreference('preferences', 'theme', 'Light');
+$settingsAccent = $settingsPreference('preferences', 'accent', 'Orange');
+$settingsInitialTab = $initialSettingsTab ?? 'overview';
+$settingsPaymentRecords = $settingsUser
+    ? \App\Models\Payment::query()->with('order')->where('customer_id', $settingsUser->id)->latest()->limit(8)->get()
+    : collect();
+$settingsPrimaryPayment = $settingsPaymentRecords->first();
+$settingsSecondaryPayment = $settingsPaymentRecords->skip(1)->first();
+$settingsPaidPaymentCount = $settingsPaymentRecords->where('status', \App\Models\Payment::STATUS_PAID)->count();
+$settingsPaymentLabel = fn ($payment) => trim(\Illuminate\Support\Str::headline((string) ($payment->payment_method ?: 'Payment')).' '.($payment->payment_gateway ? 'via '.\Illuminate\Support\Str::headline((string) $payment->payment_gateway) : ''));
+$settingsPaymentStatusTone = fn ($status) => match (strtolower((string) $status)) {
+    'paid' => 'green',
+    'failed', 'discrepancy', 'cancelled', 'canceled' => 'orange',
+    default => 'gray',
+};
+$settingsAddressLines = collect([
+    $settingsUser->street ?? null,
+    collect([$settingsUser->barangay ?? null, $settingsUser->city ?? null, $settingsUser->province ?? null])->filter()->implode(', '),
+    $settingsUser->region ?? null,
+    $settingsUser->postal_code ?? null,
+    $settingsPhone ?: null,
+])->filter()->values();
+$settingsProfileFields = collect([
+    $settingsName,
+    $settingsEmail,
+    $settingsPhone,
+    $settingsUser->street ?? null,
+    $settingsUser->barangay ?? null,
+    $settingsUser->city ?? null,
+    $settingsUser->region ?? null,
+    $settingsUser->postal_code ?? null,
+    $settingsUser?->email_verified_at,
+])->filter(fn ($value) => filled($value));
+$settingsProfileCompletion = (int) round(($settingsProfileFields->count() / 9) * 100);
+$settingsSecurityScore = ($settingsUser?->password ? 40 : 0) + ($settingsUser?->email_verified_at ? 35 : 0) + ($settingsPhone ? 25 : 0);
+$settingsSavedNotificationCount = collect(data_get($settingsPreferences, 'toggles', []))->filter(fn ($value) => $value === 'enabled')->count();
+$settingsCurrentSessionLabel = session()->getId() ? 'Current browser session' : 'Session data unavailable';
+@endphp
 <div class="st-page">
 <div class="st-settings-shell">
 <aside class="st-subsidebar" aria-label="Settings submenu">
@@ -250,7 +298,7 @@ $settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Ma
 </span>
 <span class="st-act-label">Last Login</span>
 </div>
-<div class="st-act-val">May 29, 2026&nbsp; 8:15 AM<div style="margin-top:5px">
+<div class="st-act-val">{{ optional($settingsUser?->updated_at)->format('M d, Y h:i A') ?: 'No recent account update' }}<div style="margin-top:5px">
 <span class="st-mini">This Device</span>
 </div>
 </div>
@@ -263,7 +311,7 @@ $settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Ma
 </span>
 <span class="st-act-label">Login Location</span>
 </div>
-<div class="st-act-val">Makati City, Metro Manila, Philippines</div>
+<div class="st-act-val">{{ request()->ip() ?: 'Current request' }}</div>
 </div>
 <div class="st-activity-row">
 <div class="st-activity-left">
@@ -273,7 +321,7 @@ $settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Ma
 </span>
 <span class="st-act-label">Active Sessions</span>
 </div>
-<div class="st-act-val">1 of 3<div style="margin-top:5px">
+<div class="st-act-val">{{ $settingsCurrentSessionLabel }}<div style="margin-top:5px">
 <button class="st-link" type="button" onclick="openSessionManagerPanel()">Manage Sessions</button>
 </div>
 </div>
@@ -335,7 +383,7 @@ $settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Ma
 </div>
 <div class="st-card st-right-slim overview-plain-panel overview-payment-panel">
 <div class="st-body">
-<h2 class="st-card-title">Saved Payment Methods</h2>
+<h2 class="st-card-title">Payment Records</h2>
 <div class="st-list" style="margin-top:12px">
 <div class="st-pay-item">
 <div class="st-pay-left">
@@ -344,37 +392,34 @@ $settingsTimezoneDisplay = $settingsTimezone === 'Asia/Manila' ? '(GMT+08:00) Ma
 </i>
 </div>
 <div class="st-pay-text">
-<p class="st-pay-title">Visa ending in 4242</p>
+<p class="st-pay-sub">{{ $settingsPrimaryPayment ? ((collect([$settingsPrimaryPayment->order?->order_reference, $settingsPrimaryPayment->gateway_reference])->filter()->implode(' / ') ?: 'Payment record').' - '.optional($settingsPrimaryPayment->paid_at ?? $settingsPrimaryPayment->created_at)->format('M d, Y')) : 'Saved payment methods are not yet available. Your completed payment records will appear after checkout.' }}</p>
 <p class="st-pay-sub">Expires 12/27 · {{ $settingsName ?: 'Account holder not set' }}</p>
 </div>
 </div>
-<span class="st-mini orange">Primary</span>
+<span class="st-mini {{ $settingsPrimaryPayment ? $settingsPaymentStatusTone($settingsPrimaryPayment->status) : 'gray' }}">{{ $settingsPrimaryPayment ? \Illuminate\Support\Str::headline((string) $settingsPrimaryPayment->status) : 'Empty' }}</span>
 </div>
+@if($settingsSecondaryPayment)
 <div class="st-pay-item">
 <div class="st-pay-left">
-<div class="st-card-logo master">
-<i class="fa-solid fa-circle">
-</i>
-<i class="fa-solid fa-circle">
+<div class="st-card-logo">
+<i class="fa-solid fa-receipt">
 </i>
 </div>
 <div class="st-pay-text">
-<p class="st-pay-title">Mastercard ending in 8888</p>
-<p class="st-pay-sub">Expires 08/26 · {{ $settingsName ?: 'Account holder not set' }}</p>
+<p class="st-pay-title">{{ $settingsPaymentLabel($settingsSecondaryPayment) ?: 'Checkout payment' }}</p>
+<p class="st-pay-sub">{{ collect([$settingsSecondaryPayment->order?->order_reference, $settingsSecondaryPayment->gateway_reference])->filter()->implode(' / ') ?: 'Payment record' }} - {{ optional($settingsSecondaryPayment->paid_at ?? $settingsSecondaryPayment->created_at)->format('M d, Y') }}</p>
 </div>
 </div>
-<button class="st-kebab" style="position:static;flex:0 0 auto" type="button" onclick="openPaymentActions('Mastercard ending in 8888')" aria-label="Payment method actions">
-<i class="fa-solid fa-ellipsis-vertical">
-</i>
-</button>
+<span class="st-mini {{ $settingsPaymentStatusTone($settingsSecondaryPayment->status) }}">{{ \Illuminate\Support\Str::headline((string) $settingsSecondaryPayment->status) }}</span>
 </div>
+@endif
 <div class="st-pay-bottom">
-<button class="st-add-payment" type="button" data-modal-open="paymentModal">
+<button class="st-add-payment" type="button" data-tab-jump="payments">
 <span class="st-add-circle" style="width:24px;height:24px">
-<i class="fa-solid fa-plus">
+<i class="fa-solid fa-receipt">
 </i>
 </span>
-<span>Add New<br>Payment Method</span>
+<span>View<br>Payment Records</span>
 </button>
 </div>
 </div>
@@ -1002,11 +1047,11 @@ display:inline-flex!important; align-items:center!important; gap:4px!important; 
 {{-- OVERVIEW JS --}}
 <script id="settings-overview-js">
 /* OVERVIEW JS + GLOBAL SETTINGS JS. Complete script kept once only para hindi maduplicate listeners/functions. */
-const settingsSaveRoute=@json(Route::has('settings.save') ? route('settings.save') : ''); const settingsProfileRoute=@json(Route::has('profile.update') ? route('profile.update') : ''); const settingsDisplayEmail=@json($settingsEmail ?: 'Not set'); const settingsDisplayPhone=@json($settingsPhone ?: 'Not set'); const settingsCsrf=document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || @json(csrf_token()); document.addEventListener('DOMContentLoaded',function(){ const tabs=document.querySelectorAll('.st-tab'),panels=document.querySelectorAll('.st-panel'),subItems=document.querySelectorAll('.st-subitem[data-sub-key]'),jumps=document.querySelectorAll('[data-tab-jump]'),opens=document.querySelectorAll('[data-modal-open]'),closes=document.querySelectorAll('[data-modal-close]'); function getSubKey(name){if(name==='notifications')return 'notification';if(name==='preferences')return 'preferences';if(name==='security'||name==='privacy')return 'security-privacy';return 'settings'} function activateTab(name,updateUrl=true){tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===name));panels.forEach(p=>p.classList.remove('active'));const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');const subKey=getSubKey(name);subItems.forEach(b=>b.classList.toggle('active',b.dataset.subKey===subKey));if(updateUrl)history.replaceState(null,'',window.location.pathname+'#'+name);window.scrollTo({top:0,behavior:'auto'})} tabs.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab))); jumps.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tabJump))); opens.forEach(b=>b.addEventListener('click',()=>openSettingsModal(b.dataset.modalOpen))); closes.forEach(b=>b.addEventListener('click',closeAllSettingsModals)); document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllSettingsModals()}); document.querySelectorAll('.st-select[data-setting-name]').forEach(select=>{ const key='printify_setting_'+select.dataset.settingName.toLowerCase().replace(/\s+/g,'_'); const saved=localStorage.getItem(key); if(saved){Array.from(select.options).forEach(o=>{if(o.value===saved||o.text===saved)select.value=o.value})} select.addEventListener('change',()=>{localStorage.setItem(key,select.value);persistSettingsValue('preferences',key,select.value,select.dataset.settingName)}); }); document.querySelectorAll('button,.st-select').forEach(el=>{
-el.addEventListener('click',()=>{el.classList.add('is-clicked','st-clickable-cover');setTimeout(()=>el.classList.remove('is-clicked','st-clickable-cover'),180)}) }); document.querySelectorAll('.st-pref-row').forEach(row=>{ row.addEventListener('click',e=>{if(e.target.tagName.toLowerCase()==='select')return;const s=row.querySelector('select');if(s){s.focus();row.classList.add('is-clicked');setTimeout(()=>row.classList.remove('is-clicked'),180)}}) }); const initialTab=(window.location.hash||'').replace('#','');if(initialTab&&document.getElementById('panel-'+initialTab))activateTab(initialTab,false); window.activateSettingsTab=activateTab; }); function openSettingsModal(id){const m=document.getElementById(id);if(!m)return;m.classList.add('active');document.body.style.overflow='hidden'} function closeAllSettingsModals(){document.querySelectorAll('.st-modal').forEach(m=>m.classList.remove('active'));document.body.style.overflow=''} function splitSettingsName(name){const parts=(name||'').trim().split(/\s+/).filter(Boolean);return{first_name:parts.shift()||'',last_name:parts.join(' ')}} function setProfileDisplays(data){const fallback='Not set';profileDisplayName.textContent=data.name||fallback;profileDisplayEmail.textContent=data.email||fallback;profileDisplayPhone.textContent=data.phone||fallback;profileDisplayBirth.textContent=data.birthdate||fallback;profileDisplayCompany.textContent=data.company||fallback} async function saveSettingsProfilePayload(payload){if(!settingsProfileRoute){showSettingsToast('Profile save route is unavailable.');return false}try{const response=await fetch(settingsProfileRoute,{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':settingsCsrf},body:JSON.stringify(payload)});if(!response.ok)throw new Error('Profile save failed');return true}catch(e){console.warn('Profile save failed.',e);showSettingsToast('Profile was not saved. Please check the details.');return false}} async function saveProfileModal(e){e.preventDefault();const n=profileNameInput.value.trim(),em=profileEmailInput.value.trim(),p=profilePhoneInput.value.trim(),b=profileBirthInput.value.trim(),c=profileCompanyInput.value.trim(),parts=splitSettingsName(n);const payload={name:n,first_name:parts.first_name,last_name:parts.last_name,email:em,phone:p,birthdate:b,company:c};if(!await saveSettingsProfilePayload(payload))return;setProfileDisplays(payload);const panelInputs=document.querySelectorAll('#panel-profile .st-input');if(panelInputs.length){panelInputs[0].value=n;panelInputs[1].value=em;panelInputs[2].value=p;panelInputs[3].value=c}updateOverviewAddress('Home Address',profilePrimaryAddressInput?.value||'');updateOverviewAddress('Work',profileWorkAddressInput?.value||'');window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:{name:n,initials:n? n.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase():''}}));closeAllSettingsModals();showSettingsToast('Profile and address details updated successfully.')}
+const settingsSaveRoute=@json(Route::has('settings.save') ? route('settings.save') : ''); const settingsConnectedAccountTitle=@json($settingsUser?->google_id ? 'Google connected' : 'No connected accounts'); const settingsConnectedAccountDesc=@json($settingsUser?->google_id ? ($settingsEmail ?: 'Google sign-in active') : 'Connected account details will appear after social sign-in is linked.'); const settingsProfileRoute=@json(Route::has('profile.update') ? route('profile.update') : ''); const settingsDisplayEmail=@json($settingsEmail ?: 'Not set'); const settingsDisplayPhone=@json($settingsPhone ?: 'Not set'); const settingsInitialTab=@json($settingsInitialTab); const settingsCsrf=document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || @json(csrf_token()); document.addEventListener('DOMContentLoaded',function(){ const tabs=document.querySelectorAll('.st-tab'),panels=document.querySelectorAll('.st-panel'),subItems=document.querySelectorAll('.st-subitem[data-sub-key]'),jumps=document.querySelectorAll('[data-tab-jump]'),opens=document.querySelectorAll('[data-modal-open]'),closes=document.querySelectorAll('[data-modal-close]'); function getSubKey(name){if(name==='notifications')return 'notification';if(name==='preferences')return 'preferences';if(name==='security'||name==='privacy')return 'security-privacy';return 'settings'} function activateTab(name,updateUrl=true){tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===name));panels.forEach(p=>p.classList.remove('active'));const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');const subKey=getSubKey(name);subItems.forEach(b=>b.classList.toggle('active',b.dataset.subKey===subKey));if(updateUrl)history.replaceState(null,'',window.location.pathname+'#'+name);window.scrollTo({top:0,behavior:'auto'})} tabs.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab))); jumps.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tabJump))); opens.forEach(b=>b.addEventListener('click',()=>openSettingsModal(b.dataset.modalOpen))); closes.forEach(b=>b.addEventListener('click',closeAllSettingsModals)); document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAllSettingsModals()}); document.querySelectorAll('.st-select[data-setting-name]').forEach(select=>{ const key='printify_setting_'+select.dataset.settingName.toLowerCase().replace(/\s+/g,'_'); const saved=localStorage.getItem(key); if(saved){Array.from(select.options).forEach(o=>{if(o.value===saved||o.text===saved)select.value=o.value})} select.addEventListener('change',()=>{localStorage.setItem(key,select.value);persistSettingsValue('preferences',key,select.value,select.dataset.settingName)}); }); document.querySelectorAll('button,.st-select').forEach(el=>{
+el.addEventListener('click',()=>{el.classList.add('is-clicked','st-clickable-cover');setTimeout(()=>el.classList.remove('is-clicked','st-clickable-cover'),180)}) }); document.querySelectorAll('.st-pref-row').forEach(row=>{ row.addEventListener('click',e=>{if(e.target.tagName.toLowerCase()==='select')return;const s=row.querySelector('select');if(s){s.focus();row.classList.add('is-clicked');setTimeout(()=>row.classList.remove('is-clicked'),180)}}) }); const initialTab=(window.location.hash||'').replace('#','') || settingsInitialTab;if(initialTab&&document.getElementById('panel-'+initialTab))activateTab(initialTab,false); window.activateSettingsTab=activateTab; }); function openSettingsModal(id){const m=document.getElementById(id);if(!m)return;m.classList.add('active');document.body.style.overflow='hidden'} function closeAllSettingsModals(){document.querySelectorAll('.st-modal').forEach(m=>m.classList.remove('active'));document.body.style.overflow=''} function splitSettingsName(name){const parts=(name||'').trim().split(/\s+/).filter(Boolean);return{first_name:parts.shift()||'',last_name:parts.join(' ')}} function setProfileDisplays(data){const fallback='Not set';profileDisplayName.textContent=data.name||fallback;profileDisplayEmail.textContent=data.email||fallback;profileDisplayPhone.textContent=data.phone||fallback;profileDisplayBirth.textContent=data.birthdate||fallback;profileDisplayCompany.textContent=data.company||fallback} async function saveSettingsProfilePayload(payload){if(!settingsProfileRoute){showSettingsToast('Profile save route is unavailable.');return false}try{const response=await fetch(settingsProfileRoute,{method:'PATCH',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':settingsCsrf},body:JSON.stringify(payload)});if(!response.ok)throw new Error('Profile save failed');return true}catch(e){console.warn('Profile save failed.',e);showSettingsToast('Profile was not saved. Please check the details.');return false}} async function saveProfileModal(e){e.preventDefault();const n=profileNameInput.value.trim(),em=profileEmailInput.value.trim(),p=profilePhoneInput.value.trim(),b=profileBirthInput.value.trim(),c=profileCompanyInput.value.trim(),parts=splitSettingsName(n);const payload={name:n,first_name:parts.first_name,last_name:parts.last_name,email:em,phone:p,birthdate:b,company:c};if(!await saveSettingsProfilePayload(payload))return;setProfileDisplays(payload);const panelInputs=document.querySelectorAll('#panel-profile .st-input');if(panelInputs.length){panelInputs[0].value=n;panelInputs[1].value=em;panelInputs[2].value=p;panelInputs[3].value=c}updateOverviewAddress('Home Address',profilePrimaryAddressInput?.value||'');updateOverviewAddress('Work',profileWorkAddressInput?.value||'');window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:{name:n,initials:n? n.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase():''}}));closeAllSettingsModals();showSettingsToast('Profile and address details updated successfully.')}
 async function saveProfilePanelSettings(){const inputs=document.querySelectorAll('#panel-profile .st-input');if(!inputs.length)return;const n=inputs[0].value.trim(),em=inputs[1].value.trim(),p=inputs[2].value.trim(),c=inputs[3].value.trim(),b=profileBirthInput.value.trim(),parts=splitSettingsName(n);const payload={name:n,first_name:parts.first_name,last_name:parts.last_name,email:em,phone:p,birthdate:b,company:c};if(!await saveSettingsProfilePayload(payload))return;profileNameInput.value=n;profileEmailInput.value=em;profilePhoneInput.value=p;profileCompanyInput.value=c;setProfileDisplays(payload);window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:{name:n,initials:n? n.split(/\s+/).map(part=>part[0]).join('').slice(0,2).toUpperCase():''}}));showSettingsToast('Profile settings saved.')} function saveGenericSettings(e,msg){e.preventDefault();closeAllSettingsModals();showSettingsToast(msg||'Settings saved successfully.')} async function persistSettingsValue(group,key,value,label){ localStorage.setItem('printify_setting_'+group+'_'+key,value); if(settingsSaveRoute){ try{ const response=await fetch(settingsSaveRoute,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':settingsCsrf},body:JSON.stringify({group,key,value})}); if(response.ok){showSettingsToast((label||'Setting')+' saved successfully.');return} }catch(e){console.warn('Settings backend sync skipped.',e)} } showSettingsToast((label||'Setting')+' saved locally.'); } function toggleSettingMessage(input,label){const key=label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');const value=input.checked?'enabled':'disabled';localStorage.setItem('printify_toggle_'+key,value);persistSettingsValue('toggles',key,value,label)} function copySettingsText(text){if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>showSettingsToast('Copied: '+text)).catch(()=>showSettingsToast('Copy failed.'))}else showSettingsToast('Copied: '+text)} function openPhotoPicker(){const input=document.getElementById('settingsPhotoInput');if(input)input.click()} document.addEventListener('change',function(e){if(e.target&&e.target.id==='settingsPhotoInput'&&e.target.files&&e.target.files[0]){const reader=new FileReader();reader.onload=function(ev){document.querySelectorAll('.st-avatar').forEach(img=>img.src=ev.target.result);window.dispatchEvent(new CustomEvent('printify-profile-updated',{detail:{photo:ev.target.result}}));showSettingsToast('Profile photo preview updated. Save from My Profile to keep it on every device.')};reader.readAsDataURL(e.target.files[0])}}); function openUtilityModal(title,desc,body){const t=document.getElementById('settingsUtilityTitle'),d=document.getElementById('settingsUtilityDesc'),b=document.getElementById('settingsUtilityBody');if(t)t.textContent=title;if(d)d.textContent=desc;if(b)b.innerHTML=body;openSettingsModal('settingsUtilityModal')} function openPaymentActions(label){openUtilityModal(label+' Actions','Manage this saved payment method.','<div class="st-list"><button type="button" class="st-btn" onclick="showSettingsToast(\''+label+' set as primary.\');closeAllSettingsModals()">Set as Primary</button><button type="button" class="st-btn" onclick="closeAllSettingsModals();openSettingsModal(\'paymentModal\')">Update Payment</button><button type="button" class="st-btn" onclick="showSettingsToast(\''+label+' removed.\');closeAllSettingsModals()">Remove Payment</button></div>')}
-function openSavedFilesPanel(){openUtilityModal('Saved Designs / Files','Access uploaded design files connected to your account.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Business Card Layout</p><p class="st-pay-sub">Ready for reorder · PDF</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Business Card Layout opened.\')">Open</button></div><div class="st-pay-item"><div><p class="st-pay-title">Sticker Draft</p><p class="st-pay-sub">Last updated recently · PNG</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Sticker Draft opened.\')">Open</button></div></div>')} function openConnectedAccountsPanel(){openUtilityModal('Connected Accounts','Link or review accounts connected to your Printify & Co. profile.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Google</p><p class="st-pay-sub">Connected for sign-in.</p></div><span class="st-mini">Connected</span></div></div>')} function openActivityLogPanel(){openUtilityModal('Account Activity','Recent account activity and security events.','<div class="st-list"><div class="st-activity-row"><div class="st-activity-left"><span class="st-ico"><i class="fa-regular fa-clock"></i></span><span class="st-act-label">Login</span></div><div class="st-act-val">May 29, 2026 8:15 AM</div></div><div class="st-activity-row"><div class="st-activity-left"><span class="st-ico"><i class="fa-solid fa-user-pen"></i></span><span class="st-act-label">Profile Viewed</span></div><div class="st-act-val">Today</div></div></div>')} function openSessionManagerPanel(){openUtilityModal('Active Sessions','Manage devices currently signed in to your account.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Chrome on Windows</p><p class="st-pay-sub">Makati City · Current device</p></div><span class="st-mini">Active</span></div><div class="st-pay-item"><div><p class="st-pay-title">Mobile Browser</p><p class="st-pay-sub">Last active recently</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Mobile browser session removed.\')">Remove</button></div></div>')} function openRecoveryPanel(){openUtilityModal('Recovery Options','Manage recovery email, phone, and backup access.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Recovery Email</p><p class="st-pay-sub">'+settingsDisplayEmail+'</p></div><span class="st-mini">Verified</span></div><div class="st-pay-item"><div><p class="st-pay-title">Recovery Phone</p><p class="st-pay-sub">'+settingsDisplayPhone+'</p></div><span class="st-mini">Verified</span></div><button type="button" class="st-btn" onclick="persistSettingsValue(\'security\',\'recovery_reviewed\',new Date().toISOString(),\'Recovery options\');closeAllSettingsModals()">Save Recovery Review</button></div>')}
-function openPasswordPanel(){openUtilityModal('Change Password','Update your password securely.','<form onsubmit="saveGenericSettings(event,\'Password updated successfully.\')"><div class="st-field"><label>Current Password</label><input class="st-input" type="password" required></div><div class="st-field" style="margin-top:12px"><label>New Password</label><input class="st-input" type="password" required></div><div class="st-actions"><button type="button" class="st-btn" onclick="closeAllSettingsModals()">Cancel</button><button type="submit" class="st-btn">Save Password</button></div></form>')} function openTrustedDevicesPanel(){openUtilityModal('Active Devices','Review devices with saved login access.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Windows Desktop</p><p class="st-pay-sub">Current device</p></div><span class="st-mini">Current</span></div><div class="st-pay-item"><div><p class="st-pay-title">Android Phone</p><p class="st-pay-sub">Saved device</p></div><button type="button" class="st-btn" onclick="showSettingsToast(\'Android Phone removed from saved devices.\')">Remove</button></div></div>')} function requestDataExport(){localStorage.setItem('printify_data_export_requested_at',new Date().toISOString());openUtilityModal('Data Export Requested','Your downloadable copy request has been recorded.','<div class="st-box" style="min-height:auto"><h3 class="st-box-title" style="margin-top:0">Request submitted</h3><p class="st-box-text">A copy of your account data will be prepared for download once available.</p></div><div class="st-actions"><button type="button" class="st-btn" onclick="closeAllSettingsModals()">Done</button></div>');showSettingsToast('Data download request submitted.')} function openDeactivatePanel(){openUtilityModal('Deactivate Account','Confirm before deactivating your account.','<div class="st-box" style="min-height:auto"><h3 class="st-box-title" style="margin-top:0;color:var(--st-danger)">Deactivate account?</h3><p class="st-box-text">This will hide your account access until it is restored by support.</p></div><div class="st-actions"><button type="button" class="st-btn" onclick="closeAllSettingsModals()">Cancel</button><button type="button" class="st-btn" onclick="showSettingsToast(\'Deactivate request prepared.\');closeAllSettingsModals()">Continue</button></div>')} function showSettingsToast(msg){const t=document.getElementById('settingsToast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.settingsToastTimeout);window.settingsToastTimeout=setTimeout(()=>t.classList.remove('show'),2200)} function getAddressBoxes(){return Array.from(document.querySelectorAll('#panel-overview .st-address-grid .st-box'))} function normalizeAddressText(text){return (text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).join('<br>')} function updateOverviewAddress(label,text){const boxes=getAddressBoxes();let box=boxes.find(b=>(b.querySelector('.st-box-title')?.textContent||'').trim()===label);if(!box&&boxes.length)box=boxes[0];if(!box)return;box.querySelector('.st-box-title').textContent=label;box.querySelector('.st-box-text').innerHTML=normalizeAddressText(text);localStorage.setItem('printify_address_'+label.toLowerCase().replace(/[^a-z0-9]+/g,'_'),text)} function openNewAddressModal(){addressModeInput.value='new';addressTargetInput.value='';addressLabelInput.value='';addressFullInput.value='';openSettingsModal('addressModal')}
+function openSavedFilesPanel(){openUtilityModal('Saved Designs / Files','Uploaded order files are managed from your orders.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">No saved file library yet</p><p class="st-pay-sub">Artwork and uploaded files remain connected to each order record.</p></div><button type="button" class="st-btn" onclick="window.location.href=\'{{ Route::has('myorders') ? route('myorders') : '#' }}\'">View Orders</button></div></div>')} function openConnectedAccountsPanel(){openUtilityModal('Connected Accounts','Review social sign-in connected to your profile.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">'+settingsConnectedAccountTitle+'</p><p class="st-pay-sub">'+settingsConnectedAccountDesc+'</p></div></div></div>')} function openActivityLogPanel(){openUtilityModal('Account Activity','Recent account activity from your customer record.','<div class="st-list"><div class="st-activity-row"><div class="st-activity-left"><span class="st-ico"><i class="fa-regular fa-clock"></i></span><span class="st-act-label">Account updated</span></div><div class="st-act-val">{{ optional($settingsUser?->updated_at)->format('M d, Y h:i A') ?: 'No update date available' }}</div></div><div class="st-activity-row"><div class="st-activity-left"><span class="st-ico"><i class="fa-solid fa-user-pen"></i></span><span class="st-act-label">Account created</span></div><div class="st-act-val">{{ optional($settingsUser?->created_at)->format('M d, Y h:i A') ?: 'No creation date available' }}</div></div></div>')} function openSessionManagerPanel(){openUtilityModal('Active Sessions','Current browser session information.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Current browser session</p><p class="st-pay-sub">{{ request()->ip() ?: 'Current request' }}</p></div><span class="st-mini">Active</span></div></div>')} function openRecoveryPanel(){openUtilityModal('Recovery Options','Manage recovery email, phone, and backup access.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Recovery Email</p><p class="st-pay-sub">'+settingsDisplayEmail+'</p></div><span class="st-mini">Verified</span></div><div class="st-pay-item"><div><p class="st-pay-title">Recovery Phone</p><p class="st-pay-sub">'+settingsDisplayPhone+'</p></div><span class="st-mini">Verified</span></div><button type="button" class="st-btn" onclick="persistSettingsValue(\'security\',\'recovery_reviewed\',new Date().toISOString(),\'Recovery options\');closeAllSettingsModals()">Save Recovery Review</button></div>')}
+function openPasswordPanel(){openUtilityModal('Change Password','Update your password securely.','<form onsubmit="saveGenericSettings(event,\'Password updated successfully.\')"><div class="st-field"><label>Current Password</label><input class="st-input" type="password" required></div><div class="st-field" style="margin-top:12px"><label>New Password</label><input class="st-input" type="password" required></div><div class="st-actions"><button type="button" class="st-btn" onclick="closeAllSettingsModals()">Cancel</button><button type="submit" class="st-btn">Save Password</button></div></form>')} function openTrustedDevicesPanel(){openUtilityModal('Active Devices','Review the current browser session for this account.','<div class="st-list"><div class="st-pay-item"><div><p class="st-pay-title">Current browser session</p><p class="st-pay-sub">{{ request()->ip() ?: 'Current request' }}</p></div><span class="st-mini">Active</span></div></div>')} function requestDataExport(){localStorage.setItem('printify_data_export_requested_at',new Date().toISOString());openUtilityModal('Data Export Requested','Your downloadable copy request has been recorded.','<div class="st-box" style="min-height:auto"><h3 class="st-box-title" style="margin-top:0">Request submitted</h3><p class="st-box-text">A copy of your account data will be prepared for download once available.</p></div><div class="st-actions"><button type="button" class="st-btn" onclick="closeAllSettingsModals()">Done</button></div>');showSettingsToast('Data download request submitted.')} function openDeactivatePanel(){openUtilityModal('Deactivate Account','Confirm before deactivating your account.','<div class="st-box" style="min-height:auto"><h3 class="st-box-title" style="margin-top:0;color:var(--st-danger)">Deactivate account?</h3><p class="st-box-text">This will hide your account access until it is restored by support.</p></div><div class="st-actions"><button type="button" class="st-btn" onclick="closeAllSettingsModals()">Cancel</button><button type="button" class="st-btn" onclick="showSettingsToast(\'Deactivate request prepared.\');closeAllSettingsModals()">Continue</button></div>')} function showSettingsToast(msg){const t=document.getElementById('settingsToast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.settingsToastTimeout);window.settingsToastTimeout=setTimeout(()=>t.classList.remove('show'),2200)} function getAddressBoxes(){return Array.from(document.querySelectorAll('#panel-overview .st-address-grid .st-box'))} function normalizeAddressText(text){return (text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).join('<br>')} function updateOverviewAddress(label,text){const boxes=getAddressBoxes();let box=boxes.find(b=>(b.querySelector('.st-box-title')?.textContent||'').trim()===label);if(!box&&boxes.length)box=boxes[0];if(!box)return;box.querySelector('.st-box-title').textContent=label;box.querySelector('.st-box-text').innerHTML=normalizeAddressText(text);localStorage.setItem('printify_address_'+label.toLowerCase().replace(/[^a-z0-9]+/g,'_'),text)} function openNewAddressModal(){addressModeInput.value='new';addressTargetInput.value='';addressLabelInput.value='';addressFullInput.value='';openSettingsModal('addressModal')}
 function fillAddressModal(label){const box=getAddressBoxes().find(b=>(b.querySelector('.st-box-title')?.textContent||'').trim()===label);addressModeInput.value='edit';addressTargetInput.value=label;addressLabelInput.value=label;addressFullInput.value=box?(box.querySelector('.st-box-text')?.innerText||''):'';openSettingsModal('addressModal')} function saveAddressModal(e){e.preventDefault();const label=addressLabelInput.value.trim()||'New Address',text=addressFullInput.value.trim();const old=addressTargetInput.value.trim();let box=getAddressBoxes().find(b=>(b.querySelector('.st-box-title')?.textContent||'').trim()===(old||label));if(!box){const grid=document.querySelector('#panel-overview .st-address-grid'),add=document.querySelector('#panel-overview .st-address-placeholder');box=document.createElement('div');box.className='st-box';box.innerHTML='<button class="st-kebab" type="button" aria-label="Address actions"><i class="fa-solid fa-ellipsis-vertical"></i></button><h3 class="st-box-title"></h3><p class="st-box-text"></p>';grid.insertBefore(box,add)}box.querySelector('.st-kebab').setAttribute('onclick',"openAddressActions('"+label.replace(/'/g,"\\'")+"')");box.querySelector('.st-box-title').textContent=label;box.querySelector('.st-box-text').innerHTML=normalizeAddressText(text);localStorage.setItem('printify_address_'+label.toLowerCase().replace(/[^a-z0-9]+/g,'_'),text);closeAllSettingsModals();showSettingsToast('Address saved and updated on the page.')} function openAddressActions(label){openUtilityModal(label+' Actions','Edit, set primary, or remove this saved address.','<div class="st-list"><button type="button" class="st-btn" onclick="closeAllSettingsModals();fillAddressModal(\''+label.replace(/'/g,"\\'")+'\')">Edit Address</button><button type="button" class="st-btn" onclick="setPrimaryAddress(\''+label.replace(/'/g,"\\'")+'\')">Set as Primary</button><button type="button" class="st-btn" onclick="removeOverviewAddress(\''+label.replace(/'/g,"\\'")+'\')">Remove Address</button></div>')} function setPrimaryAddress(label){document.querySelectorAll('#panel-overview .st-address-grid .st-mini.orange').forEach(e=>e.remove());const box=getAddressBoxes().find(b=>(b.querySelector('.st-box-title')?.textContent||'').trim()===label);if(box){box.insertAdjacentHTML('afterbegin','<span class="st-mini orange">Primary</span>')}closeAllSettingsModals();showSettingsToast(label+' set as primary address.')} function removeOverviewAddress(label){const box=getAddressBoxes().find(b=>(b.querySelector('.st-box-title')?.textContent||'').trim()===label);if(box)box.remove();closeAllSettingsModals();showSettingsToast(label+' removed from saved addresses.')} document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('#panel-overview .st-address-placeholder').forEach(b=>b.addEventListener('click',openNewAddressModal));}); 
 /* FINAL SAVE FLOW PATCH: save buttons show only after edits, and save buttons are green. */
 document.addEventListener('DOMContentLoaded', function(){
@@ -1084,7 +1129,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 <div class="st-info">
 <i class="fa-solid fa-location-dot">
-</i> Quezon City, Metro Manila</div>
+</i> {{ $settingsUser?->city ?: ($settingsUser?->region ?: 'Location not set') }}</div>
 <div class="st-info">Customer ID: <strong>{{ $settingsCustomerId }}</strong>
 <button class="st-copy" type="button" onclick="copySettingsText(@js($settingsCustomerId))">
 <i class="fa-regular fa-copy">
@@ -1198,8 +1243,8 @@ document.addEventListener('DOMContentLoaded', function(){
 </i>
 </span>
 <div>
-<p class="st-sec-title">Google</p>
-<p class="st-sec-sub">{{ $settingsEmail ?: 'Not set' }}</p>
+<p class="st-sec-title">{{ $settingsUser?->google_id ? 'Google connected' : 'No connected accounts' }}</p>
+<p class="st-sec-sub">{{ $settingsUser?->google_id ? ($settingsEmail ?: 'Google sign-in active') : 'Connected account details will appear after social sign-in is linked.' }}</p>
 </div>
 </div>
 </div>
@@ -1213,13 +1258,13 @@ document.addEventListener('DOMContentLoaded', function(){
 <div class="st-score-ring" style="width:112px;height:112px">
 <div class="st-score-inner" style="width:82px;height:82px">
 <div>
-<strong style="font-size:24px">92%</strong>
+<strong style="font-size:24px">{{ $settingsProfileCompletion }}%</strong>
 <br>
 <span>Complete</span>
 </div>
 </div>
 </div>
-<button class="st-btn" type="button" onclick="showSettingsToast('Profile suggestions opened.')">View Suggestions</button>
+<button class="st-btn" type="button" data-tab-jump="profile">Update Profile</button>
 </div>
 </div>
 <div class="st-card st-plain">
@@ -1260,8 +1305,8 @@ document.addEventListener('DOMContentLoaded', function(){
 </i>
 </span>
 <div>
-<p class="st-sec-title">Profile updated</p>
-<p class="st-sec-sub">Today</p>
+<p class="st-sec-title">Account updated</p>
+<p class="st-sec-sub">{{ optional($settingsUser?->updated_at)->diffForHumans() ?: 'No update date available' }}</p>
 </div>
 </div>
 </div>
@@ -1272,8 +1317,8 @@ document.addEventListener('DOMContentLoaded', function(){
 </i>
 </span>
 <div>
-<p class="st-sec-title">Design file uploaded</p>
-<p class="st-sec-sub">Recently</p>
+<p class="st-sec-title">Account created</p>
+<p class="st-sec-sub">{{ optional($settingsUser?->created_at)->diffForHumans() ?: 'No creation date available' }}</p>
 </div>
 </div>
 </div>
@@ -1325,11 +1370,11 @@ document.addEventListener('DOMContentLoaded', function(){
 <h3 class="st-modal-title" style="margin-bottom:10px">Address Book</h3>
 <div class="st-field">
 <label>Primary Address</label>
-<textarea id="profilePrimaryAddressInput" class="st-textarea" placeholder="Complete home address">123 Printify Avenue Makati City, Metro Manila 1200 Philippines +63 912 345 6789</textarea>
+<textarea id="profilePrimaryAddressInput" class="st-textarea" placeholder="Complete home address">{{ $settingsAddressLines->implode(' ') }}</textarea>
 </div>
 <div class="st-field" style="margin-top:12px">
 <label>Work Address</label>
-<textarea id="profileWorkAddressInput" class="st-textarea" placeholder="Complete work address">45 Timog Avenue Quezon City, Metro Manila 1103 Philippines +63 912 345 6789</textarea>
+<textarea id="profileWorkAddressInput" class="st-textarea" placeholder="Complete work address">{{ $settingsCompany ? $settingsCompany.' - '.$settingsEmail : '' }}</textarea>
 </div>
 <div class="st-actions">
 <button type="button" class="st-btn" data-modal-close>Cancel</button>
@@ -1518,19 +1563,19 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 <div class="st-table-lite">
 <div class="st-table-lite-row">
-<strong>Quezon City, Metro Manila, Philippines</strong>
+<strong>{{ request()->ip() ?: 'Current request' }}</strong>
 <span class="st-status-pill">Current</span>
-<span>Windows - Chrome<br>Jun 03, 2026 at 09:41 AM</span>
+<span>Current browser<br>{{ optional($settingsUser?->updated_at)->format('M d, Y h:i A') ?: 'No recent update' }}</span>
 </div>
 <div class="st-table-lite-row">
-<strong>Quezon City, Metro Manila, Philippines</strong>
-<span>iPhone - iOS</span>
-<span>Jun 02, 2026 at 10:12 PM</span>
+<strong>{{ $settingsUser?->email ?: 'Email not set' }}</strong>
+<span>Email account</span>
+<span>{{ $settingsUser?->email_verified_at ? 'Verified '.$settingsUser->email_verified_at->format('M d, Y') : 'Not verified yet' }}</span>
 </div>
 <div class="st-table-lite-row">
-<strong>Makati City, Metro Manila, Philippines</strong>
-<span>MacOS - Safari</span>
-<span>Jun 01, 2026 at 08:05 PM</span>
+<strong>{{ $settingsUser?->created_at ? 'Account created' : 'No account timestamp' }}</strong>
+<span>Profile record</span>
+<span>{{ optional($settingsUser?->created_at)->format('M d, Y h:i A') ?: 'Unavailable' }}</span>
 </div>
 </div>
 <button class="st-link" type="button" style="margin:12px auto 0;display:flex" onclick="openActivityLogPanel()">View All Activity</button>
@@ -1590,13 +1635,13 @@ document.addEventListener('DOMContentLoaded', function(){
 <div class="st-score-ring">
 <div class="st-score-inner">
 <div>
-<strong>92%</strong>
+<strong>{{ $settingsSecurityScore }}%</strong>
 <br>
-<span>Excellent</span>
+<span>Score</span>
 </div>
 </div>
 </div>
-<p class="st-card-desc" style="text-align:center">Great job! Your account security is strong.</p>
+<p class="st-card-desc" style="text-align:center">Based on password, verified email, and phone information currently saved.</p>
 <div style="margin-top:14px">
 <div class="st-check-line">
 <i class="fa-solid fa-circle-check">
@@ -1854,16 +1899,16 @@ document.addEventListener('DOMContentLoaded', function(){
 <div class="st-score-ring" style="width:112px;height:112px">
 <div class="st-score-inner" style="width:82px;height:82px">
 <div>
-<strong style="font-size:24px">92%</strong>
+<strong style="font-size:24px">{{ $settingsSavedNotificationCount }}</strong>
 <br>
-<span>All set</span>
+<span>Saved</span>
 </div>
 </div>
 </div>
 <div class="st-no-box-list">
 <div class="st-no-box-item">
 <span>Email Notifications</span>
-<span>24 enabled</span>
+<span>{{ $settingsSavedNotificationCount }} saved</span>
 </div>
 <div class="st-no-box-item">
 <span>SMS Notifications</span>
@@ -2033,54 +2078,54 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 <button class="st-btn" type="button" data-modal-open="addressModal">Edit Address</button>
 </div>
-<div class="st-address-grid">
 <div class="st-box">
 <span class="st-mini orange">Primary</span>
-<h3 class="st-box-title">Home Billing</h3>
-<p class="st-box-text">123 Printify Avenue<br>Makati City, Metro Manila 1200<br>Philippines<br>+63 912 345 6789</p>
+<h3 class="st-box-title">Profile Billing</h3>
+<p class="st-box-text">@if($settingsAddressLines->isNotEmpty()){!! $settingsAddressLines->map(fn ($line) => e($line))->implode('<br>') !!}@else Complete your profile address to use it for receipts and billing records. @endif</p>
 </div>
 <div class="st-box">
-<h3 class="st-box-title">Business Billing</h3>
-<p class="st-box-text">45 Timog Avenue<br>Quezon City, Metro Manila 1103<br>Philippines<br>{{ $settingsEmail ?: 'Email not set' }}</p>
+<h3 class="st-box-title">Billing Contact</h3>
+<p class="st-box-text">{{ $settingsEmail ?: 'Email not set' }}<br>{{ $settingsPhone ?: 'Phone not set' }}</p>
 </div>
-<button class="st-add-box" type="button" data-modal-open="addressModal">
+<button class="st-add-box" type="button" data-tab-jump="profile">
 <span class="st-add-circle">
-<i class="fa-solid fa-plus">
+<i class="fa-solid fa-user-pen">
 </i>
-</span>Add Billing Address</button>
+</span>Update Profile Address</button>
 </div>
 <div class="st-section-line">
 </div>
 <div class="st-head">
 <div>
-<h2 class="st-card-title">Preferred Payment</h2>
-<p class="st-card-desc">Cards and wallets used for checkout and automatic billing.</p>
+<h2 class="st-card-title">Payment Records</h2>
+<p class="st-card-desc">Completed checkout payments connected to your orders.</p>
 </div>
-<button class="st-btn" type="button" data-modal-open="paymentModal">Add Payment Method</button>
+<a class="st-btn" href="{{ Route::has('myorders') ? route('myorders') : '#' }}">View Orders</a>
 </div>
 <div class="st-list">
+@forelse($settingsPaymentRecords->take(3) as $payment)
 <div class="st-pay-item">
 <div class="st-pay-left">
-<div class="st-card-logo visa">
-<i class="fa-brands fa-cc-visa">
-</i>
-</div>
+<div class="st-card-logo"><i class="fa-solid fa-receipt"></i></div>
 <div class="st-pay-text">
-<p class="st-pay-title">Visa ending in 4242</p>
-<p class="st-pay-sub">Primary card · Expires 12/27</p>
+<p class="st-pay-title">{{ $settingsPaymentLabel($payment) ?: 'Checkout payment' }}</p>
+<p class="st-pay-sub">{{ collect([$payment->order?->order_reference, $payment->gateway_reference])->filter()->implode(' / ') ?: 'Payment record' }} - PHP {{ number_format((float) $payment->amount, 2) }}</p>
 </div>
 </div>
-<span class="st-mini orange">Primary</span>
+<span class="st-mini {{ $settingsPaymentStatusTone($payment->status) }}">{{ \Illuminate\Support\Str::headline((string) $payment->status) }}</span>
 </div>
+@empty
+<div class="st-pay-item"><div class="st-pay-text"><p class="st-pay-title">No payment records yet</p><p class="st-pay-sub">Saved payment methods are not yet available. Your completed payment records will appear after checkout.</p></div></div>
+@endforelse
 </div>
 <div class="st-section-line">
 </div>
 <div class="st-head">
 <div>
 <h2 class="st-card-title">Invoice & Billing</h2>
-<p class="st-card-desc">Manage invoices, receipts, and billing preferences.</p>
+<p class="st-card-desc">Review receipts and checkout payment records from your orders.</p>
 </div>
-<button class="st-btn" type="button" onclick="showSettingsToast('Invoice center opened.')">Open Invoices</button>
+<button class="st-btn" type="button" data-tab-jump="payments">View Records</button>
 </div>
 <div class="st-channel-row" style="grid-template-columns:minmax(0,1fr) 140px 110px 110px">
 <div class="st-comm-left">
@@ -2089,13 +2134,13 @@ document.addEventListener('DOMContentLoaded', function(){
 </i>
 </span>
 <div>
-<p class="st-sec-title">Monthly Invoice</p>
-<p class="st-sec-sub">Automatically send PDF invoice every month.</p>
+<p class="st-sec-title">Checkout Receipts</p>
+<p class="st-sec-sub">Receipt records are shown after completed checkout payments.</p>
 </div>
 </div>
-<span class="st-status-pill">Enabled</span>
-<button class="st-link" type="button" onclick="showSettingsToast('Invoice downloaded.')">Download</button>
-<button class="st-link" type="button" onclick="showSettingsToast('Invoice emailed.')">Email</button>
+<span class="st-status-pill gray">{{ $settingsPaymentRecords->count() }} Records</span>
+<a class="st-link" href="{{ Route::has('myorders') ? route('myorders') : '#' }}">Orders</a>
+<a class="st-link" href="{{ Route::has('help-center') ? route('help-center') : '#' }}">Support</a>
 </div>
 <div class="st-section-line">
 </div>
@@ -2104,23 +2149,22 @@ document.addEventListener('DOMContentLoaded', function(){
 <h2 class="st-card-title">Billing Activity</h2>
 <p class="st-card-desc">Latest payment and checkout activity.</p>
 </div>
-<button class="st-btn" type="button" onclick="showSettingsToast('Full billing history opened.')">View History</button>
+<button class="st-btn" type="button" data-tab-jump="payments">View History</button>
 </div>
 <div class="st-table-lite">
+@forelse($settingsPaymentRecords->take(5) as $payment)
 <div class="st-table-lite-row">
-<strong>Document Printing</strong>
-<span>Paid</span>
-<span>Jun 05, 2026<br>PHP 1,200.00</span>
+<strong>{{ collect([$payment->order?->order_reference, $payment->gateway_reference])->filter()->implode(' / ') ?: 'Payment record' }}</strong>
+<span>{{ \Illuminate\Support\Str::headline((string) $payment->status) }}</span>
+<span>{{ optional($payment->paid_at ?? $payment->created_at)->format('M d, Y') }}<br>PHP {{ number_format((float) $payment->amount, 2) }}</span>
 </div>
+@empty
 <div class="st-table-lite-row">
-<strong>Photo Services</strong>
-<span>Processing</span>
-<span>Jun 03, 2026<br>PHP 850.00</span>
+<strong>No billing activity yet</strong>
+<span>Empty</span>
+<span>Completed payment records will appear after checkout.</span>
 </div>
-<div class="st-table-lite-row">
-<strong>Large Format Printing</strong>
-<span>Paid</span>
-<span>May 30, 2026<br>PHP 2,100.00</span>
+@endforelse
 </div>
 </div>
 </div>
@@ -2136,8 +2180,8 @@ document.addEventListener('DOMContentLoaded', function(){
 </i>
 </span>
 <div>
-<p class="st-sec-title">3</p>
-<p class="st-sec-sub">Saved Methods</p>
+<p class="st-sec-title">{{ $settingsPaymentRecords->count() }}</p>
+<p class="st-sec-sub">Payment Records</p>
 </div>
 </div>
 <div class="st-stat-tile">
@@ -2146,8 +2190,8 @@ document.addEventListener('DOMContentLoaded', function(){
 </i>
 </span>
 <div>
-<p class="st-sec-title">2</p>
-<p class="st-sec-sub">Verified</p>
+<p class="st-sec-title">{{ $settingsPaidPaymentCount }}</p>
+<p class="st-sec-sub">Paid Records</p>
 </div>
 </div>
 </div>
@@ -2158,17 +2202,17 @@ document.addEventListener('DOMContentLoaded', function(){
 <h2 class="st-card-title">Secured Payment</h2>
 <div class="st-no-box-list">
 <div class="st-no-box-item">
-<span>Encrypted checkout</span>
+<span>Checkout is handled by the payment flow</span>
 <i class="fa-solid fa-circle-check" style="color:var(--st-green)">
 </i>
 </div>
 <div class="st-no-box-item">
-<span>Card data protected</span>
+<span>Card details are not stored in this customer portal</span>
 <i class="fa-solid fa-circle-check" style="color:var(--st-green)">
 </i>
 </div>
 <div class="st-no-box-item">
-<span>Fraud monitoring</span>
+<span>Payment status is recorded after checkout</span>
 <i class="fa-solid fa-circle-check" style="color:var(--st-green)">
 </i>
 </div>
@@ -2211,8 +2255,8 @@ document.addEventListener('DOMContentLoaded', function(){
 <div class="st-modal-card">
 <div class="st-modal-head">
 <div>
-<h3 class="st-modal-title">Add Payment Method</h3>
-<p class="st-modal-desc">Add a card or digital wallet.</p>
+<h3 class="st-modal-title">Payment Method Storage Not Available</h3>
+<p class="st-modal-desc">Saved payment methods are not yet available. Completed payment records appear after checkout.</p>
 </div>
 <button type="button" class="st-close" data-modal-close>×</button>
 </div>
@@ -2222,8 +2266,8 @@ document.addEventListener('DOMContentLoaded', function(){
 <input class="st-input" placeholder="{{ $settingsName ?: 'Cardholder name' }}">
 </div>
 <div class="st-field" style="margin-top:12px">
-<label>Card Number</label>
-<input class="st-input" placeholder="0000 0000 0000 0000">
+<label>Payment Reference</label>
+<input class="st-input" placeholder="Reference appears after checkout" disabled>
 </div>
 <div class="st-form-grid" style="margin-top:12px">
 <div class="st-field">
@@ -2237,7 +2281,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 <div class="st-actions">
 <button type="button" class="st-btn" data-modal-close>Cancel</button>
-<button type="submit" class="st-btn">Save Payment</button>
+<button type="button" class="st-btn" data-modal-close>Done</button>
 </div>
 </form>
 </div>
@@ -2403,8 +2447,8 @@ document.addEventListener('DOMContentLoaded', function(){
 <p class="st-sec-sub">Light mode is active.</p>
 </div>
 <select class="st-input" style="max-width:160px" onchange="persistSettingsValue('preferences','theme',this.value,'Theme')">
-<option>Light</option>
-<option>Dark</option>
+<option @selected($settingsTheme === 'Light')>Light</option>
+<option @selected($settingsTheme === 'Dark')>Dark</option>
 </select>
 </div>
 <div class="st-line-row">
@@ -3200,3 +3244,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </style>
 
 </x-app-layout>
+
+
+
+
