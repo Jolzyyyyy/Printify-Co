@@ -304,10 +304,14 @@ Route::middleware(['auth'])->prefix('p-co-2026/admin')->group(function () {
 Route::middleware(['auth', 'staff.portal', 'role:developer'])->prefix('p-co-2026/developer')->name('developer.')->group(function () {
     Route::get('/dashboard/export', [AdminDashboardController::class, 'export'])->name('dashboard.export');
     Route::get('/orders', [AdminSectionController::class, 'orders'])->name('orders.index');
+    Route::get('/payments', [AdminSectionController::class, 'payments'])->name('payments.index');
+    Route::get('/deliveries', [AdminSectionController::class, 'deliveries'])->name('deliveries.index');
     Route::get('/services', [AdminSectionController::class, 'services'])->name('services.index');
     Route::get('/customers', [AdminSectionController::class, 'customers'])->name('customers.index');
     Route::get('/reports', [AdminSectionController::class, 'reports'])->name('reports.index');
     Route::get('/analytics', [AdminSectionController::class, 'analytics'])->name('analytics.index');
+    Route::get('/audit-logs', [AdminSectionController::class, 'auditLogs'])->name('audit-logs.index');
+    Route::get('/security', [AdminSectionController::class, 'security'])->name('security.index');
     Route::get('/settings', [AdminSectionController::class, 'settings'])->name('settings.index');
     Route::get('/businesses/{business}', [DeveloperBusinessController::class, 'show'])->name('businesses.show');
     Route::get('/businesses/{business}/export', [DeveloperBusinessController::class, 'export'])->name('businesses.export');

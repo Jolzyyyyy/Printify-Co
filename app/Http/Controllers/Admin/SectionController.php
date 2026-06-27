@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\Delivery;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -60,6 +62,60 @@ class SectionController extends Controller
                 'note' => 'PHP ' . number_format((float) $order->total_price, 2) . ' / ' . optional($order->created_at)->format('M d, Y h:i A'),
             ]),
             'emptyMessage' => 'No order records are available yet.',
+        ]);
+    }
+
+    public function payments(Request $request): View
+    {
+        $user = $request->user();
+        $payments = Payment::query()
+            ->visibleToPortalUser($user)
+            ->with(['business', 'order', 'customer'])
+            ->when($request->query('status'), fn (Builder $query, string $status) => $query->where('status', $status))
+            ->latest()
+            ->limit(12)
+            ->get();
+
+        return view('Admin.sections.index', [
+            'title' => 'Payments',
+            'kicker' => $user->canViewAllPortalRecords() ? 'Platform Payment Records' : 'Business Payment Records',
+            'description' => $user->canViewAllPortalRecords()
+                ? 'Payment records across all businesses, including PayMongo and manual payment tracking.'
+                : 'Payment records scoped to this admin-client business.',
+            'cards' => $this->summaryCards($user),
+            'rows' => $payments->map(fn (Payment $payment) => [
+                'title' => ($payment->gateway_reference ?: $payment->order?->order_reference ?: 'Payment #' . $payment->id) . ' - ' . str($payment->status)->headline(),
+                'meta' => ($payment->business?->name ?: $payment->order?->adminClient?->name ?: 'Unassigned business') . ' / ' . ($payment->customer?->name ?: $payment->order?->customer_name ?: 'No customer'),
+                'note' => 'PHP ' . number_format((float) $payment->amount, 2) . ' / ' . str($payment->payment_method ?: 'unrecorded')->headline(),
+            ]),
+            'emptyMessage' => 'No payment records are available for this scope.',
+        ]);
+    }
+
+    public function deliveries(Request $request): View
+    {
+        $user = $request->user();
+        $deliveries = Delivery::query()
+            ->visibleToPortalUser($user)
+            ->with(['business', 'order', 'customer'])
+            ->when($request->query('status'), fn (Builder $query, string $status) => $query->where('status', $status))
+            ->latest()
+            ->limit(12)
+            ->get();
+
+        return view('Admin.sections.index', [
+            'title' => 'Deliveries',
+            'kicker' => $user->canViewAllPortalRecords() ? 'Platform Delivery Records' : 'Business Delivery Records',
+            'description' => $user->canViewAllPortalRecords()
+                ? 'Delivery and fulfillment records across all businesses.'
+                : 'Delivery and fulfillment records scoped to this admin-client business.',
+            'cards' => $this->summaryCards($user),
+            'rows' => $deliveries->map(fn (Delivery $delivery) => [
+                'title' => ($delivery->tracking_reference ?: $delivery->order?->order_reference ?: 'Delivery #' . $delivery->id) . ' - ' . str($delivery->status)->headline(),
+                'meta' => ($delivery->business?->name ?: $delivery->order?->adminClient?->name ?: 'Unassigned business') . ' / ' . ($delivery->customer?->name ?: $delivery->order?->customer_name ?: 'No customer'),
+                'note' => str($delivery->delivery_method ?: $delivery->courier ?: 'delivery')->headline() . ' / PHP ' . number_format((float) $delivery->delivery_fee, 2),
+            ]),
+            'emptyMessage' => 'No delivery records are available for this scope.',
         ]);
     }
 
@@ -129,6 +185,75 @@ class SectionController extends Controller
                     : 'Assigned order record',
             ]),
             'emptyMessage' => 'No report records are available yet.',
+        ]);
+    }
+
+    public function auditLogs(Request $request): View
+    {
+        $user = $request->user();
+        $logs = AuditLog::query()
+            ->with(['actor', 'targetUser', 'business'])
+            ->when(!$user->canViewAllPortalRecords(), function (Builder $query) use ($user) {
+                $query->where(function (Builder $scope) use ($user) {
+                    $scope->where('actor_id', $user->id)
+                        ->orWhere('target_user_id', $user->id)
+                        ->when($user->business_id, fn (Builder $tenant) => $tenant->orWhere('business_id', $user->business_id));
+                });
+            })
+            ->latest()
+            ->limit(12)
+            ->get();
+
+        return view('Admin.sections.index', [
+            'title' => 'Audit Logs',
+            'kicker' => 'Security And Accountability',
+            'description' => $user->canViewAllPortalRecords()
+                ? 'Platform-wide audit events for business, invitation, payment, delivery, and access actions.'
+                : 'Audit events visible to this admin-client workspace.',
+            'cards' => $this->summaryCards($user),
+            'rows' => $logs->map(fn (AuditLog $log) => [
+                'title' => str($log->action ?: 'activity')->headline(),
+                'meta' => ($log->business?->name ?: 'Platform') . ' / ' . ($log->actor?->email ?: 'System'),
+                'note' => optional($log->created_at)->format('M d, Y h:i A') . ($log->targetUser ? ' / Target: ' . $log->targetUser->email : ''),
+            ]),
+            'emptyMessage' => 'No audit logs are available for this scope.',
+        ]);
+    }
+
+    public function security(Request $request): View
+    {
+        $user = $request->user();
+        $adminClients = User::query()->where('role', User::ROLE_ADMIN_CLIENT);
+        $rows = collect([
+            [
+                'title' => 'Developer-only routes',
+                'meta' => $user->isDeveloper() ? 'Developer access verified' : 'Restricted',
+                'note' => 'Developer pages are protected by staff portal and developer role middleware.',
+            ],
+            [
+                'title' => 'Approved admin clients',
+                'meta' => (clone $adminClients)->whereNotNull('approved_at')->count() . ' accounts',
+                'note' => 'Approved business operators with staff portal access.',
+            ],
+            [
+                'title' => 'Pending invitations',
+                'meta' => (clone $adminClients)->whereNull('invitation_accepted_at')->whereNull('invite_cancelled_at')->whereNotNull('invite_token')->count() . ' accounts',
+                'note' => 'Admin-client onboarding invitations awaiting acceptance.',
+            ],
+            [
+                'title' => 'Suspended or blocked admin clients',
+                'meta' => (clone $adminClients)->whereNull('approved_at')->whereNotNull('invitation_accepted_at')->count() . ' accounts',
+                'note' => 'Accepted admin-client accounts without active approval.',
+            ],
+        ]);
+
+        return view('Admin.sections.index', [
+            'title' => 'Security',
+            'kicker' => 'Access Control',
+            'description' => 'Role access, invitation status, and admin-client approval monitoring.',
+            'cards' => $this->summaryCards($user),
+            'rows' => $rows,
+            'emptyMessage' => 'No security records are available for this scope.',
         ]);
     }
 
@@ -214,6 +339,11 @@ class SectionController extends Controller
     {
         return User::query()
             ->where('role', User::ROLE_CUSTOMER)
-            ->when(!$user->canViewAllPortalRecords(), fn (Builder $query) => $query->where('admin_client_id', $user->id));
+            ->when(!$user->canViewAllPortalRecords(), function (Builder $query) use ($user) {
+                $query->where(function (Builder $scope) use ($user) {
+                    $scope->where('admin_client_id', $user->id)
+                        ->when($user->business_id, fn (Builder $tenant) => $tenant->orWhere('business_id', $user->business_id));
+                });
+            });
     }
 }

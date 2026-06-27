@@ -301,10 +301,14 @@ class DashboardController extends Controller
                 ['title' => 'Dashboard', 'meta' => 'Developer overview and platform activity', 'url' => route('admin.dashboard')],
                 ['title' => 'Manage Admin Clients', 'meta' => 'Approve, assign, and review admin clients', 'url' => route('developer.admin-clients.index')],
                 ['title' => 'Orders', 'meta' => 'Developer order monitoring', 'url' => route('developer.orders.index')],
+                ['title' => 'Payments', 'meta' => 'Platform-wide payment records and issues', 'url' => route('developer.payments.index')],
+                ['title' => 'Deliveries', 'meta' => 'Platform-wide delivery records and fulfillment status', 'url' => route('developer.deliveries.index')],
                 ['title' => 'Services', 'meta' => 'Manage service catalog and availability', 'url' => route('developer.services.index')],
                 ['title' => 'Customers', 'meta' => 'Review customer records and activity', 'url' => route('developer.customers.index')],
                 ['title' => 'Analytics', 'meta' => 'Developer analytics and platform insights', 'url' => route('developer.analytics.index')],
                 ['title' => 'Reports', 'meta' => 'Operational and performance reports', 'url' => route('developer.reports.index')],
+                ['title' => 'Audit Logs', 'meta' => 'Recorded platform accountability events', 'url' => route('developer.audit-logs.index')],
+                ['title' => 'Security', 'meta' => 'Role access, blocked accounts, and portal controls', 'url' => route('developer.security.index')],
                 ['title' => 'Settings', 'meta' => 'Developer preferences and system controls', 'url' => route('developer.settings.index')],
             ];
         }

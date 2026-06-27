@@ -1029,11 +1029,11 @@
                         <i data-lucide="users"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Customers</span>
                     </a>
-                    <a href="{{ route('developer.orders.index') }}" class="sidebar-link">
+                    <a href="{{ route('developer.payments.index') }}" class="sidebar-link">
                         <i data-lucide="wallet-cards"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Payments</span>
                     </a>
-                    <a href="{{ route('developer.orders.index') }}" class="sidebar-link">
+                    <a href="{{ route('developer.deliveries.index') }}" class="sidebar-link">
                         <i data-lucide="truck"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Deliveries</span>
                     </a>
@@ -1050,9 +1050,13 @@
                         <i data-lucide="bar-chart-3"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Analytics</span>
                     </a>
-                    <a href="{{ route('developer.reports.index') }}" class="sidebar-link">
+                    <a href="{{ route('developer.audit-logs.index') }}" class="sidebar-link">
                         <i data-lucide="scroll-text"></i>
                         <span class="nav-text" x-show="sidebarOpen" x-transition>Audit Logs</span>
+                    </a>
+                    <a href="{{ route('developer.security.index') }}" class="sidebar-link">
+                        <i data-lucide="shield-alert"></i>
+                        <span class="nav-text" x-show="sidebarOpen" x-transition>Security</span>
                     </a>
                     <a href="{{ route('developer.settings.index') }}" class="sidebar-link">
                         <i data-lucide="settings"></i>

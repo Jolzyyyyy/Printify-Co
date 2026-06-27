@@ -7,6 +7,7 @@ use App\Models\Business;
 use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Service;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
@@ -149,11 +150,27 @@ class DeveloperDashboardMetricsService
                 ['label' => 'Total Orders', 'value' => $totalOrders, 'icon' => 'shopping-cart', 'tone' => 'blue', 'url' => route('developer.orders.index')],
                 ['label' => 'Completed Orders', 'value' => $completedOrders, 'icon' => 'circle-check', 'tone' => 'green', 'url' => route('developer.orders.index')],
                 ['label' => 'Cancelled Orders', 'value' => $cancelledOrders, 'icon' => 'circle-x', 'tone' => 'red', 'url' => route('developer.orders.index')],
-                ['label' => 'Active Deliveries', 'value' => $activeDeliveries, 'icon' => 'truck', 'tone' => 'blue', 'url' => route('developer.orders.index')],
+                ['label' => 'Active Deliveries', 'value' => $activeDeliveries, 'icon' => 'truck', 'tone' => 'blue', 'url' => route('developer.deliveries.index')],
                 ['label' => 'Total Sales', 'value' => 'PHP ' . number_format($totalSales, 2), 'icon' => 'receipt-text', 'tone' => 'blue', 'url' => route('developer.reports.index')],
                 ['label' => 'Total Revenue', 'value' => 'PHP ' . number_format($totalRevenue, 2), 'icon' => 'circle-dollar-sign', 'tone' => 'green', 'url' => route('developer.reports.index')],
-                ['label' => 'Pending Payments', 'value' => $pendingPayments, 'icon' => 'wallet-cards', 'tone' => 'orange', 'url' => route('developer.orders.index')],
-                ['label' => 'Failed Payments', 'value' => $failedPayments, 'icon' => 'badge-alert', 'tone' => 'red', 'url' => route('developer.orders.index')],
+                ['label' => 'Pending Payments', 'value' => $pendingPayments, 'icon' => 'wallet-cards', 'tone' => 'orange', 'url' => route('developer.payments.index', ['status' => Payment::STATUS_PENDING])],
+                ['label' => 'Failed Payments', 'value' => $failedPayments, 'icon' => 'badge-alert', 'tone' => 'red', 'url' => route('developer.payments.index', ['status' => Payment::STATUS_FAILED])],
+            ],
+            'operationsCards' => [
+                ['label' => 'Platform Orders', 'value' => $totalOrders, 'note' => 'All tenant order records', 'icon' => 'shopping-cart', 'tone' => 'blue', 'url' => route('developer.orders.index')],
+                ['label' => 'Payment Attention', 'value' => $pendingPayments + $failedPayments, 'note' => $failedPayments . ' failed or discrepancy records', 'icon' => 'wallet-cards', 'tone' => $failedPayments > 0 ? 'red' : 'orange', 'url' => route('developer.payments.index')],
+                ['label' => 'Active Deliveries', 'value' => $activeDeliveries, 'note' => $failedDeliveries . ' failed delivery records', 'icon' => 'truck', 'tone' => $failedDeliveries > 0 ? 'red' : 'blue', 'url' => route('developer.deliveries.index')],
+                ['label' => 'Platform Customers', 'value' => User::where('role', User::ROLE_CUSTOMER)->count(), 'note' => 'Customer accounts across businesses', 'icon' => 'users-round', 'tone' => 'green', 'url' => route('developer.customers.index')],
+                ['label' => 'Service Readiness', 'value' => Service::where('is_active', true)->count(), 'note' => Service::where('is_active', false)->count() . ' inactive service records', 'icon' => 'package-check', 'tone' => 'slate', 'url' => route('developer.services.index')],
+                ['label' => 'Problem Records', 'value' => $cancelledOrders + $failedPayments + $failedDeliveries, 'note' => 'Cancelled, failed payment, and failed delivery records', 'icon' => 'triangle-alert', 'tone' => ($cancelledOrders + $failedPayments + $failedDeliveries) > 0 ? 'red' : 'green', 'url' => route('developer.reports.index')],
+            ],
+            'reportsSecurityCards' => [
+                ['label' => 'Reports', 'value' => $businessRows->count(), 'note' => 'Business rows available for export', 'icon' => 'file-text', 'tone' => 'blue', 'url' => route('developer.reports.index')],
+                ['label' => 'Analytics', 'value' => $statusCounts->sum(), 'note' => 'Order status records in selected range', 'icon' => 'bar-chart-3', 'tone' => 'green', 'url' => route('developer.analytics.index')],
+                ['label' => 'Audit Logs', 'value' => AuditLog::count(), 'note' => 'Recorded platform audit events', 'icon' => 'scroll-text', 'tone' => 'slate', 'url' => route('developer.audit-logs.index')],
+                ['label' => 'Invitations', 'value' => $adminClients->whereNull('invitation_accepted_at')->whereNull('invite_cancelled_at')->whereNotNull('invite_token')->count(), 'note' => 'Pending admin-client onboarding', 'icon' => 'mail-clock', 'tone' => 'orange', 'url' => route('developer.invitations.index')],
+                ['label' => 'Security', 'value' => $adminClients->whereNull('approved_at')->whereNotNull('invitation_accepted_at')->count(), 'note' => 'Suspended or blocked admin-client access', 'icon' => 'shield-alert', 'tone' => 'red', 'url' => route('developer.security.index')],
+                ['label' => 'Exports', 'value' => $businessRows->count(), 'note' => 'CSV, PDF, and Excel dashboard evidence', 'icon' => 'download', 'tone' => 'blue', 'url' => route('developer.dashboard.export', ['format' => 'csv'])],
             ],
             'businessRows' => $businessRows,
             'statusCounts' => $statusCounts,
@@ -283,9 +300,9 @@ class DeveloperDashboardMetricsService
                 : route('developer.admin-clients.show', $adminClient),
             'orders_url' => route('developer.orders.index', ['business_id' => $adminClient->id]),
             'customers_url' => route('developer.customers.index', ['business_id' => $adminClient->id]),
-            'payments_url' => route('developer.orders.index', ['business_id' => $adminClient->id, 'payment' => 'issues']),
-            'deliveries_url' => route('developer.orders.index', ['business_id' => $adminClient->id, 'delivery' => 'all']),
-            'logs_url' => route('developer.reports.index', ['business_id' => $adminClient->id, 'type' => 'audit']),
+            'payments_url' => route('developer.payments.index', ['business_id' => $business?->id ?: $adminClient->id]),
+            'deliveries_url' => route('developer.deliveries.index', ['business_id' => $business?->id ?: $adminClient->id]),
+            'logs_url' => route('developer.audit-logs.index', ['business_id' => $business?->id ?: $adminClient->id]),
             'business_activate_url' => $business ? route('developer.businesses.activate', $business) : null,
             'business_inactive_url' => $business ? route('developer.businesses.inactive', $business) : null,
             'business_suspend_url' => $business ? route('developer.businesses.suspend', $business) : null,
