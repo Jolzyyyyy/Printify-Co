@@ -21,6 +21,20 @@
 <link rel="preload" as="image" href="{{ asset('images/Homesld1.jpg') }}" fetchpriority="high">
 <link rel="preload" as="image" href="{{ asset('images/Homesld2.jpg') }}">
 <link rel="preload" as="image" href="{{ asset('images/Homesld3.jpg') }}">
+<link rel="preload" as="image" href="{{ asset('images/TXTONLY (B&W).png') }}" type="image/png" fetchpriority="high">
+<link rel="preload" as="image" href="{{ asset('images/TXTWI (B&W).png') }}" type="image/png" fetchpriority="high">
+<link rel="preload" as="image" href="{{ asset('images/IO (B&W).png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/PHOTOC (B&W).png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/PCKG A-E.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/PSSPRT.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/VISA.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/LMNTN.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/SPRL BNDNG.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/SNTRBRD.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/TRPLN.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/CSTM LYT.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/MRKTNG CLLTRL.png') }}" type="image/png">
+<link rel="preload" as="image" href="{{ asset('images/STCKR CT.png') }}" type="image/png">
 <style>
 @font-face {
   font-family:'Boxing';
@@ -1128,10 +1142,14 @@ function normalizeSectionId(sectionId){
   const normalized=normalizeSectionId(sectionId);
   if(!normalized||['payment','confirmation'].includes(normalized))return;
   const nextPath=sectionPath(normalized);
-  if(window.location.pathname===nextPath&&!window.location.hash)return;
   const nextUrl=new URL(window.location.href);
   nextUrl.pathname=nextPath;
   nextUrl.hash='';
+  if(normalized!=='service-details'){
+    nextUrl.searchParams.delete('service');
+    try{sessionStorage.removeItem('selectedPrintifyService')}catch(e){}
+  }
+  if(window.location.pathname===nextPath&&!window.location.hash&&nextUrl.search===window.location.search)return;
   (replaceUrl?window.history.replaceState:window.history.pushState).call(window.history,{
     sectionId:normalized
   },'',nextUrl);
@@ -1143,7 +1161,10 @@ function normalizeSectionId(sectionId){
   if(checkout)checkout.classList.toggle('active',normalized==='checkout');
   if(detail)detail.classList.toggle('pdv-is-open',normalized==='service-details');
   if(normalized!=='checkout'&&checkout)checkout.classList.remove('active');
-  if(normalized!=='service-details'&&detail)detail.classList.remove('pdv-is-open');
+  if(normalized!=='service-details'&&detail){
+    detail.classList.remove('pdv-is-open');
+    try{sessionStorage.removeItem('selectedPrintifyService')}catch(e){}
+  }
 } function jumpTo(sectionId,options={
 }){
   const normalized=normalizeSectionId(sectionId);
@@ -1428,6 +1449,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(initialRouteSection!=='service-details'){
     document.body.classList.remove('service-detail-open');
     document.getElementById('serviceDetail')?.classList.remove('pdv-is-open');
+    try{
+      const cleanUrl=new URL(window.location.href);
+      if(cleanUrl.searchParams.has('service')){
+        cleanUrl.searchParams.delete('service');
+        window.history.replaceState(window.history.state||{sectionId:initialRouteSection},'',cleanUrl);
+      }
+      sessionStorage.removeItem('selectedPrintifyService');
+    }catch(e){}
   }
   if(initialRouteSection!=='checkout'){
     document.body.classList.remove('checkout-open');

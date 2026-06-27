@@ -3797,6 +3797,7 @@ body:has(.customer-dashboard-v2) .p-6{
         min-height:305px!important;
     }
 }
+
 </style>
 
 @php
@@ -3831,10 +3832,12 @@ body:has(.customer-dashboard-v2) .p-6{
     };
 
     $totalOrdersCount = $orders->count();
-    $totalSpentAmount = $orders->sum(fn($o) => $money($o->total_amount ?? $o->total ?? 0));
-    $paymentSettledOrders = $orders->filter(fn($o) => in_array(strtolower($o->payment_status ?? ''), ['paid','settled','completed'], true));
+    $orderAmount = fn($o) => $money($o->total_price ?? $o->total_amount ?? $o->total ?? $o->amount ?? 0);
+    $paymentKey = fn($o) => strtolower($o->payment_status ?? $o->status ?? '');
+    $totalSpentAmount = $orders->sum(fn($o) => $orderAmount($o));
+    $paymentSettledOrders = $orders->filter(fn($o) => in_array($paymentKey($o), ['paid','settled','completed'], true));
     $paymentSettledCount = $paymentSettledOrders->count();
-    $paymentSettledAmount = $paymentSettledOrders->sum(fn($o) => $money($o->total_amount ?? $o->total ?? 0));
+    $paymentSettledAmount = $paymentSettledOrders->sum(fn($o) => $orderAmount($o));
     $wishlistCount = $wishlistItems->count();
     $latestOrder = $latestOrder ?? $activeOrders->first() ?? $orders->first();
 
@@ -3848,6 +3851,7 @@ body:has(.customer-dashboard-v2) .p-6{
         'shipped'=>['label'=>'In Transit','class'=>'status-shipped'],
         'out_for_delivery'=>['label'=>'In Transit','class'=>'status-shipped'],
         'completed'=>['label'=>'Delivered','class'=>'status-delivered'],
+        'paid'=>['label'=>'Paid','class'=>'status-delivered'],
         'delivered'=>['label'=>'Delivered','class'=>'status-delivered'],
         'cancelled'=>['label'=>'Cancelled','class'=>'status-cancelled'],
         'canceled'=>['label'=>'Cancelled','class'=>'status-cancelled'],
@@ -3856,13 +3860,13 @@ body:has(.customer-dashboard-v2) .p-6{
         'partially_refunded'=>['label'=>'Refunded','class'=>'status-refunded'],
     ];
 
-    $ordersUrl = Route::has('customer.orders.index') ? route('customer.orders.index') : '#recentOrdersCard';
-    $readyOrdersUrl = Route::has('customer.orders.index') ? route('customer.orders.index', ['status'=>'shipped']) : '#recentOrdersCard';
-    $paymentsUrl = Route::has('customer.payments.index') ? route('customer.payments.index') : '#recentOrdersCard';
+    $ordersUrl = Route::has('myorders') ? route('myorders', ['status'=>'all']) : '#recentOrdersCard';
+    $readyOrdersUrl = Route::has('myorders') ? route('myorders', ['status'=>'shipped']) : '#recentOrdersCard';
+    $paymentsUrl = Route::has('myorders') ? route('myorders') : '#recentOrdersCard';
     $settledPaymentsUrl = Route::has('customer.payments.index') ? route('customer.payments.index', ['status'=>'paid']) : $paymentsUrl;
-    $newOrderUrl = Route::has('customer.orders.create') ? route('customer.orders.create') : $ordersUrl;
+    $newOrderUrl = Route::has('services.index') ? route('services.index') : $ordersUrl;
     $uploadUrl = Route::has('customer.files.create') ? route('customer.files.create') : (Route::has('customer.orders.create') ? route('customer.orders.create', ['upload'=>1]) : $ordersUrl);
-    $wishlistUrl = Route::has('customer.wishlist.index') ? route('customer.wishlist.index') : '#';
+    $wishlistUrl = Route::has('customer.wishlist.index') ? route('customer.wishlist.index') : (Route::has('services.index') ? route('services.index') : '#');
     $supportUrl = Route::has('customer.support.index') ? route('customer.support.index') : '#';
     $supportCreateUrl = Route::has('customer.support.create') ? route('customer.support.create') : $supportUrl;
     $profileUrl = Route::has('profile.edit') ? route('profile.edit') : '#';
@@ -3871,10 +3875,10 @@ body:has(.customer-dashboard-v2) .p-6{
     $quoteUrl = Route::has('customer.support.create') ? route('customer.support.create', ['topic'=>'quote']) : $supportCreateUrl;
 
     $statusChartData = collect([
-        ['key'=>'pending','label'=>'Pending','count'=>$orders->filter(fn($o)=>strtolower($o->status ?? '')==='pending')->count(),'color'=>'var(--dash-yellow)'],
+        ['key'=>'pending','label'=>'Pending','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['pending','pending_payment','pending-payment','unpaid'], true))->count(),'color'=>'var(--dash-yellow)'],
         ['key'=>'processing','label'=>'Processing','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['approved','processing','in_production'], true))->count(),'color'=>'var(--dash-orange)'],
         ['key'=>'shipped','label'=>'Shipped','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['ready','ready_for_pickup','shipped','out_for_delivery'], true))->count(),'color'=>'var(--dash-blue)'],
-        ['key'=>'delivered','label'=>'Delivered','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['completed','delivered'], true))->count(),'color'=>'var(--dash-green)'],
+        ['key'=>'delivered','label'=>'Delivered','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['completed','delivered','paid'], true))->count(),'color'=>'var(--dash-green)'],
         ['key'=>'cancelled','label'=>'Cancelled','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->count(),'color'=>'var(--dash-red)'],
         ['key'=>'refunded','label'=>'Refunded','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->count(),'color'=>'var(--dash-purple)'],
     ]);
@@ -3884,15 +3888,15 @@ body:has(.customer-dashboard-v2) .p-6{
 
     $paymentChartData = collect([
         ['key'=>'paid','label'=>'Paid','count'=>$paymentSettledCount,'amount'=>$paymentSettledAmount,'color'=>'var(--dash-green)'],
-        ['key'=>'pending','label'=>'Pending','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['pending','unpaid'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['pending','unpaid'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-yellow)'],
-        ['key'=>'failed','label'=>'Failed','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['failed','declined'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['failed','declined'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-red)'],
-        ['key'=>'cancelled','label'=>'Cancelled','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['cancelled','canceled'], true) || in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['cancelled','canceled'], true) || in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-purple)'],
-        ['key'=>'refunded','label'=>'Refunded','count'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['refunded','refund','partially_refunded'], true) || in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array(strtolower($o->payment_status ?? ''), ['refunded','refund','partially_refunded'], true) || in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),'color'=>'var(--dash-blue)'],
+        ['key'=>'pending','label'=>'Pending','count'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['pending','pending_payment','pending-payment','unpaid'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['pending','pending_payment','pending-payment','unpaid'], true))->sum(fn($o)=>$orderAmount($o)),'color'=>'var(--dash-yellow)'],
+        ['key'=>'failed','label'=>'Failed','count'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['failed','declined'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['failed','declined'], true))->sum(fn($o)=>$orderAmount($o)),'color'=>'var(--dash-red)'],
+        ['key'=>'cancelled','label'=>'Cancelled','count'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['cancelled','canceled'], true) || in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['cancelled','canceled'], true) || in_array(strtolower($o->status ?? ''), ['cancelled','canceled'], true))->sum(fn($o)=>$orderAmount($o)),'color'=>'var(--dash-purple)'],
+        ['key'=>'refunded','label'=>'Refunded','count'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['refunded','refund','partially_refunded'], true) || in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->count(),'amount'=>$orders->filter(fn($o)=>in_array($paymentKey($o), ['refunded','refund','partially_refunded'], true) || in_array(strtolower($o->status ?? ''), ['refunded','refund','partially_refunded'], true))->sum(fn($o)=>$orderAmount($o)),'color'=>'var(--dash-blue)'],
     ]);
     $paymentMax = max(1, (float) $paymentChartData->max('amount'));
 
     $monthKeys = collect(range(5,0))->map(fn($i)=>now()->subMonths($i)->format('Y-m'));
-    $revenueChartData = $monthKeys->map(function($month) use ($orders, $money) {
+    $revenueChartData = $monthKeys->map(function($month) use ($orders, $orderAmount) {
         $monthOrders = $orders->filter(function($o) use ($month) {
             if (! ($o->created_at ?? null)) return false;
             try { return \Carbon\Carbon::parse($o->created_at)->format('Y-m') === $month; }
@@ -3902,7 +3906,7 @@ body:has(.customer-dashboard-v2) .p-6{
             'key'=>$month,
             'label'=>\Carbon\Carbon::createFromFormat('Y-m', $month)->format('M'),
             'count'=>$monthOrders->count(),
-            'amount'=>$monthOrders->sum(fn($o)=>$money($o->total_amount ?? $o->total ?? 0)),
+            'amount'=>$monthOrders->sum(fn($o)=>$orderAmount($o)),
         ];
     });
     $revenueMax = max(1, (float) $revenueChartData->max('amount'));
@@ -3946,8 +3950,43 @@ body:has(.customer-dashboard-v2) .p-6{
     $currentStepIndex = array_search($normalizedStatus, $stepKeys, true);
     $currentStepIndex = $currentStepIndex === false ? 0 : $currentStepIndex;
     $progressPercent = count($stepKeys) > 1 ? (($currentStepIndex) / (count($stepKeys) - 1)) * 100 : 0;
-    $latestOrderUrl = $latestOrder && Route::has('customer.orders.show') ? route('customer.orders.show', $latestOrder->id) : $ordersUrl;
-    $latestOrderImage = $latestOrder->thumbnail_url ?? $latestOrder->image_url ?? $latestOrder->product_image ?? $latestOrder->photo_url ?? null;
+    $latestOrderItem = $latestOrder ? ($latestOrder->items?->first()) : null;
+    $latestOrderName = $latestOrderItem?->service?->name
+        ?? $latestOrderItem?->service_name
+        ?? $latestOrderItem?->product_name
+        ?? $latestOrder->product_name
+        ?? $latestOrder->project_name
+        ?? 'Print Job';
+    $latestOrderAmount = $latestOrder ? $orderAmount($latestOrder) : 0;
+    $latestOrderUrl = $latestOrder && Route::has('myorders.show') ? route('myorders.show', $latestOrder->id) : $ordersUrl;
+    $imageUrl = function ($path) {
+        $path = trim((string) ($path ?? ''));
+        if ($path === '') return null;
+        if (preg_match('/^(https?:)?\/\//i', $path) || str_starts_with($path, 'data:image/')) return $path;
+        $path = ltrim($path, '/');
+        if (str_starts_with($path, 'storage/') || str_starts_with($path, 'images/')) {
+            return file_exists(public_path($path)) ? asset($path) : null;
+        }
+        $storagePath = 'storage/'.$path;
+        return file_exists(public_path($storagePath)) ? asset($storagePath) : null;
+    };
+    $latestImagePath = $latestOrderItem?->serviceVariation?->variation_image_path
+        ?? $latestOrderItem?->image_path
+        ?? $latestOrderItem?->service?->image_path
+        ?? $latestOrder?->thumbnail_url
+        ?? $latestOrder?->image_url
+        ?? $latestOrder?->product_image
+        ?? $latestOrder?->photo_url
+        ?? null;
+    $latestFallbackImage = match (true) {
+        str_contains(strtolower($latestOrderName), 'document') => $imageUrl('images/Document PS.png'),
+        str_contains(strtolower($latestOrderName), 'photo'), str_contains(strtolower($latestOrderName), 'id') => $imageUrl('images/Photo ID (cover).png'),
+        str_contains(strtolower($latestOrderName), 'scan'), str_contains(strtolower($latestOrderName), 'copy') => $imageUrl('images/Photocopy & ScanningS.png'),
+        str_contains(strtolower($latestOrderName), 'lamination'), str_contains(strtolower($latestOrderName), 'binding') => $imageUrl('images/Lamination & BindingS.PNG'),
+        str_contains(strtolower($latestOrderName), 'large'), str_contains(strtolower($latestOrderName), 'tarpaulin') => $imageUrl('images/Large FormatPS.png'),
+        default => $imageUrl('images/Document PS.png'),
+    };
+    $latestOrderImage = $imageUrl($latestImagePath) ?? $latestFallbackImage;
 @endphp
 
 <div class="dashboard-loader" id="dashboardLoader" aria-hidden="true">
@@ -4123,7 +4162,7 @@ body:has(.customer-dashboard-v2) .p-6{
                                 <h3 class="card-title">My Payments</h3>
                                 <p class="card-subtitle">Overview of your paid, pending, failed, cancelled, and refunded payments.</p>
                             </div>
-                            <button type="button" class="select-chip js-filter-trigger" data-filter-type="payment" data-filter-value="paid">This Month</button>
+                            <button type="button" class="select-chip js-filter-trigger" data-filter-type="month" data-filter-value="{{ now()->format('Y-m') }}">This Month</button>
                         </div>
                         <div class="payment-list">
                             @foreach($paymentChartData as $payment)
@@ -4144,7 +4183,7 @@ body:has(.customer-dashboard-v2) .p-6{
                                 <h3 class="card-title">Monthly Spending</h3>
                                 <p class="card-subtitle">Your spending movement by month.</p>
                             </div>
-                            <button type="button" class="select-chip js-filter-trigger" data-filter-type="month" data-filter-value="{{ now()->format('Y-m') }}">This Year</button>
+                            <button type="button" class="select-chip js-filter-trigger" data-filter-type="year" data-filter-value="{{ now()->format('Y') }}">This Year</button>
                         </div>
                         <div class="revenue-chart">
                             <div class="revenue-axis">@foreach($spendingAxisLabels as $axisLabel)<span>{{ $axisLabel }}</span>@endforeach</div>
@@ -4196,18 +4235,17 @@ body:has(.customer-dashboard-v2) .p-6{
                         </div>
                         @if($latestOrder)
                             <div class="latest-body">
-                                <a href="{{ $latestOrderUrl }}" class="latest-thumb" aria-label="Open latest order">
+                                <a href="{{ $latestOrderUrl }}" class="latest-thumb {{ $latestOrderImage ? '' : 'latest-thumb-empty' }}" aria-label="Open latest order">
                                     @if($latestOrderImage)
-                                        <img src="{{ $latestOrderImage }}" alt="{{ $latestOrder->product_name ?? $latestOrder->project_name ?? 'Latest order' }}">
+                                        <img src="{{ $latestOrderImage }}" alt="{{ $latestOrderName }}">
                                     @else
                                         <i data-lucide="image" size="32"></i>
                                     @endif
                                 </a>
                                 <div class="latest-info">
                                     <div class="latest-title">Order #{{ $latestOrder->order_number ?? $latestOrder->id }}</div>
-                                    <div class="latest-meta">{{ $latestOrder->product_name ?? $latestOrder->project_name ?? 'Print Job' }}<br>{{ $getDate($latestOrder->created_at ?? null) ?? 'Date unavailable' }} · ₱{{ number_format($money($latestOrder->total_amount ?? $latestOrder->total ?? 0),2) }}</div>
-                                    <div class="tracking-line" style="--progress-width:{{ number_format($progressPercent,4,'.','') }}%"></div>
-                                    <div class="timeline-grid">
+                                    <div class="latest-meta">{{ $latestOrderName }}<br>{{ $getDate($latestOrder->created_at ?? null) ?? 'Date unavailable' }} · ₱{{ number_format($latestOrderAmount,2) }}</div>
+                                    <div class="timeline-grid" style="--progress-ratio:{{ number_format($progressPercent / 100,4,'.','') }}">
                                         @foreach($trackingSteps as $key => $step)
                                             @php
                                                 $stepIndex = array_search($key, $stepKeys, true);
@@ -4268,23 +4306,24 @@ body:has(.customer-dashboard-v2) .p-6{
                                             $filterStatusKey = match($orderStatusKey) {
                                                 'approved','processing','in_production'=>'processing',
                                                 'ready','ready_for_pickup','shipped','out_for_delivery'=>'shipped',
-                                                'completed','delivered'=>'delivered',
+                                                'completed','delivered','paid'=>'delivered',
                                                 'cancelled','canceled'=>'cancelled',
                                                 'refunded','refund','partially_refunded'=>'refunded',
                                                 default=>$orderStatusKey,
                                             };
-                                            $paymentStatusKey = strtolower($order->payment_status ?? 'pending');
+                                            $paymentStatusKey = $paymentKey($order);
                                             $orderStatus = $statusMap[$orderStatusKey] ?? ['label'=>ucfirst(str_replace('_',' ', $orderStatusKey)),'class'=>'status-pending'];
                                             $orderShowUrl = Route::has('customer.orders.show') ? route('customer.orders.show', $order->id) : $ordersUrl;
                                             $orderMonth = $getDate($order->created_at ?? null, 'Y-m') ?? '';
+                                            $orderYear = $getDate($order->created_at ?? null, 'Y') ?? '';
                                             $orderDate = $getDate($order->created_at ?? null) ?? 'No date';
                                         @endphp
-                                        <tr class="js-order-row" data-status="{{ $filterStatusKey }}" data-payment="{{ $paymentStatusKey }}" data-month="{{ $orderMonth }}">
+                                        <tr class="js-order-row" data-status="{{ $filterStatusKey }}" data-payment="{{ $paymentStatusKey }}" data-month="{{ $orderMonth }}" data-year="{{ $orderYear }}">
                                             <td class="order-id">#{{ $order->order_number ?? $order->id }}</td>
                                             <td>{{ $orderDate }}</td>
                                             <td><span class="status-pill {{ $orderStatus['class'] }}">{{ $orderStatus['label'] }}</span></td>
                                             <td class="product-name">{{ $order->product_name ?? $order->project_name ?? 'Print Job' }}</td>
-                                            <td class="amount-cell">₱{{ number_format($money($order->total_amount ?? $order->total ?? 0),2) }}</td>
+                                            <td class="amount-cell">₱{{ number_format($orderAmount($order),2) }}</td>
                                             <td style="text-align:center"><a href="{{ $orderShowUrl }}" class="view-button">View</a></td>
                                         </tr>
                                     @empty
@@ -4600,7 +4639,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const labels = {
         status:{pending:'Pending orders',processing:'Processing orders',shipped:'Shipped / transit orders',delivered:'Delivered orders',cancelled:'Cancelled orders',refunded:'Refunded orders'},
         payment:{paid:'Paid payments',pending:'Pending payments',failed:'Failed payments',cancelled:'Cancelled payments',refunded:'Refunded payments'},
-        month:{}
+        month:{},
+        year:{}
     };
 
     let activeType = '';
@@ -4625,10 +4665,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const status = clean(row.dataset.status);
             const payment = clean(row.dataset.payment);
             const month = clean(row.dataset.month);
+            const year = clean(row.dataset.year);
             const showStatus = activeType !== 'status' || statusList.includes(status) || status === activeValue;
             const showPayment = activeType !== 'payment' || paymentList.includes(payment) || payment === activeValue;
             const showMonth = activeType !== 'month' || month === activeValue;
-            const shouldShow = showStatus && showPayment && showMonth;
+            const showYear = activeType !== 'year' || year === activeValue;
+            const shouldShow = showStatus && showPayment && showMonth && showYear;
             row.classList.toggle('is-hidden', !shouldShow);
             if (shouldShow) visible++;
         });
@@ -4638,6 +4680,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (filterLabel) {
             if (!activeType) filterLabel.textContent = 'Showing all recent orders.';
             else if (activeType === 'month') filterLabel.textContent = 'Filtered by selected spending month.';
+            else if (activeType === 'year') filterLabel.textContent = `Filtered by ${activeValue || 'selected'} orders.`;
             else filterLabel.textContent = labels[activeType]?.[activeValue] || 'Filtered recent orders.';
         }
         setActiveButtons();

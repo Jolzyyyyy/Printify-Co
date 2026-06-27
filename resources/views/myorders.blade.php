@@ -958,6 +958,8 @@
 
 <script>
 const orderData=@json($orderPayload);
+const initialOrderStatus=@json($selectedStatus ?? 'all');
+const initialOrderSearch=@json($searchTerm ?? '');
 function orderToast(msg){const t=document.getElementById('orderToast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.orderToastTimer);window.orderToastTimer=setTimeout(()=>t.classList.remove('show'),2200)}
 function peso(value){return '₱'+Number(value||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
 function escapeAttr(value){return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -1065,6 +1067,16 @@ function bindOrdersCalendarButtonsFinal(){
     if(clearBtn){clearBtn.onclick=function(e){e.preventDefault();clearOrdersCalendarForm();};}
 }
 bindOrdersCalendarButtonsFinal();
+function applyInitialOrderFilters(){
+    const allowedStatuses=['all','pending','production','shipped','delivered','cancelled'];
+    const status=allowedStatuses.includes(String(initialOrderStatus||'').toLowerCase()) ? String(initialOrderStatus).toLowerCase() : 'all';
+    const statusFilter=document.getElementById('statusFilter');
+    const orderSearch=document.getElementById('orderSearch');
+    if(statusFilter) statusFilter.value=status;
+    if(orderSearch && initialOrderSearch) orderSearch.value=initialOrderSearch;
+    if(orderData.length){filterOrders(true)}else{updateSectionHeader(status,0);clearSelectedOrder(status)}
+}
+applyInitialOrderFilters();
 
 </script>
 </x-app-layout>

@@ -1966,6 +1966,18 @@ const csvProductExtras={"photocopy-image-only":{"categoryKey":"photo","categoryT
 const csvVariantExtras={"photocopy-image-only":[{"serviceItemId":"PCS-COPY-IM-A4-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-IM-A4-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-IM-A4-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":8,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-A4-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-A4-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-A4-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-A4-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-A4-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-A4-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-LGL-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-COPY-IM-SHT-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-IM-SHT-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Image Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":5,"bulkPrice":3.5}],"photocopy-text-only":[{"serviceItemId":"PCS-COPY-TX-A4-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-A4-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TX-LGL-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-LGL-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-COPY-TX-SHT-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-COPY-TX-SHT-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":4,"bulkPrice":2.5}],"photocopy-text-image":[{"serviceItemId":"PCS-COPY-TWI-A4-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-A4-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-A4-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-A4-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-COPY-TWI-A4-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-COPY-TWI-A4-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-COPY-TWI-A4-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Sorted Set","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-COPY-TWI-A4-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Stapled Set","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-COPY-TWI-A4-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Walk-in Copy","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-COPY-TWI-LGL-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Sorted Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Stapled Set","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-LGL-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Walk-in Copy","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-COPY-TWI-SHT-BW-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-BW-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-BW-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-FC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-FC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-FC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-PC-SRT","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Sorted Set","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-PC-STP","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Stapled Set","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-COPY-TWI-SHT-PC-WIC","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Photocopy / Text with Image","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Walk-in Copy","packageType":"","retailPrice":4,"bulkPrice":3.5}],"scanning-image-only":[{"serviceItemId":"PCS-SCAN-IM-A4-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-IM-A4-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-IM-A4-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":8,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-A4-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-A4-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-A4-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-A4-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-A4-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-A4-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-LGL-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":10,"bulkPrice":8},{"serviceItemId":"PCS-SCAN-IM-SHT-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-IM-SHT-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Image Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":5,"bulkPrice":3.5}],"scanning-text-only":[{"serviceItemId":"PCS-SCAN-TX-A4-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-A4-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TX-LGL-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-LGL-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":6,"bulkPrice":4.5},{"serviceItemId":"PCS-SCAN-TX-SHT-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":4,"bulkPrice":2.5},{"serviceItemId":"PCS-SCAN-TX-SHT-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text Only","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":4,"bulkPrice":2.5}],"scanning-text-image":[{"serviceItemId":"PCS-SCAN-TWI-A4-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-A4-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-A4-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":5,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-A4-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-SCAN-TWI-A4-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-SCAN-TWI-A4-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-SCAN-TWI-A4-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Archive-ready File","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-SCAN-TWI-A4-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Multi-page Scan","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-SCAN-TWI-A4-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"A4 (8.27 x 11.69)","finishType":"Standard Scan","packageType":"","retailPrice":7,"bulkPrice":5.5},{"serviceItemId":"PCS-SCAN-TWI-LGL-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Archive-ready File","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Multi-page Scan","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-LGL-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"Legal (8.5 x 14)","finishType":"Standard Scan","packageType":"","retailPrice":8,"bulkPrice":6},{"serviceItemId":"PCS-SCAN-TWI-SHT-BW-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-BW-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-BW-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"B\u0026W","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-FC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-FC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-FC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Full Color","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-PC-ARF","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Archive-ready File","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-PC-MPS","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Multi-page Scan","packageType":"","retailPrice":4,"bulkPrice":3.5},{"serviceItemId":"PCS-SCAN-TWI-SHT-PC-STD","service":"Photocopy \u0026 Scanning","category":"Printing","printingCategory":"Scanning / Text with Image","colorMode":"Partial Color","productSize":"Short (8.5 x 11)","finishType":"Standard Scan","packageType":"","retailPrice":4,"bulkPrice":3.5}]};
 Object.assign(products,csvProductExtras);
 Object.assign(serviceVariants,csvVariantExtras);
+delete serviceVariants.scanning;
+serviceVariants.__catalogReference=[
+  {serviceItemId:"CHK-PREVIEW-A4",service:"Checkout Preview Printing",category:"Documents",printingCategory:"Document Printing",colorMode:"Black and White",productSize:"A4",finishType:"",packageType:"",retailPrice:25,bulkPrice:20},
+  {serviceItemId:"DOC-BW-A4",service:"Document Printing",category:"Printing",printingCategory:"Document",colorMode:"Black and White",productSize:"A4",finishType:"",packageType:"",retailPrice:0,bulkPrice:0},
+  {serviceItemId:"DOC-FC-A4",service:"Document Printing",category:"Printing",printingCategory:"Document",colorMode:"Full Color",productSize:"A4",finishType:"",packageType:"",retailPrice:0,bulkPrice:0},
+  {serviceItemId:"PHOTO-ID-1X1",service:"ID & Photo Services",category:"Photo",printingCategory:"Photo",colorMode:"Full Color",productSize:"1x1 ID Photo",finishType:"",packageType:"Set of 6",retailPrice:60,bulkPrice:60},
+  {serviceItemId:"LAM-A4-GLOSS",service:"Lamination & Binding",category:"Finishing",printingCategory:"Finishing",colorMode:"",productSize:"A4",finishType:"Gloss Lamination",packageType:"",retailPrice:0,bulkPrice:0}
+];
+Object.values(serviceVariants).forEach(rows=>{(rows||[]).forEach(row=>{if(row.service==="Photo & ID Services")row.service="ID & Photo Services"})});
+Object.assign(products["id-photo"],{previewImage:"PCKG A-E.png",categoryTitle:"ID & Photo Services"});
+Object.assign(products["passport-visa"],{previewImage:"PSSPRT.png",categoryTitle:"ID & Photo Services",serviceName:"Passport",title:"Passport Photo",summaryTitle:"Passport Photo",serviceId:"IDP-PV-PASS-BW-BCC"});
+Object.assign(products["single-photo-print"],{previewImage:"SP 2R-8R.png",categoryTitle:"ID & Photo Services"});
 Object.assign(products["id-photo"],{previewImage:"PCKG A-E.png",categoryTitle:"Photo & ID Services"});
 Object.assign(products["passport-visa"],{previewImage:"PSSPRT.png",categoryTitle:"Photo & ID Services"});
 Object.assign(products["single-photo-print"],{previewImage:"SP 2R-8R.png",categoryTitle:"Photo & ID Services"});
@@ -2096,9 +2108,9 @@ function selectOptions(p){
   setSelectOptions(el.svc,uniqueOptions(rows,"finishType",fallbackFinish));
 }
 
-function imgPaths(p){let list=[p.previewImage,...(p.previewImageCandidates||[]),p.title+".png",p.serviceName+".png",key(p.title)+".png"].filter(Boolean),folders=["","./","images/","images/services/","assets/images/","uploads/services/"];return[...new Set(list.flatMap(f=>folders.map(x=>x+f).concat(folders.map(x=>(x+f).split("/").map(encodeURIComponent).join("/")))))]}
+function imageUrl(src){let value=String(src||"").trim();if(!value)return"";if(/^https?:\/\//i.test(value)||value.startsWith("/")||value.startsWith("data:"))return value;if(/^images\//i.test(value))return"/"+value.replace(/^\/+/,"");return"/images/"+value.split("/").map(encodeURIComponent).join("/")}
 
-function setImg(img,p,fail){let ck=p.serviceId+p.previewImage;if(cache[ck]){img.src=cache[ck];return}let direct=String(p.previewImage||"");if(/^images\//i.test(direct)||/^\/images\//i.test(direct)||/^https?:\/\//i.test(direct)){cache[ck]=direct;img.src=direct;img.onerror=()=>{cache[ck]="";fail&&fail()};return}let arr=imgPaths(p),i=0,probe=new Image();probe.onload=()=>{cache[ck]=arr[i-1];img.src=cache[ck]};probe.onerror=()=>{i<arr.length?probe.src=arr[i++]:fail&&fail()};probe.src=arr[i++]}
+function setImg(img,p,fail){if(!img)return;img.loading="eager";img.decoding="sync";try{img.fetchPriority="high"}catch(e){}let ck=(p.serviceId||p.title||"")+p.previewImage;if(cache[ck]){img.src=cache[ck];return}let src=imageUrl(p.previewImage);if(!src){fail&&fail();return}img.onerror=()=>{cache[ck]="";img.onerror=null;fail&&fail()};img.onload=()=>{cache[ck]=src;img.onerror=null};img.src=src}
 
 
 /* UPDATED IMAGE MAP: requested service images only; unlisted services stay blank. */
@@ -2117,7 +2129,12 @@ const requestedImageMap={
 
   /* LARGE FORMAT PRINTING */
   "tarpaulin":{BW:"TRPLN.png",FC:"TRPLN.png",PC:"TRPLN.png"},
-  "sintra-board":{BW:"SNTRBRD.png",FC:"SNTRBRD.png",PC:"SNTRBRD.png"}
+  "sintra-board":{BW:"SNTRBRD.png",FC:"SNTRBRD.png",PC:"SNTRBRD.png"},
+
+  /* CUSTOM SPECIAL PRINTING */
+  "custom-layout":{BW:"CSTM LYT.png",FC:"CSTM LYT.png",PC:"CSTM LYT.png"},
+  "marketing-collateral":{BW:"MRKTNG CLLTRL.png",FC:"MRKTNG CLLTRL.png",PC:"MRKTNG CLLTRL.png"},
+  "sticker-cut":{BW:"STCKR CT.png",FC:"STCKR CT.png",PC:"STCKR CT.png"}
 };
 function normMedia(v){return String(v||"").toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]+/g,"").trim()}
 function colorCode(v){let n=normMedia(v);if(n.includes("fullcolor")||n==="fc")return "FC";if(n.includes("partialcolor")||n==="pc")return "PC";return "BW"}
@@ -2132,12 +2149,15 @@ function mediaFileFor(serviceKey,opts={}){
 function withMedia(p,serviceKey=state.productKey,opts={}){return Object.assign({},p||{}, {previewImage:mediaFileFor(serviceKey,opts), previewImageCandidates:[]})}
 function blankPreview(){el.preview.className="pdv-document-preview is-real-image-preview pdv-blank-preview";el.preview.innerHTML=""}
 function blankSummary(){el.sumThumb.classList.remove("is-real-summary");el.sumThumb.classList.add("pdv-blank-summary");el.sumThumb.innerHTML=""}
+function passportVisaRouteSlug(){
+  return state.productKey==="passport-visa"&&normMedia(txt(el.paper)).includes("visa")?"visa":"passport";
+}
 function refreshThumbImages(){
   d.querySelectorAll("#pdvThumbStack .pdv-thumb").forEach(btn=>{
-    let serviceKey=btn.dataset.option,pr=withMedia(products[serviceKey],serviceKey,{color:txt(el.color),paper:""}),wrap=btn.querySelector(".pdv-thumb-paper");
+    let serviceKey=btn.dataset.option,active=serviceKey===state.productKey,pr=withMedia(products[serviceKey],serviceKey,{color:txt(el.color),paper:active?txt(el.paper):""}),wrap=btn.querySelector(".pdv-thumb-paper");
     if(!wrap)return;
     if(pr.previewImage){
-      btn.classList.add("has-real-thumb");wrap.classList.add("is-real-thumb");wrap.innerHTML=`<img class="pdv-thumb-real-img" alt="${esc(btn.textContent.trim())}">`;
+      btn.classList.add("has-real-thumb");wrap.classList.add("is-real-thumb");wrap.innerHTML=`<img class="pdv-thumb-real-img" alt="${esc(btn.textContent.trim())}" loading="eager" decoding="sync" fetchpriority="high">`;
       setImg(wrap.querySelector("img"),pr,()=>{btn.classList.remove("has-real-thumb");wrap.classList.remove("is-real-thumb");wrap.innerHTML=""});
     }else{
       btn.classList.remove("has-real-thumb");wrap.classList.remove("is-real-thumb");wrap.innerHTML="";
@@ -2145,6 +2165,7 @@ function refreshThumbImages(){
   });
 }
 function refreshMedia(){
+  syncPassportVisaDetailCopy();
   let mp=withMedia(state.product,state.productKey);
   preview(mp);
   summaryThumb(mp);
@@ -2152,13 +2173,56 @@ function refreshMedia(){
   try{document.title="Printify & Co. - "+(state.product?.title||"Service Details")}catch(e){}
 }
 
-function thumbs(p){let map={doc:[["text-only","TEXT ONLY","pdv-thumb-text"],["text-image","TEXT WITH IMAGE","pdv-thumb-image"],["image-only","IMAGE ONLY","pdv-thumb-grid"]],photo:[["photocopy","PHOTOCOPY","pdv-thumb-text"],["photocopy-text-only","COPY TEXT","pdv-thumb-text"],["photocopy-text-image","COPY TEXT+IMAGE","pdv-thumb-image"],["photocopy-image-only","COPY IMAGE","pdv-thumb-grid"],["scanning","SCAN TEXT","pdv-thumb-text"],["scanning-text-image","SCAN TEXT+IMAGE","pdv-thumb-image"],["scanning-image-only","SCAN IMAGE","pdv-thumb-grid"]],id:[["id-photo","ID PHOTO","pdv-thumb-grid"],["passport-visa","PASSPORT/VISA","pdv-thumb-image"],["single-photo-print","PHOTO PRINT","pdv-thumb-grid"]],bind:[["lamination","LAMINATION","pdv-thumb-text"],["spiral-binding","SPIRAL BINDING","pdv-thumb-image"]],largeformat:[["sintra-board","SINTRA BOARD","pdv-thumb-grid"],["tarpaulin","TARPAULIN","pdv-thumb-image"]],special:[["custom-layout","CUSTOM LAYOUT","pdv-thumb-grid"],["marketing-collateral","MARKETING","pdv-thumb-grid"],["sticker-cut","STICKER CUT","pdv-thumb-grid"]]}[p.categoryKey]||[];$("#pdvThumbStack").innerHTML=map.map(x=>{let pr=withMedia(products[x[0]],x[0],{color:txt(el.color),paper:""}),real=pr?.previewImage;return`<button type="button" class="pdv-thumb ${real?"has-real-thumb":""} ${state.productKey===x[0]?"is-active":""}" data-option="${x[0]}"><span class="pdv-thumb-paper ${x[2]} ${real?"is-real-thumb":""}">${real?`<img class="pdv-thumb-real-img" alt="${esc(x[1])}">`:""}</span><strong>${x[1]}</strong></button>`}).join("");d.querySelectorAll("#pdvThumbStack .pdv-thumb").forEach(btn=>{let pr=withMedia(products[btn.dataset.option],btn.dataset.option,{color:txt(el.color),paper:""}),img=btn.querySelector("img"),wrap=btn.querySelector("span");if(img)setImg(img,pr,()=>{btn.classList.remove("has-real-thumb");wrap.classList.remove("is-real-thumb");wrap.innerHTML=""})})}
+function passportVisaModeFromPayload(payload){
+  let text="";
+  if(payload&&typeof payload==="object"){
+    let requested=payload.requestedService||payload.requested_service||payload.selectedService||payload.selected_service||"";
+    let requestedClean=normMedia(requested);
+    if(requestedClean==="visa"||(requestedClean.includes("visa")&&!requestedClean.includes("passportvisa")&&!requestedClean.includes("passportandvisa")))return "Visa";
+    if(requestedClean==="passport"||requestedClean.includes("passport")||requestedClean.includes("pass"))return "Passport";
+    text=Object.keys(payload).map(k=>payload[k]).join(" ");
+  }else{
+    text=String(payload||"");
+  }
+  let clean=normMedia(text);
+  if(clean.includes("visa")&&!clean.includes("passportvisa")&&!clean.includes("passportandvisa"))return "Visa";
+  if(clean.includes("passport")||clean.includes("pass"))return "Passport";
+  return "";
+}
+function setPassportVisaPaper(mode){
+  if(state.productKey!=="passport-visa"||!mode||!el.paper?.options)return;
+  let target=Array.from(el.paper.options).find(option=>normMedia(option.text).includes(mode.toLowerCase()));
+  if(target)el.paper.value=target.value;
+}
+function syncPassportVisaDetailCopy(){
+  if(state.productKey!=="passport-visa")return;
+  let isVisa=normMedia(txt(el.paper)).includes("visa"),label=isVisa?"Visa":"Passport",title=label+" Photo";
+  Object.assign(state.product,{
+    serviceName:label,
+    title,
+    summaryTitle:title,
+    serviceId:isVisa?"IDP-PV-VISA-BW-BCC":"IDP-PV-PASS-BW-BCC",
+    previewImage:isVisa?"VISA.png":"PSSPRT.png"
+  });
+  if(el.crumbService)el.crumbService.textContent=label;
+  if(el.title)el.title.textContent=title;
+  if(el.subtitle)el.subtitle.textContent=`Professional ${label.toLowerCase()} photo preparation with clean, ready-to-submit output.`;
+  if(el.sumTitle)el.sumTitle.textContent=title;
+  try{if(/\/service-details?\/?$/i.test(location.pathname))history.replaceState(history.state||{},"","/service-details?service="+encodeURIComponent(passportVisaRouteSlug()))}catch(e){}
+}
+function applyPassportVisaRequestedMode(k,payload){
+  if(state.productKey!=="passport-visa")return;
+  setPassportVisaPaper(passportVisaModeFromPayload(payload)||passportVisaModeFromPayload(k)||"Passport");
+  syncPassportVisaDetailCopy();
+}
 
-function preview(p){p=withMedia(p,state.productKey);el.preview.className="pdv-document-preview";if(p.previewImage){el.preview.className="pdv-document-preview is-real-image-preview";el.preview.innerHTML=`<img class="pdv-real-preview-img" alt="${esc(p.title)} preview">`;setImg(el.preview.querySelector("img"),p,()=>{el.preview.className="pdv-document-preview";el.preview.innerHTML=`<div class="pdv-image-missing"><i class="fa-regular fa-image"></i><strong>Preview image not found</strong><small>Place <b>${esc(p.previewImage)}</b> inside your root or images folder.</small></div>`});return}blankPreview()}
+function thumbs(p){let map={doc:[["text-only","TEXT ONLY","pdv-thumb-text"],["text-image","TEXT WITH IMAGE","pdv-thumb-image"],["image-only","IMAGE ONLY","pdv-thumb-grid"]],photo:[["photocopy","PHOTOCOPY","pdv-thumb-text"],["photocopy-text-only","COPY TEXT","pdv-thumb-text"],["photocopy-text-image","COPY TEXT+IMAGE","pdv-thumb-image"],["photocopy-image-only","COPY IMAGE","pdv-thumb-grid"],["scanning","SCAN TEXT","pdv-thumb-text"],["scanning-text-image","SCAN TEXT+IMAGE","pdv-thumb-image"],["scanning-image-only","SCAN IMAGE","pdv-thumb-grid"]],id:[["id-photo","ID PHOTO","pdv-thumb-grid"],["passport-visa","PASSPORT/VISA","pdv-thumb-image"],["single-photo-print","PHOTO PRINT","pdv-thumb-grid"]],bind:[["lamination","LAMINATION","pdv-thumb-text"],["spiral-binding","SPIRAL BINDING","pdv-thumb-image"]],largeformat:[["sintra-board","SINTRA BOARD","pdv-thumb-grid"],["tarpaulin","TARPAULIN","pdv-thumb-image"]],special:[["custom-layout","CUSTOM LAYOUT","pdv-thumb-grid"],["marketing-collateral","MARKETING","pdv-thumb-grid"],["sticker-cut","STICKER CUT","pdv-thumb-grid"]]}[p.categoryKey]||[];$("#pdvThumbStack").innerHTML=map.map(x=>{let active=state.productKey===x[0],pr=withMedia(products[x[0]],x[0],{color:txt(el.color),paper:active?txt(el.paper):""}),real=pr?.previewImage;return`<button type="button" class="pdv-thumb ${real?"has-real-thumb":""} ${active?"is-active":""}" data-option="${x[0]}"><span class="pdv-thumb-paper ${x[2]} ${real?"is-real-thumb":""}">${real?`<img class="pdv-thumb-real-img" alt="${esc(x[1])}" loading="eager" decoding="sync" fetchpriority="high">`:""}</span><strong>${x[1]}</strong></button>`}).join("");d.querySelectorAll("#pdvThumbStack .pdv-thumb").forEach(btn=>{let active=btn.dataset.option===state.productKey,pr=withMedia(products[btn.dataset.option],btn.dataset.option,{color:txt(el.color),paper:active?txt(el.paper):""}),img=btn.querySelector("img"),wrap=btn.querySelector("span");if(img)setImg(img,pr,()=>{btn.classList.remove("has-real-thumb");wrap.classList.remove("is-real-thumb");wrap.innerHTML=""})})}
 
-function summaryThumb(p){p=withMedia(p,state.productKey);if(p.previewImage){el.sumThumb.classList.remove("pdv-blank-summary");el.sumThumb.classList.add("is-real-summary");el.sumThumb.innerHTML=`<img class="pdv-summary-real-img" alt="${esc(p.title)} preview">`;setImg(el.sumThumb.querySelector("img"),p,()=>{blankSummary()})}else{blankSummary()}}
+function preview(p){p=withMedia(p,state.productKey);el.preview.className="pdv-document-preview";if(p.previewImage){el.preview.className="pdv-document-preview is-real-image-preview";el.preview.innerHTML=`<img class="pdv-real-preview-img" alt="${esc(p.title)} preview" loading="eager" decoding="sync" fetchpriority="high">`;setImg(el.preview.querySelector("img"),p,()=>{el.preview.className="pdv-document-preview";el.preview.innerHTML=`<div class="pdv-image-missing"><i class="fa-regular fa-image"></i><strong>Preview image not found</strong><small>Place <b>${esc(p.previewImage)}</b> inside your root or images folder.</small></div>`});return}blankPreview()}
 
-function open(k,payload={},opt={}){let resolved=resolveServiceKey(k||payload),p=products[resolved]||products["text-only"];state.productKey=products[resolved]?resolved:"text-only";state.product=p;if(!opt.keepQty)el.qty.value="";el.root.classList.add("pdv-is-open");el.crumbCategory.textContent=p.categoryTitle;el.crumbService.textContent=p.serviceName;el.title.textContent=p.title;el.subtitle.textContent=p.serviceName==="Photocopy"?"High-quality black & white photocopies for documents of all sizes.":p.serviceName.toLowerCase().includes("scanning")?"Clean document scanning with organized digital output.":p.categoryKey==="id"?`Professional ${p.serviceName.toLowerCase()} preparation with clean, ready-to-submit output.`:`High-quality ${p.serviceName.toLowerCase()} service with clean, ready-to-submit output.`;el.ratingText.textContent=p.rating;el.reviewText.textContent=p.reviews+" Reviews";selectOptions(p);thumbs(p);preview(p);summaryThumb(p);step(opt.step||1);pdvUpdateOrder();try{history.replaceState(history.state||{},"","/service-details?service="+encodeURIComponent(state.productKey))}catch(e){}if(opt.scroll)requestAnimationFrame(()=>el.root.scrollIntoView({behavior:"smooth",block:"start"}))}
+function summaryThumb(p){p=withMedia(p,state.productKey);if(p.previewImage){el.sumThumb.classList.remove("pdv-blank-summary");el.sumThumb.classList.add("is-real-summary");el.sumThumb.innerHTML=`<img class="pdv-summary-real-img" alt="${esc(p.title)} preview" loading="eager" decoding="sync" fetchpriority="high">`;setImg(el.sumThumb.querySelector("img"),p,()=>{blankSummary()})}else{blankSummary()}}
+
+function open(k,payload={},opt={}){let resolved=resolveServiceKey(k||payload),p=products[resolved]||products["text-only"];state.productKey=products[resolved]?resolved:"text-only";state.product=p;if(!opt.keepQty)el.qty.value="";el.root.classList.add("pdv-is-open");el.crumbCategory.textContent=p.categoryTitle;el.crumbService.textContent=p.serviceName;el.title.textContent=p.title;el.subtitle.textContent=p.serviceName==="Photocopy"?"High-quality black & white photocopies for documents of all sizes.":p.serviceName.toLowerCase().includes("scanning")?"Clean document scanning with organized digital output.":p.categoryKey==="id"?`Professional ${p.serviceName.toLowerCase()} preparation with clean, ready-to-submit output.`:`High-quality ${p.serviceName.toLowerCase()} service with clean, ready-to-submit output.`;el.ratingText.textContent=p.rating;el.reviewText.textContent=p.reviews+" Reviews";selectOptions(p);applyPassportVisaRequestedMode(k,payload);thumbs(p);preview(p);summaryThumb(p);step(opt.step||1);pdvUpdateOrder();try{let routeKey=state.productKey==="passport-visa"?passportVisaRouteSlug():state.productKey;history.replaceState(history.state||{},"","/service-details?service="+encodeURIComponent(routeKey))}catch(e){}if(opt.scroll)requestAnimationFrame(()=>el.root.scrollIntoView({behavior:"smooth",block:"start"}))}
 
 function normVariant(v){return String(v||"").toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]+/g,"").trim()}
 function currentVariant(){let rows=variantRows(),color=normVariant(el.color.value),paper=normVariant(el.paper.value),finish=normVariant(el.svc.value),score=row=>{let s=0,hasFinish=String(row.finishType||"").trim();if(color&&normVariant(row.colorMode)===color)s+=8;if(paper&&normVariant(row.productSize)===paper)s+=8;if(finish&&hasFinish&&normVariant(row.finishType)===finish)s+=6;if(!hasFinish&&!finish)s+=2;return s};if(!rows.length)return null;let exact=rows.filter(r=>(!color||normVariant(r.colorMode)===color)&&(!paper||normVariant(r.productSize)===paper)&&(!finish||!r.finishType||normVariant(r.finishType)===finish));if(exact.length)return exact[0];return rows.slice().sort((a,b)=>score(b)-score(a))[0]||null}
@@ -2181,9 +2245,19 @@ function setFile(f){if(!f)return;let ext=(f.name.split(".").pop()||"").toLowerCa
 
 window.pdvClearFile=()=>{state.selectedFile=null;state.selectedFileObject=null;el.file.value="";var nf=document.getElementById("pdvNoFileText");if(nf)nf.textContent="No file chosen";el.fileResult.classList.remove("is-visible");el.fileName.textContent="No file selected";step(2);pdvUpdateOrder();toast("File removed. Upload is required before checkout.")};
 
+function currentRouteServiceKey(){
+  try{
+    let routeKey=new URLSearchParams(window.location.search).get("service");
+    return routeKey?resolveServiceKey(routeKey):"";
+  }catch(e){return ""}
+}
+
 window.pdvRestoreBackendDraft=function(draft){
+  if(!/\/service-details?\/?$/i.test(window.location.pathname||""))return;
   if(!draft||typeof draft!=="object")return;
   let serviceKey=resolveServiceKey(draft.service_key||draft.serviceName||draft.printing_category||"text-only");
+  let routeKey=currentRouteServiceKey();
+  if(routeKey&&products[routeKey]&&serviceKey!==routeKey)return;
   if(products[serviceKey])open(serviceKey,null,{step:1,scroll:false});
   const setValue=(select,value)=>{if(value&&[...select.options].some(option=>option.value===value||option.text===value)){let match=[...select.options].find(option=>option.value===value||option.text===value);select.value=match.value}};
   setValue(el.cat,draft.printing_category);setValue(el.color,draft.color_variation);setValue(el.paper,draft.paper_size);setValue(el.svc,draft.service_option);setValue(el.ftype,draft.file_type);
@@ -2226,15 +2300,23 @@ d.addEventListener("click",e=>{
   }
 })}
 
-window.openPrintifyServiceDetail=(payload,scroll)=>{let k=resolveServiceKey(payload);const onDetailRoute=/\/service-details?\/?$/i.test(location.pathname);if(!onDetailRoute){try{sessionStorage.setItem("selectedPrintifyService",JSON.stringify(typeof payload==="object"?Object.assign({},payload,{serviceSlug:k}):{serviceSlug:k}))}catch(e){}window.location.assign("/service-details?service="+encodeURIComponent(k));return}if(typeof setStandalonePage==="function")setStandalonePage("service-details");else document.body.classList.add("service-detail-open");open(k,typeof payload==="object"?Object.assign({},payload,{serviceSlug:k}):{serviceSlug:k},{step:1,scroll:scroll!==false})};
+window.openPrintifyServiceDetail=(payload,scroll)=>{let k=resolveServiceKey(payload),detailPayload=typeof payload==="object"?Object.assign({},payload,{serviceSlug:k}):{serviceSlug:k,requestedService:payload};const onDetailRoute=/\/service-details?\/?$/i.test(location.pathname);if(!onDetailRoute){try{sessionStorage.setItem("selectedPrintifyService",JSON.stringify(detailPayload))}catch(e){}window.location.assign("/service-details?service="+encodeURIComponent(detailPayload.requestedService||k));return}if(typeof setStandalonePage==="function")setStandalonePage("service-details");else document.body.classList.add("service-detail-open");open(k,detailPayload,{step:1,scroll:scroll!==false})};
 bind();
 let payload=null;
 try{payload=JSON.parse(sessionStorage.getItem("selectedPrintifyService")||"null")}catch(e){}
 const isServiceDetailRoute=/\/service-details?\/?$/i.test(location.pathname);
 const queryService=new URLSearchParams(window.location.search).get("service");
-if(queryService)
-window.openPrintifyServiceDetail(queryService,true);else if(payload)
-{if(isServiceDetailRoute)window.openPrintifyServiceDetail(payload,true)}else if(location.hash==="#serviceDetail"||isServiceDetailRoute)open("text-only",null,{step:1,scroll:false})})();
+if(!isServiceDetailRoute&&queryService){
+  try{
+    const cleanUrl=new URL(window.location.href);
+    cleanUrl.searchParams.delete("service");
+    window.history.replaceState(window.history.state||{},"",cleanUrl);
+    sessionStorage.removeItem("selectedPrintifyService");
+  }catch(e){}
+}
+if(isServiceDetailRoute&&queryService)
+window.openPrintifyServiceDetail(queryService,true);else if(isServiceDetailRoute&&payload)
+window.openPrintifyServiceDetail(payload,true);else if(isServiceDetailRoute)open("text-only",null,{step:1,scroll:false})})();
 </script>
 
 <style id="service-detail-cart-final-motion-lock">
@@ -2312,6 +2394,10 @@ body.front-route-service-details:not(.service-detail-hydrated) #serviceDetail{vi
   }
 
   async function hydrateServiceDetail(){
+    if(!/\/service-details?\/?$/i.test(window.location.pathname||'')){
+      document.body.classList.add('service-detail-ready','service-detail-hydrated');
+      return;
+    }
     try{
       var response=await fetch('{{ route('service-details.state') }}',{headers:{'Accept':'application/json'},credentials:'same-origin'});
       var data=response.ok?await response.json():{};
@@ -6095,6 +6181,1402 @@ body #pfyCartBackdrop.show{
 }
 </style>
 
+<style id="pdv-no-overlap-same-ui-final-lock">
+/* =========================================================
+   PRINTIFY & CO. FINAL NO-OVERLAP LOCK
+   Purpose: keep the same UI/content/design, but stop desktop
+   overlap by using safe grid columns, min-width:0, and clean
+   responsive breakpoints. Paste this LAST, or use the full file.
+========================================================= */
+:root{
+  --pdv-safe-orange:#ff4f16;
+  --pdv-safe-black:#111827;
+  --pdv-safe-border:#e5e7eb;
+  --pdv-safe-gap:clamp(14px,1.25vw,22px);
+  --pdv-safe-panel-h:620px;
+}
+
+#serviceDetail,
+#serviceDetail *{
+  box-sizing:border-box!important;
+}
+
+#serviceDetail{
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:clip!important;
+  padding:clamp(24px,2.2vw,42px) clamp(14px,2vw,34px) 64px!important;
+  background:#fff!important;
+}
+
+#serviceDetail .pdv-shell{
+  width:100%!important;
+  max-width:1560px!important;
+  margin:0 auto!important;
+  padding:0!important;
+}
+
+#serviceDetail .pdv-topbar,
+#serviceDetail .pdv-hero-row,
+#serviceDetail .pdv-layout{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+
+#serviceDetail .pdv-hero-row{
+  display:grid!important;
+  grid-template-columns:minmax(280px,1fr) minmax(600px,760px)!important;
+  gap:clamp(18px,2vw,34px)!important;
+  align-items:end!important;
+  margin:8px 0 26px!important;
+}
+
+#serviceDetail .pdv-service-intro,
+#serviceDetail .pdv-stepper{
+  min-width:0!important;
+}
+
+#serviceDetail .pdv-stepper{
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-step{
+  min-width:0!important;
+}
+
+#serviceDetail .pdv-step p{
+  white-space:nowrap!important;
+}
+
+/* Main fix: all columns are allowed to shrink safely, so the right card never rides over the form. */
+#serviceDetail .pdv-layout{
+  display:grid!important;
+  grid-template-columns:minmax(118px,150px) minmax(360px,1.35fr) minmax(300px,.95fr) minmax(290px,.88fr)!important;
+  gap:var(--pdv-safe-gap)!important;
+  align-items:stretch!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-left-card,
+#serviceDetail .pdv-preview-card,
+#serviceDetail .pdv-options-card,
+#serviceDetail .pdv-summary-card,
+#serviceDetail .pdv-card-section,
+#serviceDetail .pdv-field,
+#serviceDetail .pdv-upload-box,
+#serviceDetail .pdv-file-row,
+#serviceDetail .pdv-summary-product,
+#serviceDetail .pdv-price-grid,
+#serviceDetail .pdv-price-card{
+  min-width:0!important;
+  max-width:100%!important;
+}
+
+#serviceDetail .pdv-left-card{
+  margin:0!important;
+  padding:0!important;
+  width:100%!important;
+  min-height:var(--pdv-safe-panel-h)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-thumb-stack{
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+}
+
+#serviceDetail .pdv-thumb{
+  width:100%!important;
+  min-height:145px!important;
+  max-height:178px!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-thumb.has-real-thumb .pdv-thumb-real-img{
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+
+#serviceDetail .pdv-download-guide{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin-top:14px!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-download-guide span{
+  min-width:0!important;
+}
+
+#serviceDetail .pdv-download-guide strong,
+#serviceDetail .pdv-download-guide small{
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+
+#serviceDetail .pdv-preview-card,
+#serviceDetail .pdv-summary-card{
+  min-height:var(--pdv-safe-panel-h)!important;
+  height:auto!important;
+  border:1px solid var(--pdv-safe-border)!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-preview-card{
+  padding:clamp(16px,1.5vw,22px)!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+
+#serviceDetail .pdv-preview-window{
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:455px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-document-preview{
+  width:min(405px,92%)!important;
+  max-width:92%!important;
+  max-height:100%!important;
+  margin:0 auto!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-document-preview.is-real-image-preview{
+  width:auto!important;
+  max-width:94%!important;
+}
+
+#serviceDetail .pdv-real-preview-img{
+  max-width:100%!important;
+  max-height:500px!important;
+  object-fit:contain!important;
+}
+
+#serviceDetail .pdv-side-nav{
+  z-index:3!important;
+  flex:0 0 auto!important;
+}
+
+/* Keep options as the clean middle form, same content, no outer overlap. */
+#serviceDetail .pdv-options-card{
+  width:100%!important;
+  min-height:var(--pdv-safe-panel-h)!important;
+  height:auto!important;
+  padding:0!important;
+  margin:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+
+#serviceDetail .pdv-card-section{
+  width:100%!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-field-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px 12px!important;
+  width:100%!important;
+}
+
+#serviceDetail .pdv-field label{
+  display:block!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+#serviceDetail .pdv-field select,
+#serviceDetail .pdv-qty-box{
+  width:100%!important;
+  max-width:100%!important;
+}
+
+#serviceDetail .pdv-qty-box{
+  grid-template-columns:36px minmax(44px,1fr) 36px!important;
+}
+
+#serviceDetail .pdv-upload-box{
+  width:100%!important;
+  max-width:100%!important;
+  min-height:68px!important;
+  padding:12px!important;
+  display:block!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-file-row{
+  width:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  flex-wrap:nowrap!important;
+}
+
+#serviceDetail .pdv-choose-file{
+  flex:0 0 auto!important;
+}
+
+#serviceDetail .pdv-no-file,
+#serviceDetail #pdvNoFileText{
+  min-width:0!important;
+  flex:1 1 auto!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+#serviceDetail .pdv-upload-box small{
+  display:block!important;
+  margin-top:8px!important;
+  white-space:normal!important;
+}
+
+#serviceDetail .pdv-service-id-inline,
+#serviceDetail .pdv-warning,
+#serviceDetail .pdv-file-result{
+  width:100%!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-warning span,
+#serviceDetail .pdv-warning small,
+#serviceDetail .pdv-checkout-note small{
+  min-width:0!important;
+  overflow-wrap:anywhere!important;
+}
+
+#serviceDetail .pdv-addon{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:18px minmax(0,1fr) auto 16px!important;
+  gap:9px!important;
+  align-items:center!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-addon span{
+  min-width:0!important;
+  white-space:normal!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+#serviceDetail .pdv-addon strong{
+  white-space:nowrap!important;
+}
+
+/* Order Summary: same card, stable size, no text pushing over the edge. */
+#serviceDetail .pdv-summary-card{
+  width:100%!important;
+  padding:clamp(16px,1.35vw,22px)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+}
+
+#serviceDetail .pdv-summary-head,
+#serviceDetail .pdv-estimated-total{
+  min-width:0!important;
+  gap:10px!important;
+}
+
+#serviceDetail .pdv-summary-product{
+  display:grid!important;
+  grid-template-columns:minmax(58px,72px) minmax(0,1fr)!important;
+  gap:12px!important;
+  align-items:start!important;
+  min-height:0!important;
+}
+
+#serviceDetail .pdv-summary-product h3,
+#serviceDetail .pdv-summary-product p,
+#serviceDetail .pdv-summary-product small{
+  min-width:0!important;
+  max-width:100%!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+
+#serviceDetail .pdv-summary-thumb{
+  width:100%!important;
+  max-width:72px!important;
+  height:92px!important;
+  min-width:0!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-summary-real-img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+}
+
+#serviceDetail .pdv-price-grid{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+
+#serviceDetail .pdv-price-card{
+  width:100%!important;
+  height:auto!important;
+  min-height:82px!important;
+  max-height:none!important;
+  padding:11px 12px!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-price-card small,
+#serviceDetail .pdv-price-note,
+#serviceDetail .pdv-checkout-note{
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+
+#serviceDetail .pdv-price-note{
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-estimated-total{
+  height:auto!important;
+  min-height:32px!important;
+  max-height:none!important;
+  padding:8px 0!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-estimated-total strong{
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+
+#serviceDetail .pdv-checkout-note{
+  height:auto!important;
+  min-height:44px!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-action-row{
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin-top:auto!important;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:10px!important;
+  justify-items:stretch!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-action-row .pdv-cart,
+#serviceDetail .pdv-action-row .pdv-checkout,
+#serviceDetail .pdv-cart,
+#serviceDetail .pdv-checkout{
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:40px!important;
+  min-height:40px!important;
+  max-height:40px!important;
+  margin:0!important;
+}
+
+/* Laptop/tablet: stop forcing 4 columns before it becomes tight. */
+@media(max-width:1280px){
+  :root{--pdv-safe-panel-h:auto;}
+
+  #serviceDetail .pdv-shell{
+    max-width:1050px!important;
+  }
+
+  #serviceDetail .pdv-hero-row{
+    grid-template-columns:1fr!important;
+    align-items:start!important;
+  }
+
+  #serviceDetail .pdv-stepper{
+    max-width:100%!important;
+  }
+
+  #serviceDetail .pdv-layout{
+    grid-template-columns:150px minmax(0,1fr)!important;
+    gap:18px!important;
+    align-items:start!important;
+  }
+
+  #serviceDetail .pdv-left-card{
+    grid-column:1!important;
+    grid-row:1!important;
+    min-height:0!important;
+  }
+
+  #serviceDetail .pdv-preview-card{
+    grid-column:2!important;
+    grid-row:1!important;
+    min-height:560px!important;
+  }
+
+  #serviceDetail .pdv-options-card{
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    min-height:0!important;
+    padding:20px!important;
+    border:1px solid var(--pdv-safe-border)!important;
+    border-radius:14px!important;
+    background:#fff!important;
+  }
+
+  #serviceDetail .pdv-summary-card{
+    grid-column:1 / -1!important;
+    grid-row:3!important;
+    min-height:0!important;
+  }
+
+  #serviceDetail .pdv-summary-product{
+    grid-template-columns:82px minmax(0,1fr)!important;
+  }
+
+  #serviceDetail .pdv-summary-thumb{
+    max-width:82px!important;
+    height:102px!important;
+  }
+
+  #serviceDetail .pdv-action-row{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+
+@media(max-width:850px){
+  #serviceDetail{
+    padding:22px 12px 44px!important;
+  }
+
+  #serviceDetail .pdv-shell{
+    max-width:680px!important;
+  }
+
+  #serviceDetail .pdv-stepper{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:9px!important;
+    overflow:visible!important;
+  }
+
+  #serviceDetail .pdv-stepper>i{
+    display:none!important;
+  }
+
+  #serviceDetail .pdv-step{
+    white-space:normal!important;
+  }
+
+  #serviceDetail .pdv-step p{
+    white-space:normal!important;
+  }
+
+  #serviceDetail .pdv-layout{
+    grid-template-columns:1fr!important;
+    gap:14px!important;
+  }
+
+  #serviceDetail .pdv-left-card,
+  #serviceDetail .pdv-preview-card,
+  #serviceDetail .pdv-options-card,
+  #serviceDetail .pdv-summary-card{
+    grid-column:1!important;
+    grid-row:auto!important;
+    min-height:0!important;
+  }
+
+  #serviceDetail .pdv-thumb-stack{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+
+  #serviceDetail .pdv-thumb{
+    min-height:118px!important;
+  }
+
+  #serviceDetail .pdv-preview-card{
+    padding:16px!important;
+  }
+
+  #serviceDetail .pdv-preview-window{
+    min-height:420px!important;
+  }
+
+  #serviceDetail .pdv-field-grid{
+    grid-template-columns:1fr!important;
+  }
+
+  #serviceDetail .pdv-price-grid,
+  #serviceDetail .pdv-action-row{
+    grid-template-columns:1fr!important;
+  }
+}
+
+@media(max-width:480px){
+  #serviceDetail .pdv-service-intro h1{
+    font-size:26px!important;
+  }
+
+  #serviceDetail .pdv-stepper{
+    grid-template-columns:1fr!important;
+  }
+
+  #serviceDetail .pdv-thumb-stack{
+    grid-template-columns:1fr!important;
+  }
+
+  #serviceDetail .pdv-file-row{
+    flex-direction:column!important;
+    align-items:stretch!important;
+  }
+
+  #serviceDetail .pdv-choose-file{
+    width:100%!important;
+  }
+
+  #serviceDetail .pdv-summary-product{
+    grid-template-columns:64px minmax(0,1fr)!important;
+  }
+
+  #serviceDetail .pdv-summary-thumb{
+    max-width:64px!important;
+    height:86px!important;
+  }
+}
+</style>
+
+
+<style>
+/* =========================================================
+   FINAL FIX - NO OVERLAP STEPPER + EQUAL PRICE BOXES
+   Added only as CSS override. No HTML/JS/functions removed.
+========================================================= */
+
+/* STEP 1-4: keep inside its own clean card and prevent text overlap */
+#serviceDetail .pdv-hero-row{
+  display:grid!important;
+  grid-template-columns:minmax(300px,1fr) minmax(680px,760px)!important;
+  gap:clamp(18px,2vw,34px)!important;
+  align-items:end!important;
+}
+
+#serviceDetail .pdv-stepper{
+  width:100%!important;
+  max-width:760px!important;
+  min-width:680px!important;
+  justify-self:end!important;
+  display:grid!important;
+  grid-template-columns:max-content minmax(38px,1fr) max-content minmax(38px,1fr) max-content minmax(38px,1fr) max-content!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:18px 28px!important;
+  margin:0!important;
+  background:#fff!important;
+  border:1px solid #dfe4ea!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-stepper>i{
+  display:block!important;
+  width:100%!important;
+  min-width:38px!important;
+  height:1px!important;
+  border:0!important;
+  border-top:1.5px dashed #cfd4dc!important;
+  background:transparent!important;
+}
+
+#serviceDetail .pdv-step{
+  min-width:max-content!important;
+  width:auto!important;
+  flex:0 0 auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+  padding:0!important;
+  margin:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  color:#4b5563!important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-step span,
+#serviceDetail .pdv-step.is-active span,
+#serviceDetail .pdv-step.is-done span{
+  flex:0 0 30px!important;
+  width:30px!important;
+  min-width:30px!important;
+  max-width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:50%!important;
+  font-size:13px!important;
+  line-height:30px!important;
+  font-weight:800!important;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;
+  box-shadow:none!important;
+}
+
+#serviceDetail .pdv-step span{
+  background:#fff!important;
+  color:#4b5563!important;
+  border:2px solid #4b5563!important;
+}
+
+#serviceDetail .pdv-step.is-active span,
+#serviceDetail .pdv-step.is-done span{
+  background:#ff4f16!important;
+  color:#fff!important;
+  border-color:#ff4f16!important;
+}
+
+#serviceDetail .pdv-step p,
+#serviceDetail .pdv-step.is-active p,
+#serviceDetail .pdv-step.is-done p{
+  display:block!important;
+  margin:0!important;
+  padding:0!important;
+  color:inherit!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+#serviceDetail .pdv-step.is-active,
+#serviceDetail .pdv-step.is-done{
+  color:#ff4f16!important;
+}
+
+/* PRICE BOXES: Retail Price and Bulk Price always same top/bottom height */
+#serviceDetail .pdv-price-grid{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  align-items:stretch!important;
+  grid-auto-rows:1fr!important;
+}
+
+#serviceDetail .pdv-price-card,
+#serviceDetail .pdv-price-card:hover,
+#serviceDetail .pdv-price-card:focus,
+#serviceDetail .pdv-price-card:active,
+#serviceDetail .pdv-price-card.is-active,
+#serviceDetail .pdv-price-card.is-active:hover,
+#serviceDetail .pdv-price-card.is-active:focus,
+#serviceDetail .pdv-price-card.is-active:active{
+  width:100%!important;
+  height:104px!important;
+  min-height:104px!important;
+  max-height:104px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  gap:4px!important;
+  padding:14px 14px!important;
+  border-radius:10px!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail .pdv-price-label{
+  display:block!important;
+  width:100%!important;
+  min-height:14px!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+}
+
+#serviceDetail .pdv-price-medallion{
+  display:block!important;
+  margin:0!important;
+  font-size:16px!important;
+  line-height:1.1!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+}
+
+#serviceDetail .pdv-price-medallion b{
+  font-size:17px!important;
+  line-height:1.1!important;
+}
+
+#serviceDetail .pdv-price-card small{
+  display:block!important;
+  width:100%!important;
+  min-height:30px!important;
+  margin:0!important;
+  font-size:10.5px!important;
+  line-height:1.28!important;
+  white-space:normal!important;
+  overflow:hidden!important;
+}
+
+#serviceDetail #pdvBulkPriceCard small:after{
+  display:block!important;
+  margin:3px 0 0 0!important;
+  white-space:nowrap!important;
+}
+
+/* Keep desktop from squeezing before tablet breakpoint */
+@media(max-width:1280px){
+  #serviceDetail .pdv-hero-row{
+    grid-template-columns:1fr!important;
+    align-items:start!important;
+  }
+
+  #serviceDetail .pdv-stepper{
+    justify-self:start!important;
+    width:100%!important;
+    max-width:760px!important;
+    min-width:0!important;
+  }
+}
+
+/* Tablet/mobile: steps become clean tiles, no overlapping text */
+@media(max-width:850px){
+  #serviceDetail .pdv-stepper{
+    min-width:0!important;
+    max-width:100%!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+    padding:14px!important;
+    overflow:hidden!important;
+  }
+
+  #serviceDetail .pdv-stepper>i{
+    display:none!important;
+  }
+
+  #serviceDetail .pdv-step{
+    min-width:0!important;
+    width:100%!important;
+    border:1px solid #e5e7eb!important;
+    border-radius:999px!important;
+    padding:9px 11px!important;
+    background:#fff!important;
+  }
+
+  #serviceDetail .pdv-step p,
+  #serviceDetail .pdv-step.is-active p,
+  #serviceDetail .pdv-step.is-done p{
+    white-space:normal!important;
+    line-height:1.2!important;
+  }
+
+  #serviceDetail .pdv-price-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+
+@media(max-width:560px){
+  #serviceDetail .pdv-stepper,
+  #serviceDetail .pdv-price-grid{
+    grid-template-columns:1fr!important;
+  }
+
+  #serviceDetail .pdv-price-card,
+  #serviceDetail .pdv-price-card:hover,
+  #serviceDetail .pdv-price-card:focus,
+  #serviceDetail .pdv-price-card:active,
+  #serviceDetail .pdv-price-card.is-active,
+  #serviceDetail .pdv-price-card.is-active:hover,
+  #serviceDetail .pdv-price-card.is-active:focus,
+  #serviceDetail .pdv-price-card.is-active:active{
+    height:auto!important;
+    min-height:92px!important;
+    max-height:none!important;
+  }
+}
+</style>
+
+<style id="pdv-final-stepper-near-title-no-overlap-fix">
+/* =========================================================
+   FINAL OVERRIDE - STEPPER NEAR TITLE / NO OVERLAP
+   Purpose:
+   - Forces the 1 Select Service / 2 Customize / 3 Upload File / 4 Checkout
+     progress bar back into the hero title area.
+   - Cancels older grid-column overrides that pushed the stepper outside the page.
+   - Keeps all existing HTML, JS functions, prices, upload, cart, and checkout logic intact.
+========================================================= */
+
+/* DESKTOP: title + stepper share the hero row safely */
+@media (min-width:1281px){
+  #serviceDetail .pdv-hero-row{
+    display:grid!important;
+    grid-template-columns:minmax(300px,1fr) minmax(0,760px)!important;
+    column-gap:clamp(18px,2vw,34px)!important;
+    row-gap:14px!important;
+    align-items:end!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow:visible!important;
+    margin:8px 0 26px!important;
+  }
+
+  /* IMPORTANT: resets old rules such as grid-column:1/3 and grid-column:3/5 */
+  #serviceDetail .pdv-service-intro{
+    grid-column:1!important;
+    grid-row:1!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  #serviceDetail .pdv-stepper{
+    grid-column:2!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    align-self:end!important;
+    width:100%!important;
+    max-width:760px!important;
+    min-width:0!important;
+    display:grid!important;
+    grid-template-columns:max-content minmax(28px,1fr) max-content minmax(28px,1fr) max-content minmax(28px,1fr) max-content!important;
+    align-items:center!important;
+    gap:10px!important;
+    padding:16px 24px!important;
+    margin:0!important;
+    background:#fff!important;
+    border:1px solid #dfe4ea!important;
+    border-radius:14px!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+}
+
+/* LAPTOP / SMALL DESKTOP: put the stepper directly under the title, still near title */
+@media (max-width:1280px){
+  #serviceDetail .pdv-hero-row{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    row-gap:14px!important;
+    align-items:start!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow:visible!important;
+  }
+
+  #serviceDetail .pdv-service-intro{
+    grid-column:1!important;
+    grid-row:1!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  #serviceDetail .pdv-stepper{
+    grid-column:1!important;
+    grid-row:2!important;
+    justify-self:start!important;
+    align-self:start!important;
+    width:min(100%,760px)!important;
+    max-width:760px!important;
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+}
+
+/* Shared stepper cleanup */
+#serviceDetail .pdv-stepper>i{
+  display:block!important;
+  width:100%!important;
+  min-width:18px!important;
+  height:1px!important;
+  border:0!important;
+  border-top:1.5px dashed #cfd4dc!important;
+  background:transparent!important;
+}
+
+#serviceDetail .pdv-step{
+  min-width:0!important;
+  width:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+  padding:0!important;
+  margin:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+}
+
+#serviceDetail .pdv-step span,
+#serviceDetail .pdv-step.is-active span,
+#serviceDetail .pdv-step.is-done span{
+  flex:0 0 30px!important;
+  width:30px!important;
+  min-width:30px!important;
+  max-width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  border-radius:50%!important;
+  font-size:13px!important;
+  line-height:30px!important;
+  font-weight:800!important;
+  box-shadow:none!important;
+}
+
+#serviceDetail .pdv-step span{
+  background:#fff!important;
+  color:#4b5563!important;
+  border:2px solid #4b5563!important;
+}
+
+#serviceDetail .pdv-step.is-active span,
+#serviceDetail .pdv-step.is-done span{
+  background:#ff4f16!important;
+  color:#fff!important;
+  border-color:#ff4f16!important;
+}
+
+#serviceDetail .pdv-step p,
+#serviceDetail .pdv-step.is-active p,
+#serviceDetail .pdv-step.is-done p{
+  display:block!important;
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  color:inherit!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+}
+
+#serviceDetail .pdv-step.is-active,
+#serviceDetail .pdv-step.is-done{
+  color:#ff4f16!important;
+}
+
+/* Prevent the page from creating unwanted horizontal scroll because of old implicit grid columns */
+#serviceDetail,
+#serviceDetail .pdv-shell,
+#serviceDetail .pdv-topbar,
+#serviceDetail .pdv-hero-row,
+#serviceDetail .pdv-layout{
+  max-width:100%!important;
+  min-width:0!important;
+}
+
+/* Tablet/mobile: clean two-column step tiles */
+@media (max-width:850px){
+  #serviceDetail .pdv-stepper{
+    grid-column:1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+    padding:14px!important;
+    overflow:hidden!important;
+  }
+
+  #serviceDetail .pdv-stepper>i{
+    display:none!important;
+  }
+
+  #serviceDetail .pdv-step{
+    width:100%!important;
+    min-width:0!important;
+    border:1px solid #e5e7eb!important;
+    border-radius:999px!important;
+    padding:9px 11px!important;
+    background:#fff!important;
+    overflow:hidden!important;
+  }
+
+  #serviceDetail .pdv-step p,
+  #serviceDetail .pdv-step.is-active p,
+  #serviceDetail .pdv-step.is-done p{
+    white-space:normal!important;
+    line-height:1.2!important;
+    overflow:hidden!important;
+  }
+}
+
+@media (max-width:560px){
+  #serviceDetail .pdv-stepper{
+    grid-template-columns:1fr!important;
+  }
+}
+</style>
+
+<style id="pdv-final-preview-upload-height-no-shake-lock">
+/* =========================================================
+   FINAL FIX - PREVIEW MAIN BOX + UPLOAD FILE NO SHAKE
+   Requested:
+   - Keep the Preview image size as-is.
+   - Reduce only the Preview main box extra height.
+   - Reduce Upload File box height.
+   - Stop shaking/moving on hover, upload, drag, focus, and resize.
+   - No HTML/JS function removed.
+========================================================= */
+:root{
+  --pdv-safe-panel-h:540px!important;
+  --pdv-panel-h:540px!important;
+}
+
+#serviceDetail,
+#serviceDetail .pdv-shell,
+#serviceDetail .pdv-layout,
+#serviceDetail .pdv-preview-card,
+#serviceDetail .pdv-preview-window,
+#serviceDetail [data-pdv-section="upload"],
+#serviceDetail .pdv-upload-box,
+#serviceDetail .pdv-file-row,
+#serviceDetail #pdvFileResult{
+  overflow-anchor:none!important;
+}
+
+/* Preview: bawas height sa MAIN BOX only, hindi sa image. */
+#serviceDetail .pdv-preview-card,
+#serviceDetail .pdv-preview-card:hover,
+#serviceDetail .pdv-preview-card:focus-within{
+  align-self:start!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  padding:16px 20px 18px!important;
+  background:#fff!important;
+  border:1px solid #111827!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+  transform:none!important;
+  translate:none!important;
+  scale:1!important;
+  animation:none!important;
+  transition:none!important;
+  will-change:auto!important;
+}
+
+#serviceDetail .pdv-product-head{
+  margin-bottom:8px!important;
+}
+
+#serviceDetail .pdv-preview-window{
+  flex:0 0 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+#serviceDetail .pdv-document-preview,
+#serviceDetail .pdv-document-preview:hover,
+#serviceDetail .pdv-document-preview:focus{
+  margin:0 auto!important;
+  transform:none!important;
+  translate:none!important;
+  scale:1!important;
+  animation:none!important;
+  transition:none!important;
+  will-change:auto!important;
+}
+
+/* Keep image height same as the current accepted preview image. */
+#serviceDetail .pdv-real-preview-img{
+  max-height:500px!important;
+  max-width:100%!important;
+  object-fit:contain!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+#serviceDetail .pdv-product-review-block{
+  margin-top:10px!important;
+  padding:8px 12px!important;
+  border-radius:8px!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+/* Upload File: bawas height, same position/spacing, no jump. */
+#serviceDetail [data-pdv-section="upload"]{
+  contain:layout paint!important;
+}
+
+#serviceDetail .pdv-upload-box,
+#serviceDetail .pdv-upload-box:hover,
+#serviceDetail .pdv-upload-box:focus-within,
+#serviceDetail .pdv-upload-box.is-dragging{
+  width:100%!important;
+  max-width:100%!important;
+  height:58px!important;
+  min-height:58px!important;
+  max-height:58px!important;
+  margin:0!important;
+  padding:7px 10px!important;
+  display:block!important;
+  overflow:hidden!important;
+  border:1px solid #dfe4ea!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  outline:0!important;
+  transform:none!important;
+  translate:none!important;
+  scale:1!important;
+  animation:none!important;
+  transition:none!important;
+  will-change:auto!important;
+}
+
+#serviceDetail .pdv-file-row{
+  width:100%!important;
+  height:27px!important;
+  min-height:27px!important;
+  max-height:27px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  flex-wrap:nowrap!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+#serviceDetail .pdv-choose-file{
+  position:relative!important;
+  flex:0 0 122px!important;
+  width:122px!important;
+  min-width:122px!important;
+  max-width:122px!important;
+  height:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  margin:0!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+#serviceDetail .pdv-no-file,
+#serviceDetail #pdvNoFileText{
+  min-width:0!important;
+  flex:1 1 auto!important;
+  display:block!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  line-height:30px!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+#serviceDetail .pdv-upload-box small{
+  display:block!important;
+  margin:2px 0 0!important;
+  padding:0!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  line-height:1.15!important;
+  font-size:10.5px!important;
+}
+
+/* Reserve fixed space for file result so upload/remove will not push layout down/up. */
+#serviceDetail #pdvFileResult{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  height:28px!important;
+  min-height:28px!important;
+  max-height:28px!important;
+  margin-top:6px!important;
+  padding:5px 9px!important;
+  overflow:hidden!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+#serviceDetail #pdvFileResult.is-visible{
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+
+#serviceDetail #pdvFileResult span{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+#serviceDetail .pdv-warning{
+  margin-top:10px!important;
+  padding:10px 12px!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+#serviceDetail .pdv-service-id-inline{
+  margin-top:12px!important;
+  transform:none!important;
+  animation:none!important;
+  transition:none!important;
+}
+
+/* No movement from old hover/global rules. */
+#serviceDetail .pdv-preview-card *,
+#serviceDetail .pdv-upload-box *,
+#serviceDetail #pdvFileResult *{
+  backface-visibility:hidden!important;
+}
+
+@media(max-width:1280px){
+  #serviceDetail .pdv-preview-card,
+  #serviceDetail .pdv-preview-card:hover{
+    min-height:0!important;
+    height:auto!important;
+  }
+}
+
+@media(max-width:850px){
+  #serviceDetail .pdv-preview-card,
+  #serviceDetail .pdv-preview-card:hover{
+    padding:14px!important;
+    min-height:0!important;
+  }
+  #serviceDetail .pdv-real-preview-img{
+    max-height:420px!important;
+  }
+  #serviceDetail .pdv-upload-box,
+  #serviceDetail .pdv-upload-box:hover,
+  #serviceDetail .pdv-upload-box.is-dragging{
+    height:auto!important;
+    min-height:58px!important;
+    max-height:none!important;
+  }
+  #serviceDetail .pdv-file-row{
+    height:auto!important;
+    min-height:30px!important;
+    max-height:none!important;
+  }
+}
+</style>
+
+<script id="pdv-final-preview-upload-no-shake-script">
+/* Safety lock: keeps uploaded-file UI steady after file select/remove without changing existing functions. */
+(function(){
+  if(window.__pdvPreviewUploadNoShakeLock)return;
+  window.__pdvPreviewUploadNoShakeLock=true;
+
+  function lockPreviewUploadMotion(){
+    var root=document.getElementById('serviceDetail');
+    if(!root)return;
+    ['.pdv-preview-card','.pdv-preview-window','.pdv-document-preview','.pdv-upload-box','.pdv-file-row','#pdvFileResult'].forEach(function(sel){
+      root.querySelectorAll(sel).forEach(function(el){
+        el.style.setProperty('transform','none','important');
+        el.style.setProperty('animation','none','important');
+        el.style.setProperty('transition','none','important');
+        el.style.setProperty('will-change','auto','important');
+      });
+    });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',lockPreviewUploadMotion,{once:true});
+  }else{
+    lockPreviewUploadMotion();
+  }
+
+  document.addEventListener('change',function(event){
+    if(event.target&&event.target.id==='pdvFileInput'){
+      requestAnimationFrame(lockPreviewUploadMotion);
+      setTimeout(lockPreviewUploadMotion,60);
+    }
+  },true);
+
+  document.addEventListener('click',function(event){
+    if(event.target&&event.target.closest&&event.target.closest('#serviceDetail .pdv-file-result button')){
+      requestAnimationFrame(lockPreviewUploadMotion);
+      setTimeout(lockPreviewUploadMotion,60);
+    }
+  },true);
+
+  window.addEventListener('resize',function(){requestAnimationFrame(lockPreviewUploadMotion)},{passive:true});
+  document.addEventListener('printify:service-detail-opened',lockPreviewUploadMotion);
 
 <script id="printify-accurate-service-routing-hard-fix">
 (function(){

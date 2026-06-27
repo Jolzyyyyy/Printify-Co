@@ -4,6 +4,25 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Poppins:wght@500;600;700&display=swap">
 @endonce
 
+@php
+    $helpCustomer = auth()->user();
+    $serverHelpTickets = $helpCustomer && class_exists(\App\Models\SupportTicket::class)
+        ? \App\Models\SupportTicket::where('user_id', $helpCustomer->id)
+            ->latest()
+            ->limit(8)
+            ->get()
+            ->map(fn ($ticket) => [
+                'ref' => $ticket->reference,
+                'topic' => $ticket->topic,
+                'order' => $ticket->order_reference,
+                'message' => $ticket->message,
+                'status' => $ticket->status,
+                'createdAt' => $ticket->created_at?->toISOString(),
+            ])
+            ->values()
+        : collect();
+@endphp
+
 <style>
 :root{--hc-orange:#FE7B09;--hc-orange2:#FFAB0A;--hc-ink:#111827;--hc-muted:#6b7280;--hc-line:#111827;--hc-soft:#fff;--hc-hover:rgba(17,24,39,.075);--hc-shadow:none;--hc-shadow2:none;--hc-radius:8px;--hc-green:#16a34a;--hc-blue:#2563eb;--hc-purple:#7c3aed;--hc-red:#ef4444}
 .hc-page{min-height:calc(100vh - 70px);background:#fff;color:var(--hc-ink);font-family:'Inter',system-ui,sans-serif;font-weight:400;letter-spacing:0}
@@ -831,8 +850,10 @@
 
             <section class="hc-card hc-ticket-activity-card">
                 <div class="hc-body">
-                    <h2 class="hc-card-title">Ticket Activity</h2>
-                    <p class="hc-card-desc">Recent support activity saved for this account.</p>
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                        <div><h2 class="hc-card-title">Ticket Activity</h2><p class="hc-card-desc">Recent support activity saved for this account.</p></div>
+                        <button type="button" class="hc-btn" onclick="openTicketModal('Order Concern')"><i class="fa-regular fa-message"></i> Submit Ticket</button>
+                    </div>
                     <div class="hc-list" id="ticketList" style="margin-top:10px"></div>
                 </div>
             </section>
@@ -882,9 +903,11 @@
 <script>
 const helpKey='printify_help_tickets';
 const helpTicketStoreUrl=@json(Route::has('help-center.tickets.store') ? route('help-center.tickets.store') : null);
+const helpServerTickets=@json($serverHelpTickets);
 const helpCsrf=@json(csrf_token());
 function helpToast(msg){const t=document.getElementById('helpToast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.helpToastTimer);window.helpToastTimer=setTimeout(()=>t.classList.remove('show'),2400)}
-function helpTickets(){try{return JSON.parse(localStorage.getItem(helpKey)||'[]')}catch(e){return []}}
+function helpLocalTickets(){try{return JSON.parse(localStorage.getItem(helpKey)||'[]')}catch(e){return []}}
+function helpTickets(){const seen=new Set();return [...(Array.isArray(helpServerTickets)?helpServerTickets:[]),...helpLocalTickets()].filter(ticket=>{const key=ticket.ref||ticket.reference||ticket.createdAt||JSON.stringify(ticket);if(seen.has(key))return false;seen.add(key);return true})}
 function saveTickets(items){localStorage.setItem(helpKey,JSON.stringify(items))}
 function helpField(id){return document.getElementById(id)}
 function escapeHelpText(value){return String(value||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}

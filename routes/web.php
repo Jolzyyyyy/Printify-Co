@@ -119,8 +119,17 @@ Route::middleware(['auth', 'role:customer', 'customer_otp'])->group(function () 
         return redirect()->route('home'); 
     })->name('customer.home');
 
-    Route::get('/dashboard', function () {
-        return view('dashboard'); 
+    Route::get('/dashboard', function (Request $request) {
+        $orders = Order::query()
+            ->where('user_id', $request->user()->id)
+            ->with(['items.service', 'items.serviceVariation', 'files'])
+            ->withCount('items')
+            ->latest()
+            ->get();
+
+        return view('dashboard', [
+            'orders' => $orders,
+        ]);
     })->name('dashboard');
 
     // ROUTES PARA SA CUSTOMER PROFILE
