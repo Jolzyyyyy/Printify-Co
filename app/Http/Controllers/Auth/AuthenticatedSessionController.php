@@ -22,8 +22,18 @@ class AuthenticatedSessionController extends Controller
     /**
      * Ipakita ang Login Form.
      */
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
+        $user = $request->user();
+
+        if ($user && $user->canAccessAdminPortal()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        } elseif ($user) {
+            return redirect()->route('dashboard.redirect');
+        }
+
         $this->storeSafeIntendedUrl($request);
 
         return view('auth.login', [

@@ -20,6 +20,34 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_staff_session_can_open_customer_login_without_admin_redirect(): void
+    {
+        $developer = User::factory()->create([
+            'role' => User::ROLE_DEVELOPER,
+        ]);
+
+        $response = $this
+            ->actingAs($developer)
+            ->withSession(['staff_otp_passed' => true])
+            ->get('/login');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('auth.login');
+        $this->assertGuest();
+    }
+
+    public function test_authenticated_customer_login_link_uses_customer_redirect_flow(): void
+    {
+        $customer = User::factory()->create([
+            'role' => User::ROLE_CUSTOMER,
+        ]);
+
+        $this
+            ->actingAs($customer)
+            ->get('/login')
+            ->assertRedirect(route('dashboard.redirect', absolute: false));
+    }
+
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
         Notification::fake();
