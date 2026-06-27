@@ -5,12 +5,17 @@
         $isDeveloperPortal = isset($portalUser) && $portalUser->isDeveloper();
         $isAdminClientPortal = isset($portalUser) && $portalUser->isAdminClient();
         $headerNotifications = $headerNotifications ?? collect();
-        $dashboardStats = $dashboardStats ?? ['revenue' => 0, 'orders' => 0, 'customers' => 0, 'services' => 0, 'pending' => 0, 'ready' => 0, 'completed' => 0, 'cancelled' => 0];
+        $dashboardStats = $dashboardStats ?? ['sales' => 0, 'revenue' => 0, 'orders' => 0, 'active_orders' => 0, 'customers' => 0, 'services' => 0, 'pending' => 0, 'ready' => 0, 'completed' => 0, 'cancelled' => 0, 'pending_payments' => 0, 'failed_payments' => 0, 'active_deliveries' => 0];
         $dashboardServiceAlerts = $dashboardServiceAlerts ?? collect();
         $dashboardServiceAlertCount = $dashboardServiceAlertCount ?? $dashboardServiceAlerts->count();
         $dashboardActiveUsersLabel = $dashboardActiveUsersLabel ?? 'Active Users';
         $dashboardActiveUsersRoute = $dashboardActiveUsersRoute ?? route('admin.customers');
         $dashboardRecentOrders = $dashboardRecentOrders ?? collect();
+        $dashboardPipeline = $dashboardPipeline ?? collect();
+        $dashboardRecentPayments = $dashboardRecentPayments ?? collect();
+        $dashboardRecentDeliveries = $dashboardRecentDeliveries ?? collect();
+        $dashboardHasPaymentRows = $dashboardHasPaymentRows ?? false;
+        $dashboardHasDeliveryRows = $dashboardHasDeliveryRows ?? false;
         $portalRoleLabel = $portalRoleLabel ?? ($isDeveloperPortal ? 'Developer' : ($isAdminClientPortal ? 'Admin Client' : 'Admin'));
         $portalRoleUpper = $portalRoleUpper ?? strtoupper($portalRoleLabel);
         $portalTitle = $portalTitle ?? ($isDeveloperPortal ? 'Developer Dashboard' : 'ADMIN DASHBOARD');
@@ -1179,17 +1184,17 @@
                     </div>
 
                     <div class="quick-actions-container">
-                        <div class="action-circle-group" @click="openModal('New Print Job', 'Initiating new printer workflow...', '#60A5FA')">
-                            <div class="action-circle circle-purple"><i data-lucide="file-plus-2" style="width:24px"></i></div>
-                            <span class="action-label">New Print Job</span>
+                        <div class="action-circle-group" @click="window.location.href='{{ route('admin.orders') }}'">
+                            <div class="action-circle circle-purple"><i data-lucide="clipboard-list" style="width:24px"></i></div>
+                            <span class="action-label">Orders</span>
                         </div>
-                        <div class="action-circle-group" @click="openModal('System Status', 'All servers are running optimally.', '#4ADE80')">
-                            <div class="action-circle circle-green"><i data-lucide="bar-chart-3" style="width:24px"></i></div>
-                            <span class="action-label">System Status</span>
+                        <div class="action-circle-group" @click="window.location.href='{{ route('admin.customers') }}'">
+                            <div class="action-circle circle-green"><i data-lucide="users-round" style="width:24px"></i></div>
+                            <span class="action-label">Customers</span>
                         </div>
-                        <div class="action-circle-group" @click="openModal('Printer Queue', '3 jobs currently in queue.', '#FBBF24')">
-                            <div class="action-circle circle-yellow"><i data-lucide="layers" style="width:24px"></i></div>
-                            <span class="action-label">Printer Queue</span>
+                        <div class="action-circle-group" @click="window.location.href='{{ route('admin.products') }}'">
+                            <div class="action-circle circle-yellow"><i data-lucide="package-check" style="width:24px"></i></div>
+                            <span class="action-label">Services</span>
                         </div>
                         <div class="action-circle-group" @click="chatOpen = true">
                             <div class="action-circle circle-blue"><i data-lucide="headphones" style="width:24px"></i></div>
@@ -1212,7 +1217,7 @@
                         'total' => 'PHP '.number_format((float) ($order->total_price ?? 0), 2),
                         'address' => $order->delivery_address ?? 'Customer address not provided',
                         'fulfillmentType' => $order->delivery_method ?? 'Pickup',
-                        'tracking' => $order->tracking_number ?? 'N/A',
+                        'tracking' => $order->delivery_tracking_number ?? $order->lalamove_order_id ?? 'N/A',
                         'notes' => $order->notes ?? 'No special instructions.',
                     ])->values();
                     $developer = $developerCommandCenter ?? null;
@@ -2842,38 +2847,39 @@
                     @else
 
                     <section class="dash-metrics">
-                        <button type="button" class="dash-metric blue" @click="openInfo('Revenue Details','Total recorded revenue: PHP {{ number_format($dashboardStats['revenue'], 2) }}. This is calculated from order totals.')">
-                            <span class="dash-icon dash-blue-soft"><i data-lucide="circle-dollar-sign"></i></span><span><small>Revenue</small><strong>PHP {{ number_format($dashboardStats['revenue'], 2) }}</strong><span>&uarr; 12.6% vs last 7 days</span></span>
+                        <button type="button" class="dash-metric blue" @click="openInfo('Revenue Details','Paid revenue for this admin-client workspace: PHP {{ number_format($dashboardStats['revenue'], 2) }}.')">
+                            <span class="dash-icon dash-blue-soft"><i data-lucide="circle-dollar-sign"></i></span><span><small>Paid Revenue</small><strong>PHP {{ number_format($dashboardStats['revenue'], 2) }}</strong><span>From paid orders</span></span>
                         </button>
                         <button type="button" class="dash-metric orange" @click="window.location.href='{{ route('admin.orders') }}'">
-                            <span class="dash-icon dash-orange-soft"><i data-lucide="shopping-bag"></i></span><span><small>Total Orders</small><strong>{{ number_format($dashboardStats['orders']) }}</strong><span>&uarr; 18.3% vs last 7 days</span></span>
+                            <span class="dash-icon dash-orange-soft"><i data-lucide="shopping-bag"></i></span><span><small>Total Orders</small><strong>{{ number_format($dashboardStats['orders']) }}</strong><span>{{ number_format($dashboardStats['active_orders']) }} active</span></span>
                         </button>
                         <button type="button" class="dash-metric green" @click="window.location.href='{{ $dashboardActiveUsersRoute }}'">
-                            <span class="dash-icon dash-green-soft"><i data-lucide="users-round"></i></span><span><small>{{ $dashboardActiveUsersLabel }}</small><strong>{{ number_format($dashboardStats['customers']) }}</strong><span>&uarr; 9.4% vs last 7 days</span></span>
+                            <span class="dash-icon dash-green-soft"><i data-lucide="users-round"></i></span><span><small>{{ $dashboardActiveUsersLabel }}</small><strong>{{ number_format($dashboardStats['customers']) }}</strong><span>Tenant customers</span></span>
                         </button>
-                        <button type="button" class="dash-metric red" @click="openInfo('Pending Approvals','Pending review count: {{ number_format($dashboardStats['pending']) }}. Review order and customer requests that need action.')">
-                            <span class="dash-icon dash-red-soft"><i data-lucide="clipboard-check"></i></span><span><small>Pending Approvals</small><strong>{{ number_format($dashboardStats['pending']) }}</strong><span class="red-trend">&darr; 5.1% vs last 7 days</span></span>
+                        <button type="button" class="dash-metric red" @click="openInfo('Payment Attention','Pending or failed payment records assigned to this workspace.')">
+                            <span class="dash-icon dash-red-soft"><i data-lucide="wallet-cards"></i></span><span><small>Payment Attention</small><strong>{{ number_format($dashboardStats['pending_payments'] + $dashboardStats['failed_payments']) }}</strong><span class="red-trend">{{ number_format($dashboardStats['failed_payments']) }} failed</span></span>
                         </button>
                         <button type="button" class="dash-metric cyan" @click="window.location.href='{{ route('admin.products') }}'">
-                            <span class="dash-icon dash-cyan-soft"><i data-lucide="package-check"></i></span><span><small>{{ $isDeveloperPortal ? 'Services' : 'Services / Products' }}</small><strong>{{ number_format($dashboardStats['services']) }}</strong><span>&uarr; 7.2% vs last 7 days</span></span>
+                            <span class="dash-icon dash-cyan-soft"><i data-lucide="truck"></i></span><span><small>Active Deliveries</small><strong>{{ number_format($dashboardStats['active_deliveries']) }}</strong><span>For fulfillment</span></span>
                         </button>
                     </section>
 
                     <section class="dash-grid-three">
                         <article class="dash-main-box dash-production-panel">
-                            <h2 class="dash-card-title">Print Production Live Status</h2>
+                            <h2 class="dash-card-title">Order Workload</h2>
                             @php
-                                $liveRows = [
-                                    ['DTG Printing', 148, 250, '#0b63f6'],
-                                    ['Sublimation', 96, 180, '#10b981'],
-                                    ['UV Printing', 74, 150, '#f59e0b'],
-                                    ['Packaging', 38, 120, '#ef4444'],
-                                ];
+                                $pipelineMax = max(1, (int) $dashboardPipeline->max('value'));
+                                $pipelineColors = ['blue' => '#0b63f6', 'orange' => '#f59e0b', 'green' => '#10b981', 'purple' => '#8b5cf6', 'red' => '#ef4444'];
                             @endphp
-                            @foreach($liveRows as [$label, $done, $total, $color])
-                                @php $percent = $total > 0 ? min(100, round(($done / $total) * 100)) : 0; @endphp
-                                <div class="dash-live-row"><span>{{ $label }}</span><span>{{ $done }} / {{ $total }}</span><div class="dash-bar"><span style="width:{{ $percent }}%;background:{{ $color }}"></span></div><strong>{{ $percent }}%</strong><span class="dash-ontime"><i class="dash-dot green"></i>On Time</span></div>
-                            @endforeach
+                            @forelse($dashboardPipeline as $pipelineRow)
+                                @php
+                                    $pipelinePercent = min(100, round(((int) $pipelineRow['value'] / $pipelineMax) * 100));
+                                    $pipelineColor = $pipelineColors[$pipelineRow['tone']] ?? '#0b63f6';
+                                @endphp
+                                <div class="dash-live-row"><span>{{ $pipelineRow['label'] }}</span><span>{{ number_format($pipelineRow['value']) }}</span><div class="dash-bar"><span style="width:{{ $pipelinePercent }}%;background:{{ $pipelineColor }}"></span></div><strong>{{ $pipelinePercent }}%</strong><span class="dash-ontime"><i class="dash-dot {{ $pipelineRow['tone'] }}"></i>Live</span></div>
+                            @empty
+                                <div class="dash-live-row"><span>No orders</span><span>0</span><div class="dash-bar"><span style="width:0"></span></div><strong>0%</strong><span class="dash-ontime"><i class="dash-dot blue"></i>Ready</span></div>
+                            @endforelse
                             <div class="dash-mini-row">
                                 <div class="dash-mini"><i data-lucide="clipboard-list" style="width:13px"></i>All Orders<strong>{{ number_format($dashboardStats['orders']) }}</strong></div>
                                 <div class="dash-mini"><i data-lucide="circle-check" style="width:13px"></i>Completed<strong>{{ number_format($dashboardStats['completed']) }}</strong></div>
@@ -2884,19 +2890,26 @@
 
                         <article class="dash-main-box dash-pipeline-panel">
                             <h2 class="dash-card-title">Order Pipeline Snapshot</h2>
+                            @php
+                                $orderTotal = max(1, (int) $dashboardStats['orders']);
+                                $pendingSlice = round(($dashboardStats['pending'] / $orderTotal) * 100);
+                                $activeSlice = round(($dashboardStats['active_orders'] / $orderTotal) * 100);
+                                $readySlice = round(($dashboardStats['ready'] / $orderTotal) * 100);
+                                $completedSlice = max(0, 100 - $pendingSlice - $activeSlice - $readySlice);
+                            @endphp
                             <div class="dash-donut-wrap">
                                 <svg class="dash-donut-svg" viewBox="0 0 220 220">
                                     <circle cx="110" cy="110" r="74" fill="none" stroke="#e8edf5" stroke-width="30"></circle>
-                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#0b63f6" stroke-width="30" stroke-dasharray="22 100" stroke-dashoffset="0" transform="rotate(-90 110 110)"></circle>
-                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#f59e0b" stroke-width="30" stroke-dasharray="28 100" stroke-dashoffset="-22" transform="rotate(-90 110 110)"></circle>
-                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#10b981" stroke-width="30" stroke-dasharray="20 100" stroke-dashoffset="-50" transform="rotate(-90 110 110)"></circle>
-                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#8b5cf6" stroke-width="30" stroke-dasharray="30 100" stroke-dashoffset="-70" transform="rotate(-90 110 110)"></circle>
+                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#0b63f6" stroke-width="30" stroke-dasharray="{{ $pendingSlice }} 100" stroke-dashoffset="0" transform="rotate(-90 110 110)"></circle>
+                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#f59e0b" stroke-width="30" stroke-dasharray="{{ $activeSlice }} 100" stroke-dashoffset="-{{ $pendingSlice }}" transform="rotate(-90 110 110)"></circle>
+                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#10b981" stroke-width="30" stroke-dasharray="{{ $readySlice }} 100" stroke-dashoffset="-{{ $pendingSlice + $activeSlice }}" transform="rotate(-90 110 110)"></circle>
+                                    <circle cx="110" cy="110" r="74" fill="none" stroke="#8b5cf6" stroke-width="30" stroke-dasharray="{{ $completedSlice }} 100" stroke-dashoffset="-{{ $pendingSlice + $activeSlice + $readySlice }}" transform="rotate(-90 110 110)"></circle>
                                     <text x="110" y="105" text-anchor="middle" class="dash-donut-number">{{ number_format($dashboardStats['orders']) }}</text>
                                     <text x="110" y="128" text-anchor="middle" class="dash-donut-label">Total Orders</text>
                                 </svg>
                                 <div class="dash-legend">
                                     <div class="dash-legend-line"><span><i class="dash-dot blue"></i>New</span><strong>{{ number_format($dashboardStats['pending']) }}</strong></div>
-                                    <div class="dash-legend-line"><span><i class="dash-dot orange"></i>Processing</span><strong>{{ number_format(max(0, $dashboardStats['orders'] - $dashboardStats['pending'] - $dashboardStats['ready'] - $dashboardStats['completed'])) }}</strong></div>
+                                    <div class="dash-legend-line"><span><i class="dash-dot orange"></i>Active</span><strong>{{ number_format($dashboardStats['active_orders']) }}</strong></div>
                                     <div class="dash-legend-line"><span><i class="dash-dot green"></i>Ready</span><strong>{{ number_format($dashboardStats['ready']) }}</strong></div>
                                     <div class="dash-legend-line"><span><i class="dash-dot purple"></i>Completed</span><strong>{{ number_format($dashboardStats['completed']) }}</strong></div>
                                 </div>
@@ -2905,12 +2918,12 @@
                         </article>
 
                         <article class="dash-plain-panel dash-quick-panel">
-                            <h2 class="dash-card-title">Quick Admin Actions</h2>
-                            <a class="dash-action-line" href="{{ route('admin.orders') }}"><span class="dash-action-icon"><i data-lucide="clipboard-list"></i></span><span><strong>View Production Queue</strong><small>See current print jobs</small></span><i data-lucide="chevron-right"></i></a>
-                            <a class="dash-action-line" href="{{ route('admin.customers') }}"><span class="dash-action-icon"><i data-lucide="users-round"></i></span><span><strong>Review Customer Records</strong><small>Manage customer profiles</small></span><i data-lucide="chevron-right"></i></a>
-                            <a class="dash-action-line" href="{{ route('admin.products') }}"><span class="dash-action-icon"><i data-lucide="package-pen"></i></span><span><strong>{{ $isDeveloperPortal ? 'Service Catalog' : 'Product Edits' }}</strong><small>{{ $isDeveloperPortal ? 'Review service availability' : 'Add or update products' }}</small></span><i data-lucide="chevron-right"></i></a>
-                            <a class="dash-action-line" href="{{ route('admin.orders') }}"><span class="dash-action-icon"><i data-lucide="rotate-ccw"></i></span><span><strong>Return Requests</strong><small>Manage return and refund</small></span><i data-lucide="chevron-right"></i></a>
-                            <a class="dash-action-line" href="{{ route('admin.products') }}"><span class="dash-action-icon"><i data-lucide="boxes"></i></span><span><strong>{{ $isDeveloperPortal ? 'Service Items' : 'Catalog Items' }}</strong><small>Manage catalog and services</small></span><i data-lucide="chevron-right"></i></a>
+                            <h2 class="dash-card-title">Workspace Actions</h2>
+                            <a class="dash-action-line" href="{{ route('admin.orders') }}"><span class="dash-action-icon"><i data-lucide="clipboard-list"></i></span><span><strong>Manage Orders</strong><small>Review assigned customer orders</small></span><i data-lucide="chevron-right"></i></a>
+                            <a class="dash-action-line" href="{{ route('admin.customers') }}"><span class="dash-action-icon"><i data-lucide="users-round"></i></span><span><strong>Assigned Customers</strong><small>View customer records under this business</small></span><i data-lucide="chevron-right"></i></a>
+                            <a class="dash-action-line" href="{{ route('admin.products') }}"><span class="dash-action-icon"><i data-lucide="package-check"></i></span><span><strong>Service Catalog</strong><small>Review available print services</small></span><i data-lucide="chevron-right"></i></a>
+                            <a class="dash-action-line" href="{{ route('admin.reports') }}"><span class="dash-action-icon"><i data-lucide="chart-no-axes-combined"></i></span><span><strong>Reports</strong><small>Open business reports and summaries</small></span><i data-lucide="chevron-right"></i></a>
+                            <a class="dash-action-line" href="{{ route('admin.admin-client-profile.edit') }}"><span class="dash-action-icon"><i data-lucide="building-2"></i></span><span><strong>Business Profile</strong><small>Maintain admin-client reference details</small></span><i data-lucide="chevron-right"></i></a>
                         </article>
                     </section>
 
@@ -2918,14 +2931,14 @@
                         <article class="dash-main-box dash-alert-stock-box dash-alerts-stock-panel">
                             <div class="dash-alert-stock-inner">
                                 <div class="dash-alert-area dash-system-alerts-panel">
-                                    <h2 class="dash-card-title">System Alerts</h2>
+                                    <h2 class="dash-card-title">Operational Alerts</h2>
                                     <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.orders') }}','Opening pending order checks...')"><span class="dash-alert-copy"><span class="dash-alert-icon red"><i data-lucide="triangle-alert" style="width:16px"></i></span><span><strong>Pending order checks</strong><br><small>Orders need verification</small></span></span><b class="dash-count-pill red">{{ number_format($dashboardStats['pending']) }}</b></button>
-                                    <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.products') }}','Opening synced service catalog records...')"><span class="dash-alert-copy"><span class="dash-alert-icon orange"><i data-lucide="trophy" style="width:16px"></i></span><span><strong>Synced service records</strong><br><small>Customer catalog items live in this portal</small></span></span><b class="dash-count-pill">{{ number_format($dashboardServiceAlertCount) }}</b></button>
-                                    <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.orders') }}','Opening ready for release orders...')"><span class="dash-alert-copy"><span class="dash-alert-icon blue"><i data-lucide="package-check" style="width:16px"></i></span><span><strong>Ready for release</strong><br><small>Orders ready to dispatch</small></span></span><b class="dash-count-pill blue">{{ number_format($dashboardStats['ready']) }}</b></button>
+                                    <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.orders') }}','Opening payment follow-up records...')"><span class="dash-alert-copy"><span class="dash-alert-icon orange"><i data-lucide="wallet-cards" style="width:16px"></i></span><span><strong>Payment follow-up</strong><br><small>Pending or failed payment records</small></span></span><b class="dash-count-pill">{{ number_format($dashboardStats['pending_payments'] + $dashboardStats['failed_payments']) }}</b></button>
+                                    <button type="button" class="dash-alert-line" @click="openReal('{{ route('admin.orders') }}','Opening active delivery records...')"><span class="dash-alert-copy"><span class="dash-alert-icon blue"><i data-lucide="truck" style="width:16px"></i></span><span><strong>Active deliveries</strong><br><small>Orders still in fulfillment</small></span></span><b class="dash-count-pill blue">{{ number_format($dashboardStats['active_deliveries']) }}</b></button>
                                     <a class="dash-link" href="{{ route('admin.orders') }}">View all alerts <i data-lucide="arrow-right" style="width:14px"></i></a>
                                 </div>
                                 <div class="dash-stock-area dash-low-stock-panel">
-                                    <h2 class="dash-card-title">{{ $isDeveloperPortal ? 'Service Alerts' : 'Low Stock Alerts' }}</h2>
+                                    <h2 class="dash-card-title">Service Readiness</h2>
                                     <table class="dash-table dash-stock-table">
                                         <thead><tr><th>Service</th><th>Options</th><th>Status</th></tr></thead>
                                         <tbody>
@@ -2942,12 +2955,12 @@
                         </article>
 
                         <article class="dash-plain-panel dash-pending-panel">
-                            <h2 class="dash-card-title">Pending Approvals</h2>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.customers') }}','Opening user registrations...')"><span>User registrations</span><strong>{{ number_format($dashboardStats['pending']) }}</strong></button>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening return requests...')"><span>Return requests</span><strong>{{ number_format(max(0, $dashboardStats['cancelled'])) }}</strong></button>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.products') }}','Opening {{ $isDeveloperPortal ? 'service' : 'product' }} edits...')"><span>{{ $isDeveloperPortal ? 'Service edits' : 'Product edits' }}</span><strong>{{ number_format(max(0, $dashboardStats['services'])) }}</strong></button>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.products') }}','Opening catalog submissions...')"><span>Catalog item submissions</span><strong>1</strong></button>
-                            <a class="dash-link" href="{{ route('admin.orders') }}">Review all approvals <i data-lucide="arrow-right" style="width:14px"></i></a>
+                            <h2 class="dash-card-title">Action Queue</h2>
+                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening pending orders...')"><span>Pending orders</span><strong>{{ number_format($dashboardStats['pending']) }}</strong></button>
+                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening ready orders...')"><span>Ready for pickup/delivery</span><strong>{{ number_format($dashboardStats['ready']) }}</strong></button>
+                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening payment follow-up...')"><span>Payment follow-up</span><strong>{{ number_format($dashboardStats['pending_payments'] + $dashboardStats['failed_payments']) }}</strong></button>
+                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening delivery follow-up...')"><span>Delivery follow-up</span><strong>{{ number_format($dashboardStats['active_deliveries']) }}</strong></button>
+                            <a class="dash-link" href="{{ route('admin.orders') }}">Review all actions <i data-lucide="arrow-right" style="width:14px"></i></a>
                         </article>
                     </section>
 
@@ -2982,12 +2995,27 @@
                         </article>
 
                         <article class="dash-plain-panel dash-task-panel">
-                            <h2 class="dash-card-title">Staff Task Reminder</h2>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening pending requests...')"><span><i data-lucide="check-square" style="width:14px"></i> Review pending requests</span><strong>{{ number_format($dashboardStats['pending']) }}</strong></button>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening production queue...')"><span><i data-lucide="check-square" style="width:14px"></i> Update production queue</span><strong>{{ number_format($dashboardStats['orders']) }}</strong></button>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.products') }}','Opening product records...')"><span><i data-lucide="check-square" style="width:14px"></i> Check product records</span><strong>{{ number_format($dashboardStats['services']) }}</strong></button>
-                            <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.customers') }}','Opening customer inquiries...')"><span><i data-lucide="check-square" style="width:14px"></i> Reply to customer inquiries</span><strong>1</strong></button>
-                            <a class="dash-link" href="{{ route('admin.customers') }}">View all tasks <i data-lucide="arrow-right" style="width:14px"></i></a>
+                            <h2 class="dash-card-title">Payment & Delivery</h2>
+                            @forelse($dashboardRecentPayments->take(2) as $paymentRecord)
+                                @php
+                                    $paymentOrder = $dashboardHasPaymentRows ? $paymentRecord->order : $paymentRecord;
+                                    $paymentLabel = $dashboardHasPaymentRows ? ($paymentRecord->gateway_reference ?: '#'.$paymentRecord->id) : ($paymentRecord->payment_reference ?: '#'.$paymentRecord->id);
+                                    $paymentStatus = $dashboardHasPaymentRows ? $paymentRecord->status : ($paymentRecord->paid_at ? 'paid' : 'pending');
+                                @endphp
+                                <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening payment record...')"><span><i data-lucide="wallet-cards" style="width:14px"></i> {{ $paymentLabel }}</span><strong>{{ \Illuminate\Support\Str::headline($paymentStatus) }}</strong></button>
+                            @empty
+                                <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening payment records...')"><span><i data-lucide="wallet-cards" style="width:14px"></i> No payment records yet</span><strong>0</strong></button>
+                            @endforelse
+                            @forelse($dashboardRecentDeliveries->take(2) as $deliveryRecord)
+                                @php
+                                    $deliveryLabel = $dashboardHasDeliveryRows ? ($deliveryRecord->tracking_reference ?: optional($deliveryRecord->order)->order_reference ?: '#'.$deliveryRecord->id) : ($deliveryRecord->delivery_tracking_number ?: $deliveryRecord->order_reference ?: '#'.$deliveryRecord->id);
+                                    $deliveryStatus = $dashboardHasDeliveryRows ? $deliveryRecord->status : ($deliveryRecord->delivery_booking_status ?: $deliveryRecord->lalamove_status ?: 'pending');
+                                @endphp
+                                <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening delivery record...')"><span><i data-lucide="truck" style="width:14px"></i> {{ $deliveryLabel }}</span><strong>{{ \Illuminate\Support\Str::headline($deliveryStatus) }}</strong></button>
+                            @empty
+                                <button type="button" class="dash-task-line" @click="openReal('{{ route('admin.orders') }}','Opening delivery records...')"><span><i data-lucide="truck" style="width:14px"></i> No delivery records yet</span><strong>0</strong></button>
+                            @endforelse
+                            <a class="dash-link" href="{{ route('admin.orders') }}">View order records <i data-lucide="arrow-right" style="width:14px"></i></a>
                         </article>
                     </section>
 
@@ -3002,7 +3030,7 @@
                             <div class="dash-modal-grid">
                                 <article class="dash-modal-card"><h3>Customer</h3><div class="dash-customer-flex"><div class="dash-avatar"><i data-lucide="user"></i></div><div><strong x-text="selectedOrder?.customer || 'Customer'"></strong><small x-text="selectedOrder?.email || 'customer@example.com'"></small><small x-text="selectedOrder?.phone || '+63 900 000 0000'"></small></div></div><small style="display:inline-block;margin-top:10px;color:#64748b">Customer ID: Auto-generated</small></article>
                                 <article class="dash-modal-card"><h3>Shipping Address</h3><p class="dash-address"><i data-lucide="map-pin"></i><span x-text="selectedOrder?.address || 'Customer address not provided'"></span></p></article>
-                                <article class="dash-modal-card"><h3>Payment Method</h3><p style="margin:0 0 8px;font-weight:800"><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ef4444"></span><span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#f59e0b;margin-left:-7px"></span> VISA &bull;&bull;&bull;&bull; 4242</p><span class="dash-pill completed">Paid</span></article>
+                                <article class="dash-modal-card"><h3>Payment</h3><p style="margin:0 0 8px;font-weight:800" x-text="selectedOrder?.payment || 'Payment not recorded'"></p><span class="dash-pill" :class="(selectedOrder?.payment || '').toLowerCase().includes('paid') ? 'completed' : 'processing'" x-text="selectedOrder?.payment || 'Pending'"></span></article>
                             </div>
                             <section class="dash-status-strip">
                                 <div><span>Order Status</span><b x-text="selectedOrder?.status || 'Recorded'"></b></div>
@@ -3015,7 +3043,7 @@
                             <div class="dash-modal-bottom">
                                 <article class="dash-modal-card"><h3>Notes / Special Instructions</h3><p style="font-size:12px;line-height:1.55;margin:0" x-text="selectedOrder?.notes || 'No special instructions.'"></p></article>
                                 <article class="dash-modal-card"><h3>Order Timeline</h3><div class="dash-activity-line"><span>Order Placed</span><strong>Done</strong></div><div class="dash-activity-line"><span>Payment Confirmed</span><strong>Done</strong></div><div class="dash-activity-line"><span>Preparing</span><strong>Current</strong></div></article>
-                                <article class="dash-modal-card dash-modal-actions"><h3>Actions</h3><button type="button" class="dash-btn dash-primary" @click="printInvoice()"><i data-lucide="printer"></i>Print Invoice</button><button type="button" class="dash-btn dash-outline" @click="markCompleted()"><i data-lucide="check-circle"></i>Mark Completed</button></article>
+                                <article class="dash-modal-card dash-modal-actions"><h3>Actions</h3><button type="button" class="dash-btn dash-primary" @click="printInvoice()"><i data-lucide="printer"></i>Print Invoice</button><button type="button" class="dash-btn dash-outline" @click="openReal('{{ route('admin.orders') }}','Opening order management...')"><i data-lucide="external-link"></i>Open Orders</button></article>
                             </div>
                         </div>
                     </div>
@@ -3117,7 +3145,7 @@
                                 openReal(url,message){this.showToast(message||'Opening...');window.dispatchEvent(new CustomEvent('printify-admin-feedback',{detail:{message:message||'Opening section...'}}));setTimeout(()=>{window.location.href=url},350);},
                                 refreshDashboard(){this.showToast('Dashboard refreshed');this.refreshIcons();setTimeout(()=>window.location.reload(),450);},
                                 exportDashboard(){
-                                    const rows=[['Metric','Value'],['Revenue','PHP {{ number_format($dashboardStats['revenue'], 2) }}'],['Orders','{{ number_format($dashboardStats['orders']) }}'],['{{ $dashboardActiveUsersLabel }}','{{ number_format($dashboardStats['customers']) }}'],['Pending Approvals','{{ number_format($dashboardStats['pending']) }}'],['Services','{{ number_format($dashboardStats['services']) }}']];
+                                    const rows=[['Metric','Value'],['Sales','PHP {{ number_format($dashboardStats['sales'], 2) }}'],['Paid Revenue','PHP {{ number_format($dashboardStats['revenue'], 2) }}'],['Orders','{{ number_format($dashboardStats['orders']) }}'],['Active Orders','{{ number_format($dashboardStats['active_orders']) }}'],['{{ $dashboardActiveUsersLabel }}','{{ number_format($dashboardStats['customers']) }}'],['Pending Payments','{{ number_format($dashboardStats['pending_payments']) }}'],['Failed Payments','{{ number_format($dashboardStats['failed_payments']) }}'],['Active Deliveries','{{ number_format($dashboardStats['active_deliveries']) }}'],['Services','{{ number_format($dashboardStats['services']) }}']];
                                     const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');
                                     const a=document.createElement('a');
                                     a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
@@ -3139,14 +3167,6 @@
                                     w.document.close();
                                     this.showToast('Print window opened for '+o.id);
                                 },
-                                markCompleted(){
-                                    if(!this.selectedOrder){this.showToast('Select an order first');return;}
-                                    this.selectedOrder.status='Completed';
-                                    const found=this.orders.find(o=>o.id===this.selectedOrder.id);
-                                    if(found)found.status='Completed';
-                                    this.showToast(this.selectedOrder.id+' marked as completed');
-                                    this.refreshIcons();
-                                }
                             }
                         }
                     </script>

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\Delivery;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Service;
 use App\Models\User;
 use App\Services\DeveloperDashboardMetricsService;
@@ -24,7 +26,12 @@ class DashboardController extends Controller
         $orderQuery = Order::query()->visibleToPortalUser($user);
         $customerQuery = User::query()
             ->where('role', User::ROLE_CUSTOMER)
-            ->when($isAdminClient, fn (Builder $query) => $query->where('admin_client_id', $user->id));
+            ->when($isAdminClient, function (Builder $query) use ($user) {
+                $query->where(function (Builder $scope) use ($user) {
+                    $scope->where('admin_client_id', $user->id)
+                        ->when($user->business_id, fn (Builder $tenant) => $tenant->orWhere('business_id', $user->business_id));
+                });
+            });
 
         $statusCounts = (clone $orderQuery)
             ->selectRaw('status, COUNT(*) as total')
@@ -149,12 +156,28 @@ class DashboardController extends Controller
                 ->whereNotNull('approved_at'))
             ->when($isAdminClient, fn (Builder $query) => $query
                 ->where('role', User::ROLE_CUSTOMER)
-                ->where('admin_client_id', $user->id))
+                ->where(function (Builder $scope) use ($user) {
+                    $scope->where('admin_client_id', $user->id)
+                        ->when($user->business_id, fn (Builder $tenant) => $tenant->orWhere('business_id', $user->business_id));
+                }))
             ->when(!$isDeveloper && !$isAdminClient, fn (Builder $query) => $query
                 ->where('role', User::ROLE_CUSTOMER));
-        $dashboardServices = Service::query()->where('is_active', true);
+        $dashboardServices = Service::query()
+            ->where('is_active', true)
+            ->when($isAdminClient && $user->business_id, function (Builder $query) use ($user) {
+                $query->where(function (Builder $scope) use ($user) {
+                    $scope->whereNull('business_id')
+                        ->orWhere('business_id', $user->business_id);
+                });
+            });
         $dashboardServiceAlerts = Service::query()
             ->where('is_active', true)
+            ->when($isAdminClient && $user->business_id, function (Builder $query) use ($user) {
+                $query->where(function (Builder $scope) use ($user) {
+                    $scope->whereNull('business_id')
+                        ->orWhere('business_id', $user->business_id);
+                });
+            })
             ->withCount('activeVariations')
             ->orderBy('category')
             ->orderBy('name')
@@ -187,16 +210,57 @@ class DashboardController extends Controller
             })
             ->values();
 
+        $dashboardPayments = Payment::query()->visibleToPortalUser($user);
+        $dashboardDeliveries = Delivery::query()->visibleToPortalUser($user);
+        $hasPaymentRows = (clone $dashboardPayments)->exists();
+        $hasDeliveryRows = (clone $dashboardDeliveries)->exists();
+        $completedStatuses = ['Completed', 'completed'];
+        $cancelledStatuses = ['Cancelled', 'cancelled', 'canceled'];
+        $activeOrderStatuses = ['Pending', 'pending', 'For Verification', 'for_verification', 'Processing', 'processing', 'Ready', 'Ready / Delivery', 'ready', 'out_for_delivery'];
+        $readyStatuses = ['Ready', 'Ready / Delivery', 'ready', 'out_for_delivery'];
+        $pendingPaymentStatuses = [Payment::STATUS_PENDING, 'pending_payment', 'unpaid'];
+        $failedPaymentStatuses = [Payment::STATUS_FAILED, Payment::STATUS_DISCREPANCY, Payment::STATUS_CANCELLED, 'failed', 'discrepancy', 'cancelled'];
+        $activeDeliveryStatuses = ['pending', 'pending_manual_booking', 'pending_lalamove_configuration', 'waiting_for_payment', 'booked', 'out_for_delivery', 'ready', 'processing'];
+
         $dashboardStats = [
-            'revenue' => (float) (clone $dashboardOrders)->sum('total_price'),
+            'sales' => (float) (clone $dashboardOrders)->sum('total_price'),
+            'revenue' => $hasPaymentRows
+                ? (float) (clone $dashboardPayments)->where(Payment::query()->qualifyColumn('status'), Payment::STATUS_PAID)->sum('amount')
+                : (float) (clone $dashboardOrders)->whereNotNull('paid_at')->sum('total_price'),
             'orders' => (clone $dashboardOrders)->count(),
+            'active_orders' => (clone $dashboardOrders)->whereIn('status', $activeOrderStatuses)->count(),
             'customers' => (clone $dashboardActiveUsers)->count(),
             'services' => (clone $dashboardServices)->count(),
-            'pending' => (clone $dashboardOrders)->whereIn('status', ['Pending', 'For Verification'])->count(),
-            'ready' => (clone $dashboardOrders)->whereIn('status', ['Ready', 'Ready / Delivery'])->count(),
-            'completed' => (clone $dashboardOrders)->where('status', 'Completed')->count(),
-            'cancelled' => (clone $dashboardOrders)->where('status', 'Cancelled')->count(),
+            'pending' => (clone $dashboardOrders)->whereIn('status', ['Pending', 'pending', 'For Verification', 'for_verification'])->count(),
+            'ready' => (clone $dashboardOrders)->whereIn('status', $readyStatuses)->count(),
+            'completed' => (clone $dashboardOrders)->whereIn('status', $completedStatuses)->count(),
+            'cancelled' => (clone $dashboardOrders)->whereIn('status', $cancelledStatuses)->count(),
+            'pending_payments' => $hasPaymentRows
+                ? (clone $dashboardPayments)->whereIn(Payment::query()->qualifyColumn('status'), $pendingPaymentStatuses)->count()
+                : (clone $dashboardOrders)->whereNull('paid_at')->count(),
+            'failed_payments' => $hasPaymentRows
+                ? (clone $dashboardPayments)->whereIn(Payment::query()->qualifyColumn('status'), $failedPaymentStatuses)->count()
+                : (clone $dashboardOrders)->whereIn('status', ['payment_failed', 'Payment Failed'])->count(),
+            'active_deliveries' => $hasDeliveryRows
+                ? (clone $dashboardDeliveries)->whereIn(Delivery::query()->qualifyColumn('status'), $activeDeliveryStatuses)->count()
+                : (clone $dashboardOrders)->whereNotNull('delivery_booking_status')->whereNotIn('delivery_booking_status', ['delivered', 'failed', 'cancelled'])->count(),
         ];
+
+        $dashboardPipeline = collect([
+            ['label' => 'Pending', 'value' => $dashboardStats['pending'], 'tone' => 'blue'],
+            ['label' => 'Active', 'value' => $dashboardStats['active_orders'], 'tone' => 'orange'],
+            ['label' => 'Ready', 'value' => $dashboardStats['ready'], 'tone' => 'green'],
+            ['label' => 'Completed', 'value' => $dashboardStats['completed'], 'tone' => 'purple'],
+            ['label' => 'Cancelled', 'value' => $dashboardStats['cancelled'], 'tone' => 'red'],
+        ]);
+
+        $dashboardRecentPayments = $hasPaymentRows
+            ? (clone $dashboardPayments)->with(['order', 'customer'])->latest()->limit(5)->get()
+            : (clone $dashboardOrders)->whereNotNull('payment_method')->latest()->limit(5)->get();
+
+        $dashboardRecentDeliveries = $hasDeliveryRows
+            ? (clone $dashboardDeliveries)->with(['order', 'customer'])->latest()->limit(5)->get()
+            : (clone $dashboardOrders)->whereNotNull('delivery_booking_status')->latest()->limit(5)->get();
 
         $portalRoleLabel = $isDeveloper ? 'Developer' : ($isAdminClient ? 'Admin Client' : 'Admin');
 
@@ -210,6 +274,11 @@ class DashboardController extends Controller
             'dashboardActiveUsersLabel' => $isDeveloper ? 'Active Admin Clients' : ($isAdminClient ? 'Active Customers' : 'Active Users'),
             'dashboardActiveUsersRoute' => $isDeveloper ? route('developer.admin-clients.index') : route('admin.customers'),
             'dashboardRecentOrders' => (clone $dashboardOrders)->with('user')->latest()->limit(5)->get(),
+            'dashboardPipeline' => $dashboardPipeline,
+            'dashboardRecentPayments' => $dashboardRecentPayments,
+            'dashboardRecentDeliveries' => $dashboardRecentDeliveries,
+            'dashboardHasPaymentRows' => $hasPaymentRows,
+            'dashboardHasDeliveryRows' => $hasDeliveryRows,
             'portalRoleLabel' => $portalRoleLabel,
             'portalRoleUpper' => strtoupper($portalRoleLabel),
             'portalTitle' => $isDeveloper ? 'Developer Dashboard' : 'ADMIN DASHBOARD',
