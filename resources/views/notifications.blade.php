@@ -1,7 +1,7 @@
 <x-app-layout>
 @php
     $customer = auth()->user();
-    $customerName = $customer->name ?? trim(($customer->first_name ?? 'Eyra').' '.($customer->last_name ?? 'Mae'));
+    $customerName = $customer?->name ?? trim(($customer?->first_name ?? '').' '.($customer?->last_name ?? '')) ?: 'Customer';
     $tabs = [
         'all' => 'All',
         'order' => 'Order Updates',
@@ -10,20 +10,130 @@
         'promotions' => 'Promotions',
         'messages' => 'Messages',
     ];
-    $notifications = [
-        ['category'=>'billing','step'=>2,'order'=>'#ORD-55201','chip'=>'Order Update','title'=>'Payment Pending Reminder','time'=>'2 mins ago','icon'=>'card','color'=>'orange','preview'=>'Payment for Order <strong>#ORD-55201</strong> is pending. Complete payment to proceed.','message'=>'This is a friendly reminder that the payment for your order is still pending. To avoid delays, please complete your payment at your earliest convenience.','total'=>'₱2,850.00','balance'=>'₱2,850.00','payment'=>'Bank Transfer (BPI)','due'=>'May 29, 2026, 11:59 PM','unread'=>true],
-        ['category'=>'order','step'=>1,'order'=>'#ORD-55198','chip'=>'Proof Approved','title'=>'Proof Approved','time'=>'28 mins ago','icon'=>'check','color'=>'green','preview'=>'Your proof for Order <strong>#ORD-55198</strong> has been approved. Production will start next.','message'=>'Your proof has been approved. We will start production shortly and notify you once your order moves to the next stage.','total'=>'₱1,950.00','balance'=>'Paid','payment'=>'GCash','due'=>'Production starts today','unread'=>true],
-        ['category'=>'order','step'=>1,'order'=>'#ORD-55196','chip'=>'File Alert','title'=>'File Rejected - Low Resolution','time'=>'1 hour ago','icon'=>'warn','color'=>'red','preview'=>'The file uploaded for Order <strong>#ORD-55196</strong> is too low resolution.','message'=>'The uploaded file is below our recommended resolution. Please upload a clearer file so our team can continue processing.','total'=>'₱980.00','balance'=>'Paid','payment'=>'Credit Card','due'=>'Upload replacement file','unread'=>true],
-        ['category'=>'order','step'=>4,'order'=>'#ORD-55190','chip'=>'Order Complete','title'=>'Production Completed','time'=>'3 hours ago','icon'=>'file','color'=>'blue','preview'=>'Great news! Your order <strong>#ORD-55190</strong> has been completed.','message'=>'Great news! Your order has been completed and is now ready for pickup or delivery based on your selected option.','total'=>'₱3,120.00','balance'=>'Paid','payment'=>'GCash','due'=>'Ready for pickup / delivery','unread'=>false],
-        ['category'=>'order','step'=>4,'order'=>'#ORD-55188','chip'=>'Shipping Update','title'=>'Order Shipped','time'=>'5 hours ago','icon'=>'truck','color'=>'blue','preview'=>'Your order <strong>#ORD-55188</strong> has been shipped via LBC Express.','message'=>'Your order has been shipped via LBC Express. Please monitor your tracking link for delivery updates.','total'=>'₱1,450.00','balance'=>'Paid','payment'=>'Maya','due'=>'In transit via LBC Express','unread'=>false],
-        ['category'=>'order','step'=>3,'order'=>'#ORD-55185','chip'=>'Pickup Reminder','title'=>'Pickup Schedule Reminder','time'=>'8 hours ago','icon'=>'calendar','color'=>'purple','preview'=>'Your order <strong>#ORD-55185</strong> is ready for pickup tomorrow.','message'=>'This is a reminder that your order is ready for pickup tomorrow. Please bring your valid ID and order confirmation.','total'=>'₱2,280.00','balance'=>'Paid','payment'=>'Credit Card','due'=>'May 30, 2026, 3:00 PM','unread'=>false],
-        ['category'=>'messages','step'=>0,'order'=>'Message','chip'=>'Branch Reply','title'=>'Branch Reply - Makati','time'=>'Yesterday, 2:15 PM','icon'=>'msg','color'=>'orange','preview'=>'Glokal branch replied to your inquiry about bulk pricing.','message'=>'Glokal branch replied to your inquiry about bulk pricing. You may reply to the branch or contact support for assistance.','total'=>'Not applicable','balance'=>'Not applicable','payment'=>'Not applicable','due'=>'Reply available','unread'=>false],
-        ['category'=>'promotions','step'=>0,'order'=>'Promo','chip'=>'Exclusive Coupon','title'=>'Exclusive Coupon - Expires Soon!','time'=>'Yesterday, 9:00 AM','icon'=>'tag','color'=>'green','preview'=>'Get 15% OFF on your next order. Use code PRINT15.','message'=>'Get 15% OFF your next order. Use code PRINT15 before it expires.','total'=>'15% OFF','balance'=>'Promo code: PRINT15','payment'=>'Valid until May 31, 2026','due'=>'Apply before checkout','unread'=>false],
-        ['category'=>'security','step'=>0,'order'=>'Account','chip'=>'Security','title'=>'Account Verified Successfully','time'=>'May 27, 2026, 4:20 PM','icon'=>'shield','color'=>'green','preview'=>'Your account has been verified. Thank you!','message'=>'Your account has been verified successfully. Thank you for completing the verification process.','total'=>'Verified','balance'=>'No action needed','payment'=>'Account Security','due'=>'Completed','unread'=>false],
-        ['category'=>'security','step'=>0,'order'=>'Account','chip'=>'Security Alert','title'=>'Suspicious Login Detected','time'=>'May 27, 2026, 1:05 PM','icon'=>'shield','color'=>'red','preview'=>'We detected a login attempt from a new device in Quezon City.','message'=>'We detected a login attempt from a new device in Quezon City. If this was not you, please secure your account immediately.','total'=>'Security alert','balance'=>'Review needed','payment'=>'Login Protection','due'=>'Immediate action recommended','unread'=>false],
-        ['category'=>'billing','step'=>4,'order'    =>'#ORD-55180','chip'=>'Billing','title'=>'Invoice Available','time'=>'May 27, 2026, 10:30 AM','icon'=>'file','color'=>'blue','preview'=>'Invoice for Order <strong>#ORD-55180</strong> is now available for download.','message'=>'Your invoice is now available for download. You may view or save it from your account billing records.','total'=>'₱2,050.00','balance'=>'Paid','payment'=>'Credit Card','due'=>'Invoice ready','unread'=>false],
-        ['category'=>'promotions','step'=>0,'order'=>'Promo','chip'=>'Recommendation','title'=>'Re-order Recommendation','time'=>'May 26, 2026, 11:20 AM','icon'=>'card','color'=>'blue','preview'=>'Need more business cards? Re-order in one click.','message'=>'Need more business cards? You can re-order your previous design in one click.','total'=>'Re-order available','balance'=>'Optional','payment'=>'Previous design saved','due'=>'Anytime','unread'=>false],
-    ];
+    $readNotifications = session('customer_notifications_read', []);
+    $readAllAt = session('customer_notifications_all_read_at') ? \Illuminate\Support\Carbon::parse(session('customer_notifications_all_read_at')) : null;
+    $money = fn ($value) => '₱'.number_format((float) $value, 2);
+    $orderRef = fn ($order) => $order->order_reference ?: '#ORD-'.str_pad((string) $order->id, 5, '0', STR_PAD_LEFT);
+    $orderStep = function (?string $status) {
+        return match (strtolower(trim((string) $status))) {
+            'pending', 'pending payment', 'unpaid', 'awaiting payment' => 2,
+            'processing', 'in production', 'production', 'paid' => 3,
+            'shipped', 'in transit', 'ready' => 3,
+            'completed', 'complete', 'delivered', 'cancelled' => 4,
+            default => 1,
+        };
+    };
+    $orderIcon = function (?string $status) {
+        return match (strtolower(trim((string) $status))) {
+            'pending', 'pending payment', 'unpaid', 'awaiting payment' => ['card', 'orange'],
+            'paid', 'completed', 'complete', 'delivered' => ['check', 'green'],
+            'shipped', 'in transit', 'ready' => ['truck', 'blue'],
+            'cancelled', 'failed', 'rejected' => ['warn', 'red'],
+            default => ['file', 'blue'],
+        };
+    };
+    $isPaidOrder = fn ($order) => filled($order->paid_at) || in_array(strtolower((string) $order->status), ['paid', 'completed', 'complete', 'delivered'], true);
+    $orders = $customer
+        ? $customer->orders()->with('items')->latest()->limit(10)->get()
+        : collect();
+    $supportTickets = $customer && class_exists(\App\Models\SupportTicket::class)
+        ? \App\Models\SupportTicket::where('user_id', $customer->id)->latest()->limit(4)->get()
+        : collect();
+
+    $notifications = collect();
+    foreach ($orders as $order) {
+        [$icon, $color] = $orderIcon($order->status);
+        $ref = $orderRef($order);
+        $paid = $isPaidOrder($order);
+        $status = $order->status ?: 'Order placed';
+        $category = $paid ? 'order' : 'billing';
+        $title = $paid ? 'Order Status Updated' : 'Payment Pending';
+        $notificationId = 'order-'.$order->id.'-'.\Illuminate\Support\Str::slug($status);
+        $created = $order->updated_at ?: $order->created_at ?: now();
+        $invoiceUrl = $order->receipt_pdf_path
+            ? \Illuminate\Support\Facades\Storage::url($order->receipt_pdf_path)
+            : route('myorders.show', $order);
+
+        $notifications->push([
+            'id' => $notificationId,
+            'category' => $category,
+            'step' => $orderStep($order->status),
+            'order' => $ref,
+            'chip' => $paid ? 'Order Update' : 'Billing',
+            'title' => $title,
+            'time' => $created->diffForHumans(),
+            'timestamp' => $created->timestamp,
+            'icon' => $icon,
+            'color' => $color,
+            'preview' => 'Order <strong>'.e($ref).'</strong> is currently '.e($status).'.',
+            'message' => 'Your order '.$ref.' is currently marked as '.$status.'. You can open the order page for full tracking, payment, and receipt details.',
+            'total' => $money($order->total_price ?? 0),
+            'balance' => $paid ? 'Paid' : $money($order->total_price ?? 0),
+            'payment' => $order->payment_method ?: $order->payment_provider ?: 'Not recorded',
+            'due' => $paid ? ($order->paid_at?->format('M d, Y h:i A') ?: 'Paid') : 'Awaiting payment',
+            'unread' => ! isset($readNotifications[$notificationId]) && (! $readAllAt || $created->gt($readAllAt)),
+            'track_url' => route('myorders.show', $order),
+            'invoice_url' => $invoiceUrl,
+            'support_topic' => 'Order '.$ref,
+        ]);
+    }
+
+    if ($customer?->email_verified_at) {
+        $created = $customer->email_verified_at;
+        $notificationId = 'security-email-verified';
+        $notifications->push([
+            'id' => $notificationId,
+            'category' => 'security',
+            'step' => 0,
+            'order' => 'Account',
+            'chip' => 'Security',
+            'title' => 'Email Verified',
+            'time' => $created->diffForHumans(),
+            'timestamp' => $created->timestamp,
+            'icon' => 'shield',
+            'color' => 'green',
+            'preview' => 'Your account email <strong>'.e($customer->email).'</strong> is verified.',
+            'message' => 'Your account email is verified. This helps protect your profile and order notifications.',
+            'total' => 'Verified',
+            'balance' => 'No action needed',
+            'payment' => 'Account security',
+            'due' => $created->format('M d, Y h:i A'),
+            'unread' => ! isset($readNotifications[$notificationId]) && (! $readAllAt || $created->gt($readAllAt)),
+            'track_url' => route('security').'#overview',
+            'invoice_url' => route('security').'#overview',
+            'support_topic' => 'Account Security',
+        ]);
+    }
+
+    foreach ($supportTickets as $ticket) {
+        $created = $ticket->updated_at ?: $ticket->created_at ?: now();
+        $notificationId = 'support-'.$ticket->id;
+        $notifications->push([
+            'id' => $notificationId,
+            'category' => 'messages',
+            'step' => 0,
+            'order' => $ticket->reference ?: 'Support',
+            'chip' => 'Support',
+            'title' => $ticket->topic ?: 'Support Message',
+            'time' => $created->diffForHumans(),
+            'timestamp' => $created->timestamp,
+            'icon' => 'msg',
+            'color' => 'orange',
+            'preview' => e(\Illuminate\Support\Str::limit($ticket->message ?: 'Support thread updated.', 110)),
+            'message' => $ticket->message ?: 'Support thread updated.',
+            'total' => 'Not applicable',
+            'balance' => $ticket->status ?: 'Open',
+            'payment' => 'Support',
+            'due' => $created->format('M d, Y h:i A'),
+            'unread' => ! isset($readNotifications[$notificationId]) && (! $readAllAt || $created->gt($readAllAt)),
+            'track_url' => route('help-center'),
+            'invoice_url' => route('help-center'),
+            'support_topic' => $ticket->topic ?: 'Customer Support',
+        ]);
+    }
+
+    $notifications = $notifications->sortByDesc('timestamp')->values();
+    $initialNotification = $notifications->first();
 @endphp
 
 <style>
@@ -940,7 +1050,11 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
                         data-total="{{ $notification['total'] }}"
                         data-balance="{{ $notification['balance'] }}"
                         data-payment="{{ $notification['payment'] }}"
-                        data-due="{{ $notification['due'] }}">
+                        data-due="{{ $notification['due'] }}"
+                        data-notification-id="{{ $notification['id'] }}"
+                        data-track-url="{{ $notification['track_url'] }}"
+                        data-invoice-url="{{ $notification['invoice_url'] }}"
+                        data-support-topic="{{ $notification['support_topic'] }}">
                         <input class="nf-check" type="checkbox" aria-label="Select notification" onclick="event.stopPropagation()">
                         <span class="nf-ico {{ $notification['color'] }}"><svg><use href="#i-{{ $notification['icon'] }}"/></svg></span>
                         <span>
@@ -950,7 +1064,7 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
                         <span class="nf-time">{{ $notification['time'] }} @if($notification['unread'])<i class="nf-dot"></i>@endif</span>
                     </button>
                 @endforeach
-                <div class="nf-empty nf-hidden" id="emptyState">No notifications found.</div>
+                <div class="nf-empty {{ $notifications->isEmpty() ? '' : 'nf-hidden' }}" id="emptyState">No notifications found.</div>
             </div>
             <div class="nf-foot" id="listFoot">Showing notifications</div>
         </section>
@@ -959,23 +1073,23 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
             <div class="nf-center">
                 <section class="nf-card nf-detail" aria-label="Notification detail">
                     <div class="nf-detail-top">
-                        <span class="nf-chip" id="detailChip">Order Update</span>
+                        <span class="nf-chip" id="detailChip">{{ $initialNotification['chip'] ?? 'Notification' }}</span>
                         <button class="nf-close" type="button" id="clearDetailBtn" aria-label="Clear notification detail">×</button>
                     </div>
-                    <h2 class="nf-detail-title" id="detailTitle">Payment Pending Reminder</h2>
+                    <h2 class="nf-detail-title" id="detailTitle">{{ $initialNotification['title'] ?? 'No notification selected' }}</h2>
                     <div class="nf-detail-row">
-                        <p class="nf-order">Reference <span id="detailOrder">#ORD-55201</span></p>
-                        <span class="nf-time" id="detailTime">2 mins ago <i class="nf-dot"></i></span>
+                        <p class="nf-order">Reference <span id="detailOrder">{{ $initialNotification['order'] ?? '—' }}</span></p>
+                        <span class="nf-time" id="detailTime">{{ $initialNotification['time'] ?? '—' }} @if($initialNotification && $initialNotification['unread'])<i class="nf-dot"></i>@endif</span>
                     </div>
                     <div class="nf-letter">
                         <p><strong>Hello {{ $customerName ?: 'Customer' }},</strong></p>
-                        <p id="detailMessage">This is a friendly reminder that the payment for your order is still pending. To avoid delays, please complete your payment at your earliest convenience.</p>
+                        <p id="detailMessage">{{ $initialNotification['message'] ?? 'Select a notification from the list to view its full details.' }}</p>
                     </div>
                     <div class="nf-summary">
-                        <div class="nf-row"><span>Total Amount</span><span class="money" id="detailTotal">₱2,850.00</span></div>
-                        <div class="nf-row"><span>Outstanding Balance</span><span class="money" id="detailBalance">₱2,850.00</span></div>
-                        <div class="nf-row"><span>Payment Method</span><span id="detailPayment">Bank Transfer (BPI)</span></div>
-                        <div class="nf-row"><span>Due Date / Status</span><span id="detailDue">May 29, 2026, 11:59 PM</span></div>
+                        <div class="nf-row"><span>Total Amount</span><span class="money" id="detailTotal">{{ $initialNotification['total'] ?? '—' }}</span></div>
+                        <div class="nf-row"><span>Outstanding Balance</span><span class="money" id="detailBalance">{{ $initialNotification['balance'] ?? '—' }}</span></div>
+                        <div class="nf-row"><span>Payment Method</span><span id="detailPayment">{{ $initialNotification['payment'] ?? '—' }}</span></div>
+                        <div class="nf-row"><span>Due Date / Status</span><span id="detailDue">{{ $initialNotification['due'] ?? '—' }}</span></div>
                     </div>
                     <div class="nf-letter">
                         <p>Use the actions below if you need to track the related order, view the invoice, or contact support.</p>
@@ -1002,7 +1116,7 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
                             </div>
                         @endforeach
                     </div>
-                    <p class="nf-process-meta">Reference: <span id="progressOrder">#ORD-55201</span> &nbsp;&nbsp;•&nbsp;&nbsp; Updates are based on your selected notification.</p>
+                    <p class="nf-process-meta">Reference: <span id="progressOrder">{{ $initialNotification['order'] ?? '—' }}</span> &nbsp;&nbsp;•&nbsp;&nbsp; Updates are based on your selected notification.</p>
                 </section>
             </div>
         </div>
@@ -1091,7 +1205,7 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
         <div class="nf-modal-card" role="dialog" aria-modal="true" aria-labelledby="supportTitle">
             <div class="nf-modal-head"><h3 class="nf-modal-title" id="supportTitle">Reply to Support</h3><button class="nf-close" type="button" data-modal-close>×</button></div>
             <form class="nf-modal-body" id="supportForm">
-                <div class="nf-field"><label class="nf-label" for="supportSubject">Subject</label><input class="nf-input" id="supportSubject" type="text" value="Payment Pending Reminder" required></div>
+                <div class="nf-field"><label class="nf-label" for="supportSubject">Subject</label><input class="nf-input" id="supportSubject" type="text" value="{{ $initialNotification['title'] ?? 'Notification support request' }}" required></div>
                 <div class="nf-field"><label class="nf-label" for="supportMessage">Message</label><textarea class="nf-textarea" id="supportMessage" placeholder="Type your reply here..." required></textarea></div>
                 <div class="nf-modal-actions"><button class="nf-action secondary" type="button" data-modal-close>Cancel</button><button class="nf-action" type="submit" id="sendSupportBtn">Send Reply</button></div>
             </form>
@@ -1106,11 +1220,11 @@ body:has(.nf-page) main,body:has(.nf-page) .main-content,body:has(.nf-page) .con
             <div class="nf-modal-head"><h3 class="nf-modal-title" id="invoiceTitle">Invoice Preview</h3><button class="nf-close" type="button" data-modal-close>×</button></div>
             <div class="nf-modal-body">
                 <div class="nf-summary">
-                    <div class="nf-row"><span>Reference</span><span id="invoiceOrder">#ORD-55201</span></div>
-                    <div class="nf-row"><span>Total</span><span class="money" id="invoiceTotal">₱2,850.00</span></div>
-                    <div class="nf-row"><span>Balance</span><span id="invoiceBalance">₱2,850.00</span></div>
-                    <div class="nf-row"><span>Payment</span><span id="invoicePayment">Bank Transfer (BPI)</span></div>
-                    <div class="nf-row"><span>Due / Status</span><span id="invoiceDue">May 29, 2026, 11:59 PM</span></div>
+                    <div class="nf-row"><span>Reference</span><span id="invoiceOrder">{{ $initialNotification['order'] ?? '—' }}</span></div>
+                    <div class="nf-row"><span>Total</span><span class="money" id="invoiceTotal">{{ $initialNotification['total'] ?? '—' }}</span></div>
+                    <div class="nf-row"><span>Balance</span><span id="invoiceBalance">{{ $initialNotification['balance'] ?? '—' }}</span></div>
+                    <div class="nf-row"><span>Payment</span><span id="invoicePayment">{{ $initialNotification['payment'] ?? '—' }}</span></div>
+                    <div class="nf-row"><span>Due / Status</span><span id="invoiceDue">{{ $initialNotification['due'] ?? '—' }}</span></div>
                 </div>
                 <div class="nf-modal-actions"><button class="nf-action secondary" type="button" data-modal-close>Close</button><button class="nf-action" type="button" id="printInvoiceBtn">Print Invoice</button></div>
             </div>
@@ -1134,6 +1248,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const unreadCount = $('#unreadCount');
     const toast = $('#notifToast');
     const prefKey = 'printify_notification_preferences_v2';
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || @json(csrf_token());
+    const markReadUrl = @json(route('customer.notifications.mark-read'));
+    const markAllReadUrl = @json(route('customer.notifications.mark-all-read'));
+    const supportMessageUrl = @json(route('customer.support.messages.store'));
     let activeFilter = 'all';
     let toastTimer = null;
 
@@ -1166,6 +1284,28 @@ document.addEventListener('DOMContentLoaded', function () {
         if (dot) dot.remove();
         return true;
     }
+    async function persistRead(card) {
+        if (!card?.dataset.notificationId) return;
+        try {
+            await fetch(markReadUrl, {
+                method:'POST',
+                headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrfToken},
+                body:JSON.stringify({notification_id:card.dataset.notificationId})
+            });
+        } catch (error) {
+            console.warn('Notification read sync failed.', error);
+        }
+    }
+    async function persistAllRead() {
+        try {
+            await fetch(markAllReadUrl, {
+                method:'POST',
+                headers:{'Accept':'application/json','X-CSRF-TOKEN':csrfToken}
+            });
+        } catch (error) {
+            console.warn('Notification read-all sync failed.', error);
+        }
+    }
     function setProgress(step, orderId) {
         const fill = $('#progressFill');
         const map = [0,20,40,60,80];
@@ -1193,8 +1333,10 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#detailPayment').textContent = card.dataset.payment || '—';
         $('#detailDue').textContent = card.dataset.due || '—';
         $('#supportSubject').value = card.dataset.title || 'Notification support request';
+        $('#supportSubject').dataset.topic = card.dataset.supportTopic || card.dataset.title || 'Customer Support';
         setProgress(card.dataset.step, card.dataset.order);
         const wasUnread = removeUnread(card);
+        if (wasUnread) persistRead(card);
         updateAllStates();
         if (wasUnread && !silent) showToast('Notification opened and marked as read.');
         if (!silent) updateNotificationUrl({view:'detail'});
@@ -1260,6 +1402,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function markAllAsRead() {
         let count = 0;
         cards.forEach(card => { if (removeUnread(card)) count++; });
+        if (count) persistAllRead();
         updateAllStates();
         updateNotificationUrl({action:'mark-all-read'});
         showToast(count ? 'All notifications marked as read.' : 'No unread notifications left.');
@@ -1302,6 +1445,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const pairs = {invoiceOrder:'detailOrder', invoiceTotal:'detailTotal', invoiceBalance:'detailBalance', invoicePayment:'detailPayment', invoiceDue:'detailDue'};
         Object.keys(pairs).forEach(target => { const src = $(`#${pairs[target]}`); const dest = $(`#${target}`); if (src && dest) dest.textContent = src.textContent; });
     }
+    function currentNotificationCard() {
+        return $('.nf-item.active') || $('.nf-item:not(.nf-hidden)');
+    }
     function openModal(id) {
         const modal = document.getElementById(id);
         if (!modal) return;
@@ -1337,15 +1483,59 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#markAllSide')?.addEventListener('click', markAllAsRead);
     $('#unreadBtn')?.addEventListener('click', () => { sortSelect.value = 'unread'; sortNotifications('unread'); updateNotificationUrl({view:'unread', sort:'unread'}); showToast('Unread notifications shown first.'); });
     $('#historyBtn')?.addEventListener('click', () => { activeFilter = 'all'; tabs.forEach(t => t.classList.toggle('active', t.dataset.filter === 'all')); applyFilter('all'); updateNotificationUrl({filter:'all', view:'history'}); showToast('Notification history opened.'); });
-    $('#trackOrderBtn')?.addEventListener('click', () => { const card = $('.nf-process-card'); if (card) { card.scrollIntoView({behavior:'smooth', block:'center'}); card.classList.add('is-highlighted'); setTimeout(() => card.classList.remove('is-highlighted'), 1400); } showToast(`Tracking opened for ${$('#detailOrder').textContent}.`); });
-    $('#invoiceBtn')?.addEventListener('click', () => { syncInvoiceModal(); openModal('invoiceModal'); showToast('Invoice preview opened.'); });
+    $('#trackOrderBtn')?.addEventListener('click', () => {
+        const activeCard = currentNotificationCard();
+        if (activeCard?.dataset.trackUrl) {
+            window.location.href = activeCard.dataset.trackUrl;
+            return;
+        }
+        const card = $('.nf-process-card');
+        if (card) { card.scrollIntoView({behavior:'smooth', block:'center'}); card.classList.add('is-highlighted'); setTimeout(() => card.classList.remove('is-highlighted'), 1400); }
+        showToast(`Tracking opened for ${$('#detailOrder').textContent}.`);
+    });
+    $('#invoiceBtn')?.addEventListener('click', () => {
+        const activeCard = currentNotificationCard();
+        if (activeCard?.dataset.invoiceUrl) {
+            window.location.href = activeCard.dataset.invoiceUrl;
+            return;
+        }
+        syncInvoiceModal();
+        openModal('invoiceModal');
+        showToast('Invoice preview opened.');
+    });
     $('#printInvoiceBtn')?.addEventListener('click', () => { syncInvoiceModal(); showToast('Preparing invoice for print.'); setTimeout(() => window.print(), 180); });
     $$('[data-open-modal]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.openModal)));
     $$('[data-modal-close]').forEach(el => el.addEventListener('click', closeModals));
     document.addEventListener('keydown', event => { if (event.key === 'Escape') { closeModals(); nfCloseCalendar(); } });
     $$('.nf-switch input').forEach(input => input.addEventListener('change', () => { savePreferenceState(); if (input.dataset.prefLabel) showToast(`${input.dataset.prefLabel} ${input.checked ? 'enabled' : 'disabled'}.`); }));
     $('#preferencesForm')?.addEventListener('submit', event => { event.preventDefault(); const btn = $('#savePrefBtn'); const old = btn.textContent; btn.textContent = 'Saving...'; btn.disabled = true; savePreferenceState(); setTimeout(() => { btn.textContent = old; btn.disabled = false; closeModals(); showToast('Notification preferences saved.'); }, 420); });
-    $('#supportForm')?.addEventListener('submit', event => { event.preventDefault(); const subject = $('#supportSubject').value.trim(); const message = $('#supportMessage').value.trim(); const btn = $('#sendSupportBtn'); if (!subject || !message) { showToast('Please complete the subject and message.'); return; } const old = btn.textContent; btn.textContent = 'Sending...'; btn.disabled = true; setTimeout(() => { btn.textContent = old; btn.disabled = false; $('#supportMessage').value = ''; closeModals(); showToast('Support reply sent successfully.'); }, 520); });
+    $('#supportForm')?.addEventListener('submit', async event => {
+        event.preventDefault();
+        const subject = $('#supportSubject').value.trim();
+        const message = $('#supportMessage').value.trim();
+        const btn = $('#sendSupportBtn');
+        if (!subject || !message) { showToast('Please complete the subject and message.'); return; }
+        const old = btn.textContent;
+        btn.textContent = 'Sending...';
+        btn.disabled = true;
+        try {
+            const response = await fetch(supportMessageUrl, {
+                method:'POST',
+                headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrfToken},
+                body:JSON.stringify({topic:$('#supportSubject').dataset.topic || subject, message:`${subject}\n\n${message}`})
+            });
+            if (!response.ok) throw new Error('Support request failed.');
+            $('#supportMessage').value = '';
+            closeModals();
+            showToast('Support reply sent successfully.');
+        } catch (error) {
+            console.warn('Support reply failed.', error);
+            showToast('Support reply could not be sent. Please try again.');
+        } finally {
+            btn.textContent = old;
+            btn.disabled = false;
+        }
+    });
 
 
     const notificationStatusFilter = $('#notificationStatusFilter');

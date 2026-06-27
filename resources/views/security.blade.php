@@ -5,161 +5,255 @@
 @endonce
 
 @php
-    /*
-        Security & Privacy is intentionally template-first.
-        No hard-coded customer/device/email/location/IP records are stored here.
-        When backend data is ready, pass these optional arrays from the controller:
-        $securityOverview, $overviewAccessItems, $overviewLoginActivity, $overviewSessions,
-        $accountVerification, $passwordStats, $recoveryMethods, $activeDevices,
-        $loginActivities, $deviceSettings, $privacySummary, $privacyControls, $cookiePreferences.
-    */
+    $securityUser = auth()->user();
+    $securityEmail = $securityUser?->email ?: 'Email not set';
+    $securityPhone = $securityUser?->phone ?: 'Phone not set';
+    $emailVerifiedAt = $securityUser?->email_verified_at;
+    $emailVerified = filled($emailVerifiedAt);
+    $phoneOnFile = filled($securityUser?->phone);
+    $identityVerified = $emailVerified;
+    $identityDate = $emailVerifiedAt ? $emailVerifiedAt->format('M d, Y') : null;
+    $needsPasswordSetup = $securityUser && method_exists($securityUser, 'needsPasswordSetup')
+        ? $securityUser->needsPasswordSetup()
+        : ! filled($securityUser?->password);
+    $hasPassword = filled($securityUser?->password) && ! $needsPasswordSetup;
+    $passwordChangedAt = $securityUser?->getAttribute('password_changed_at') ?: $securityUser?->getAttribute('password_updated_at');
+    $passwordChangedDate = $passwordChangedAt ? \Illuminate\Support\Carbon::parse($passwordChangedAt) : null;
+    $passwordStatusLabel = $passwordChangedDate ? 'Last changed' : 'Password status';
+    $passwordStatusText = $passwordChangedDate
+        ? $passwordChangedDate->format('M d, Y h:i A')
+        : ($hasPassword ? 'Password is set' : 'Setup required');
+    $passwordStrengthText = $hasPassword ? 'Strong' : 'Setup needed';
+    $passwordStrengthColor = $hasPassword ? 'var(--sp-green)' : 'var(--sp-orange)';
+    $recoveryEmail = $securityUser?->getAttribute('backup_email') ?: $securityEmail;
+    $recoveryEmailStatus = $emailVerified ? 'Verified' : 'Pending';
+    $recoveryEmailClass = $emailVerified ? 'green' : 'orange';
+    $recoveryPhone = $phoneOnFile ? $securityPhone : 'Phone not set';
+    $recoveryPhoneStatus = $phoneOnFile ? 'On file' : 'Missing';
+    $recoveryPhoneClass = $phoneOnFile ? 'green' : 'gray';
+    $passwordUpdateRoute = Route::has('password.update')
+        ? route('password.update')
+        : (Route::has('password.change') ? route('password.change') : url()->current());
+    $profileEditUrl = Route::has('profile.edit') ? route('profile.edit') : url()->current();
+    $passwordHealthScore = ($hasPassword ? 40 : 0) + ($emailVerified ? 35 : 0) + ($phoneOnFile ? 25 : 0);
+    $passwordHealthClass = $passwordHealthScore >= 75 ? 'var(--sp-green)' : ($passwordHealthScore >= 40 ? 'var(--sp-orange)' : 'var(--sp-red)');
+    $passwordHealthLabel = $passwordHealthScore >= 75 ? 'Good' : ($passwordHealthScore >= 40 ? 'Needs Review' : 'Action Needed');
+    $passwordHealthDescription = $passwordHealthScore >= 75
+        ? 'Your password and recovery details are in good condition.'
+        : 'Complete your password and recovery details to secure your account.';
+    $passwordHealthRows = [
+        ['label' => 'Password set', 'ok' => $hasPassword, 'value' => $hasPassword ? 'Yes' : 'No'],
+        ['label' => 'Email verified', 'ok' => $emailVerified, 'value' => $emailVerified ? 'Yes' : 'Pending'],
+        ['label' => 'Phone on file', 'ok' => $phoneOnFile, 'value' => $phoneOnFile ? 'Yes' : 'Missing'],
+    ];
+    $currentSessionId = session()->getId();
+    $currentUserAgent = request()->userAgent() ?: 'Unknown browser';
+    $currentIpAddress = request()->ip() ?: 'Unknown IP';
+    $parseDevice = function (?string $userAgent) {
+        $agent = (string) $userAgent;
+        $lowerAgent = strtolower($agent);
+        $browser = 'Unknown browser';
+        $browserIcon = 'fa-regular fa-window-maximize';
 
-    $securityOverview = $securityOverview ?? [];
-    $passwordStats = $passwordStats ?? [];
-    $privacySummary = $privacySummary ?? [];
+        if (preg_match('/Edg\/([0-9.]+)/', $agent, $match)) {
+            $browser = 'Microsoft Edge '.$match[1];
+            $browserIcon = 'fa-brands fa-edge';
+        } elseif (preg_match('/Chrome\/([0-9.]+)/', $agent, $match) && ! str_contains($lowerAgent, 'edg/')) {
+            $browser = 'Chrome '.$match[1];
+            $browserIcon = 'fa-brands fa-chrome';
+        } elseif (preg_match('/Firefox\/([0-9.]+)/', $agent, $match)) {
+            $browser = 'Firefox '.$match[1];
+            $browserIcon = 'fa-brands fa-firefox-browser';
+        } elseif (preg_match('/Version\/([0-9.]+).*Safari\//', $agent, $match)) {
+            $browser = 'Safari '.$match[1];
+            $browserIcon = 'fa-brands fa-safari';
+        }
 
-    $overviewAccessItems = collect($overviewAccessItems ?? [
+        $platform = 'Unknown OS';
+        $deviceIcon = 'fa-solid fa-desktop';
+        if (str_contains($lowerAgent, 'windows')) {
+            $platform = 'Windows';
+            $deviceIcon = 'fa-brands fa-windows';
+        } elseif (str_contains($lowerAgent, 'iphone')) {
+            $platform = 'iPhone';
+            $deviceIcon = 'fa-solid fa-mobile-screen';
+        } elseif (str_contains($lowerAgent, 'ipad')) {
+            $platform = 'iPad';
+            $deviceIcon = 'fa-solid fa-tablet-screen-button';
+        } elseif (str_contains($lowerAgent, 'android')) {
+            $platform = 'Android';
+            $deviceIcon = 'fa-solid fa-mobile-screen';
+        } elseif (str_contains($lowerAgent, 'mac os') || str_contains($lowerAgent, 'macintosh')) {
+            $platform = 'macOS';
+            $deviceIcon = 'fa-solid fa-laptop';
+        } elseif (str_contains($lowerAgent, 'linux')) {
+            $platform = 'Linux';
+            $deviceIcon = 'fa-solid fa-desktop';
+        }
+
+        return [
+            'device' => $platform.' • '.preg_replace('/\s+[0-9.]+$/', '', $browser),
+            'platform' => $platform,
+            'browser' => $browser,
+            'browser_icon' => $browserIcon,
+            'device_icon' => $deviceIcon,
+        ];
+    };
+    $deviceSessions = collect();
+    if ($securityUser && \Illuminate\Support\Facades\Schema::hasTable('sessions')) {
+        $deviceSessions = \Illuminate\Support\Facades\DB::table('sessions')
+            ->where('user_id', $securityUser->id)
+            ->orderByDesc('last_activity')
+            ->limit(8)
+            ->get()
+            ->map(function ($sessionRow) use ($parseDevice, $currentSessionId) {
+                $parsed = $parseDevice($sessionRow->user_agent);
+                $lastActive = \Illuminate\Support\Carbon::createFromTimestamp((int) $sessionRow->last_activity);
+
+                return array_merge($parsed, [
+                    'id' => $sessionRow->id,
+                    'ip_address' => $sessionRow->ip_address ?: 'Unknown IP',
+                    'location' => 'Location not tracked',
+                    'last_active' => $lastActive->diffForHumans(),
+                    'last_active_exact' => $lastActive->format('M d, Y h:i A'),
+                    'is_current' => hash_equals((string) $currentSessionId, (string) $sessionRow->id),
+                    'status' => hash_equals((string) $currentSessionId, (string) $sessionRow->id) ? 'This device' : 'Active',
+                ]);
+            });
+    }
+    if ($deviceSessions->isEmpty()) {
+        $parsed = $parseDevice($currentUserAgent);
+        $deviceSessions = collect([array_merge($parsed, [
+            'id' => $currentSessionId,
+            'ip_address' => $currentIpAddress,
+            'location' => 'Location not tracked',
+            'last_active' => 'Just now',
+            'last_active_exact' => now()->format('M d, Y h:i A'),
+            'is_current' => true,
+            'status' => 'This device',
+        ])]);
+    }
+    $activeDeviceCount = $deviceSessions->count();
+    $currentDevice = $deviceSessions->firstWhere('is_current', true) ?: $deviceSessions->first();
+    $sessionLifetimeMinutes = (int) config('session.lifetime', 120);
+    $sessionLifetimeLabel = $sessionLifetimeMinutes >= 1440
+        ? floor($sessionLifetimeMinutes / 1440).' days'
+        : ($sessionLifetimeMinutes >= 60 ? floor($sessionLifetimeMinutes / 60).' hours' : $sessionLifetimeMinutes.' minutes');
+    $verificationRows = [
         [
-            'key' => 'password',
+            'icon' => 'fa-regular fa-envelope',
+            'label' => 'Email Address',
+            'value' => $securityEmail,
+            'status' => $emailVerified ? 'Verified' : 'Pending',
+            'class' => $emailVerified ? 'green' : 'orange',
+        ],
+        [
+            'icon' => 'fa-solid fa-mobile-screen',
+            'label' => 'Phone Number',
+            'value' => $securityPhone,
+            'status' => $phoneOnFile ? 'On file' : 'Missing',
+            'class' => $phoneOnFile ? 'green' : 'gray',
+        ],
+        [
+            'icon' => 'fa-regular fa-id-card',
+            'label' => 'Identity Verification',
+            'value' => $identityVerified ? 'Verified on '.$identityDate : 'Not verified yet',
+            'status' => $identityVerified ? 'Verified' : 'Pending',
+            'class' => $identityVerified ? 'green' : 'orange',
+        ],
+    ];
+
+    $overviewAccessItems = collect([
+        [
             'icon' => 'fa-solid fa-key',
             'tone' => 'danger',
             'title' => 'Password',
             'description' => 'Keep your password strong and unique to protect your account.',
-            'meta_label' => 'Last changed',
-            'meta_value' => data_get($passwordStats, 'last_changed', 'No password record yet'),
-            'status' => data_get($passwordStats, 'status', 'Template only'),
-            'action' => 'Change Password',
+            'meta_label' => $passwordStatusLabel,
+            'meta_value' => $passwordStatusText,
+            'status' => $passwordStrengthText,
+            'status_tone' => $hasPassword ? 'green' : 'orange',
+            'action' => $hasPassword ? 'Change Password' : 'Set Password',
             'target' => 'password',
             'variant' => 'primary',
         ],
         [
-            'key' => 'account_security',
             'icon' => 'fa-solid fa-lock',
             'tone' => 'danger',
             'title' => 'Account Security',
-            'description' => 'Add an extra layer of security to your account.',
-            'meta_label' => 'Status',
-            'meta_value' => data_get($securityOverview, 'account_status', 'No security status yet'),
-            'status' => data_get($securityOverview, 'security_badge', 'Template only'),
-            'action' => 'Manage Security',
-            'target' => null,
+            'description' => 'Review your password, recovery details, and active sessions.',
+            'meta_label' => 'Active sessions',
+            'meta_value' => $activeDeviceCount.' '.\Illuminate\Support\Str::plural('session', $activeDeviceCount),
+            'status' => $passwordHealthLabel,
+            'status_tone' => $passwordHealthScore >= 75 ? 'green' : 'orange',
+            'action' => 'Review Devices',
+            'target' => 'devices',
             'variant' => 'outline',
         ],
         [
-            'key' => 'email_verification',
             'icon' => 'fa-regular fa-envelope',
             'tone' => 'dark',
             'title' => 'Email Verification',
-            'description' => 'Your verified email will appear here after account verification is connected.',
+            'description' => 'Your verified email is used to protect and recover your account.',
             'meta_label' => 'Email address',
-            'meta_value' => data_get($securityOverview, 'email', 'No email record yet'),
-            'status' => data_get($securityOverview, 'email_status', 'No record yet'),
+            'meta_value' => $securityEmail,
+            'status' => $emailVerified ? 'Verified' : 'Pending',
+            'status_tone' => $emailVerified ? 'green' : 'orange',
             'action' => 'Update Email',
             'target' => null,
             'variant' => 'outline',
         ],
     ]);
-
-    $overviewLoginActivity = collect($overviewLoginActivity ?? []);
-    $overviewSessions = collect($overviewSessions ?? []);
-    $accountVerification = collect($accountVerification ?? []);
-    $activeDevices = collect($activeDevices ?? []);
-    $loginActivities = collect($loginActivities ?? []);
-    $recoveryMethods = collect($recoveryMethods ?? []);
-
-    $deviceSettings = collect($deviceSettings ?? [
-        [
-            'key' => 'session_timeout',
-            'icon' => 'fa-regular fa-clock',
-            'title' => 'Session timeout',
-            'description' => 'Automatically sign out inactive sessions.',
-            'type' => 'select',
-            'value' => 'Not set',
-        ],
-        [
-            'key' => 'new_device_alerts',
-            'icon' => 'fa-regular fa-bell',
-            'title' => 'New device alerts',
-            'description' => 'Email me when a new device signs in.',
-            'type' => 'switch',
-            'enabled' => false,
-        ],
-        [
-            'key' => 'remember_active_devices',
-            'icon' => 'fa-solid fa-shield-halved',
-            'title' => 'Remember active devices',
-            'description' => 'Keep known devices easier to review.',
-            'type' => 'switch',
-            'enabled' => false,
-        ],
+    $overviewLoginActivity = $deviceSessions->take(3)->map(fn ($sessionRow) => [
+        'location' => $sessionRow['location'],
+        'browser' => $sessionRow['browser'].' on '.$sessionRow['platform'],
+        'status' => $sessionRow['status'],
+        'status_tone' => $sessionRow['is_current'] ? 'green' : 'gray',
+    ]);
+    $overviewSessions = $deviceSessions->take(3)->map(fn ($sessionRow) => [
+        'icon' => $sessionRow['device_icon'],
+        'device' => $sessionRow['device'],
+        'meta' => $sessionRow['last_active_exact'],
+        'status' => $sessionRow['status'],
+        'can_sign_out' => false,
+    ]);
+    $accountVerification = collect($verificationRows)->map(fn ($row) => [
+        'icon' => $row['icon'],
+        'title' => $row['label'],
+        'value' => $row['value'],
+        'status' => $row['status'],
+        'status_tone' => $row['class'],
     ]);
 
-    $privacyControls = collect($privacyControls ?? [
-        [
-            'key' => 'profile_visibility',
-            'icon' => 'fa-regular fa-user',
-            'title' => 'Profile Visibility',
-            'description' => 'Allow others to see your profile information.',
-            'enabled' => false,
-        ],
-        [
-            'key' => 'order_visibility',
-            'icon' => 'fa-solid fa-bag-shopping',
-            'title' => 'Order Visibility',
-            'description' => 'Allow others to view your orders and purchase history.',
-            'enabled' => false,
-        ],
-        [
-            'key' => 'personalized_recommendations',
-            'icon' => 'fa-solid fa-wand-magic-sparkles',
-            'title' => 'Personalized Recommendations',
-            'description' => 'Show product recommendations based on your activity.',
-            'enabled' => false,
-        ],
-        [
-            'key' => 'marketing_communications',
-            'icon' => 'fa-regular fa-envelope',
-            'title' => 'Marketing Communications',
-            'description' => 'Receive promotional emails and updates from PrintifyCo.',
-            'enabled' => false,
-        ],
+    $securityScore = $passwordHealthScore;
+    $securityScoreWidth = $passwordHealthScore;
+    $savedPrivacySettings = session('customer_settings.privacy', []);
+    $privacySettingEnabled = fn (string $key) => in_array(
+        strtolower((string) data_get($savedPrivacySettings, $key, '')),
+        ['1', 'true', 'enabled', 'on', 'yes'],
+        true
+    );
+    $privacyControls = collect([
+        ['icon' => 'fa-regular fa-user', 'title' => 'Profile Visibility', 'description' => 'Control whether your profile information can be shared.', 'enabled' => $privacySettingEnabled('profile_visibility')],
+        ['icon' => 'fa-solid fa-bag-shopping', 'title' => 'Order Visibility', 'description' => 'Control whether your order history can be shared.', 'enabled' => $privacySettingEnabled('order_visibility')],
+        ['icon' => 'fa-solid fa-wand-magic-sparkles', 'title' => 'Personalized Recommendations', 'description' => 'Use account activity for service recommendations.', 'enabled' => $privacySettingEnabled('personalized_recommendations')],
+        ['icon' => 'fa-regular fa-envelope', 'title' => 'Marketing Communications', 'description' => 'Receive promotional emails and product updates.', 'enabled' => $privacySettingEnabled('marketing_communications')],
     ]);
-
-    $cookiePreferences = collect($cookiePreferences ?? [
-        [
-            'key' => 'essential_cookies',
-            'icon' => 'fa-solid fa-cookie',
-            'title' => 'Essential Cookies',
-            'description' => 'Necessary for the website to function properly.',
-            'status' => 'Always Active',
-            'status_tone' => 'plain',
-        ],
-        [
-            'key' => 'analytics_cookies',
-            'icon' => 'fa-solid fa-chart-simple',
-            'title' => 'Analytics Cookies',
-            'description' => 'Help us understand how you use our website.',
-            'status' => 'Not set',
-            'status_tone' => 'gray',
-        ],
-        [
-            'key' => 'marketing_cookies',
-            'icon' => 'fa-solid fa-bullhorn',
-            'title' => 'Marketing Cookies',
-            'description' => 'Used to deliver personalized ads and content.',
-            'status' => 'Not set',
-            'status_tone' => 'gray',
-        ],
+    $configuredPrivacyCount = collect($savedPrivacySettings)->filter(fn ($value) => filled($value))->count();
+    $privacyScore = min(100, $configuredPrivacyCount * 25);
+    $privacyScoreWidth = $privacyScore;
+    $privacySummary = [
+        'label' => $configuredPrivacyCount ? 'Privacy preferences saved' : 'No saved privacy review yet',
+        'description' => $configuredPrivacyCount
+            ? $configuredPrivacyCount.' privacy '.\Illuminate\Support\Str::plural('preference', $configuredPrivacyCount).' configured.'
+            : 'Choose your preferences in Settings to build your privacy summary.',
+        'last_reviewed' => $configuredPrivacyCount ? 'Current session' : 'No record yet',
+    ];
+    $cookiePreferences = collect([
+        ['icon' => 'fa-solid fa-cookie', 'title' => 'Essential Cookies', 'description' => 'Necessary for authentication and core site functions.', 'status' => 'Always Active', 'status_tone' => 'plain'],
+        ['icon' => 'fa-solid fa-chart-simple', 'title' => 'Analytics Cookies', 'description' => 'Help improve the customer portal experience.', 'status' => 'Not set', 'status_tone' => 'gray'],
+        ['icon' => 'fa-solid fa-bullhorn', 'title' => 'Marketing Cookies', 'description' => 'Support personalized promotions and content.', 'status' => 'Not set', 'status_tone' => 'gray'],
     ]);
-
-    $securityScore = data_get($securityOverview, 'score');
-    $securityScoreWidth = is_numeric($securityScore) ? min(100, max(0, (int) $securityScore)) : 0;
-
-    $passwordScore = data_get($passwordStats, 'score');
-    $passwordScoreWidth = is_numeric($passwordScore) ? min(100, max(0, (int) $passwordScore)) : 0;
-
-    $privacyScore = data_get($privacySummary, 'score');
-    $privacyScoreWidth = is_numeric($privacyScore) ? min(100, max(0, (int) $privacyScore)) : 0;
 @endphp
 
 <style>
@@ -941,333 +1035,62 @@
 
         <!-- PASSWORD TAB -->
         <section class="sp-panel" id="password-panel">
-            <div class="password-reference-layout">
-                <main class="password-full">
-                    <section class="sp-card">
-                        <div class="password-management">
-                            <div class="password-head-row">
-                                <div class="sp-title-left">
-                                    <span class="sp-icon red"><i class="fa-solid fa-lock"></i></span>
-                                    <div>
-                                        <h2 class="sp-card-title">Password Management</h2>
-                                        <p class="sp-card-desc">A strong password helps keep your account safe and secure.</p>
-                                    </div>
-                                </div>
-                                <button type="button" class="sp-btn pill">Password Tips</button>
-                            </div>
+            <div class="sp-layout">
+                <main class="sp-main">
+                    <section class="sp-card"><div class="sp-card-pad">
+                        <div class="sp-head-row"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-lock"></i></span><div><h2 class="sp-card-title">Password Management</h2><p class="sp-card-desc">A strong password helps keep your account safe and secure.</p></div></div><button type="button" class="sp-btn soft"><i class="fa-regular fa-lightbulb"></i> Password Tips</button></div>
+                        <div class="sp-info-band" style="margin-top:18px"><div><small>Password strength</small><br><b style="color:{{ $passwordStrengthColor }}">{{ $passwordStrengthText }}</b></div><div class="sp-strength" style="width:220px"><i></i><i></i><i></i><i></i><i class="{{ $hasPassword ? '' : 'off' }}"></i></div><div><small>{{ $passwordStatusLabel }}</small><br><b>{{ $passwordStatusText }}</b></div></div>
+                    </div></section>
 
-                            <div class="password-strength-panel">
-                                <div class="password-score-left">
-                                    <div class="password-score-circle">{{ $passwordScore ?? '—' }}<small>/100</small></div>
-                                    <div class="password-strength-name">
-                                        <span class="sp-card-desc">Password strength</span>
-                                        <b>{{ data_get($passwordStats, 'label', 'No record yet') }}</b>
-                                    </div>
-                                </div>
-                                <div class="password-bars" aria-label="Password strength meter">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="{{ $passwordScoreWidth >= ($i * 20) ? '' : 'off' }}"></i>
-                                    @endfor
-                                </div>
-                                <div class="password-last-changed">
-                                    <small>Last changed</small>
-                                    <b>{{ data_get($passwordStats, 'last_changed', 'No password record yet') }}</b>
-                                </div>
-                            </div>
-                        </div>
+                    <section class="sp-card"><div class="sp-card-pad">
+                        <div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-key"></i></span><div><h2 class="sp-card-title">Change Password</h2><p class="sp-card-desc">Use a strong password that you don’t use on other websites.</p></div></div>
+                        @if (session('status') === 'password-updated')
+                            <div class="sp-status green" style="margin:14px 0">Password updated successfully.</div>
+                        @endif
+                        <form method="POST" action="{{ $passwordUpdateRoute }}">
+                            @csrf
+                            @method('put')
+                            <div class="sp-field"><label for="current_password">Current Password</label><div class="sp-input-wrap"><input id="current_password" class="sp-input" type="password" name="current_password" autocomplete="current-password" placeholder="{{ $needsPasswordSetup ? 'Not required for setup' : 'Enter current password' }}"><button class="sp-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button></div>@error('current_password', 'updatePassword')<p class="sp-card-desc" style="color:var(--sp-red);margin-top:6px">{{ $message }}</p>@enderror</div>
+                            <div class="sp-field"><label for="password">New Password</label><div class="sp-input-wrap"><input id="password" class="sp-input" type="password" name="password" autocomplete="new-password" placeholder="Enter new password"><button class="sp-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button></div>@error('password', 'updatePassword')<p class="sp-card-desc" style="color:var(--sp-red);margin-top:6px">{{ $message }}</p>@enderror<div class="sp-strength"><i></i><i></i><i></i><i></i><i class="off"></i><span style="font-size:12px;color:var(--sp-green);font-weight:800">Strong</span></div><p class="sp-card-desc">Use 8 or more characters with a mix of letters, numbers &amp; symbols.</p></div>
+                            <div class="sp-field"><label for="password_confirmation">Confirm New Password</label><div class="sp-input-wrap"><input id="password_confirmation" class="sp-input" type="password" name="password_confirmation" autocomplete="new-password" placeholder="Confirm new password"><button class="sp-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button></div>@error('password_confirmation', 'updatePassword')<p class="sp-card-desc" style="color:var(--sp-red);margin-top:6px">{{ $message }}</p>@enderror</div>
+                            <div style="display:flex;justify-content:flex-end;margin-top:18px"><button type="submit" class="sp-btn">Update Password</button></div>
+                        </form>
+                    </div></section>
 
-                        <div class="password-change">
-                            <div class="sp-title-left">
-                                <span class="sp-icon red"><i class="fa-solid fa-key"></i></span>
-                                <div>
-                                    <h2 class="sp-card-title">Change Password</h2>
-                                    <p class="sp-card-desc">Use a strong password that you don't use on other websites.</p>
-                                </div>
-                            </div>
-
-                            <form class="password-form" method="POST" action="{{ Route::has('password.change') ? route('password.change') : '#' }}">
-                                @csrf
-                                @if(Route::has('password.change'))
-                                    @method('put')
-                                @endif
-
-                                <div class="password-field">
-                                    <label for="current_password">Current Password</label>
-                                    <div class="password-input-wrap">
-                                        <input id="current_password" class="password-input" type="password" name="current_password" placeholder="••••••••••••" autocomplete="current-password">
-                                        <button class="password-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button>
-                                    </div>
-                                </div>
-
-                                <div class="password-field">
-                                    <label for="password">New Password</label>
-                                    <div class="password-input-wrap">
-                                        <input id="password" class="password-input" type="password" name="password" placeholder="••••••••••" autocomplete="new-password">
-                                        <button class="password-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button>
-                                    </div>
-                                    <div class="password-inline-strength">
-                                        <div class="password-bars" aria-label="New password strength meter"><i></i><i></i><i></i><i></i><i></i></div>
-                                        <span>Template only</span>
-                                    </div>
-                                    <p class="sp-card-desc">Use 8 or more characters with a mix of letters, numbers &amp; symbols.</p>
-                                </div>
-
-                                <div class="password-field">
-                                    <label for="password_confirmation">Confirm New Password</label>
-                                    <div class="password-input-wrap">
-                                        <input id="password_confirmation" class="password-input" type="password" name="password_confirmation" placeholder="••••••••••" autocomplete="new-password">
-                                        <button class="password-eye" type="button" data-toggle-pass><i class="fa-regular fa-eye"></i></button>
-                                    </div>
-                                </div>
-
-                                <div class="password-submit-row">
-                                    <button type="submit" class="sp-btn primary pill">Update Password</button>
-                                </div>
-                            </form>
-                        </div>
-                    </section>
-
-                    <div class="password-bottom-grid">
-                        <section class="sp-card password-bottom-card">
-                            <div class="sp-title-left">
-                                <span class="sp-icon red"><i class="fa-solid fa-shield-halved"></i></span>
-                                <div>
-                                    <h3 class="sp-card-title sm">Password Requirements</h3>
-                                    <p class="sp-card-desc">Your password must include:</p>
-                                </div>
-                            </div>
-                            <div class="password-check-list">
-                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> At least 8 characters long</span>
-                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> At least one number (0–9)</span>
-                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> At least one special character (!@#$%^&amp;*)</span>
-                            </div>
-                        </section>
-
-                        <section class="sp-card password-bottom-card">
-                            <div class="sp-title-left">
-                                <span class="sp-icon"><i class="fa-solid fa-arrows-rotate"></i></span>
-                                <div>
-                                    <h3 class="sp-card-title sm">Recovery Options</h3>
-                                    <p class="sp-card-desc">Recovery records will appear here after backend verification is connected.</p>
-                                </div>
-                            </div>
-                            <div class="password-check-list">
-                                @forelse($recoveryMethods as $method)
-                                    <div class="password-recovery-row">
-                                        <div class="sp-row-left">
-                                            <span class="sp-icon blue"><i class="{{ data_get($method, 'icon', 'fa-regular fa-envelope') }}"></i></span>
-                                            <div>
-                                                <strong class="sp-mini-title">{{ data_get($method, 'title', 'Recovery Method') }}</strong>
-                                                <small class="sp-mini-desc">{{ data_get($method, 'value', 'No value') }}</small>
-                                            </div>
-                                        </div>
-                                        <span class="sp-status {{ data_get($method, 'status_tone', 'green') }}">{{ data_get($method, 'status', 'Verified') }}</span>
-                                        <button type="button" class="password-edit-button">Edit</button>
-                                    </div>
-                                @empty
-                                    <div class="sp-empty">No recovery email or phone record yet. This card is only a template.</div>
-                                @endforelse
-                            </div>
-                        </section>
-
-                        <section class="sp-card password-bottom-card">
-                            <div class="sp-title-left">
-                                <span class="sp-icon green"><i class="fa-solid fa-shield"></i></span>
-                                <div>
-                                    <h3 class="sp-card-title sm">Password Best Practices</h3>
-                                    <p class="sp-card-desc">Keep your sign-in details safe.</p>
-                                </div>
-                            </div>
-                            <div class="password-check-list">
-                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Use a unique password for your account</span>
-                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Avoid using personal information</span>
-                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Change your password regularly</span>
-                                <span class="password-check"><i class="fa-solid fa-circle-check"></i> Don't share your password with anyone</span>
-                            </div>
-                        </section>
+                    <div class="sp-grid-2">
+                        <section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-shield-halved"></i></span><div><h3 class="sp-card-title sm">Password Requirements</h3><p class="sp-card-desc">Your password must include:</p></div></div><div class="sp-check-list"><span class="sp-check"><i class="fa-solid fa-circle-check"></i> At least 8 characters long</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i> At least one number (0–9)</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i> At least one special character (!@#$%^&amp;*)</span></div></div></section>
+                        <section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-arrows-rotate"></i></span><div><h3 class="sp-card-title sm">Recovery Options</h3><p class="sp-card-desc">Use these options to recover your account.</p></div></div><div class="sp-row"><div class="sp-row-left"><span class="sp-icon"><i class="fa-regular fa-envelope"></i></span><div><strong>Recovery Email</strong><small>{{ $recoveryEmail }}</small></div></div><span class="sp-status {{ $recoveryEmailClass }}">{{ $recoveryEmailStatus }}</span><a href="{{ $profileEditUrl }}" class="sp-btn soft">Edit</a></div><div class="sp-row"><div class="sp-row-left"><span class="sp-icon"><i class="fa-solid fa-mobile-screen"></i></span><div><strong>Recovery Phone</strong><small>{{ $recoveryPhone }}</small></div></div><span class="sp-status {{ $recoveryPhoneClass }}">{{ $recoveryPhoneStatus }}</span><a href="{{ $profileEditUrl }}" class="sp-btn soft">Edit</a></div></div></section>
                     </div>
                 </main>
+                <aside class="sp-side">
+                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Password Health</h3><div class="sp-row-left" style="margin-top:18px"><div style="width:94px;height:94px;border-radius:50%;border:12px solid {{ $passwordHealthClass }};display:grid;place-items:center;color:{{ $passwordHealthClass }};font-size:26px;font-weight:800">{{ $passwordHealthScore }}<br><small style="font-size:12px;color:#111827">/100</small></div><div><h3 style="margin:0;color:{{ $passwordHealthClass }}">{{ $passwordHealthLabel }}</h3><p class="sp-card-desc">{{ $passwordHealthDescription }}</p></div></div><div class="sp-list">@foreach($passwordHealthRows as $row)<div class="sp-row"><span class="sp-check"><i class="fa-solid {{ $row['ok'] ? 'fa-circle-check' : 'fa-circle-exclamation' }}"></i>{{ $row['label'] }}</span><b style="color:{{ $row['ok'] ? 'var(--sp-green)' : 'var(--sp-orange)' }};font-size:12px">{{ $row['value'] }}</b></div>@endforeach</div></div></section>
+                </aside>
+            </div>
+        </section>
+
+        <!-- SECURITY TAB -->
+        <section class="sp-panel" id="twofa-panel">
+            <div class="sp-layout">
+                <main class="sp-main">
+                    <section class="sp-card"><div class="sp-card-pad"><div class="sp-head-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-lock"></i></span><div><h2 class="sp-card-title">Account Security</h2><p class="sp-card-desc">Keep your customer account protected with strong sign-in details and updated recovery information.</p></div></div><span class="sp-status green"><i class="fa-solid fa-circle-check"></i> Verified</span></div></div></section>
+                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-users" style="color:var(--sp-orange);margin-right:8px"></i>Recovery Methods</h3><p class="sp-card-desc">These options can be used to recover your account if you lose access.</p><div class="sp-list"><div class="sp-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-mobile-screen"></i></span><div><strong>Recovery Phone</strong><small>{{ $recoveryPhone }}</small></div></div><span class="sp-status {{ $recoveryPhoneClass }}">{{ $recoveryPhoneStatus }}</span><a href="{{ $profileEditUrl }}" class="sp-btn soft">Edit</a></div><div class="sp-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-regular fa-envelope"></i></span><div><strong>Recovery Email</strong><small>{{ $recoveryEmail }}</small></div></div><span class="sp-status {{ $recoveryEmailClass }}">{{ $recoveryEmailStatus }}</span><a href="{{ $profileEditUrl }}" class="sp-btn soft">Edit</a></div></div></div></section>
+                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-laptop" style="color:var(--sp-orange);margin-right:8px"></i>Active Devices</h3><p class="sp-card-desc">Devices with recent account access.</p><table class="sp-table"><thead><tr><th>Device</th><th>Browser</th><th>Location</th><th>Last Active</th><th>Status</th></tr></thead><tbody>@foreach($deviceSessions as $sessionRow)<tr><td><div class="sp-device"><i class="{{ $sessionRow['device_icon'] }}"></i><div><b>{{ $sessionRow['device'] }}</b><small>{{ $sessionRow['platform'] }}</small></div></div></td><td>{{ $sessionRow['browser'] }}</td><td>{{ $sessionRow['location'] }}<small>{{ $sessionRow['ip_address'] }}</small></td><td>{{ $sessionRow['last_active_exact'] }}</td><td><span class="sp-status {{ $sessionRow['is_current'] ? 'green' : 'gray' }}">{{ $sessionRow['status'] }}</span></td></tr>@endforeach</tbody></table></div></section>
+                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-circle-info" style="color:var(--sp-orange);margin-right:8px"></i>Security Tips</h3><div class="sp-grid-4" style="margin-top:14px"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Use a strong password</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Keep recovery details updated</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Review active devices</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Contact support for suspicious activity</span></div></div></section>
+                </main>
+                <aside class="sp-side"><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Protection Status</h3><p class="sp-card-desc">Your account is well protected.</p><div class="sp-row-left" style="margin-top:16px"><div style="width:86px;height:86px;border-radius:50%;border:10px solid var(--sp-green);display:grid;place-items:center;color:var(--sp-green);font-size:22px"><i class="fa-solid fa-shield-halved"></i></div><div><h3 style="margin:0">Strong</h3><p class="sp-card-desc">Your account is protected.</p></div></div><div class="sp-list"><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Strong password</span><b style="color:var(--sp-green);font-size:12px">Good</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Recovery email</span><b style="color:var(--sp-green);font-size:12px">Verified</b></div><div class="sp-row"><span class="sp-check"><i class="fa-solid fa-circle-check"></i>Recovery phone</span><b style="color:var(--sp-green);font-size:12px">Verified</b></div></div></div></section><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Account Verification</h3><p class="sp-card-desc">Your identity and contact details.</p><div class="sp-list">@foreach($verificationRows as $row)<div class="sp-row"><div class="sp-row-left"><i class="{{ $row['icon'] }}"></i><div><strong>{{ $row['label'] }}</strong><small>{{ $row['value'] }}</small></div></div><span class="sp-status {{ $row['class'] }}">{{ $row['status'] }}</span></div>@endforeach<button class="sp-link">View all verification details <i class="fa-solid fa-chevron-right"></i></button></div></div></section><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Security Help</h3><p class="sp-card-desc">Need help with account access?</p><div class="sp-list"><div class="sp-row-left"><span class="sp-icon blue"><i class="fa-solid fa-lock-open"></i></span><div><strong>Can’t access your account?</strong><small>Use a recovery method or contact support.</small></div></div><div class="sp-row-left"><span class="sp-icon blue"><i class="fa-regular fa-circle-question"></i></span><div><strong>Need more assistance?</strong><small>Contact our support team for help.</small></div></div><button class="sp-link">Go to Help Center <i class="fa-solid fa-arrow-up-right-from-square"></i></button></div></div></section></aside>
             </div>
         </section>
 
         <!-- DEVICES TAB -->
         <section class="sp-panel" id="devices-panel">
-            <div class="devices-reference-layout">
-                <section class="sp-card devices-card">
-                    <div class="sp-card-pad">
-                        <div class="sp-title-left">
-                            <span class="sp-icon green"><i class="fa-solid fa-desktop"></i></span>
-                            <div>
-                                <h2 class="sp-card-title">Active Devices &amp; Sessions</h2>
-                                <p class="sp-card-desc">These are the devices currently signed in to your account.</p>
-                            </div>
-                        </div>
-
-                        <div class="devices-summary">
-                            <div class="devices-count-box">
-                                <div class="devices-count-circle">{{ $activeDevices->count() }}</div>
-                                <div>
-                                    <strong class="sp-mini-title">Active<br>Devices</strong>
-                                    <small class="sp-mini-desc">{{ $activeDevices->count() ? 'Backend device records loaded.' : 'No device record yet.' }}</small>
-                                </div>
-                            </div>
-                            <div class="devices-feature"><span><i class="fa-regular fa-circle-check"></i> Regular monitoring</span><i class="fa-solid fa-chevron-down"></i></div>
-                            <div class="devices-feature"><span><i class="fa-regular fa-circle-check"></i> Device verification ready</span><i class="fa-solid fa-chevron-down"></i></div>
-                            <div class="devices-feature"><span><i class="fa-regular fa-circle-check"></i> Secure sessions</span><i class="fa-solid fa-chevron-down"></i></div>
-                        </div>
-
-                        <table class="sp-table" aria-label="Active devices and sessions">
-                            <thead>
-                                <tr>
-                                    <th>Device</th>
-                                    <th>Browser</th>
-                                    <th>Location</th>
-                                    <th>Last Active</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($activeDevices as $device)
-                                    <tr>
-                                        <td>
-                                            <div class="sp-device">
-                                                <i class="{{ data_get($device, 'icon', 'fa-solid fa-display') }}"></i>
-                                                <div>
-                                                    <b>{{ data_get($device, 'name', 'Device') }}</b>
-                                                    <small>{{ data_get($device, 'os', 'Operating system') }}</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>{{ data_get($device, 'browser', 'Browser') }}</td>
-                                        <td>{{ data_get($device, 'location', 'Location') }}<small>{{ data_get($device, 'country', '') }}</small></td>
-                                        <td>{{ data_get($device, 'last_active', 'Last active') }}</td>
-                                        <td><span class="sp-status {{ data_get($device, 'status_tone', 'green') }}">{{ data_get($device, 'status', 'Active') }}</span></td>
-                                        <td>
-                                            @if(data_get($device, 'is_current', false))
-                                                —
-                                            @else
-                                                <button type="button" class="sp-btn">Sign Out</button>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6">
-                                            <div class="sp-empty">No device/session records yet. Connected devices will appear here once backend session tracking is added.</div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-
-                        <div class="devices-warning-row">
-                            <p><i class="fa-solid fa-shield-halved"></i> Didn’t recognize a device? Sign out controls will work once backend sessions are connected.</p>
-                            <button type="button" class="sp-btn primary pill">Sign Out All Other Sessions</button>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="sp-card devices-card">
-                    <div class="sp-card-pad">
-                        <div class="devices-activity-settings">
-                            <div>
-                                <div class="sp-title-left">
-                                    <span class="sp-icon"><i class="fa-solid fa-chart-line"></i></span>
-                                    <div>
-                                        <h3 class="sp-card-title">Recent Login Activity &amp; Device Security Settings</h3>
-                                        <p class="sp-card-desc">Review your most recent account access and manage security preferences.</p>
-                                    </div>
-                                </div>
-                                <table class="sp-table" aria-label="Recent login activity">
-                                    <thead>
-                                        <tr>
-                                            <th>Date &amp; Time</th>
-                                            <th>Device / Browser</th>
-                                            <th>Location</th>
-                                            <th>IP Address</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($loginActivities as $activity)
-                                            <tr>
-                                                <td>{{ data_get($activity, 'datetime', 'Date and time') }}</td>
-                                                <td>{{ data_get($activity, 'device_browser', 'Device / Browser') }}</td>
-                                                <td>{{ data_get($activity, 'location', 'Location') }}</td>
-                                                <td>{{ data_get($activity, 'ip_address', 'IP address') }}</td>
-                                                <td><span class="sp-status {{ data_get($activity, 'status_tone', 'green') }}">{{ data_get($activity, 'status', 'Success') }}</span></td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="5">
-                                                    <div class="sp-empty">No login activity yet. Login history will appear here after backend tracking is connected.</div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <aside class="devices-settings-side">
-                                @foreach($deviceSettings as $setting)
-                                    <div class="device-setting-row">
-                                        <div class="sp-row-left">
-                                            <span class="sp-icon green"><i class="{{ data_get($setting, 'icon') }}"></i></span>
-                                            <div>
-                                                <strong class="sp-mini-title">{{ data_get($setting, 'title') }}</strong>
-                                                <small class="sp-mini-desc">{{ data_get($setting, 'description') }}</small>
-                                            </div>
-                                        </div>
-                                        @if(data_get($setting, 'type') === 'select')
-                                            <button type="button" class="sp-btn">{{ data_get($setting, 'value', 'Not set') }} <i class="fa-solid fa-chevron-down"></i></button>
-                                        @else
-                                            <label class="sp-switch" title="Template toggle only">
-                                                <input type="checkbox" data-template-switch @checked(data_get($setting, 'enabled', false))>
-                                                <span class="sp-slider"></span>
-                                            </label>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </aside>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="sp-card devices-card">
-                    <div class="sp-card-pad">
-                        <div class="sp-title-left">
-                            <span class="sp-icon"><i class="fa-solid fa-shield-halved"></i></span>
-                            <div>
-                                <h3 class="sp-card-title">Safety Reminder</h3>
-                                <p class="sp-card-desc">Follow these tips to keep your account secure.</p>
-                            </div>
-                        </div>
-                        <div class="safety-grid">
-                            <div class="safety-item">
-                                <span class="safety-icon red"><i class="fa-solid fa-lock"></i></span>
-                                <div>
-                                    <strong class="sp-mini-title">Always log out</strong>
-                                    <small class="sp-mini-desc">Log out of shared or public devices.</small>
-                                </div>
-                            </div>
-                            <div class="safety-item">
-                                <span class="safety-icon"><i class="fa-regular fa-eye"></i></span>
-                                <div>
-                                    <strong class="sp-mini-title">Review unknown logins</strong>
-                                    <small class="sp-mini-desc">Check login activity regularly.</small>
-                                </div>
-                            </div>
-                            <div class="safety-item">
-                                <span class="safety-icon dark"><i class="fa-regular fa-envelope"></i></span>
-                                <div>
-                                    <strong class="sp-mini-title">Enable alerts</strong>
-                                    <small class="sp-mini-desc">Keep new device alerts on.</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+            <div class="sp-layout">
+                <main class="sp-main">
+                    <section class="sp-card"><div class="sp-card-pad"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-desktop"></i></span><div><h2 class="sp-card-title">Active Devices &amp; Sessions</h2><p class="sp-card-desc">These are the sessions currently recorded for your account.</p></div></div><div class="sp-grid-3" style="margin-top:18px"><div><h2 style="margin:0;font-size:32px">{{ $activeDeviceCount }}</h2><b>{{ \Illuminate\Support\Str::plural('Active Session', $activeDeviceCount) }}</b><p class="sp-card-desc">{{ $currentDevice['device'] ?? 'Current device' }}</p></div><span class="sp-check"><i class="fa-solid fa-circle-check"></i> Current device identified</span><span class="sp-check"><i class="fa-solid fa-circle-check"></i> Sessions stored by Laravel</span><span class="sp-check"><i class="fa-solid fa-circle-info"></i> Location is not tracked</span></div></div></section>
+                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-display" style="color:var(--sp-orange);margin-right:8px"></i>Active Sessions / Devices</h3><p class="sp-card-desc">Manage the sessions that are currently recorded for your account.</p><table class="sp-table"><thead><tr><th>Device</th><th>Browser</th><th>Location</th><th>Last Active</th><th>Status</th><th>Action</th></tr></thead><tbody>@foreach($deviceSessions as $sessionRow)<tr><td><div class="sp-device"><i class="{{ $sessionRow['device_icon'] }}"></i><div><b>{{ $sessionRow['device'] }}</b><small>{{ $sessionRow['platform'] }}</small></div></div></td><td><i class="{{ $sessionRow['browser_icon'] }}" style="color:#16a34a"></i> {{ $sessionRow['browser'] }}</td><td>{{ $sessionRow['location'] }}<small>{{ $sessionRow['ip_address'] }}</small></td><td>{{ $sessionRow['last_active'] }}<small>{{ $sessionRow['last_active_exact'] }}</small></td><td><span class="sp-status {{ $sessionRow['is_current'] ? 'green' : 'gray' }}">{{ $sessionRow['status'] }}</span></td><td>{{ $sessionRow['is_current'] ? '—' : 'Recorded' }}</td></tr>@endforeach</tbody></table><div class="sp-head-row" style="margin-top:14px"><p class="sp-card-desc"><i class="fa-solid fa-shield-halved"></i> Only sessions stored by the app are shown here. Location lookup and per-device sign-out are not configured.</p><button type="button" class="sp-btn" data-tab-jump="password">Change Password</button></div></div></section>
+                    <section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-chart-line" style="color:var(--sp-orange);margin-right:8px"></i>Recent Login Activity</h3><p class="sp-card-desc">Recent session records available for your account.</p><table class="sp-table"><thead><tr><th>Date &amp; Time</th><th>Device / Browser</th><th>Location</th><th>IP Address</th><th>Status</th></tr></thead><tbody>@foreach($deviceSessions as $sessionRow)<tr><td>{{ $sessionRow['last_active_exact'] }}</td><td>{{ $sessionRow['device'] }}</td><td>{{ $sessionRow['location'] }}</td><td>{{ $sessionRow['ip_address'] }}</td><td><span class="sp-status {{ $sessionRow['is_current'] ? 'green' : 'gray' }}">{{ $sessionRow['is_current'] ? 'Current' : 'Recorded' }}</span></td></tr>@endforeach</tbody></table></div></section>
+                    <div class="sp-grid-2"><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-gear" style="color:var(--sp-orange);margin-right:8px"></i>Device Security Settings</h3><div class="sp-list"><div class="sp-setting-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-regular fa-clock"></i></span><div><strong>Session timeout</strong><small>Automatically sign out inactive sessions.</small></div></div><button type="button" class="sp-btn soft">{{ $sessionLifetimeLabel }} <i class="fa-solid fa-chevron-down"></i></button></div><div class="sp-setting-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-regular fa-bell"></i></span><div><strong>New device alerts</strong><small>Email me when a new device signs in.</small></div></div><label class="sp-switch"><input checked type="checkbox"><span class="sp-slider"></span></label></div><div class="sp-setting-row"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-shield-halved"></i></span><div><strong>Remember active devices</strong><small>Keep known devices easier to review.</small></div></div><label class="sp-switch"><input checked type="checkbox"><span class="sp-slider"></span></label></div></div></div></section><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm"><i class="fa-solid fa-display" style="color:var(--sp-orange);margin-right:8px"></i>Manage Devices</h3><p class="sp-card-desc">Review real sessions currently stored by your account.</p><div class="sp-list"><div class="sp-setting-row"><div><strong>Review recorded sessions</strong><small>{{ $activeDeviceCount }} {{ \Illuminate\Support\Str::plural('session', $activeDeviceCount) }} available in the sessions table.</small></div><i class="fa-solid fa-chevron-right"></i></div><div class="sp-setting-row"><div><strong>Secure unfamiliar activity</strong><small>Change your password if a recorded session looks unfamiliar.</small></div><i class="fa-solid fa-chevron-right"></i></div><button type="button" class="sp-btn block" data-tab-jump="password">Change Password</button></div></div></section></div>
+                </main>
+                <aside class="sp-side"><section class="sp-card"><div class="sp-card-pad"><h3 class="sp-card-title sm">Safety Reminder</h3><p class="sp-card-desc">Follow these tips to keep your account secure.</p><div class="sp-list"><div class="sp-row-left"><span class="sp-icon green"><i class="fa-solid fa-lock"></i></span><div><strong>Always log out</strong><small>Log out of shared or public devices.</small></div></div><div class="sp-row-left"><span class="sp-icon"><i class="fa-regular fa-eye"></i></span><div><strong>Review unknown logins</strong><small>Check login activity regularly.</small></div></div><div class="sp-row-left"><span class="sp-icon blue"><i class="fa-regular fa-envelope"></i></span><div><strong>Enable alerts</strong><small>Keep new device alerts on.</small></div></div></div></div></section></aside>
             </div>
         </section>
 

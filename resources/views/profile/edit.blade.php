@@ -484,7 +484,7 @@
 }
 
 
-/* FINAL PROFILE PHOTO FLOW: initials avatar, crop upload, Facebook-style view/change menu */
+/* FINAL PROFILE PHOTO FLOW: initials avatar, crop upload, view/change menu */
 .profile-page .prof-avatar{cursor:pointer;position:relative;transition:filter .18s ease,transform .18s ease;}
 .profile-page .prof-avatar:hover,.profile-page .prof-avatar:focus{filter:brightness(.96);outline:0;transform:none!important;}
 .profile-page .prof-photo-menu{position:absolute;left:0;top:calc(100% + 10px);z-index:70;width:190px;border:1px solid #111827;border-radius:12px;background:#fff;box-shadow:0 18px 42px rgba(15,23,42,.14);padding:7px;}
